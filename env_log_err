@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\ConEmu\ConEmu\..\..\..\tools\scripts\env.py", line 126, in <module>
+    main()
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\ConEmu\ConEmu\..\..\..\tools\scripts\env.py", line 122, in main
+    args.func(args)
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\scripts\cmds\cmd_package\__init__.py", line 50, in run_env_cmd
+    package_upgrade()
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\scripts\cmds\cmd_package\cmd_package_upgrade.py", line 144, in package_upgrade
+    Information_statistics()
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\scripts\cmds\cmd_package\cmd_package_upgrade.py", line 135, in Information_statistics
+    response = requests.get('https://www.rt-thread.org/studio/statistics/api/envuse?userid='+str(mac_addr)+'&username='+str(mac_addr)+'&envversion=1.0&studioversion=2.0&ip=127.0.0.1')
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\Python27\lib\site-packages\requests\api.py", line 75, in get
+    return request('get', url, params=params, **kwargs)
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\Python27\lib\site-packages\requests\api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\Python27\lib\site-packages\requests\sessions.py", line 529, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\Python27\lib\site-packages\requests\sessions.py", line 645, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\Wcy34\Documents\Github\env_released_1.2.3_gcc10\tools\Python27\lib\site-packages\requests\adapters.py", line 517, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='www.rt-thread.org', port=443): Max retries exceeded with url: /studio/statistics/api/envuse?userid=64:bc:58:e1:fb:03&username=64:bc:58:e1:fb:03&envversion=1.0&studioversion=2.0&ip=127.0.0.1 (Caused by SSLError(SSLEOFError(8, u'EOF occurred in violation of protocol (_ssl.c:727)'),))

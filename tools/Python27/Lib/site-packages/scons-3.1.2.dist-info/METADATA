@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: scons
+Version: 3.1.2
+Summary: Open Source next-generation build tool.
+Home-page: http://www.scons.org/
+Author: William Deegan
+Author-email: bill@baddogconsulting.com
+License: UNKNOWN
+Platform: UNKNOWN
+
+Open Source next-generation build tool.
+Improved, cross-platform substitute for the classic Make
+utility.  In short, SCons is an easier, more reliable
+and faster way to build software.
+
