@@ -1,3 +1,7 @@
 [submodule "tools/scripts"]
     path = tools/scripts
     url = https://github.com/RT-Thread/env.git
+
+[submodule "packages/packages"]
+    path = packages/packages
+    url = https://github.com/RT-Thread/packages.git
