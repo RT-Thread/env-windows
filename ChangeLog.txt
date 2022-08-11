@@ -1,0 +1,151 @@
+﻿2022-6-22
+    * 添加env默认.config文件，防止出现错误日志
+    * 修改部分env默认Kconfig值
+
+2022-4-47
+    * 添加强制更新脚本的命令
+    * 添加mac地址统计
+    * 工具链更新为 gcc 10
+
+2020-2-29
+
+    * 更新版本至 v1.2.0
+    * 添加 git 工具到 env 中
+
+2020-2-28
+
+    * 更新版本至 v1.1.4
+    * 解决由于 git crlf 配置导致的仓库更新失败问题
+
+2019-8-27
+
+    * 更新版本至 v1.1.3
+    * 添加 env 开机自动更新功能
+
+2019-4-18
+
+    * 更新版本至 v1.1.2
+    * 更新 scons 版本到 3.0.5
+    * 修复 vc 警告问题
+    * 修复 unicode 错误问题
+    * 在 tools 目录下添加 get-pip.py 脚本，直接在 env 中执行 python get-pip.py 命令即可安装 pip 工具
+
+2019-3-12
+
+    * 更新版本至 v1.1.1
+    * 修复缺少 cmd 命令导致 env 无法启动的 Bug
+
+2019-1-10
+
+    * 增加开启提示信息，提高用户体验
+    * 优化关键的提示信息
+    * 添加 system32 路径环境变量，避免用户出现 cmd 命令找不到的情况
+    * 添加 PYTHONHOME 环境变量，避免出现 PYTHON 环境变量的问题
+
+2018-8-28
+
+    * 更新版本至 1.0.0
+    * 加强 env 在下载软件包时的操作安全性
+    * 支持从国内镜像源升级软件包索引和功能脚本，加快更新速度
+    
+2018-8-1
+
+    * 更新版本至 0.7.1
+    * 解决 win7 32位下 env 更新后无法使用的问题
+    * 将脚本更新到最新，并默认打开镜像下载，解决更新过慢的问题
+    
+2018-3-13
+
+    * 更新版本至 0.7.0
+    * 更换 env 控制台为 ConEmu 
+        * 支持命令自动补全
+        * 可右键在任意位置打开
+        * 解决了之前的 ConsoleZ 选中复制粘贴不方便，调整窗口大小可能导致 menuconfig 显示异常的问题
+        * 更多高级功能有待大家探索
+    * package --update 时会自动更新版本号为 latest 的软件包
+    * 优化了软件包下载、存储环节的容错处理，软件包意外丢失后，下次 update 时可以自动重新下载
+    * 移除自动生成的 rtconfig.h 文件中的无用注释信息
+
+2018-1-4 
+
+    * 将env config功能放在env中，当用户使用'menuconfig -s/--setting'时可以配置是否自动更新packages，
+      或者是否自动生成mdk/iar的project。
+
+2018-1-2
+
+    * 版本更新到0.6.4
+    * 给32位python添加python27.dll文件，解决有机器缺少python27.dll的问题。
+    * 将工具链从env中拿出去，减小env的体积。
+    * 增加在Windows平台下自动更新packages和自动生成mdk/iar工程的功能。需要用户在env config中选择相应的选项。
+    * 提供精简版和全功能版本的env,精简版将gcc工具链和qemu工具都拿出，使得体积更小。
+
+2017-11-29  
+
+    * pkgs --upgrade命令增加功能自动更新env scripts
+    * 使用pkgs --upgrade命令不仅可以更新组件包列表还可以更新env脚本
+
+2017-11-29  
+
+    * 增加online packages的多版本支持
+    * 在根目录下增加自动升级env的小程序update_env,双击运行即可更新env内的python脚本
+    * env内脚本的地址为https://github.com/RT-Thread/env.git
+
+2017-11-16  
+
+    * 加入32位的python,解决在32位电脑上使用env的问题
+    * 修改console.exe为console_64.exe
+    * 修改console.bat为console_32.exe
+    * 添加console_32.bat  console_64.bat
+    * 加入env工具介绍.pptx
+    
+2017-11-6  
+
+    * 修改scons_config.exe的存放位置为 tools/bin/scons_config.exe
+    * 加入qemu32位和64位安装包,32位绿色版加入环境变量   env\tools\qemu\qemu32
+    * 加入git绿色版并加入环境变量  env\tools\git\Git\bin
+
+2017-11-1  
+
+    * 更换默认GCC工具链版本为：gcc version 5.4.1 20160919 (release)
+    * [ARM/embedded-5-branch revision 240496] (GNU Tools for ARM Embedded Processors)
+
+2017-10-30  
+
+    * 添加env_console.exe,console.bat。如果因为电脑为32位而打不开，可以使用console.bat来打开env环境。
+    * 修改KConfig_bsp为Kconfig,以后统一使用Kconfig为menuconfig配置文件，直接将Kconfig到bsp目录即可。
+    * 添加git安装包在env\tools\git目录。
+    * 添加qemu arm 模拟器在env\tools\qemu目录。
+    
+2017-10-24  
+
+    * 修改pkgs --list命令列出的包名称为json文件中的name。
+    * 完善使用menuconfig之后的提示信息。加入scons的使用命令和pkgs命令的提示。
+    
+2017-10-20  
+
+    * 修改git包下载名称为创建组件包时填入的名称，比如"name": "cJSON"。
+    
+2017-10-19  
+
+    * 修改使用pkgs --list命令后再更新包不成功的bug。
+    * 本次发布不自带工具链。
+
+2017-10-17  
+
+    * 完善menuconfig提示信息，提示修改bsp中的Kconfig,通过修改default指定RTT_ROOT路径。
+      之后就无需多次设置RTT_ROOT.
+    * 添加scons_config.exe,
+      使用方法：
+          1.复制到bsp目录下，
+          2.在rtconfig.py文件的首行添加 import scons_config ,保存后退出。
+          3.打开scons_config.exe来选择RTT_ROOT，和编译工具链后点击生成即可。
+    * 添加多种工具链:arm_gcc,mips_gcc,xtensa_gcc,也可以通过。
+    
+2017-10-14  
+
+    * 增加changelog.txt
+    * 增加console.exe来测试使用
+    * 增加menuconfig --slient命令来测试kconfig文件是否正确
+    * 修改直接使用pkgs命令则打印出命令帮助信息。
+
+
