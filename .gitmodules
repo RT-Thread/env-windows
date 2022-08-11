@@ -1,0 +1,3 @@
+[submodule "tools/scripts"]
+    path = tools/scripts
+    url = https://github.com/RT-Thread/env.git
