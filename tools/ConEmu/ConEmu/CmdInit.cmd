@@ -70,12 +70,11 @@ start /b python %~dp0..\..\scripts\init_env.py
 :: ====== RT-Thread ENV Change Code Page ================
 
 chcp 65001 > nul
-echo 欢迎使用 RT-Thread env (V1.2.4) 工具
+echo RT-Thread Env Tool (V1.2.5)
 echo  ^\ ^| /
 echo - RT -     Thread Operating System
 echo  / ^| ^\
-echo 2006 - 2019 Copyright by rt-thread team
-echo Online help documents : https://www.rt-thread.org/document/site 
+echo 2006 - 2022 Copyright by RT-Thread team
 
 Setlocal ENABLEDELAYEDEXPANSION
 ::启用命令扩展，参加setlocal /?命令
