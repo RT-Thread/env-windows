@@ -1,7 +1,7 @@
 # Env for Windows
 
 ## How to download
-Please use git command and clone recursively
+Please use git command and clone recursively, then follow the tutorials and documents to install Env tool:
 ```shell
 git clone --recursive https://github.com/mysterywolf/env-windows.git
 ```
