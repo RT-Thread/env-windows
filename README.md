@@ -3,7 +3,7 @@
 ## How to download
 Please use git command and clone recursively, then follow the tutorials and documents to install Env tool:
 ```shell
-git clone --recursive https://github.com/mysterywolf/env-windows.git
+git clone --recursive https://github.com/RT-Thread/env-windows.git
 ```
 
 ## Tutorials and documents
