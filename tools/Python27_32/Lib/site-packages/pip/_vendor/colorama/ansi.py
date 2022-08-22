@@ -6,7 +6,7 @@ See: http://en.wikipedia.org/wiki/ANSI_escape_code
 
 CSI = '\033['
 OSC = '\033]'
-BEL = '\a'
+BEL = '\007'
 
 
 def code_to_chars(code):
