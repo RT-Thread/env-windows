@@ -1,0 +1,21 @@
+* text auto eol=crlf
+
+*.cmd text eol=crlf
+*.xml text eol=crlf
+*.reg text eol=crlf
+*.bat text eol=crlf
+*.py text
+*.c text
+*.h text
+*.sh text
+
+*.exe binary
+*.dll binary
+*.o binary
+*.a binary
+*.png binary
+*.gif binary
+*.jpg binary
+*.png binary
+*.t32 binary
+*.t64 binary
