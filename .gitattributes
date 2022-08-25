@@ -17,5 +17,9 @@
 *.gif binary
 *.jpg binary
 *.png binary
+*.bmp binary
+*.ico binary
 *.t32 binary
 *.t64 binary
+*.pyd binary
+*.pyc binary
