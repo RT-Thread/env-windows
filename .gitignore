@@ -1,1 +1,4 @@
 *.pyc
+*.pickle
+/env_log_std
+/env_log_err
