@@ -70,7 +70,8 @@ start /b python %~dp0..\..\scripts\init_env.py
 :: ====== RT-Thread ENV Change Code Page ================
 
 chcp 65001 > nul
-echo RT-Thread Env Tool for Windows (V1.3.5)
+echo RT-Thread Env Tool for Windows 
+env -v
 echo  ^\ ^| /
 echo - RT -     Thread Operating System
 echo  / ^| ^\
