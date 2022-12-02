@@ -65,12 +65,12 @@ set PATH=%PYTHONPATH%;%PATH%
 set PATH=%SCONS%;%PATH%
 set PATH=%ENV_ROOT%\tools\qemu\qemu32;%PATH%
 
-start /b python %~dp0..\..\scripts\init_env.py
+::start /b python %~dp0..\..\scripts\init_env.py
 
 :: ====== RT-Thread ENV Change Code Page ================
 
 chcp 65001 > nul
-
+python %~dp0..\..\scripts\env.py -v
 echo  ^\ ^| /
 echo - RT -     Thread Operating System
 echo  / ^| ^\
