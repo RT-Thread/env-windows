@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Block Device Operations &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Persistent reservation helper protocol" href="pr-helper.html" />
+    <link rel="prev" title="D-Bus display" href="dbus-display.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Live Block Device Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#disk-image-backing-chain-notation">Disk image backing chain notation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brief-overview-of-live-block-qmp-primitives">Brief overview of live block QMP primitives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interacting-with-a-qemu-instance">Interacting with a QEMU instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-disk-image-chain">Example disk image chain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-note-on-points-in-time-vs-file-names">A note on points-in-time vs file names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#live-block-streaming-block-stream">Live block streaming — <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-block-stream">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#live-block-commit-block-commit">Live block commit — <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-block-commit">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#live-disk-synchronization-drive-mirror-and-blockdev-mirror">Live disk synchronization — <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> and <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-drive-mirror">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-live-storage-migration-with-drive-mirror-nbd">QMP invocation for live storage migration with <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> + NBD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes-on-blockdev-mirror">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-blockdev-mirror">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#live-disk-backup-blockdev-backup-and-the-deprecated-drive-backup">Live disk backup — <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> and the deprecated``drive-backup``</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-drive-backup">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#moving-from-the-deprecated-drive-backup-to-newer-blockdev-backup">Moving from the deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> to newer <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes-on-blockdev-backup">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qmp-invocation-for-blockdev-backup">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">Live Block Device Operations</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/live-block-operations.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="live-block-device-operations">
+<h1><a class="toc-backref" href="#id2">Live Block Device Operations</a><a class="headerlink" href="#live-block-device-operations" title="Permalink to this heading"></a></h1>
+<p>QEMU Block Layer currently (as of QEMU 2.9) supports four major kinds of
+live block device jobs – stream, commit, mirror, and backup.  These can
+be used to manipulate disk image chains to accomplish certain tasks,
+namely: live copy data from backing files into overlays; shorten long
+disk image chains by merging data from overlays into backing files; live
+synchronize data from a disk image chain (including current active disk)
+to another target image; and point-in-time (and incremental) backups of
+a block device.  Below is a description of the said block (QMP)
+primitives, and some (non-exhaustive list of) examples to illustrate
+their use.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The file <code class="docutils literal notranslate"><span class="pre">qapi/block-core.json</span></code> in the QEMU source tree has the
+canonical QEMU API (QAPI) schema documentation for the QMP
+primitives discussed here.</p>
+</div>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#live-block-device-operations" id="id2">Live Block Device Operations</a></p>
+<ul>
+<li><p><a class="reference internal" href="#disk-image-backing-chain-notation" id="id3">Disk image backing chain notation</a></p></li>
+<li><p><a class="reference internal" href="#brief-overview-of-live-block-qmp-primitives" id="id4">Brief overview of live block QMP primitives</a></p></li>
+<li><p><a class="reference internal" href="#interacting-with-a-qemu-instance" id="id5">Interacting with a QEMU instance</a></p></li>
+<li><p><a class="reference internal" href="#example-disk-image-chain" id="id6">Example disk image chain</a></p></li>
+<li><p><a class="reference internal" href="#a-note-on-points-in-time-vs-file-names" id="id7">A note on points-in-time vs file names</a></p></li>
+<li><p><a class="reference internal" href="#live-block-streaming-block-stream" id="id8">Live block streaming — <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#qmp-invocation-for-block-stream" id="id9">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#live-block-commit-block-commit" id="id10">Live block commit — <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#qmp-invocation-for-block-commit" id="id11">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#live-disk-synchronization-drive-mirror-and-blockdev-mirror" id="id12">Live disk synchronization — <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> and <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#qmp-invocation-for-drive-mirror" id="id13">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code></a></p></li>
+<li><p><a class="reference internal" href="#qmp-invocation-for-live-storage-migration-with-drive-mirror-nbd" id="id14">QMP invocation for live storage migration with <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> + NBD</a></p></li>
+<li><p><a class="reference internal" href="#notes-on-blockdev-mirror" id="id15">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a></p></li>
+<li><p><a class="reference internal" href="#qmp-invocation-for-blockdev-mirror" id="id16">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#live-disk-backup-blockdev-backup-and-the-deprecated-drive-backup" id="id17">Live disk backup — <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> and the deprecated``drive-backup``</a></p>
+<ul>
+<li><p><a class="reference internal" href="#qmp-invocation-for-drive-backup" id="id18">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code></a></p></li>
+<li><p><a class="reference internal" href="#moving-from-the-deprecated-drive-backup-to-newer-blockdev-backup" id="id19">Moving from the deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> to newer <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></p></li>
+<li><p><a class="reference internal" href="#notes-on-blockdev-backup" id="id20">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></p></li>
+<li><p><a class="reference internal" href="#qmp-invocation-for-blockdev-backup" id="id21">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="disk-image-backing-chain-notation">
+<h2><a class="toc-backref" href="#id3">Disk image backing chain notation</a><a class="headerlink" href="#disk-image-backing-chain-notation" title="Permalink to this heading"></a></h2>
+<p>A simple disk image chain.  (This can be created live using QMP
+<code class="docutils literal notranslate"><span class="pre">blockdev-snapshot-sync</span></code>, or offline via <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>               <span class="p">(</span><span class="n">Live</span> <span class="n">QEMU</span><span class="p">)</span>
+                    <span class="o">|</span>
+                    <span class="o">.</span>
+                    <span class="n">V</span>
+
+        <span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;-----</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span>
+
+<span class="p">(</span><span class="n">backing</span> <span class="n">file</span><span class="p">)</span>    <span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The arrow can be read as: Image [A] is the backing file of disk image
+[B].  And live QEMU is currently writing to image [B], consequently, it
+is also referred to as the “active layer”.</p>
+<p>There are two kinds of terminology that are common when referring to
+files in a disk image backing chain:</p>
+<ol class="arabic simple">
+<li><p>Directional: ‘base’ and ‘top’.  Given the simple disk image chain
+above, image [A] can be referred to as ‘base’, and image [B] as
+‘top’.  (This terminology can be seen in the QAPI schema file,
+block-core.json.)</p></li>
+<li><p>Relational: ‘backing file’ and ‘overlay’.  Again, taking the same
+simple disk image chain from the above, disk image [A] is referred
+to as the backing file, and image [B] as overlay.</p></li>
+</ol>
+<blockquote>
+<div><p>Throughout this document, we will use the relational terminology.</p>
+</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The overlay files can generally be any format that supports a
+backing file, although QCOW2 is the preferred format and the one
+used in this document.</p>
+</div>
+</section>
+<section id="brief-overview-of-live-block-qmp-primitives">
+<h2><a class="toc-backref" href="#id4">Brief overview of live block QMP primitives</a><a class="headerlink" href="#brief-overview-of-live-block-qmp-primitives" title="Permalink to this heading"></a></h2>
+<p>The following are the four different kinds of live block operations that
+QEMU block layer supports.</p>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">block-stream</span></code>: Live copy of data from backing files into overlay
+files.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Once the ‘stream’ operation has finished, three things to
+note:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>QEMU rewrites the backing chain to remove
+reference to the now-streamed and redundant backing
+file;</p></li>
+<li><p>the streamed file <em>itself</em> won’t be removed by QEMU,
+and must be explicitly discarded by the user;</p></li>
+<li><p>the streamed file remains valid – i.e. further
+overlays can be created based on it.  Refer the
+<code class="docutils literal notranslate"><span class="pre">block-stream</span></code> section further below for more
+details.</p></li>
+</ol>
+</div></blockquote>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-commit</span></code>: Live merge of data from overlay files into backing
+files (with the optional goal of removing the overlay file from the
+chain).  Since QEMU 2.0, this includes “active <code class="docutils literal notranslate"><span class="pre">block-commit</span></code>”
+(i.e. merge the current active layer into the base image).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Once the ‘commit’ operation has finished, there are three
+things to note here as well:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>QEMU rewrites the backing chain to remove reference
+to now-redundant overlay images that have been
+committed into a backing file;</p></li>
+<li><p>the committed file <em>itself</em> won’t be removed by QEMU
+– it ought to be manually removed;</p></li>
+<li><p>however, unlike in the case of <code class="docutils literal notranslate"><span class="pre">block-stream</span></code>, the
+intermediate images will be rendered invalid – i.e.
+no more further overlays can be created based on
+them.  Refer the <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> section further
+below for more details.</p></li>
+</ol>
+</div></blockquote>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> (and <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code>): Synchronize a running
+disk to another image.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> (and the deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code>):
+Point-in-time (live) copy of a block device to a destination.</p></li>
+</ol>
+</section>
+<section id="interacting-with-a-qemu-instance">
+<span id="id1"></span><h2><a class="toc-backref" href="#id5">Interacting with a QEMU instance</a><a class="headerlink" href="#interacting-with-a-qemu-instance" title="Permalink to this heading"></a></h2>
+<p>To show some example invocations of command-line, we will use the
+following invocation of QEMU, with a QMP server running over UNIX
+socket:</p>
+<pre class="literal-block">$ qemu-system-x86_64 -display none -no-user-config -nodefaults \
+  -m 512 -blockdev \
+  node-name=node-A,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./a.qcow2 \
+  -device virtio-blk,drive=node-A,id=virtio0 \
+  -monitor stdio -qmp unix:/tmp/qmp-sock,server=on,wait=off</pre>
+<p>The <code class="docutils literal notranslate"><span class="pre">-blockdev</span></code> command-line option, used above, is available from
+QEMU 2.9 onwards.  In the above invocation, notice the <code class="docutils literal notranslate"><span class="pre">node-name</span></code>
+parameter that is used to refer to the disk image a.qcow2 (‘node-A’) –
+this is a cleaner way to refer to a disk image (as opposed to referring
+to it by spelling out file paths).  So, we will continue to designate a
+<code class="docutils literal notranslate"><span class="pre">node-name</span></code> to each further disk image created (either via
+<code class="docutils literal notranslate"><span class="pre">blockdev-snapshot-sync</span></code>, or <code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code>) as part of the disk
+image chain, and continue to refer to the disks using their
+<code class="docutils literal notranslate"><span class="pre">node-name</span></code> (where possible, because <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> does not yet, as
+of QEMU 2.9, accept <code class="docutils literal notranslate"><span class="pre">node-name</span></code> parameter) when performing various
+block operations.</p>
+<p>To interact with the QEMU instance launched above, we will use the
+<code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> utility (located at: <code class="docutils literal notranslate"><span class="pre">qemu/scripts/qmp</span></code>, as part of the
+QEMU source directory), which takes key-value pairs for QMP commands.
+Invoke it as below (which will also print out the complete raw JSON
+syntax for reference – examples in the following sections):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./qmp-shell -v -p /tmp/qmp-sock
+(QEMU)
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the event we have to repeat a certain QMP command, we will: for
+the first occurrence of it, show the <code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> invocation, <em>and</em>
+the corresponding raw JSON QMP syntax; but for subsequent
+invocations, present just the <code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> syntax, and omit the
+equivalent JSON output.</p>
+</div>
+</section>
+<section id="example-disk-image-chain">
+<h2><a class="toc-backref" href="#id6">Example disk image chain</a><a class="headerlink" href="#example-disk-image-chain" title="Permalink to this heading"></a></h2>
+<p>We will use the below disk image chain (and occasionally spelling it
+out where appropriate) when discussing various primitives:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Where [A] is the original base image; [B] and [C] are intermediate
+overlay images; image [D] is the active layer – i.e. live QEMU is
+writing to it.  (The rule of thumb is: live QEMU will always be pointing
+to the rightmost image in a disk image chain.)</p>
+<p>The above image chain can be created by invoking
+<code class="docutils literal notranslate"><span class="pre">blockdev-snapshot-sync</span></code> commands as following (which shows the
+creation of overlay image [B]) using the <code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> (our invocation
+also prints the raw JSON invocation of it):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">A</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-snapshot-sync&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snapshot-file&quot;</span><span class="p">:</span> <span class="s2">&quot;b.qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snapshot-node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-B&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here, “node-A” is the name QEMU internally uses to refer to the base
+image [A] – it is the backing file, based on which the overlay image,
+[B], is created.</p>
+<p>To create the rest of the overlay images, [C], and [D] (omitting the raw
+JSON output for brevity):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">C</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+<span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">C</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+</section>
+<section id="a-note-on-points-in-time-vs-file-names">
+<h2><a class="toc-backref" href="#id7">A note on points-in-time vs file names</a><a class="headerlink" href="#a-note-on-points-in-time-vs-file-names" title="Permalink to this heading"></a></h2>
+<p>In our disk image chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We have <em>three</em> points in time and an active layer:</p>
+<ul class="simple">
+<li><p>Point 1: Guest state when [B] was created is contained in file [A]</p></li>
+<li><p>Point 2: Guest state when [C] was created is contained in [A] + [B]</p></li>
+<li><p>Point 3: Guest state when [D] was created is contained in
+[A] + [B] + [C]</p></li>
+<li><p>Active layer: Current guest state is contained in [A] + [B] + [C] +
+[D]</p></li>
+</ul>
+<p>Therefore, be aware with naming choices:</p>
+<ul class="simple">
+<li><p>Naming a file after the time it is created is misleading – the
+guest data for that point in time is <em>not</em> contained in that file
+(as explained earlier)</p></li>
+<li><p>Rather, think of files as a <em>delta</em> from the backing file</p></li>
+</ul>
+</section>
+<section id="live-block-streaming-block-stream">
+<h2><a class="toc-backref" href="#id8">Live block streaming — <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a><a class="headerlink" href="#live-block-streaming-block-stream" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">block-stream</span></code> command allows you to do live copy data from backing
+files into overlay images.</p>
+<p>Given our original example disk image chain from earlier:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The disk image chain can be shortened in one of the following different
+ways (not an exhaustive list).</p>
+<ol class="arabic" id="case-1">
+<li><p>Merge everything into the active layer: I.e. copy all contents from
+the base image, [A], and overlay images, [B] and [C], into [D],
+<em>while</em> the guest is running.  The resulting chain will be a
+standalone image, [D] – with contents from [A], [B] and [C] merged
+into it (where live QEMU writes go to):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="case-2" start="2">
+<li><p>Taking the same example disk image chain mentioned earlier, merge
+only images [B] and [C] into [D], the active layer.  The result will
+be contents of images [B] and [C] will be copied into [D], and the
+backing file pointer of image [D] will be adjusted to point to image
+[A].  The resulting chain will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="case-3" start="3">
+<li><p>Intermediate streaming (available since QEMU 2.8): Starting afresh
+with the original example disk image chain, with a total of four
+images, it is possible to copy contents from image [B] into image
+[C].  Once the copy is finished, image [B] can now be (optionally)
+discarded; and the backing file pointer of image [C] will be
+adjusted to point to [A].  I.e. after performing “intermediate
+streaming” of [B] into [C], the resulting image chain will be (where
+live QEMU is writing to [D]):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<section id="qmp-invocation-for-block-stream">
+<h3><a class="toc-backref" href="#id9">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-stream</span></code></a><a class="headerlink" href="#qmp-invocation-for-block-stream" title="Permalink to this heading"></a></h3>
+<p>For <a class="reference internal" href="#case-1">Case-1</a>, to merge contents of all the backing files into the
+active layer, where ‘node-D’ is the current active image (by default
+<code class="docutils literal notranslate"><span class="pre">block-stream</span></code> will flatten the entire chain); <code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> (and its
+corresponding JSON output):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">stream</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-stream&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For <a class="reference internal" href="#case-2">Case-2</a>, merge contents of the images [B] and [C] into [D], where
+image [D] ends up referring to image [A] as its backing file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">stream</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">base</span><span class="o">-</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">A</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+</pre></div>
+</div>
+<p>And for <a class="reference internal" href="#case-3">Case-3</a>, of “intermediate” streaming”, merge contents of
+images [B] into [C], where [C] ends up referring to [A] as its backing
+image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">stream</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">C</span> <span class="n">base</span><span class="o">-</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">A</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+</pre></div>
+</div>
+<p>Progress of a <code class="docutils literal notranslate"><span class="pre">block-stream</span></code> operation can be monitored via the QMP
+command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">jobs</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-block-jobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">block-stream</span></code> operation has completed, QEMU will emit an
+event, <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code>.  The intermediate overlays remain valid,
+and can now be (optionally) discarded, or retained to create further
+overlays based on them.  Finally, the <code class="docutils literal notranslate"><span class="pre">block-stream</span></code> jobs can be
+restarted at anytime.</p>
+</section>
+</section>
+<section id="live-block-commit-block-commit">
+<h2><a class="toc-backref" href="#id10">Live block commit — <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a><a class="headerlink" href="#live-block-commit-block-commit" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> command lets you merge live data from overlay
+images into backing file(s).  Since QEMU 2.0, this includes “live active
+commit” (i.e. it is possible to merge the “active layer”, the right-most
+image in a disk image chain where live QEMU will be writing to, into the
+base image).  This is analogous to <code class="docutils literal notranslate"><span class="pre">block-stream</span></code>, but in the opposite
+direction.</p>
+<p>Again, starting afresh with our example disk image chain, where live
+QEMU is writing to the right-most image in the chain, [D]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The disk image chain can be shortened in one of the following ways:</p>
+<ol class="arabic" id="block-commit-case-1">
+<li><p>Commit content from only image [B] into image [A].  The resulting
+chain is the following, where image [C] is adjusted to point at [A]
+as its new backing file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Commit content from images [B] and [C] into image [A].  The
+resulting chain, where image [D] is adjusted to point to image [A]
+as its new backing file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="block-commit-case-3" start="3">
+<li><p>Commit content from images [B], [C], and the active layer [D] into
+image [A].  The resulting chain (in this case, a consolidated single
+image):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Commit content from image only image [C] into image [B].  The
+resulting chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Commit content from image [C] and the active layer [D] into image
+[B].  The resulting chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<section id="qmp-invocation-for-block-commit">
+<h3><a class="toc-backref" href="#id11">QMP invocation for <code class="docutils literal notranslate"><span class="pre">block-commit</span></code></a><a class="headerlink" href="#qmp-invocation-for-block-commit" title="Permalink to this heading"></a></h3>
+<p>For <a class="reference internal" href="#block-commit-case-1"><span class="std std-ref">Case-1</span></a>, to merge contents only from
+image [B] into image [A], the invocation is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">commit</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">base</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">top</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-commit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="s2">&quot;b.qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;base&quot;</span><span class="p">:</span> <span class="s2">&quot;a.qcow2&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the above <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> operation has completed, a
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code> event will be issued, and no further action is
+required.  As the end result, the backing file of image [C] is adjusted
+to point to image [A], and the original 4-image chain will end up being
+transformed to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The intermediate image [B] is invalid (as in: no more further
+overlays based on it can be created).</p>
+<p>Reasoning: An intermediate image after a ‘stream’ operation still
+represents that old point-in-time, and may be valid in that context.
+However, an intermediate image after a ‘commit’ operation no longer
+represents any point-in-time, and is invalid in any context.</p>
+</div>
+<p>However, <a class="reference internal" href="#block-commit-case-3"><span class="std std-ref">Case-3</span></a> (also called: “active
+<code class="docutils literal notranslate"><span class="pre">block-commit</span></code>”) is a <em>two-phase</em> operation: In the first phase, the
+content from the active overlay, along with the intermediate overlays,
+is copied into the backing file (also called the base image).  In the
+second phase, adjust the said backing file as the current active image
+– possible via issuing the command <code class="docutils literal notranslate"><span class="pre">block-job-complete</span></code>.  Optionally,
+the <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> operation can be cancelled by issuing the command
+<code class="docutils literal notranslate"><span class="pre">block-job-cancel</span></code>, but be careful when doing this.</p>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">block-commit</span></code> operation has completed, the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code> will be emitted, signalling that the synchronization
+has finished.  Now the job can be gracefully completed by issuing the
+command <code class="docutils literal notranslate"><span class="pre">block-job-complete</span></code> – until such a command is issued, the
+‘commit’ operation remains active.</p>
+<p>The following is the flow for <a class="reference internal" href="#block-commit-case-3"><span class="std std-ref">Case-3</span></a> to
+convert a disk image chain such as this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Into:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Where content from all the subsequent overlays, [B], and [C], including
+the active layer, [D], is committed back to [A] – which is where live
+QEMU is performing all its current writes).</p>
+<p>Start the “active <code class="docutils literal notranslate"><span class="pre">block-commit</span></code>” operation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">commit</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">base</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">top</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-commit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="s2">&quot;d.qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;base&quot;</span><span class="p">:</span> <span class="s2">&quot;a.qcow2&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the synchronization has completed, the event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code> will
+be emitted.</p>
+<p>Then, optionally query for the status of the active block operations.
+We can see the ‘commit’ job is now ready to be completed, as indicated
+by the line <em>“ready”: true</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">jobs</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-block-jobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;commit&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">1376256</span><span class="p">,</span>
+            <span class="s2">&quot;paused&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;ready&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;io-status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">1376256</span><span class="p">,</span>
+            <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;speed&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Gracefully complete the ‘commit’ block device job:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="n">complete</span> <span class="n">device</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-job-complete&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Finally, once the above job is completed, an event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code> will be emitted.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The invocation for rest of the cases (2, 4, and 5), discussed in the
+previous section, is omitted for brevity.</p>
+</div>
+</section>
+</section>
+<section id="live-disk-synchronization-drive-mirror-and-blockdev-mirror">
+<h2><a class="toc-backref" href="#id12">Live disk synchronization — <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> and <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a><a class="headerlink" href="#live-disk-synchronization-drive-mirror-and-blockdev-mirror" title="Permalink to this heading"></a></h2>
+<p>Synchronize a running disk image chain (all or part of it) to a target
+image.</p>
+<p>Again, given our familiar disk image chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> (and its newer equivalent <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code>)
+allows you to copy data from the entire chain into a single target image
+(which can be located on a different host), [E].</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When you cancel an in-progress ‘mirror’ job <em>before</em> the source and
+target are synchronized, <code class="docutils literal notranslate"><span class="pre">block-job-cancel</span></code> will emit the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_CANCELLED</span></code>.  However, note that if you cancel a
+‘mirror’ job <em>after</em> it has indicated (via the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code>) that the source and target have reached
+synchronization, then the event emitted by <code class="docutils literal notranslate"><span class="pre">block-job-cancel</span></code>
+changes to <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code>.</p>
+<p>Besides the ‘mirror’ job, the “active <code class="docutils literal notranslate"><span class="pre">block-commit</span></code>” is the only
+other block device job that emits the event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code>.
+The rest of the block device jobs (‘stream’, “non-active
+<code class="docutils literal notranslate"><span class="pre">block-commit</span></code>”, and ‘backup’) end automatically.</p>
+</div>
+<p>So there are two possible actions to take, after a ‘mirror’ job has
+emitted the event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code>, indicating that the source and
+target have reached synchronization:</p>
+<ol class="arabic simple">
+<li><p>Issuing the command <code class="docutils literal notranslate"><span class="pre">block-job-cancel</span></code> (after it emits the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code>) will create a point-in-time (which is at
+the time of <em>triggering</em> the cancel command) copy of the entire disk
+image chain (or only the top-most image, depending on the <code class="docutils literal notranslate"><span class="pre">sync</span></code>
+mode), contained in the target image [E]. One use case for this is
+live VM migration with non-shared storage.</p></li>
+<li><p>Issuing the command <code class="docutils literal notranslate"><span class="pre">block-job-complete</span></code> (after it emits the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code>) will adjust the guest device (i.e. live
+QEMU) to point to the target image, [E], causing all the new writes
+from this point on to happen there.</p></li>
+</ol>
+<p>About synchronization modes: The synchronization mode determines
+<em>which</em> part of the disk image chain will be copied to the target.
+Currently, there are four different kinds:</p>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">full</span></code> – Synchronize the content of entire disk image chain to
+the target</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">top</span></code> – Synchronize only the contents of the top-most disk image
+in the chain to the target</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code> – Synchronize only the new writes from this point on.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case of <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> (or deprecated
+<code class="docutils literal notranslate"><span class="pre">drive-backup</span></code>), the behavior of <code class="docutils literal notranslate"><span class="pre">none</span></code>
+synchronization mode is different.  Normally, a
+<code class="docutils literal notranslate"><span class="pre">backup</span></code> job consists of two parts: Anything that is
+overwritten by the guest is first copied out to the
+backup, and in the background the whole image is copied
+from start to end. With <code class="docutils literal notranslate"><span class="pre">sync=none</span></code>, it’s only the
+first part.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">incremental</span></code> – Synchronize content that is described by the
+dirty bitmap</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Refer to the <a class="reference internal" href="bitmaps.html"><span class="doc">Dirty Bitmaps and Incremental Backup</span></a> document in the QEMU source
+tree to learn about the detailed workings of the <code class="docutils literal notranslate"><span class="pre">incremental</span></code>
+synchronization mode.</p>
+</div>
+<section id="qmp-invocation-for-drive-mirror">
+<h3><a class="toc-backref" href="#id13">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code></a><a class="headerlink" href="#qmp-invocation-for-drive-mirror" title="Permalink to this heading"></a></h3>
+<p>To copy the contents of the entire disk image chain, from [A] all the
+way to [D], to a new target (<code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> will create the destination
+file, if it doesn’t already exist), call it [E]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">drive</span><span class="o">-</span><span class="n">mirror</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">target</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">sync</span><span class="o">=</span><span class="n">full</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;drive-mirror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;e.qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;full&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;sync&quot;:</span> <span class="pre">&quot;full&quot;</span></code>, from the above, means: copy the <em>entire</em> chain
+to the destination.</p>
+<p>Following the above, querying for active block jobs will show that a
+‘mirror’ job is “ready” to be completed (and QEMU will also emit an
+event, <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">jobs</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-block-jobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;mirror&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">21757952</span><span class="p">,</span>
+            <span class="s2">&quot;paused&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;ready&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;io-status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">21757952</span><span class="p">,</span>
+            <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;speed&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And, as noted in the previous section, there are two possible actions
+at this point:</p>
+<ol class="loweralpha">
+<li><p>Create a point-in-time snapshot by ending the synchronization.  The
+point-in-time is at the time of <em>ending</em> the sync.  (The result of
+the following being: the target image, [E], will be populated with
+content from the entire chain, [A] to [D]):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="n">cancel</span> <span class="n">device</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-job-cancel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Or, complete the operation and pivot the live QEMU to the target
+copy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="n">complete</span> <span class="n">device</span><span class="o">=</span><span class="n">job0</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>In either of the above cases, if you once again run the
+<code class="docutils literal notranslate"><span class="pre">query-block-jobs</span></code> command, there should not be any active block
+operation.</p>
+<p>Comparing ‘commit’ and ‘mirror’: In both then cases, the overlay images
+can be discarded.  However, with ‘commit’, the <em>existing</em> base image
+will be modified (by updating it with contents from overlays); while in
+the case of ‘mirror’, a <em>new</em> target image is populated with the data
+from the disk image chain.</p>
+</section>
+<section id="qmp-invocation-for-live-storage-migration-with-drive-mirror-nbd">
+<h3><a class="toc-backref" href="#id14">QMP invocation for live storage migration with <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> + NBD</a><a class="headerlink" href="#qmp-invocation-for-live-storage-migration-with-drive-mirror-nbd" title="Permalink to this heading"></a></h3>
+<p>Live storage migration (without shared storage setup) is one of the most
+common use-cases that takes advantage of the <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> primitive
+and QEMU’s built-in Network Block Device (NBD) server.  Here’s a quick
+walk-through of this setup.</p>
+<p>Given the disk image chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Instead of copying content from the entire chain, synchronize <em>only</em> the
+contents of the <em>top</em>-most disk image (i.e. the active layer), [D], to a
+target, say, [TargetDisk].</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The destination host must already have the contents of the backing
+chain, involving images [A], [B], and [C], visible via other means
+– whether by <code class="docutils literal notranslate"><span class="pre">cp</span></code>, <code class="docutils literal notranslate"><span class="pre">rsync</span></code>, or by some storage array-specific
+command.)</p>
+</div>
+<p>Sometimes, this is also referred to as “shallow copy” – because only
+the “active layer”, and not the rest of the image chain, is copied to
+the destination.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In this example, for the sake of simplicity, we’ll be using the same
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code> as both source and destination.</p>
+</div>
+<p>As noted earlier, on the destination host the contents of the backing
+chain – from images [A] to [C] – are already expected to exist in some
+form (e.g. in a file called, <code class="docutils literal notranslate"><span class="pre">Contents-of-A-B-C.qcow2</span></code>).  Now, on the
+destination host, let’s create a target overlay image (with the image
+<code class="docutils literal notranslate"><span class="pre">Contents-of-A-B-C.qcow2</span></code> as its backing file), to which the contents
+of image [D] (from the source QEMU) will be mirrored to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 -b ./Contents-of-A-B-C.qcow2 \
+    -F qcow2 ./target-disk.qcow2
+</pre></div>
+</div>
+<p>And start the destination QEMU (we already have the source QEMU running
+– discussed in the section: <a class="reference internal" href="#interacting-with-a-qemu-instance">Interacting with a QEMU instance</a>)
+instance, with the following invocation.  (As noted earlier, for
+simplicity’s sake, the destination QEMU is started on the same host, but
+it could be located elsewhere):</p>
+<pre class="literal-block">$ qemu-system-x86_64 -display none -no-user-config -nodefaults \
+  -m 512 -blockdev \
+  node-name=node-TargetDisk,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./target-disk.qcow2 \
+  -device virtio-blk,drive=node-TargetDisk,id=virtio0 \
+  -S -monitor stdio -qmp unix:./qmp-sock2,server=on,wait=off \
+  -incoming tcp:localhost:6666</pre>
+<p>Given the disk image chain on source QEMU:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>On the destination host, it is expected that the contents of the chain
+<code class="docutils literal notranslate"><span class="pre">[A]</span> <span class="pre">&lt;--</span> <span class="pre">[B]</span> <span class="pre">&lt;--</span> <span class="pre">[C]</span></code> are <em>already</em> present, and therefore copy <em>only</em>
+the content of image [D].</p>
+<ol class="arabic">
+<li><p>[On <em>destination</em> QEMU] As part of the first step, start the
+built-in NBD server on a given host (local host, represented by
+<code class="docutils literal notranslate"><span class="pre">::</span></code>)and port:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">nbd</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">start</span> <span class="n">addr</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;inet&quot;</span><span class="p">,</span><span class="s2">&quot;data&quot;</span><span class="p">:{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span><span class="s2">&quot;::&quot;</span><span class="p">,</span><span class="s2">&quot;port&quot;</span><span class="p">:</span><span class="s2">&quot;49153&quot;</span><span class="p">}}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;nbd-server-start&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;::&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;49153&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;inet&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>[On <em>destination</em> QEMU] And export the destination disk image using
+QEMU’s built-in NBD server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">nbd</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">add</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">TargetDisk</span> <span class="n">writable</span><span class="o">=</span><span class="n">true</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;nbd-server-add&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-TargetDisk&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>[On <em>source</em> QEMU] Then, invoke <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> (NB: since we’re
+running <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> with <code class="docutils literal notranslate"><span class="pre">mode=existing</span></code> (meaning:
+synchronize to a pre-created file, therefore ‘existing’, file on the
+target host), with the synchronization mode as ‘top’ (<code class="docutils literal notranslate"><span class="pre">&quot;sync:</span>
+<span class="pre">&quot;top&quot;</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">drive</span><span class="o">-</span><span class="n">mirror</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">target</span><span class="o">=</span><span class="n">nbd</span><span class="p">:</span><span class="n">localhost</span><span class="p">:</span><span class="mi">49153</span><span class="p">:</span><span class="n">exportname</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">TargetDisk</span> <span class="n">sync</span><span class="o">=</span><span class="n">top</span> <span class="n">mode</span><span class="o">=</span><span class="n">existing</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;drive-mirror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;existing&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;nbd:localhost:49153:exportname=node-TargetDisk&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>[On <em>source</em> QEMU] Once <code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code> copies the entire data, and the
+event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code> is emitted, issue <code class="docutils literal notranslate"><span class="pre">block-job-cancel</span></code> to
+gracefully end the synchronization, from source QEMU:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="n">cancel</span> <span class="n">device</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-job-cancel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>[On <em>destination</em> QEMU] Then, stop the NBD server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">nbd</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">stop</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;nbd-server-stop&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>[On <em>destination</em> QEMU] Finally, resume the guest vCPUs by issuing the
+QMP command <code class="docutils literal notranslate"><span class="pre">cont</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">cont</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;cont&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Higher-level libraries (e.g. libvirt) automate the entire above
+process (although note that libvirt does not allow same-host
+migrations to localhost for other reasons).</p>
+</div>
+</section>
+<section id="notes-on-blockdev-mirror">
+<h3><a class="toc-backref" href="#id15">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a><a class="headerlink" href="#notes-on-blockdev-mirror" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code> command is equivalent in core functionality to
+<code class="docutils literal notranslate"><span class="pre">drive-mirror</span></code>, except that it operates at node-level in a BDS graph.</p>
+<p>Also: for <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code>, the ‘target’ image needs to be explicitly
+created (using <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>) and attach it to live QEMU via
+<code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code>, which assigns a name to the to-be created target node.</p>
+<p>E.g. the sequence of actions to create a point-in-time backup of an
+entire disk image chain, to a target, using <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code> would be:</p>
+<ol class="arabic simple" start="0">
+<li><p>Create the QCOW2 overlays, to arrive at a backing chain of desired
+depth</p></li>
+<li><p>Create the target image (using <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>), say, <code class="docutils literal notranslate"><span class="pre">e.qcow2</span></code></p></li>
+<li><p>Attach the above created file (<code class="docutils literal notranslate"><span class="pre">e.qcow2</span></code>), run-time, using
+<code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code> to QEMU</p></li>
+<li><p>Perform <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code> (use <code class="docutils literal notranslate"><span class="pre">&quot;sync&quot;:</span> <span class="pre">&quot;full&quot;</span></code> to copy the
+entire chain to the target).  And notice the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code></p></li>
+<li><p>Optionally, query for active block jobs, there should be a ‘mirror’
+job ready to be completed</p></li>
+<li><p>Gracefully complete the ‘mirror’ block device job, and notice the
+event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code></p></li>
+<li><p>Shutdown the guest by issuing the QMP <code class="docutils literal notranslate"><span class="pre">quit</span></code> command so that
+caches are flushed</p></li>
+<li><p>Then, finally, compare the contents of the disk image chain, and
+the target copy with <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">compare</span></code>.  You should notice:
+“Images are identical”</p></li>
+</ol>
+</section>
+<section id="qmp-invocation-for-blockdev-mirror">
+<h3><a class="toc-backref" href="#id16">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code></a><a class="headerlink" href="#qmp-invocation-for-blockdev-mirror" title="Permalink to this heading"></a></h3>
+<p>Given the disk image chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To copy the contents of the entire disk image chain, from [A] all the
+way to [D], to a new target, call it [E].  The following is the flow.</p>
+<p>Create the overlay images, [B], [C], and [D]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">A</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+<span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">C</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+<span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">C</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+<p>Create the target image, [E]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 e.qcow2 39M
+</pre></div>
+</div>
+<p>Add the above created target image to QEMU, via <code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">add</span> <span class="n">driver</span><span class="o">=</span><span class="n">qcow2</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">E</span> <span class="n">file</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;file&quot;</span><span class="p">,</span><span class="s2">&quot;filename&quot;</span><span class="p">:</span><span class="s2">&quot;e.qcow2&quot;</span><span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-E&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;e.qcow2&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Perform <code class="docutils literal notranslate"><span class="pre">blockdev-mirror</span></code>, and notice the event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_READY</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">mirror</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="n">target</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">E</span> <span class="n">sync</span><span class="o">=</span><span class="n">full</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-mirror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;node-E&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;full&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Query for active block jobs, there should be a ‘mirror’ job ready:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">jobs</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-block-jobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;mirror&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="mi">21561344</span><span class="p">,</span>
+            <span class="s2">&quot;paused&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;ready&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;io-status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">21561344</span><span class="p">,</span>
+            <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;speed&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Gracefully complete the block device job operation, and notice the
+event <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="n">complete</span> <span class="n">device</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;block-job-complete&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Shutdown the guest, by issuing the <code class="docutils literal notranslate"><span class="pre">quit</span></code> QMP command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">quit</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="live-disk-backup-blockdev-backup-and-the-deprecated-drive-backup">
+<h2><a class="toc-backref" href="#id17">Live disk backup — <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> and the deprecated``drive-backup``</a><a class="headerlink" href="#live-disk-backup-blockdev-backup-and-the-deprecated-drive-backup" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> (and the deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code>) allows
+you to create a point-in-time snapshot.</p>
+<p>In this case, the point-in-time is when you <em>start</em> the
+<code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> (or deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code>) command.</p>
+<section id="qmp-invocation-for-drive-backup">
+<h3><a class="toc-backref" href="#id18">QMP invocation for <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code></a><a class="headerlink" href="#qmp-invocation-for-drive-backup" title="Permalink to this heading"></a></h3>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> command is deprecated since QEMU 6.2 and
+will be removed in future.</p>
+<p>Yet again, starting afresh with our example disk image chain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">D</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To create a target image [E], with content populated from image [A] to
+[D], from the above chain, the following is the syntax.  (If the target
+image does not exist, <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> will create it):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">drive</span><span class="o">-</span><span class="n">backup</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">D</span> <span class="n">sync</span><span class="o">=</span><span class="n">full</span> <span class="n">target</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;drive-backup&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;e.qcow2&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the above <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> has completed, a <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code> event
+will be issued, indicating the live block device job operation has
+completed, and no further action is required.</p>
+</section>
+<section id="moving-from-the-deprecated-drive-backup-to-newer-blockdev-backup">
+<h3><a class="toc-backref" href="#id19">Moving from the deprecated <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> to newer <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a><a class="headerlink" href="#moving-from-the-deprecated-drive-backup-to-newer-blockdev-backup" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> differs from <code class="docutils literal notranslate"><span class="pre">drive-backup</span></code> in how you specify
+the backup target. With <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> you can’t specify filename
+as a target.  Instead you use <code class="docutils literal notranslate"><span class="pre">node-name</span></code> of existing block node,
+which you may add by <code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code> or <code class="docutils literal notranslate"><span class="pre">blockdev-create</span></code> commands.
+Correspondingly, <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> doesn’t have <code class="docutils literal notranslate"><span class="pre">mode</span></code> and
+<code class="docutils literal notranslate"><span class="pre">format</span></code> arguments which don’t apply to an existing block node. See
+following sections for details and examples.</p>
+</section>
+<section id="notes-on-blockdev-backup">
+<h3><a class="toc-backref" href="#id20">Notes on <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a><a class="headerlink" href="#notes-on-blockdev-backup" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> command operates at node-level in a Block Driver
+State (BDS) graph.</p>
+<p>E.g. the sequence of actions to create a point-in-time backup
+of an entire disk image chain, to a target, using <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code>
+would be:</p>
+<ol class="arabic simple" start="0">
+<li><p>Create the QCOW2 overlays, to arrive at a backing chain of desired
+depth</p></li>
+<li><p>Create the target image (using <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>), say, <code class="docutils literal notranslate"><span class="pre">e.qcow2</span></code></p></li>
+<li><p>Attach the above created file (<code class="docutils literal notranslate"><span class="pre">e.qcow2</span></code>), run-time, using
+<code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code> to QEMU</p></li>
+<li><p>Perform <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> (use <code class="docutils literal notranslate"><span class="pre">&quot;sync&quot;:</span> <span class="pre">&quot;full&quot;</span></code> to copy the
+entire chain to the target).  And notice the event
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code></p></li>
+<li><p>Shutdown the guest, by issuing the QMP <code class="docutils literal notranslate"><span class="pre">quit</span></code> command, so that
+caches are flushed</p></li>
+<li><p>Then, finally, compare the contents of the disk image chain, and
+the target copy with <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">compare</span></code>.  You should notice:
+“Images are identical”</p></li>
+</ol>
+<p>The following section shows an example QMP invocation for
+<code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code>.</p>
+</section>
+<section id="qmp-invocation-for-blockdev-backup">
+<h3><a class="toc-backref" href="#id21">QMP invocation for <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code></a><a class="headerlink" href="#qmp-invocation-for-blockdev-backup" title="Permalink to this heading"></a></h3>
+<p>Given a disk image chain of depth 1 where image [B] is the active
+overlay (live QEMU is writing to it):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="o">&lt;--</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The following is the procedure to copy the content from the entire chain
+to a target image (say, [E]), which has the full content from [A] and
+[B].</p>
+<p>Create the overlay [B]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">sync</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">A</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">qcow2</span> <span class="n">snapshot</span><span class="o">-</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="nb">format</span><span class="o">=</span><span class="n">qcow2</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-snapshot-sync&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snapshot-file&quot;</span><span class="p">:</span> <span class="s2">&quot;b.qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snapshot-node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-B&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Create a target image that will contain the copy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 e.qcow2 39M
+</pre></div>
+</div>
+<p>Then add it to QEMU via <code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">add</span> <span class="n">driver</span><span class="o">=</span><span class="n">qcow2</span> <span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">E</span> <span class="n">file</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;file&quot;</span><span class="p">,</span><span class="s2">&quot;filename&quot;</span><span class="p">:</span><span class="s2">&quot;e.qcow2&quot;</span><span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;node-name&quot;</span><span class="p">:</span> <span class="s2">&quot;node-E&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;e.qcow2&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then invoke <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> to copy the contents from the entire
+image chain, consisting of images [A] and [B] to the target image
+‘e.qcow2’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">blockdev</span><span class="o">-</span><span class="n">backup</span> <span class="n">device</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">B</span> <span class="n">target</span><span class="o">=</span><span class="n">node</span><span class="o">-</span><span class="n">E</span> <span class="n">sync</span><span class="o">=</span><span class="n">full</span> <span class="n">job</span><span class="o">-</span><span class="nb">id</span><span class="o">=</span><span class="n">job0</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;node-B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;job-id&quot;</span><span class="p">:</span> <span class="s2">&quot;job0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;node-E&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;full&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the above ‘backup’ operation has completed, the event,
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETED</span></code> will be emitted, signalling successful
+completion.</p>
+<p>Next, query for any active block device jobs (there should be none):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">jobs</span>
+<span class="p">{</span>
+    <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-block-jobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Shutdown the guest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">quit</span>
+<span class="p">{</span>
+        <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+        <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above step is really important; if forgotten, an error, “Failed
+to get shared “write” lock on e.qcow2”, will be thrown when you do
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">compare</span></code> to verify the integrity of the disk image
+with the backup content.</p>
+</div>
+<p>The end result will be the image ‘e.qcow2’ containing a
+point-in-time backup of the disk image chain – i.e. contents from
+images [A] and [B] at the time the <code class="docutils literal notranslate"><span class="pre">blockdev-backup</span></code> command was
+initiated.</p>
+<p>One way to confirm the backup disk image contains the identical content
+with the disk image chain is to compare the backup and the contents of
+the chain, you should see “Images are identical”.  (NB: this is assuming
+QEMU was launched with <code class="docutils literal notranslate"><span class="pre">-S</span></code> option, which will not start the CPUs at
+guest boot up):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-img compare b.qcow2 e.qcow2
+Warning: Image size mismatch!
+Images are identical.
+</pre></div>
+</div>
+<p>NOTE: The “Warning: Image size mismatch!” is expected, as we created the
+target image (e.qcow2) with 39M size.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dbus-display.html" class="btn btn-neutral float-left" title="D-Bus display" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pr-helper.html" class="btn btn-neutral float-right" title="Persistent reservation helper protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

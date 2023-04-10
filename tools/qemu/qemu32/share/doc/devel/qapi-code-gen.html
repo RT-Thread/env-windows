@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to use the QAPI code generator &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fuzzing" href="fuzzing.html" />
+    <link rel="prev" title="CI" href="ci.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">How to use the QAPI code generator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-qapi-schema-language">The QAPI schema language</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#client-json-protocol-introspection">Client JSON Protocol introspection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compatibility-considerations">Compatibility considerations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code-generation">Code generation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">How to use the QAPI code generator</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/qapi-code-gen.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-use-the-qapi-code-generator">
+<h1>How to use the QAPI code generator<a class="headerlink" href="#how-to-use-the-qapi-code-generator" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>QAPI is a native C API within QEMU which provides management-level
+functionality to internal and external users.  For external
+users/processes, this interface is made available by a JSON-based wire
+format for the QEMU Monitor Protocol (QMP) for controlling qemu, as
+well as the QEMU Guest Agent (QGA) for communicating with the guest.
+The remainder of this document uses “Client JSON Protocol” when
+referring to the wire contents of a QMP or QGA connection.</p>
+<p>To map between Client JSON Protocol interfaces and the native C API,
+we generate C code from a QAPI schema.  This document describes the
+QAPI schema language, and how it gets mapped to the Client JSON
+Protocol and to C.  It additionally provides guidance on maintaining
+Client JSON Protocol compatibility.</p>
+</section>
+<section id="the-qapi-schema-language">
+<h2>The QAPI schema language<a class="headerlink" href="#the-qapi-schema-language" title="Permalink to this heading"></a></h2>
+<p>The QAPI schema defines the Client JSON Protocol’s commands and
+events, as well as types used by them.  Forward references are
+allowed.</p>
+<p>It is permissible for the schema to contain additional types not used
+by any commands or events, for the side effect of generated C code
+used internally.</p>
+<p>There are several kinds of types: simple types (a number of built-in
+types, such as <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">str</span></code>; as well as enumerations), arrays,
+complex types (structs and unions), and alternate types (a choice
+between other types).</p>
+<section id="schema-syntax">
+<h3>Schema syntax<a class="headerlink" href="#schema-syntax" title="Permalink to this heading"></a></h3>
+<p>Syntax is loosely based on <a class="reference external" href="http://www.ietf.org/rfc/rfc8259.txt">JSON</a>.
+Differences:</p>
+<ul class="simple">
+<li><p>Comments: start with a hash character (<code class="docutils literal notranslate"><span class="pre">#</span></code>) that is not part of a
+string, and extend to the end of the line.</p></li>
+<li><p>Strings are enclosed in <code class="docutils literal notranslate"><span class="pre">'single</span> <span class="pre">quotes'</span></code>, not <code class="docutils literal notranslate"><span class="pre">&quot;double</span> <span class="pre">quotes&quot;</span></code>.</p></li>
+<li><p>Strings are restricted to printable ASCII, and escape sequences to
+just <code class="docutils literal notranslate"><span class="pre">\\</span></code>.</p></li>
+<li><p>Numbers and <code class="docutils literal notranslate"><span class="pre">null</span></code> are not supported.</p></li>
+</ul>
+<p>A second layer of syntax defines the sequences of JSON texts that are
+a correctly structured QAPI schema.  We provide a grammar for this
+syntax in an EBNF-like notation:</p>
+<ul class="simple">
+<li><p>Production rules look like <code class="docutils literal notranslate"><span class="pre">non-terminal</span> <span class="pre">=</span> <span class="pre">expression</span></code></p></li>
+<li><p>Concatenation: expression <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">B</span></code> matches expression <code class="docutils literal notranslate"><span class="pre">A</span></code>, then <code class="docutils literal notranslate"><span class="pre">B</span></code></p></li>
+<li><p>Alternation: expression <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">|</span> <span class="pre">B</span></code> matches expression <code class="docutils literal notranslate"><span class="pre">A</span></code> or <code class="docutils literal notranslate"><span class="pre">B</span></code></p></li>
+<li><p>Repetition: expression <code class="docutils literal notranslate"><span class="pre">A...</span></code> matches zero or more occurrences of
+expression <code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
+<li><p>Repetition: expression <code class="docutils literal notranslate"><span class="pre">A,</span> <span class="pre">...</span></code> matches zero or more occurrences of
+expression <code class="docutils literal notranslate"><span class="pre">A</span></code> separated by <code class="docutils literal notranslate"><span class="pre">,</span></code></p></li>
+<li><p>Grouping: expression <code class="docutils literal notranslate"><span class="pre">(</span> <span class="pre">A</span> <span class="pre">)</span></code> matches expression <code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
+<li><p>JSON’s structural characters are terminals: <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">}</span> <span class="pre">[</span> <span class="pre">]</span> <span class="pre">:</span> <span class="pre">,</span></code></p></li>
+<li><p>JSON’s literal names are terminals: <code class="docutils literal notranslate"><span class="pre">false</span> <span class="pre">true</span></code></p></li>
+<li><p>String literals enclosed in <code class="docutils literal notranslate"><span class="pre">'single</span> <span class="pre">quotes'</span></code> are terminal, and match
+this JSON string, with a leading <code class="docutils literal notranslate"><span class="pre">*</span></code> stripped off</p></li>
+<li><p>When JSON object member’s name starts with <code class="docutils literal notranslate"><span class="pre">*</span></code>, the member is
+optional.</p></li>
+<li><p>The symbol <code class="docutils literal notranslate"><span class="pre">STRING</span></code> is a terminal, and matches any JSON string</p></li>
+<li><p>The symbol <code class="docutils literal notranslate"><span class="pre">BOOL</span></code> is a terminal, and matches JSON <code class="docutils literal notranslate"><span class="pre">false</span></code> or <code class="docutils literal notranslate"><span class="pre">true</span></code></p></li>
+<li><p>ALL-CAPS words other than <code class="docutils literal notranslate"><span class="pre">STRING</span></code> are non-terminals</p></li>
+</ul>
+<p>The order of members within JSON objects does not matter unless
+explicitly noted.</p>
+<p>A QAPI schema consists of a series of top-level expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCHEMA</span> <span class="o">=</span> <span class="n">TOP</span><span class="o">-</span><span class="n">LEVEL</span><span class="o">-</span><span class="n">EXPR</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>The top-level expressions are all JSON objects.  Code and
+documentation is generated in schema definition order.  Code order
+should not matter.</p>
+<p>A top-level expressions is either a directive or a definition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TOP</span><span class="o">-</span><span class="n">LEVEL</span><span class="o">-</span><span class="n">EXPR</span> <span class="o">=</span> <span class="n">DIRECTIVE</span> <span class="o">|</span> <span class="n">DEFINITION</span>
+</pre></div>
+</div>
+<p>There are two kinds of directives and six kinds of definitions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DIRECTIVE</span> <span class="o">=</span> <span class="n">INCLUDE</span> <span class="o">|</span> <span class="n">PRAGMA</span>
+<span class="n">DEFINITION</span> <span class="o">=</span> <span class="n">ENUM</span> <span class="o">|</span> <span class="n">STRUCT</span> <span class="o">|</span> <span class="n">UNION</span> <span class="o">|</span> <span class="n">ALTERNATE</span> <span class="o">|</span> <span class="n">COMMAND</span> <span class="o">|</span> <span class="n">EVENT</span>
+</pre></div>
+</div>
+<p>These are discussed in detail below.</p>
+</section>
+<section id="built-in-types">
+<h3>Built-in Types<a class="headerlink" href="#built-in-types" title="Permalink to this heading"></a></h3>
+<p>The following types are predefined, and map to C as follows:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Schema</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>JSON</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">*</span></code></p></td>
+<td><p>any JSON string, UTF-8</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">number</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p>any JSON number</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int64_t</span></code></p></td>
+<td><p>a JSON number without fractional part
+that fits into the C integer type</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int8</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int16_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int32</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int32_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int64</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int64_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uint16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">uint32</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uint64</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint64_t</span></code></p></td>
+<td><p>likewise</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint64_t</span></code></p></td>
+<td><p>like <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code>, except
+<code class="docutils literal notranslate"><span class="pre">StringInputVisitor</span></code> accepts size suffixes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p>JSON <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QNull</span> <span class="pre">*</span></code></p></td>
+<td><p>JSON <code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QObject</span> <span class="pre">*</span></code></p></td>
+<td><p>any JSON value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">QType</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QType</span></code></p></td>
+<td><p>JSON string matching enum <code class="docutils literal notranslate"><span class="pre">QType</span></code> values</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="include-directives">
+<h3>Include directives<a class="headerlink" href="#include-directives" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INCLUDE</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="n">STRING</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The QAPI schema definitions can be modularized using the ‘include’ directive:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;path/to/file.json&#39;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The directive is evaluated recursively, and include paths are relative
+to the file using the directive.  Multiple includes of the same file
+are idempotent.</p>
+<p>As a matter of style, it is a good idea to have all files be
+self-contained, but at the moment, nothing prevents an included file
+from making a forward reference to a type that is only introduced by
+an outer file.  The parser may be made stricter in the future to
+prevent incomplete include files.</p>
+</section>
+<section id="pragma-directives">
+<span id="pragma"></span><h3>Pragma directives<a class="headerlink" href="#pragma-directives" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PRAGMA</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;pragma&#39;</span><span class="p">:</span> <span class="p">{</span>
+               <span class="s1">&#39;*doc-required&#39;</span><span class="p">:</span> <span class="n">BOOL</span><span class="p">,</span>
+               <span class="s1">&#39;*command-name-exceptions&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="n">STRING</span><span class="p">,</span> <span class="o">...</span> <span class="p">],</span>
+               <span class="s1">&#39;*command-returns-exceptions&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="n">STRING</span><span class="p">,</span> <span class="o">...</span> <span class="p">],</span>
+               <span class="s1">&#39;*member-name-exceptions&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="n">STRING</span><span class="p">,</span> <span class="o">...</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The pragma directive lets you control optional generator behavior.</p>
+<p>Pragma’s scope is currently the complete schema.  Setting the same
+pragma to different values in parts of the schema doesn’t work.</p>
+<p>Pragma ‘doc-required’ takes a boolean value.  If true, documentation
+is required.  Default is false.</p>
+<p>Pragma ‘command-name-exceptions’ takes a list of commands whose names
+may contain <code class="docutils literal notranslate"><span class="pre">&quot;_&quot;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">&quot;-&quot;</span></code>.  Default is none.</p>
+<p>Pragma ‘command-returns-exceptions’ takes a list of commands that may
+violate the rules on permitted return types.  Default is none.</p>
+<p>Pragma ‘member-name-exceptions’ takes a list of types whose member
+names may contain uppercase letters, and <code class="docutils literal notranslate"><span class="pre">&quot;_&quot;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">&quot;-&quot;</span></code>.
+Default is none.</p>
+</section>
+<section id="enumeration-types">
+<span id="enum-value"></span><h3>Enumeration types<a class="headerlink" href="#enumeration-types" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ENUM</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+         <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="n">ENUM</span><span class="o">-</span><span class="n">VALUE</span><span class="p">,</span> <span class="o">...</span> <span class="p">],</span>
+         <span class="s1">&#39;*prefix&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+         <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+         <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+<span class="n">ENUM</span><span class="o">-</span><span class="n">VALUE</span> <span class="o">=</span> <span class="n">STRING</span>
+           <span class="o">|</span> <span class="p">{</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+               <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+               <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘enum’ names the enum type.</p>
+<p>Each member of the ‘data’ array defines a value of the enumeration
+type.  The form STRING is shorthand for <code class="code docutils literal notranslate"><span class="pre">{</span> <span class="pre">'name':</span> <span class="pre">STRING</span> <span class="pre">}</span></code>.  The
+‘name’ values must be be distinct.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="s1">&#39;MyEnum&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span> <span class="s1">&#39;value2&#39;</span><span class="p">,</span> <span class="s1">&#39;value3&#39;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Nothing prevents an empty enumeration, although it is probably not
+useful.</p>
+<p>On the wire, an enumeration type’s value is represented by its
+(string) name.  In C, it’s represented by an enumeration constant.
+These are of the form PREFIX_NAME, where PREFIX is derived from the
+enumeration type’s name, and NAME from the value’s name.  For the
+example above, the generator maps ‘MyEnum’ to MY_ENUM and ‘value1’ to
+VALUE1, resulting in the enumeration constant MY_ENUM_VALUE1.  The
+optional ‘prefix’ member overrides PREFIX.</p>
+<p>The generated C enumeration constants have values 0, 1, …, N-1 (in
+QAPI schema order), where N is the number of values.  There is an
+additional enumeration constant PREFIX__MAX with value N.</p>
+<p>Do not use string or an integer type when an enumeration type can do
+the job satisfactorily.</p>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring the
+schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="type-references-and-array-types">
+<span id="type-ref"></span><h3>Type references and array types<a class="headerlink" href="#type-references-and-array-types" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span> <span class="o">=</span> <span class="n">STRING</span> <span class="o">|</span> <span class="n">ARRAY</span><span class="o">-</span><span class="n">TYPE</span>
+<span class="n">ARRAY</span><span class="o">-</span><span class="n">TYPE</span> <span class="o">=</span> <span class="p">[</span> <span class="n">STRING</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>A string denotes the type named by the string.</p>
+<p>A one-element array containing a string denotes an array of the type
+named by the string.  Example: <code class="docutils literal notranslate"><span class="pre">['int']</span></code> denotes an array of <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p>
+</section>
+<section id="struct-types">
+<h3>Struct types<a class="headerlink" href="#struct-types" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">STRUCT</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+           <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">MEMBERS</span><span class="p">,</span>
+           <span class="s1">&#39;*base&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+           <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+           <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+<span class="n">MEMBERS</span> <span class="o">=</span> <span class="p">{</span> <span class="n">MEMBER</span><span class="p">,</span> <span class="o">...</span> <span class="p">}</span>
+<span class="n">MEMBER</span> <span class="o">=</span> <span class="n">STRING</span> <span class="p">:</span> <span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span>
+       <span class="o">|</span> <span class="n">STRING</span> <span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span><span class="p">,</span>
+                    <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+                    <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘struct’ names the struct type.</p>
+<p>Each MEMBER of the ‘data’ object defines a member of the struct type.</p>
+<p id="members">The MEMBER’s STRING name consists of an optional <code class="docutils literal notranslate"><span class="pre">*</span></code> prefix and the
+struct member name.  If <code class="docutils literal notranslate"><span class="pre">*</span></code> is present, the member is optional.</p>
+<p>The MEMBER’s value defines its properties, in particular its type.
+The form <a class="reference internal" href="#type-ref">TYPE-REF</a> is shorthand for <code class="code docutils literal notranslate"><span class="pre">{</span> <span class="pre">'type':</span> <span class="pre">TYPE-REF</span> <span class="pre">}</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;MyType&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;member1&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;member2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">],</span> <span class="s1">&#39;*member3&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>A struct type corresponds to a struct in C, and an object in JSON.
+The C struct’s members are generated in QAPI schema order.</p>
+<p>The optional ‘base’ member names a struct type whose members are to be
+included in this type.  They go first in the C struct.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptionsGenericFormat&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptionsGenericCOWFormat&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptionsGenericFormat&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;*backing&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>An example BlockdevOptionsGenericCOWFormat object on the wire could use
+both members like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;/some/place/my-image&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;backing&quot;</span><span class="p">:</span> <span class="s2">&quot;/some/place/my-backing-file&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="union-types">
+<h3>Union types<a class="headerlink" href="#union-types" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UNION</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;union&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+          <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">(</span> <span class="n">MEMBERS</span> <span class="o">|</span> <span class="n">STRING</span> <span class="p">),</span>
+          <span class="s1">&#39;discriminator&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+          <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">BRANCHES</span><span class="p">,</span>
+          <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+          <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+<span class="n">BRANCHES</span> <span class="o">=</span> <span class="p">{</span> <span class="n">BRANCH</span><span class="p">,</span> <span class="o">...</span> <span class="p">}</span>
+<span class="n">BRANCH</span> <span class="o">=</span> <span class="n">STRING</span> <span class="p">:</span> <span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span>
+       <span class="o">|</span> <span class="n">STRING</span> <span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span><span class="p">,</span> <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘union’ names the union type.</p>
+<p>The ‘base’ member defines the common members.  If it is a <a class="reference internal" href="#members">MEMBERS</a>
+object, it defines common members just like a struct type’s ‘data’
+member defines struct type members.  If it is a STRING, it names a
+struct type whose members are the common members.</p>
+<p>Member ‘discriminator’ must name a non-optional enum-typed member of
+the base struct.  That member’s value selects a branch by its name.
+If no such branch exists, an empty branch is assumed.</p>
+<p>Each BRANCH of the ‘data’ object defines a branch of the union.  A
+union must have at least one branch.</p>
+<p>The BRANCH’s STRING name is the branch name.  It must be a value of
+the discriminator enum type.</p>
+<p>The BRANCH’s value defines the branch’s properties, in particular its
+type.  The type must a struct type.  The form <a class="reference internal" href="#type-ref">TYPE-REF</a> is shorthand
+for <code class="code docutils literal notranslate"><span class="pre">{</span> <span class="pre">'type':</span> <span class="pre">TYPE-REF</span> <span class="pre">}</span></code>.</p>
+<p>In the Client JSON Protocol, a union is represented by an object with
+the common members (from the base type) and the selected branch’s
+members.  The two sets of member names must be disjoint.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;qcow2&#39;</span> <span class="p">]</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s1">&#39;union&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptions&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;*read-only&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="p">},</span>
+  <span class="s1">&#39;discriminator&#39;</span><span class="p">:</span> <span class="s1">&#39;driver&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptionsFile&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;qcow2&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptionsQcow2&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Resulting in these JSON objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;read-only&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/some/place/my-image&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span> <span class="s2">&quot;read-only&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;backing&quot;</span><span class="p">:</span> <span class="s2">&quot;/some/place/my-image&quot;</span><span class="p">,</span> <span class="s2">&quot;lazy-refcounts&quot;</span><span class="p">:</span> <span class="n">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The order of branches need not match the order of the enum values.
+The branches need not cover all possible enum values.  In the
+resulting generated C data types, a union is represented as a struct
+with the base members in QAPI schema order, and then a union of
+structures for each branch of the struct.</p>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="alternate-types">
+<h3>Alternate types<a class="headerlink" href="#alternate-types" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ALTERNATE</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;alternate&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+              <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">ALTERNATIVES</span><span class="p">,</span>
+              <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+              <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+<span class="n">ALTERNATIVES</span> <span class="o">=</span> <span class="p">{</span> <span class="n">ALTERNATIVE</span><span class="p">,</span> <span class="o">...</span> <span class="p">}</span>
+<span class="n">ALTERNATIVE</span> <span class="o">=</span> <span class="n">STRING</span> <span class="p">:</span> <span class="n">STRING</span>
+            <span class="o">|</span> <span class="n">STRING</span> <span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span> <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘alternate’ names the alternate type.</p>
+<p>Each ALTERNATIVE of the ‘data’ object defines a branch of the
+alternate.  An alternate must have at least one branch.</p>
+<p>The ALTERNATIVE’s STRING name is the branch name.</p>
+<p>The ALTERNATIVE’s value defines the branch’s properties, in particular
+its type.  The form STRING is shorthand for <code class="code docutils literal notranslate"><span class="pre">{</span> <span class="pre">'type':</span> <span class="pre">STRING</span> <span class="pre">}</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;alternate&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevRef&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;definition&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockdevOptions&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;reference&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>An alternate type is like a union type, except there is no
+discriminator on the wire.  Instead, the branch to use is inferred
+from the value.  An alternate can only express a choice between types
+represented differently on the wire.</p>
+<p>If a branch is typed as the ‘bool’ built-in, the alternate accepts
+true and false; if it is typed as any of the various numeric
+built-ins, it accepts a JSON number; if it is typed as a ‘str’
+built-in or named enum type, it accepts a JSON string; if it is typed
+as the ‘null’ built-in, it accepts JSON null; and if it is typed as a
+complex type (struct or union), it accepts a JSON object.</p>
+<p>The example alternate declaration above allows using both of the
+following example objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;my_existing_block_device_id&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;read-only&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/mydisk.qcow2&quot;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="commands">
+<h3>Commands<a class="headerlink" href="#commands" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMMAND</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+            <span class="p">(</span>
+            <span class="s1">&#39;*data&#39;</span><span class="p">:</span> <span class="p">(</span> <span class="n">MEMBERS</span> <span class="o">|</span> <span class="n">STRING</span> <span class="p">),</span>
+            <span class="o">|</span>
+            <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+            <span class="s1">&#39;boxed&#39;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="s1">&#39;*returns&#39;</span><span class="p">:</span> <span class="n">TYPE</span><span class="o">-</span><span class="n">REF</span><span class="p">,</span>
+            <span class="s1">&#39;*success-response&#39;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s1">&#39;*gen&#39;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s1">&#39;*allow-oob&#39;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s1">&#39;*allow-preconfig&#39;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s1">&#39;*coroutine&#39;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+            <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘command’ names the command.</p>
+<p>Member ‘data’ defines the arguments.  It defaults to an empty <a class="reference internal" href="#members">MEMBERS</a>
+object.</p>
+<p>If ‘data’ is a <a class="reference internal" href="#members">MEMBERS</a> object, then MEMBERS defines arguments just
+like a struct type’s ‘data’ defines struct type members.</p>
+<p>If ‘data’ is a STRING, then STRING names a complex type whose members
+are the arguments.  A union type requires <code class="docutils literal notranslate"><span class="pre">'boxed':</span> <span class="pre">true</span></code>.</p>
+<p>Member ‘returns’ defines the command’s return type.  It defaults to an
+empty struct type.  It must normally be a complex type or an array of
+a complex type.  To return anything else, the command must be listed
+in pragma ‘commands-returns-exceptions’.  If you do this, extending
+the command to return additional information will be harder.  Use of
+the pragma for new commands is strongly discouraged.</p>
+<p>A command’s error responses are not specified in the QAPI schema.
+Error conditions should be documented in comments.</p>
+<p>In the Client JSON Protocol, the value of the “execute” or “exec-oob”
+member is the command name.  The value of the “arguments” member then
+has to conform to the arguments, and the value of the success
+response’s “return” member will conform to the return type.</p>
+<p>Some example commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;my-first-command&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;arg1&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;*arg2&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;MyType&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;*value&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;my-second-command&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;returns&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;MyType&#39;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>which would validate this Client JSON Protocol transaction:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">=&gt;</span> <span class="p">{</span> <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;my-first-command&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;arg1&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="o">&lt;=</span> <span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="p">}</span> <span class="p">}</span>
+<span class="o">=&gt;</span> <span class="p">{</span> <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;my-second-command&quot;</span> <span class="p">}</span>
+<span class="o">&lt;=</span> <span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;one&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The generator emits a prototype for the C function implementing the
+command.  The function itself needs to be written by hand.  See
+section <a class="reference internal" href="#code-generated-for-commands">Code generated for commands</a> for examples.</p>
+<p>The function returns the return type.  When member ‘boxed’ is absent,
+it takes the command arguments as arguments one by one, in QAPI schema
+order.  Else it takes them wrapped in the C struct generated for the
+complex argument type.  It takes an additional <code class="docutils literal notranslate"><span class="pre">Error</span> <span class="pre">**</span></code> argument in
+either case.</p>
+<p>The generator also emits a marshalling function that extracts
+arguments for the user’s function out of an input QDict, calls the
+user’s function, and if it succeeded, builds an output QObject from
+its return value.  This is for use by the QMP monitor core.</p>
+<p>In rare cases, QAPI cannot express a type-safe representation of a
+corresponding Client JSON Protocol command.  You then have to suppress
+generation of a marshalling function by including a member ‘gen’ with
+boolean value false, and instead write your own function.  For
+example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;netdev_add&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">},</span>
+  <span class="s1">&#39;gen&#39;</span><span class="p">:</span> <span class="n">false</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Please try to avoid adding new commands that rely on this, and instead
+use type-safe unions.</p>
+<p>Normally, the QAPI schema is used to describe synchronous exchanges,
+where a response is expected.  But in some cases, the action of a
+command is expected to change state in a way that a successful
+response is not possible (although the command will still return an
+error object on failure).  When a successful reply is not possible,
+the command definition includes the optional member ‘success-response’
+with boolean value false.  So far, only QGA makes use of this member.</p>
+<p>Member ‘allow-oob’ declares whether the command supports out-of-band
+(OOB) execution.  It defaults to false.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;migrate_recover&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">},</span> <span class="s1">&#39;allow-oob&#39;</span><span class="p">:</span> <span class="n">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>See qmp-spec.txt for out-of-band execution syntax and semantics.</p>
+<p>Commands supporting out-of-band execution can still be executed
+in-band.</p>
+<p>When a command is executed in-band, its handler runs in the main
+thread with the BQL held.</p>
+<p>When a command is executed out-of-band, its handler runs in a
+dedicated monitor I/O thread with the BQL <em>not</em> held.</p>
+<p>An OOB-capable command handler must satisfy the following conditions:</p>
+<ul class="simple">
+<li><p>It terminates quickly.</p></li>
+<li><p>It does not invoke system calls that may block.</p></li>
+<li><p>It does not access guest RAM that may block when userfaultfd is
+enabled for postcopy live migration.</p></li>
+<li><p>It takes only “fast” locks, i.e. all critical sections protected by
+any lock it takes also satisfy the conditions for OOB command
+handler code.</p></li>
+</ul>
+<p>The restrictions on locking limit access to shared state.  Such access
+requires synchronization, but OOB commands can’t take the BQL or any
+other “slow” lock.</p>
+<p>When in doubt, do not implement OOB execution support.</p>
+<p>Member ‘allow-preconfig’ declares whether the command is available
+before the machine is built.  It defaults to false.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="s1">&#39;QMPCapability&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;oob&#39;</span> <span class="p">]</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;qmp_capabilities&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;*enable&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;QMPCapability&#39;</span> <span class="p">]</span> <span class="p">},</span>
+  <span class="s1">&#39;allow-preconfig&#39;</span><span class="p">:</span> <span class="n">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>QMP is available before the machine is built only when QEMU was
+started with –preconfig.</p>
+<p>Member ‘coroutine’ tells the QMP dispatcher whether the command handler
+is safe to be run in a coroutine.  It defaults to false.  If it is true,
+the command handler is called from coroutine context and may yield while
+waiting for an external event (such as I/O completion) in order to avoid
+blocking the guest and other background operations.</p>
+<p>Coroutine safety can be hard to prove, similar to thread safety.  Common
+pitfalls are:</p>
+<ul class="simple">
+<li><p>The global mutex isn’t held across <code class="docutils literal notranslate"><span class="pre">qemu_coroutine_yield()</span></code>, so
+operations that used to assume that they execute atomically may have
+to be more careful to protect against changes in the global state.</p></li>
+<li><p>Nested event loops (<code class="docutils literal notranslate"><span class="pre">AIO_WAIT_WHILE()</span></code> etc.) are problematic in
+coroutine context and can easily lead to deadlocks.  They should be
+replaced by yielding and reentering the coroutine when the condition
+becomes false.</p></li>
+</ul>
+<p>Since the command handler may assume coroutine context, any callers
+other than the QMP dispatcher must also call it in coroutine context.
+In particular, HMP commands calling such a QMP command handler must be
+marked <code class="docutils literal notranslate"><span class="pre">.coroutine</span> <span class="pre">=</span> <span class="pre">true</span></code> in hmp-commands.hx.</p>
+<p>It is an error to specify both <code class="docutils literal notranslate"><span class="pre">'coroutine':</span> <span class="pre">true</span></code> and <code class="docutils literal notranslate"><span class="pre">'allow-oob':</span> <span class="pre">true</span></code>
+for a command.  We don’t currently have a use case for both together and
+without a use case, it’s not entirely clear what the semantics should
+be.</p>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="events">
+<h3>Events<a class="headerlink" href="#events" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EVENT</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+          <span class="p">(</span>
+          <span class="s1">&#39;*data&#39;</span><span class="p">:</span> <span class="p">(</span> <span class="n">MEMBERS</span> <span class="o">|</span> <span class="n">STRING</span> <span class="p">),</span>
+          <span class="o">|</span>
+          <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
+          <span class="s1">&#39;boxed&#39;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+          <span class="p">)</span>
+          <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span><span class="p">,</span>
+          <span class="s1">&#39;*features&#39;</span><span class="p">:</span> <span class="n">FEATURES</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Member ‘event’ names the event.  This is the event name used in the
+Client JSON Protocol.</p>
+<p>Member ‘data’ defines the event-specific data.  It defaults to an
+empty MEMBERS object.</p>
+<p>If ‘data’ is a MEMBERS object, then MEMBERS defines event-specific
+data just like a struct type’s ‘data’ defines struct type members.</p>
+<p>If ‘data’ is a STRING, then STRING names a complex type whose members
+are the event-specific data.  A union type requires <code class="docutils literal notranslate"><span class="pre">'boxed':</span> <span class="pre">true</span></code>.</p>
+<p>An example event is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="s1">&#39;EVENT_C&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;*a&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Resulting in this JSON object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;EVENT_C&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;test string&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;seconds&quot;</span><span class="p">:</span> <span class="mi">1267020223</span><span class="p">,</span> <span class="s2">&quot;microseconds&quot;</span><span class="p">:</span> <span class="mi">435656</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The generator emits a function to send the event.  When member ‘boxed’
+is absent, it takes event-specific data one by one, in QAPI schema
+order.  Else it takes them wrapped in the C struct generated for the
+complex type.  See section <a class="reference internal" href="#code-generated-for-events">Code generated for events</a> for examples.</p>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>The optional ‘features’ member specifies features.  See <a class="reference internal" href="#features">Features</a>
+below for more on this.</p>
+</section>
+<section id="features">
+<span id="feature"></span><h3>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FEATURES</span> <span class="o">=</span> <span class="p">[</span> <span class="n">FEATURE</span><span class="p">,</span> <span class="o">...</span> <span class="p">]</span>
+<span class="n">FEATURE</span> <span class="o">=</span> <span class="n">STRING</span>
+        <span class="o">|</span> <span class="p">{</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span> <span class="s1">&#39;*if&#39;</span><span class="p">:</span> <span class="n">COND</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Sometimes, the behaviour of QEMU changes compatibly, but without a
+change in the QMP syntax (usually by allowing values or operations
+that previously resulted in an error).  QMP clients may still need to
+know whether the extension is available.</p>
+<p>For this purpose, a list of features can be specified for a command or
+struct type.  Each list member can either be <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">'name':</span> <span class="pre">STRING,</span> <span class="pre">'*if':</span>
+<span class="pre">COND</span> <span class="pre">}</span></code>, or STRING, which is shorthand for <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">'name':</span> <span class="pre">STRING</span> <span class="pre">}</span></code>.</p>
+<p>The optional ‘if’ member specifies a conditional.  See <a class="reference internal" href="#configuring-the-schema">Configuring
+the schema</a> below for more on this.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;TestType&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="p">},</span>
+  <span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;allow-negative-numbers&#39;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The feature strings are exposed to clients in introspection, as
+explained in section <a class="reference internal" href="#client-json-protocol-introspection">Client JSON Protocol introspection</a>.</p>
+<p>Intended use is to have each feature string signal that this build of
+QEMU shows a certain behaviour.</p>
+<section id="special-features">
+<h4>Special features<a class="headerlink" href="#special-features" title="Permalink to this heading"></a></h4>
+<p>Feature “deprecated” marks a command, event, enum value, or struct
+member as deprecated.  It is not supported elsewhere so far.
+Interfaces so marked may be withdrawn in future releases in accordance
+with QEMU’s deprecation policy.</p>
+<p>Feature “unstable” marks a command, event, enum value, or struct
+member as unstable.  It is not supported elsewhere so far.  Interfaces
+so marked may be withdrawn or changed incompatibly in future releases.</p>
+</section>
+</section>
+<section id="naming-rules-and-reserved-names">
+<h3>Naming rules and reserved names<a class="headerlink" href="#naming-rules-and-reserved-names" title="Permalink to this heading"></a></h3>
+<p>All names must begin with a letter, and contain only ASCII letters,
+digits, hyphen, and underscore.  There are two exceptions: enum values
+may start with a digit, and names that are downstream extensions (see
+section <a class="reference internal" href="#downstream-extensions">Downstream extensions</a>) start with underscore.</p>
+<p>Names beginning with <code class="docutils literal notranslate"><span class="pre">q_</span></code> are reserved for the generator, which uses
+them for munging QMP names that resemble C keywords or other
+problematic strings.  For example, a member named <code class="docutils literal notranslate"><span class="pre">default</span></code> in qapi
+becomes <code class="docutils literal notranslate"><span class="pre">q_default</span></code> in the generated C code.</p>
+<p>Types, commands, and events share a common namespace.  Therefore,
+generally speaking, type definitions should always use CamelCase for
+user-defined type names, while built-in types are lowercase.</p>
+<p>Type names ending with <code class="docutils literal notranslate"><span class="pre">Kind</span></code> or <code class="docutils literal notranslate"><span class="pre">List</span></code> are reserved for the
+generator, which uses them for implicit union enums and array types,
+respectively.</p>
+<p>Command names, member names within a type, and feature names should be
+all lower case with words separated by a hyphen.  However, some
+existing older commands and complex types use underscore; when
+extending them, consistency is preferred over blindly avoiding
+underscore.</p>
+<p>Event names should be ALL_CAPS with words separated by underscore.</p>
+<p>Member name <code class="docutils literal notranslate"><span class="pre">u</span></code> and names starting with <code class="docutils literal notranslate"><span class="pre">has-</span></code> or <code class="docutils literal notranslate"><span class="pre">has_</span></code> are reserved
+for the generator, which uses them for unions and for tracking
+optional members.</p>
+<p>Names beginning with <code class="docutils literal notranslate"><span class="pre">x-</span></code> used to signify “experimental”.  This
+convention has been replaced by special feature “unstable”.</p>
+<p>Pragmas <code class="docutils literal notranslate"><span class="pre">command-name-exceptions</span></code> and <code class="docutils literal notranslate"><span class="pre">member-name-exceptions</span></code> let
+you violate naming rules.  Use for new code is strongly discouraged. See
+<a class="reference internal" href="#pragma-directives">Pragma directives</a> for details.</p>
+</section>
+<section id="downstream-extensions">
+<h3>Downstream extensions<a class="headerlink" href="#downstream-extensions" title="Permalink to this heading"></a></h3>
+<p>QAPI schema names that are externally visible, say in the Client JSON
+Protocol, need to be managed with care.  Names starting with a
+downstream prefix of the form __RFQDN_ are reserved for the downstream
+who controls the valid, reverse fully qualified domain name RFQDN.
+RFQDN may only contain ASCII letters, digits, hyphen and period.</p>
+<p>Example: Red Hat, Inc. controls redhat.com, and may therefore add a
+downstream command <code class="docutils literal notranslate"><span class="pre">__com.redhat_drive-mirror</span></code>.</p>
+</section>
+<section id="configuring-the-schema">
+<h3>Configuring the schema<a class="headerlink" href="#configuring-the-schema" title="Permalink to this heading"></a></h3>
+<p>Syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COND</span> <span class="o">=</span> <span class="n">STRING</span>
+     <span class="o">|</span> <span class="p">{</span> <span class="s1">&#39;all: [ COND, ... ] }</span>
+     <span class="o">|</span> <span class="p">{</span> <span class="s1">&#39;any: [ COND, ... ] }</span>
+     <span class="o">|</span> <span class="p">{</span> <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="n">COND</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>All definitions take an optional ‘if’ member.  Its value must be a
+string, or an object with a single member ‘all’, ‘any’ or ‘not’.</p>
+<p>The C code generated for the definition will then be guarded by an #if
+preprocessing directive with an operand generated from that condition:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>STRING will generate defined(STRING)</p></li>
+<li><p>{ ‘all’: [COND, …] } will generate (COND &amp;&amp; …)</p></li>
+<li><p>{ ‘any’: [COND, …] } will generate (COND || …)</p></li>
+<li><p>{ ‘not’: COND } will generate !COND</p></li>
+</ul>
+</div></blockquote>
+<p>Example: a conditional struct</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;IfStruct&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="p">},</span>
+  <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;CONFIG_FOO&#39;</span><span class="p">,</span> <span class="s1">&#39;HAVE_BAR&#39;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>gets its generated code guarded like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#if defined(CONFIG_FOO) &amp;&amp; defined(HAVE_BAR)</span>
+<span class="o">...</span> <span class="n">generated</span> <span class="n">code</span> <span class="o">...</span>
+<span class="c1">#endif /* defined(HAVE_BAR) &amp;&amp; defined(CONFIG_FOO) */</span>
+</pre></div>
+</div>
+<p>Individual members of complex types, commands arguments, and
+event-specific data can also be made conditional.  This requires the
+longhand form of MEMBER.</p>
+<p>Example: a struct type with unconditional member ‘foo’ and conditional
+member ‘bar’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;IfStruct&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bar&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="s1">&#39;IFCOND&#39;</span><span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>A union’s discriminator may not be conditional.</p>
+<p>Likewise, individual enumeration values be conditional.  This requires
+the longhand form of <a class="reference internal" href="#enum-value">ENUM-VALUE</a>.</p>
+<p>Example: an enum type with unconditional value ‘foo’ and conditional
+value ‘bar’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="s1">&#39;IfEnum&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+            <span class="p">{</span> <span class="s1">&#39;name&#39;</span> <span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="s1">&#39;IFCOND&#39;</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Likewise, features can be conditional.  This requires the longhand
+form of <a class="reference internal" href="#feature">FEATURE</a>.</p>
+<p>Example: a struct with conditional feature ‘allow-negative-numbers’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;TestType&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="p">},</span>
+  <span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;allow-negative-numbers&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="s1">&#39;IFCOND&#39;</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Please note that you are responsible to ensure that the C code will
+compile with an arbitrary combination of conditions, since the
+generator is unable to check it at this point.</p>
+<p>The conditions apply to introspection as well, i.e. introspection
+shows a conditional entity only when the condition is satisfied in
+this particular build.</p>
+</section>
+<section id="documentation-comments">
+<h3>Documentation comments<a class="headerlink" href="#documentation-comments" title="Permalink to this heading"></a></h3>
+<p>A multi-line comment that starts and ends with a <code class="docutils literal notranslate"><span class="pre">##</span></code> line is a
+documentation comment.</p>
+<p>If the documentation comment starts like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
+<span class="c1"># @SYMBOL:</span>
+</pre></div>
+</div>
+<p>it documents the definition of SYMBOL, else it’s free-form
+documentation.</p>
+<p>See below for more on <a class="reference internal" href="#definition-documentation">Definition documentation</a>.</p>
+<p>Free-form documentation may be used to provide additional text and
+structuring content.</p>
+<section id="headings-and-subheadings">
+<h4>Headings and subheadings<a class="headerlink" href="#headings-and-subheadings" title="Permalink to this heading"></a></h4>
+<p>A free-form documentation comment containing a line which starts with
+some <code class="docutils literal notranslate"><span class="pre">=</span></code> symbols and then a space defines a section heading:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
+<span class="c1"># = This is a top level heading</span>
+<span class="c1">#</span>
+<span class="c1"># This is a free-form comment which will go under the</span>
+<span class="c1"># top level heading.</span>
+<span class="c1">##</span>
+
+<span class="c1">##</span>
+<span class="c1"># == This is a second level heading</span>
+<span class="c1">##</span>
+</pre></div>
+</div>
+<p>A heading line must be the first line of the documentation
+comment block.</p>
+<p>Section headings must always be correctly nested, so you can only
+define a third-level heading inside a second-level heading, and so on.</p>
+</section>
+<section id="documentation-markup">
+<h4>Documentation markup<a class="headerlink" href="#documentation-markup" title="Permalink to this heading"></a></h4>
+<p>Documentation comments can use most rST markup.  In particular,
+a <code class="docutils literal notranslate"><span class="pre">::</span></code> literal block can be used for examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ::</span>
+<span class="c1">#</span>
+<span class="c1">#   Text of the example, may span</span>
+<span class="c1">#   multiple lines</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">*</span></code> starts an itemized list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># * First item, may span</span>
+<span class="c1">#   multiple lines</span>
+<span class="c1"># * Second item</span>
+</pre></div>
+</div>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">-</span></code> instead of <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+<p>A decimal number followed by <code class="docutils literal notranslate"><span class="pre">.</span></code> starts a numbered list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. First item, may span</span>
+<span class="c1">#    multiple lines</span>
+<span class="c1"># 2. Second item</span>
+</pre></div>
+</div>
+<p>The actual number doesn’t matter.</p>
+<p>Lists of either kind must be preceded and followed by a blank line.
+If a list item’s text spans multiple lines, then the second and
+subsequent lines must be correctly indented to line up with the
+first character of the first line.</p>
+<p>The usual <strong>**strong**</strong>, <em>*emphasized*</em> and <code class="docutils literal notranslate"><span class="pre">``literal``</span></code> markup
+should be used.  If you need a single literal <code class="docutils literal notranslate"><span class="pre">*</span></code>, you will need to
+backslash-escape it.  As an extension beyond the usual rST syntax, you
+can also use <code class="docutils literal notranslate"><span class="pre">&#64;foo</span></code> to reference a name in the schema; this is rendered
+the same way as <code class="docutils literal notranslate"><span class="pre">``foo``</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
+<span class="c1"># Some text foo with **bold** and *emphasis*</span>
+<span class="c1"># 1. with a list</span>
+<span class="c1"># 2. like that</span>
+<span class="c1">#</span>
+<span class="c1"># And some code:</span>
+<span class="c1">#</span>
+<span class="c1"># ::</span>
+<span class="c1">#</span>
+<span class="c1">#   $ echo foo</span>
+<span class="c1">#   -&gt; do this</span>
+<span class="c1">#   &lt;- get that</span>
+<span class="c1">##</span>
+</pre></div>
+</div>
+</section>
+<section id="definition-documentation">
+<h4>Definition documentation<a class="headerlink" href="#definition-documentation" title="Permalink to this heading"></a></h4>
+<p>Definition documentation, if present, must immediately precede the
+definition it documents.</p>
+<p>When documentation is required (see <a class="reference internal" href="#pragma">pragma</a> ‘doc-required’), every
+definition must have documentation.</p>
+<p>Definition documentation starts with a line naming the definition,
+followed by an optional overview, a description of each argument (for
+commands and events), member (for structs and unions), branch (for
+alternates), or value (for enums), a description of each feature (if
+any), and finally optional tagged sections.</p>
+<p>The description of an argument or feature ‘name’ starts with
+‘&#64;name:’.  The description text can start on the line following the
+‘&#64;name:’, in which case it must not be indented at all.  It can also
+start on the same line as the ‘&#64;name:’.  In this case if it spans
+multiple lines then second and subsequent lines must be indented to
+line up with the first character of the first line of the
+description:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># @argone:</span>
+<span class="c1"># This is a two line description</span>
+<span class="c1"># in the first style.</span>
+<span class="c1">#</span>
+<span class="c1"># @argtwo: This is a two line description</span>
+<span class="c1">#          in the second style.</span>
+</pre></div>
+</div>
+<p>The number of spaces between the ‘:’ and the text is not significant.</p>
+<div class="admonition-fixme admonition">
+<p class="admonition-title">FIXME</p>
+<p>The parser accepts these things in almost any order.</p>
+</div>
+<div class="admonition-fixme admonition">
+<p class="admonition-title">FIXME</p>
+<p>union branches should be described, too.</p>
+</div>
+<p>Extensions added after the definition was first released carry a
+‘(since x.y.z)’ comment.</p>
+<p>The feature descriptions must be preceded by a line “Features:”, like
+this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Features:</span>
+<span class="c1"># @feature: Description text</span>
+</pre></div>
+</div>
+<p>A tagged section starts with one of the following words:
+“Note:”/”Notes:”, “Since:”, “Example”/”Examples”, “Returns:”, “TODO:”.
+The section ends with the start of a new section.</p>
+<p>The text of a section can start on a new line, in
+which case it must not be indented at all.  It can also start
+on the same line as the ‘Note:’, ‘Returns:’, etc tag.  In this
+case if it spans multiple lines then second and subsequent
+lines must be indented to match the first, in the same way as
+multiline argument descriptions.</p>
+<p>A ‘Since: x.y.z’ tagged section lists the release that introduced the
+definition.</p>
+<p>An ‘Example’ or ‘Examples’ section is automatically rendered
+entirely as literal fixed-width text.  In other sections,
+the text is formatted, and rST markup can be used.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
+<span class="c1"># @BlockStats:</span>
+<span class="c1">#</span>
+<span class="c1"># Statistics of a virtual block device or a block backing device.</span>
+<span class="c1">#</span>
+<span class="c1"># @device: If the stats are for a virtual block device, the name</span>
+<span class="c1">#          corresponding to the virtual block device.</span>
+<span class="c1">#</span>
+<span class="c1"># @node-name: The node name of the device. (since 2.3)</span>
+<span class="c1">#</span>
+<span class="c1"># ... more members ...</span>
+<span class="c1">#</span>
+<span class="c1"># Since: 0.14.0</span>
+<span class="c1">##</span>
+<span class="p">{</span> <span class="s1">&#39;struct&#39;</span><span class="p">:</span> <span class="s1">&#39;BlockStats&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;*device&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;*node-name&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+           <span class="o">...</span> <span class="n">more</span> <span class="n">members</span> <span class="o">...</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="c1">##</span>
+<span class="c1"># @query-blockstats:</span>
+<span class="c1">#</span>
+<span class="c1"># Query the @BlockStats for all virtual block devices.</span>
+<span class="c1">#</span>
+<span class="c1"># @query-nodes: If true, the command will query all the</span>
+<span class="c1">#               block nodes ... explain, explain ...  (since 2.3)</span>
+<span class="c1">#</span>
+<span class="c1"># Returns: A list of @BlockStats for each virtual block devices.</span>
+<span class="c1">#</span>
+<span class="c1"># Since: 0.14.0</span>
+<span class="c1">#</span>
+<span class="c1"># Example:</span>
+<span class="c1">#</span>
+<span class="c1"># -&gt; { &quot;execute&quot;: &quot;query-blockstats&quot; }</span>
+<span class="c1"># &lt;- {</span>
+<span class="c1">#      ... lots of output ...</span>
+<span class="c1">#    }</span>
+<span class="c1">#</span>
+<span class="c1">##</span>
+<span class="p">{</span> <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;query-blockstats&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;*query-nodes&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="p">},</span>
+  <span class="s1">&#39;returns&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;BlockStats&#39;</span><span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="client-json-protocol-introspection">
+<h2>Client JSON Protocol introspection<a class="headerlink" href="#client-json-protocol-introspection" title="Permalink to this heading"></a></h2>
+<p>Clients of a Client JSON Protocol commonly need to figure out what
+exactly the server (QEMU) supports.</p>
+<p>For this purpose, QMP provides introspection via command
+query-qmp-schema.  QGA currently doesn’t support introspection.</p>
+<p>While Client JSON Protocol wire compatibility should be maintained
+between qemu versions, we cannot make the same guarantees for
+introspection stability.  For example, one version of qemu may provide
+a non-variant optional member of a struct, and a later version rework
+the member to instead be non-optional and associated with a variant.
+Likewise, one version of qemu may list a member with open-ended type
+‘str’, and a later version could convert it to a finite set of strings
+via an enum type; or a member may be converted from a specific type to
+an alternate that represents a choice between the original type and
+something else.</p>
+<p>query-qmp-schema returns a JSON array of SchemaInfo objects.  These
+objects together describe the wire ABI, as defined in the QAPI schema.
+There is no specified order to the SchemaInfo objects returned; a
+client must search for a particular name throughout the entire array
+to learn more about that name, but is at least guaranteed that there
+will be no collisions between type, command, and event names.</p>
+<p>However, the SchemaInfo can’t reflect all the rules and restrictions
+that apply to QMP.  It’s interface introspection (figuring out what’s
+there), not interface specification.  The specification is in the QAPI
+schema.  To understand how QMP is to be used, you need to study the
+QAPI schema.</p>
+<p>Like any other command, query-qmp-schema is itself defined in the QAPI
+schema, along with the SchemaInfo type.  This text attempts to give an
+overview how things work.  For details you need to consult the QAPI
+schema.</p>
+<p>SchemaInfo objects have common members “name”, “meta-type”,
+“features”, and additional variant members depending on the value of
+meta-type.</p>
+<p>Each SchemaInfo object describes a wire ABI entity of a certain
+meta-type: a command, event or one of several kinds of type.</p>
+<p>SchemaInfo for commands and events have the same name as in the QAPI
+schema.</p>
+<p>Command and event names are part of the wire ABI, but type names are
+not.  Therefore, the SchemaInfo for types have auto-generated
+meaningless names.  For readability, the examples in this section use
+meaningful type names instead.</p>
+<p>Optional member “features” exposes the entity’s feature strings as a
+JSON array of strings.</p>
+<p>To examine a type, start with a command or event using it, then follow
+references by name.</p>
+<p>QAPI schema definitions not reachable that way are omitted.</p>
+<p>The SchemaInfo for a command has meta-type “command”, and variant
+members “arg-type”, “ret-type” and “allow-oob”.  On the wire, the
+“arguments” member of a client’s “execute” command must conform to the
+object type named by “arg-type”.  The “return” member that the server
+passes in a success response conforms to the type named by “ret-type”.
+When “allow-oob” is true, it means the command supports out-of-band
+execution.  It defaults to false.</p>
+<p>If the command takes no arguments, “arg-type” names an object type
+without members.  Likewise, if the command returns nothing, “ret-type”
+names an object type without members.</p>
+<p>Example: the SchemaInfo for command query-qmp-schema</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;query-qmp-schema&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;command&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;arg-type&quot;</span><span class="p">:</span> <span class="s2">&quot;q_empty&quot;</span><span class="p">,</span> <span class="s2">&quot;ret-type&quot;</span><span class="p">:</span> <span class="s2">&quot;SchemaInfoList&quot;</span> <span class="p">}</span>
+
+  <span class="n">Type</span> <span class="s2">&quot;q_empty&quot;</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">automatic</span> <span class="nb">object</span> <span class="nb">type</span> <span class="n">without</span> <span class="n">members</span><span class="p">,</span> <span class="ow">and</span> <span class="nb">type</span>
+  <span class="s2">&quot;SchemaInfoList&quot;</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">array</span> <span class="n">of</span> <span class="n">SchemaInfo</span> <span class="nb">type</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The SchemaInfo for an event has meta-type “event”, and variant member
+“arg-type”.  On the wire, a “data” member that the server passes in an
+event conforms to the object type named by “arg-type”.</p>
+<p>If the event carries no additional information, “arg-type” names an
+object type without members.  The event may not have a data member on
+the wire then.</p>
+<p>Each command or event defined with ‘data’ as MEMBERS object in the
+QAPI schema implicitly defines an object type.</p>
+<p>Example: the SchemaInfo for EVENT_C from section <a class="reference internal" href="#events">Events</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;EVENT_C&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;arg-type&quot;</span><span class="p">:</span> <span class="s2">&quot;q_obj-EVENT_C-arg&quot;</span> <span class="p">}</span>
+
+<span class="n">Type</span> <span class="s2">&quot;q_obj-EVENT_C-arg&quot;</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">implicitly</span> <span class="n">defined</span> <span class="nb">object</span> <span class="nb">type</span> <span class="k">with</span>
+<span class="n">the</span> <span class="n">two</span> <span class="n">members</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">event</span><span class="s1">&#39;s definition.</span>
+</pre></div>
+</div>
+<p>The SchemaInfo for struct and union types has meta-type “object”.</p>
+<p>The SchemaInfo for a struct type has variant member “members”.</p>
+<p>The SchemaInfo for a union type additionally has variant members “tag”
+and “variants”.</p>
+<p>“members” is a JSON array describing the object’s common members, if
+any.  Each element is a JSON object with members “name” (the member’s
+name), “type” (the name of its type), “features” (a JSON array of
+feature strings), and “default”.  The latter two are optional.  The
+member is optional if “default” is present.  Currently, “default” can
+only have value null.  Other values are reserved for future
+extensions.  The “members” array is in no particular order; clients
+must search the entire object when learning whether a particular
+member is supported.</p>
+<p>Example: the SchemaInfo for MyType from section <a class="reference internal" href="#struct-types">Struct types</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyType&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;member1&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;member2&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;member3&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">null</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>“features” exposes the command’s feature strings as a JSON array of
+strings.</p>
+<p>Example: the SchemaInfo for TestType from section <a class="reference internal" href="#features">Features</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;TestType&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span> <span class="p">}</span> <span class="p">],</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;allow-negative-numbers&quot;</span><span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>“tag” is the name of the common member serving as type tag.
+“variants” is a JSON array describing the object’s variant members.
+Each element is a JSON object with members “case” (the value of type
+tag this element applies to) and “type” (the name of an object type
+that provides the variant members for this type tag value).  The
+“variants” array is in no particular order, and is not guaranteed to
+list cases in the same order as the corresponding “tag” enum type.</p>
+<p>Example: the SchemaInfo for union BlockdevOptions from section
+<a class="reference internal" href="#union-types">Union types</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevOptions&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;driver&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevDriver&quot;</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;read-only&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">null</span> <span class="p">}</span> <span class="p">],</span>
+  <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;driver&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;variants&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;case&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevOptionsFile&quot;</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;case&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevOptionsQcow2&quot;</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that base types are “flattened”: its members are included in the
+“members” array.</p>
+<p>The SchemaInfo for an alternate type has meta-type “alternate”, and
+variant member “members”.  “members” is a JSON array.  Each element is
+a JSON object with member “type”, which names a type.  Values of the
+alternate type conform to exactly one of its member types.  There is
+no guarantee on the order in which “members” will be listed.</p>
+<p>Example: the SchemaInfo for BlockdevRef from section <a class="reference internal" href="#alternate-types">Alternate types</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevRef&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;alternate&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;BlockdevOptions&quot;</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The SchemaInfo for an array type has meta-type “array”, and variant
+member “element-type”, which names the array’s element type.  Array
+types are implicitly defined.  For convenience, the array’s name may
+resemble the element type; however, clients should examine member
+“element-type” instead of making assumptions based on parsing member
+“name”.</p>
+<p>Example: the SchemaInfo for [‘str’]</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;[str]&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;element-type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The SchemaInfo for an enumeration type has meta-type “enum” and
+variant member “members”.</p>
+<p>“members” is a JSON array describing the enumeration values.  Each
+element is a JSON object with member “name” (the member’s name), and
+optionally “features” (a JSON array of feature strings).  The
+“members” array is in no particular order; clients must search the
+entire array when learning whether a particular value is supported.</p>
+<p>Example: the SchemaInfo for MyEnum from section <a class="reference internal" href="#enumeration-types">Enumeration types</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyEnum&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;enum&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value3&quot;</span> <span class="p">}</span>
+  <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The SchemaInfo for a built-in type has the same name as the type in
+the QAPI schema (see section <a class="reference internal" href="#built-in-types">Built-in Types</a>), with one exception
+detailed below.  It has variant member “json-type” that shows how
+values of this type are encoded on the wire.</p>
+<p>Example: the SchemaInfo for str</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="s2">&quot;meta-type&quot;</span><span class="p">:</span> <span class="s2">&quot;builtin&quot;</span><span class="p">,</span> <span class="s2">&quot;json-type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The QAPI schema supports a number of integer types that only differ in
+how they map to C.  They are identical as far as SchemaInfo is
+concerned.  Therefore, they get all mapped to a single type “int” in
+SchemaInfo.</p>
+<p>As explained above, type names are not part of the wire ABI.  Not even
+the names of built-in types.  Clients should examine member
+“json-type” instead of hard-coding names of built-in types.</p>
+</section>
+<section id="compatibility-considerations">
+<h2>Compatibility considerations<a class="headerlink" href="#compatibility-considerations" title="Permalink to this heading"></a></h2>
+<p>Maintaining backward compatibility at the Client JSON Protocol level
+while evolving the schema requires some care.  This section is about
+syntactic compatibility, which is necessary, but not sufficient, for
+actual compatibility.</p>
+<p>Clients send commands with argument data, and receive command
+responses with return data and events with event data.</p>
+<p>Adding opt-in functionality to the send direction is backwards
+compatible: adding commands, optional arguments, enumeration values,
+union and alternate branches; turning an argument type into an
+alternate of that type; making mandatory arguments optional.  Clients
+oblivious of the new functionality continue to work.</p>
+<p>Incompatible changes include removing commands, command arguments,
+enumeration values, union and alternate branches, adding mandatory
+command arguments, and making optional arguments mandatory.</p>
+<p>The specified behavior of an absent optional argument should remain
+the same.  With proper documentation, this policy still allows some
+flexibility; for example, when an optional ‘buffer-size’ argument is
+specified to default to a sensible buffer size, the actual default
+value can still be changed.  The specified default behavior is not the
+exact size of the buffer, only that the default size is sensible.</p>
+<p>Adding functionality to the receive direction is generally backwards
+compatible: adding events, adding return and event data members.
+Clients are expected to ignore the ones they don’t know.</p>
+<p>Removing “unreachable” stuff like events that can’t be triggered
+anymore, optional return or event data members that can’t be sent
+anymore, and return or event data member (enumeration) values that
+can’t be sent anymore makes no difference to clients, except for
+introspection.  The latter can conceivably confuse clients, so tread
+carefully.</p>
+<p>Incompatible changes include removing return and event data members.</p>
+<p>Any change to a command definition’s ‘data’ or one of the types used
+there (recursively) needs to consider send direction compatibility.</p>
+<p>Any change to a command definition’s ‘return’, an event definition’s
+‘data’, or one of the types used there (recursively) needs to consider
+receive direction compatibility.</p>
+<p>Any change to types used in both contexts need to consider both.</p>
+<p>Enumeration type values and complex and alternate type members may be
+reordered freely.  For enumerations and alternate types, this doesn’t
+affect the wire encoding.  For complex types, this might make the
+implementation emit JSON object members in a different order, which
+the Client JSON Protocol permits.</p>
+<p>Since type names are not visible in the Client JSON Protocol, types
+may be freely renamed.  Even certain refactorings are invisible, such
+as splitting members from one type into a common base type.</p>
+</section>
+<section id="code-generation">
+<h2>Code generation<a class="headerlink" href="#code-generation" title="Permalink to this heading"></a></h2>
+<p>The QAPI code generator qapi-gen.py generates code and documentation
+from the schema.  Together with the core QAPI libraries, this code
+provides everything required to take JSON commands read in by a Client
+JSON Protocol server, unmarshal the arguments into the underlying C
+types, call into the corresponding C function, map the response back
+to a Client JSON Protocol response to be returned to the user, and
+introspect the commands.</p>
+<p>As an example, we’ll use the following schema, which describes a
+single complex user-defined type, along with command which takes a
+list of that type as a parameter, and returns a single element of that
+type.  The user is responsible for writing the implementation of
+qmp_my_command(); everything else is produced by the generator.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat example-schema.json
+{ &#39;struct&#39;: &#39;UserDefOne&#39;,
+  &#39;data&#39;: { &#39;integer&#39;: &#39;int&#39;, &#39;*string&#39;: &#39;str&#39; } }
+
+{ &#39;command&#39;: &#39;my-command&#39;,
+  &#39;data&#39;: { &#39;arg1&#39;: [&#39;UserDefOne&#39;] },
+  &#39;returns&#39;: &#39;UserDefOne&#39; }
+
+{ &#39;event&#39;: &#39;MY_EVENT&#39; }
+</pre></div>
+</div>
+<p>We run qapi-gen.py like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python scripts/qapi-gen.py --output-dir=&quot;qapi-generated&quot; \
+--prefix=&quot;example-&quot; example-schema.json
+</pre></div>
+</div>
+<p>For a more thorough look at generated code, the testsuite includes
+tests/qapi-schema/qapi-schema-tests.json that covers more examples of
+what the generator will accept, and compiles the resulting C code as
+part of ‘make check-unit’.</p>
+<section id="code-generated-for-qapi-types">
+<h3>Code generated for QAPI types<a class="headerlink" href="#code-generated-for-qapi-types" title="Permalink to this heading"></a></h3>
+<p>The following files are created:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-types.h</span></code></dt><dd><p>C types corresponding to types defined in the schema</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-types.c</span></code></dt><dd><p>Cleanup functions for the above C types</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The $(prefix) is an optional parameter used as a namespace to keep the
+generated code from one schema/code-generation separated from others so code
+can be generated/used from multiple schemas without clobbering previously
+created code.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat qapi-generated/example-qapi-types.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_TYPES_H
+#define EXAMPLE_QAPI_TYPES_H
+
+#include &quot;qapi/qapi-builtin-types.h&quot;
+
+typedef struct UserDefOne UserDefOne;
+
+typedef struct UserDefOneList UserDefOneList;
+
+typedef struct q_obj_my_command_arg q_obj_my_command_arg;
+
+struct UserDefOne {
+    int64_t integer;
+    bool has_string;
+    char *string;
+};
+
+void qapi_free_UserDefOne(UserDefOne *obj);
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOne, qapi_free_UserDefOne)
+
+struct UserDefOneList {
+    UserDefOneList *next;
+    UserDefOne *value;
+};
+
+void qapi_free_UserDefOneList(UserDefOneList *obj);
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOneList, qapi_free_UserDefOneList)
+
+struct q_obj_my_command_arg {
+    UserDefOneList *arg1;
+};
+
+#endif /* EXAMPLE_QAPI_TYPES_H */
+$ cat qapi-generated/example-qapi-types.c
+[Uninteresting stuff omitted...]
+
+void qapi_free_UserDefOne(UserDefOne *obj)
+{
+    Visitor *v;
+
+    if (!obj) {
+        return;
+    }
+
+    v = qapi_dealloc_visitor_new();
+    visit_type_UserDefOne(v, NULL, &amp;obj, NULL);
+    visit_free(v);
+}
+
+void qapi_free_UserDefOneList(UserDefOneList *obj)
+{
+    Visitor *v;
+
+    if (!obj) {
+        return;
+    }
+
+    v = qapi_dealloc_visitor_new();
+    visit_type_UserDefOneList(v, NULL, &amp;obj, NULL);
+    visit_free(v);
+}
+
+[Uninteresting stuff omitted...]
+</pre></div>
+</div>
+<p>For a modular QAPI schema (see section <a class="reference internal" href="#include-directives">Include directives</a>), code for
+each sub-module SUBDIR/SUBMODULE.json is actually generated into</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SUBDIR/$(prefix)qapi-types-SUBMODULE.h
+SUBDIR/$(prefix)qapi-types-SUBMODULE.c
+</pre></div>
+</div>
+<p>If qapi-gen.py is run with option –builtins, additional files are
+created:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">qapi-builtin-types.h</span></code></dt><dd><p>C types corresponding to built-in types</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">qapi-builtin-types.c</span></code></dt><dd><p>Cleanup functions for the above C types</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="code-generated-for-visiting-qapi-types">
+<h3>Code generated for visiting QAPI types<a class="headerlink" href="#code-generated-for-visiting-qapi-types" title="Permalink to this heading"></a></h3>
+<p>These are the visitor functions used to walk through and convert
+between a native QAPI C data structure and some other format (such as
+QObject); the generated functions are named visit_type_FOO() and
+visit_type_FOO_members().</p>
+<p>The following files are generated:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-visit.c</span></code></dt><dd><p>Visitor function for a particular C type, used to automagically
+convert QObjects into the corresponding C type and vice-versa, as
+well as for deallocating memory for an existing C type</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-visit.h</span></code></dt><dd><p>Declarations for previously mentioned visitor functions</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat qapi-generated/example-qapi-visit.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_VISIT_H
+#define EXAMPLE_QAPI_VISIT_H
+
+#include &quot;qapi/qapi-builtin-visit.h&quot;
+#include &quot;example-qapi-types.h&quot;
+
+
+bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp);
+
+bool visit_type_UserDefOne(Visitor *v, const char *name,
+                 UserDefOne **obj, Error **errp);
+
+bool visit_type_UserDefOneList(Visitor *v, const char *name,
+                 UserDefOneList **obj, Error **errp);
+
+bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp);
+
+#endif /* EXAMPLE_QAPI_VISIT_H */
+$ cat qapi-generated/example-qapi-visit.c
+[Uninteresting stuff omitted...]
+
+bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
+{
+    if (!visit_type_int(v, &quot;integer&quot;, &amp;obj-&gt;integer, errp)) {
+        return false;
+    }
+    if (visit_optional(v, &quot;string&quot;, &amp;obj-&gt;has_string)) {
+        if (!visit_type_str(v, &quot;string&quot;, &amp;obj-&gt;string, errp)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool visit_type_UserDefOne(Visitor *v, const char *name,
+                 UserDefOne **obj, Error **errp)
+{
+    bool ok = false;
+
+    if (!visit_start_struct(v, name, (void **)obj, sizeof(UserDefOne), errp)) {
+        return false;
+    }
+    if (!*obj) {
+        /* incomplete */
+        assert(visit_is_dealloc(v));
+        ok = true;
+        goto out_obj;
+    }
+    if (!visit_type_UserDefOne_members(v, *obj, errp)) {
+        goto out_obj;
+    }
+    ok = visit_check_struct(v, errp);
+out_obj:
+    visit_end_struct(v, (void **)obj);
+    if (!ok &amp;&amp; visit_is_input(v)) {
+        qapi_free_UserDefOne(*obj);
+        *obj = NULL;
+    }
+    return ok;
+}
+
+bool visit_type_UserDefOneList(Visitor *v, const char *name,
+                 UserDefOneList **obj, Error **errp)
+{
+    bool ok = false;
+    UserDefOneList *tail;
+    size_t size = sizeof(**obj);
+
+    if (!visit_start_list(v, name, (GenericList **)obj, size, errp)) {
+        return false;
+    }
+
+    for (tail = *obj; tail;
+         tail = (UserDefOneList *)visit_next_list(v, (GenericList *)tail, size)) {
+        if (!visit_type_UserDefOne(v, NULL, &amp;tail-&gt;value, errp)) {
+            goto out_obj;
+        }
+    }
+
+    ok = visit_check_list(v, errp);
+out_obj:
+    visit_end_list(v, (void **)obj);
+    if (!ok &amp;&amp; visit_is_input(v)) {
+        qapi_free_UserDefOneList(*obj);
+        *obj = NULL;
+    }
+    return ok;
+}
+
+bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
+{
+    if (!visit_type_UserDefOneList(v, &quot;arg1&quot;, &amp;obj-&gt;arg1, errp)) {
+        return false;
+    }
+    return true;
+}
+
+[Uninteresting stuff omitted...]
+</pre></div>
+</div>
+<p>For a modular QAPI schema (see section <a class="reference internal" href="#include-directives">Include directives</a>), code for
+each sub-module SUBDIR/SUBMODULE.json is actually generated into</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SUBDIR/$(prefix)qapi-visit-SUBMODULE.h
+SUBDIR/$(prefix)qapi-visit-SUBMODULE.c
+</pre></div>
+</div>
+<p>If qapi-gen.py is run with option –builtins, additional files are
+created:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">qapi-builtin-visit.h</span></code></dt><dd><p>Visitor functions for built-in types</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">qapi-builtin-visit.c</span></code></dt><dd><p>Declarations for these visitor functions</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="code-generated-for-commands">
+<h3>Code generated for commands<a class="headerlink" href="#code-generated-for-commands" title="Permalink to this heading"></a></h3>
+<p>These are the marshaling/dispatch functions for the commands defined
+in the schema.  The generated code provides qmp_marshal_COMMAND(), and
+declares qmp_COMMAND() that the user must implement.</p>
+<p>The following files are generated:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-commands.c</span></code></dt><dd><p>Command marshal/dispatch functions for each QMP command defined in
+the schema</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-commands.h</span></code></dt><dd><p>Function prototypes for the QMP commands specified in the schema</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-commands.trace-events</span></code></dt><dd><p>Trace event declarations, see <a class="reference internal" href="tracing.html#tracing"><span class="std std-ref">Tracing</span></a>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-init-commands.h</span></code></dt><dd><p>Command initialization prototype</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-init-commands.c</span></code></dt><dd><p>Command initialization code</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat qapi-generated/example-qapi-commands.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_COMMANDS_H
+#define EXAMPLE_QAPI_COMMANDS_H
+
+#include &quot;example-qapi-types.h&quot;
+
+UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
+void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp);
+
+#endif /* EXAMPLE_QAPI_COMMANDS_H */
+
+$ cat qapi-generated/example-qapi-commands.trace-events
+# AUTOMATICALLY GENERATED, DO NOT MODIFY
+
+qmp_enter_my_command(const char *json) &quot;%s&quot;
+qmp_exit_my_command(const char *result, bool succeeded) &quot;%s %d&quot;
+
+$ cat qapi-generated/example-qapi-commands.c
+[Uninteresting stuff omitted...]
+
+
+static void qmp_marshal_output_UserDefOne(UserDefOne *ret_in,
+                                QObject **ret_out, Error **errp)
+{
+    Visitor *v;
+
+    v = qobject_output_visitor_new_qmp(ret_out);
+    if (visit_type_UserDefOne(v, &quot;unused&quot;, &amp;ret_in, errp)) {
+        visit_complete(v, ret_out);
+    }
+    visit_free(v);
+    v = qapi_dealloc_visitor_new();
+    visit_type_UserDefOne(v, &quot;unused&quot;, &amp;ret_in, NULL);
+    visit_free(v);
+}
+
+void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp)
+{
+    Error *err = NULL;
+    bool ok = false;
+    Visitor *v;
+    UserDefOne *retval;
+    q_obj_my_command_arg arg = {0};
+
+    v = qobject_input_visitor_new_qmp(QOBJECT(args));
+    if (!visit_start_struct(v, NULL, NULL, 0, errp)) {
+        goto out;
+    }
+    if (visit_type_q_obj_my_command_arg_members(v, &amp;arg, errp)) {
+        ok = visit_check_struct(v, errp);
+    }
+    visit_end_struct(v, NULL);
+    if (!ok) {
+        goto out;
+    }
+
+    if (trace_event_get_state_backends(TRACE_QMP_ENTER_MY_COMMAND)) {
+        g_autoptr(GString) req_json = qobject_to_json(QOBJECT(args));
+
+        trace_qmp_enter_my_command(req_json-&gt;str);
+    }
+
+    retval = qmp_my_command(arg.arg1, &amp;err);
+    if (err) {
+        trace_qmp_exit_my_command(error_get_pretty(err), false);
+        error_propagate(errp, err);
+        goto out;
+    }
+
+    qmp_marshal_output_UserDefOne(retval, ret, errp);
+
+    if (trace_event_get_state_backends(TRACE_QMP_EXIT_MY_COMMAND)) {
+        g_autoptr(GString) ret_json = qobject_to_json(*ret);
+
+        trace_qmp_exit_my_command(ret_json-&gt;str, true);
+    }
+
+out:
+    visit_free(v);
+    v = qapi_dealloc_visitor_new();
+    visit_start_struct(v, NULL, NULL, 0, NULL);
+    visit_type_q_obj_my_command_arg_members(v, &amp;arg, NULL);
+    visit_end_struct(v, NULL);
+    visit_free(v);
+}
+
+[Uninteresting stuff omitted...]
+$ cat qapi-generated/example-qapi-init-commands.h
+[Uninteresting stuff omitted...]
+#ifndef EXAMPLE_QAPI_INIT_COMMANDS_H
+#define EXAMPLE_QAPI_INIT_COMMANDS_H
+
+#include &quot;qapi/qmp/dispatch.h&quot;
+
+void example_qmp_init_marshal(QmpCommandList *cmds);
+
+#endif /* EXAMPLE_QAPI_INIT_COMMANDS_H */
+$ cat qapi-generated/example-qapi-init-commands.c
+[Uninteresting stuff omitted...]
+void example_qmp_init_marshal(QmpCommandList *cmds)
+{
+    QTAILQ_INIT(cmds);
+
+    qmp_register_command(cmds, &quot;my-command&quot;,
+                         qmp_marshal_my_command, QCO_NO_OPTIONS);
+}
+[Uninteresting stuff omitted...]
+</pre></div>
+</div>
+<p>For a modular QAPI schema (see section <a class="reference internal" href="#include-directives">Include directives</a>), code for
+each sub-module SUBDIR/SUBMODULE.json is actually generated into:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SUBDIR/$(prefix)qapi-commands-SUBMODULE.h
+SUBDIR/$(prefix)qapi-commands-SUBMODULE.c
+</pre></div>
+</div>
+</section>
+<section id="code-generated-for-events">
+<h3>Code generated for events<a class="headerlink" href="#code-generated-for-events" title="Permalink to this heading"></a></h3>
+<p>This is the code related to events defined in the schema, providing
+qapi_event_send_EVENT().</p>
+<p>The following files are created:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-events.h</span></code></dt><dd><p>Function prototypes for each event type</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-events.c</span></code></dt><dd><p>Implementation of functions to send an event</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-emit-events.h</span></code></dt><dd><p>Enumeration of all event names, and common event code declarations</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-emit-events.c</span></code></dt><dd><p>Common event code definitions</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat qapi-generated/example-qapi-events.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_EVENTS_H
+#define EXAMPLE_QAPI_EVENTS_H
+
+#include &quot;qapi/util.h&quot;
+#include &quot;example-qapi-types.h&quot;
+
+void qapi_event_send_my_event(void);
+
+#endif /* EXAMPLE_QAPI_EVENTS_H */
+$ cat qapi-generated/example-qapi-events.c
+[Uninteresting stuff omitted...]
+
+void qapi_event_send_my_event(void)
+{
+    QDict *qmp;
+
+    qmp = qmp_event_build_dict(&quot;MY_EVENT&quot;);
+
+    example_qapi_event_emit(EXAMPLE_QAPI_EVENT_MY_EVENT, qmp);
+
+    qobject_unref(qmp);
+}
+
+[Uninteresting stuff omitted...]
+$ cat qapi-generated/example-qapi-emit-events.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_EMIT_EVENTS_H
+#define EXAMPLE_QAPI_EMIT_EVENTS_H
+
+#include &quot;qapi/util.h&quot;
+
+typedef enum example_QAPIEvent {
+    EXAMPLE_QAPI_EVENT_MY_EVENT,
+    EXAMPLE_QAPI_EVENT__MAX,
+} example_QAPIEvent;
+
+#define example_QAPIEvent_str(val) \
+    qapi_enum_lookup(&amp;example_QAPIEvent_lookup, (val))
+
+extern const QEnumLookup example_QAPIEvent_lookup;
+
+void example_qapi_event_emit(example_QAPIEvent event, QDict *qdict);
+
+#endif /* EXAMPLE_QAPI_EMIT_EVENTS_H */
+$ cat qapi-generated/example-qapi-emit-events.c
+[Uninteresting stuff omitted...]
+
+const QEnumLookup example_QAPIEvent_lookup = {
+    .array = (const char *const[]) {
+        [EXAMPLE_QAPI_EVENT_MY_EVENT] = &quot;MY_EVENT&quot;,
+    },
+    .size = EXAMPLE_QAPI_EVENT__MAX
+};
+
+[Uninteresting stuff omitted...]
+</pre></div>
+</div>
+<p>For a modular QAPI schema (see section <a class="reference internal" href="#include-directives">Include directives</a>), code for
+each sub-module SUBDIR/SUBMODULE.json is actually generated into</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SUBDIR/$(prefix)qapi-events-SUBMODULE.h
+SUBDIR/$(prefix)qapi-events-SUBMODULE.c
+</pre></div>
+</div>
+</section>
+<section id="code-generated-for-introspection">
+<h3>Code generated for introspection<a class="headerlink" href="#code-generated-for-introspection" title="Permalink to this heading"></a></h3>
+<p>The following files are created:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-introspect.c</span></code></dt><dd><p>Defines a string holding a JSON description of the schema</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$(prefix)qapi-introspect.h</span></code></dt><dd><p>Declares the above string</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat qapi-generated/example-qapi-introspect.h
+[Uninteresting stuff omitted...]
+
+#ifndef EXAMPLE_QAPI_INTROSPECT_H
+#define EXAMPLE_QAPI_INTROSPECT_H
+
+#include &quot;qapi/qmp/qlit.h&quot;
+
+extern const QLitObject example_qmp_schema_qlit;
+
+#endif /* EXAMPLE_QAPI_INTROSPECT_H */
+$ cat qapi-generated/example-qapi-introspect.c
+[Uninteresting stuff omitted...]
+
+const QLitObject example_qmp_schema_qlit = QLIT_QLIST(((QLitObject[]) {
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;arg-type&quot;, QLIT_QSTR(&quot;0&quot;), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;command&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;my-command&quot;), },
+        { &quot;ret-type&quot;, QLIT_QSTR(&quot;1&quot;), },
+        {}
+    })),
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;arg-type&quot;, QLIT_QSTR(&quot;2&quot;), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;event&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;MY_EVENT&quot;), },
+        {}
+    })),
+    /* &quot;0&quot; = q_obj_my-command-arg */
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;members&quot;, QLIT_QLIST(((QLitObject[]) {
+            QLIT_QDICT(((QLitDictEntry[]) {
+                { &quot;name&quot;, QLIT_QSTR(&quot;arg1&quot;), },
+                { &quot;type&quot;, QLIT_QSTR(&quot;[1]&quot;), },
+                {}
+            })),
+            {}
+        })), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;object&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;0&quot;), },
+        {}
+    })),
+    /* &quot;1&quot; = UserDefOne */
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;members&quot;, QLIT_QLIST(((QLitObject[]) {
+            QLIT_QDICT(((QLitDictEntry[]) {
+                { &quot;name&quot;, QLIT_QSTR(&quot;integer&quot;), },
+                { &quot;type&quot;, QLIT_QSTR(&quot;int&quot;), },
+                {}
+            })),
+            QLIT_QDICT(((QLitDictEntry[]) {
+                { &quot;default&quot;, QLIT_QNULL, },
+                { &quot;name&quot;, QLIT_QSTR(&quot;string&quot;), },
+                { &quot;type&quot;, QLIT_QSTR(&quot;str&quot;), },
+                {}
+            })),
+            {}
+        })), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;object&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;1&quot;), },
+        {}
+    })),
+    /* &quot;2&quot; = q_empty */
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;members&quot;, QLIT_QLIST(((QLitObject[]) {
+            {}
+        })), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;object&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;2&quot;), },
+        {}
+    })),
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;element-type&quot;, QLIT_QSTR(&quot;1&quot;), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;array&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;[1]&quot;), },
+        {}
+    })),
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;json-type&quot;, QLIT_QSTR(&quot;int&quot;), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;builtin&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;int&quot;), },
+        {}
+    })),
+    QLIT_QDICT(((QLitDictEntry[]) {
+        { &quot;json-type&quot;, QLIT_QSTR(&quot;string&quot;), },
+        { &quot;meta-type&quot;, QLIT_QSTR(&quot;builtin&quot;), },
+        { &quot;name&quot;, QLIT_QSTR(&quot;str&quot;), },
+        {}
+    })),
+    {}
+}));
+
+[Uninteresting stuff omitted...]
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ci.html" class="btn btn-neutral float-left" title="CI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fuzzing.html" class="btn btn-neutral float-right" title="Fuzzing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

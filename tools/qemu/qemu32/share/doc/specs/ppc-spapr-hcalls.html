@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sPAPR hypervisor calls &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="NUMA mechanics for sPAPR (pseries machines)" href="ppc-spapr-numa.html" />
+    <link rel="prev" title="sPAPR Dynamic Reconfiguration" href="ppc-spapr-hotplug.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../system/index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../system/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../system/targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../system/target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../system/target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../system/target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../system/security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../system/index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../system/targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../system/target-ppc.html">PowerPC System emulator</a></li>
+          <li class="breadcrumb-item"><a href="../system/ppc/pseries.html">pSeries family boards (<code class="docutils literal notranslate"><span class="pre">pseries</span></code>)</a></li>
+      <li class="breadcrumb-item active">sPAPR hypervisor calls</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/ppc-spapr-hcalls.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="spapr-hypervisor-calls">
+<h1>sPAPR hypervisor calls<a class="headerlink" href="#spapr-hypervisor-calls" title="Permalink to this heading"></a></h1>
+<p>When used with the <code class="docutils literal notranslate"><span class="pre">pseries</span></code> machine type, <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc64</span></code> implements
+a set of hypervisor calls (a.k.a. hcalls) defined in the Linux on Power
+Architecture Reference (<a class="reference internal" href="../system/ppc/pseries.html#lopar" id="id1"><span>[LoPAR]</span></a>) document. This document is a subset of the
+Power Architecture Platform Reference (PAPR+) specification (IBM internal only),
+which is what PowerVM, the IBM proprietary hypervisor, adheres to.</p>
+<p>The subset in LoPAR is selected based on the requirements of Linux as a guest.</p>
+<p>In addition to those calls, we have added our own private hypervisor
+calls which are mostly used as a private interface between the firmware
+running in the guest and QEMU.</p>
+<p>All those hypercalls start at hcall number 0xf000 which correspond
+to an implementation specific range in PAPR.</p>
+<section id="h-rtas-0xf000">
+<h2><code class="docutils literal notranslate"><span class="pre">H_RTAS</span> <span class="pre">(0xf000)</span></code><a class="headerlink" href="#h-rtas-0xf000" title="Permalink to this heading"></a></h2>
+<p>RTAS stands for Run-Time Abstraction Sercies and is a set of runtime services
+generally provided by the firmware inside the guest to the operating system. It
+predates the existence of hypervisors (it was originally an extension to Open
+Firmware) and is still used by PAPR and LoPAR to provide various services that
+are not performance sensitive.</p>
+<p>We currently implement the RTAS services in QEMU itself. The actual RTAS
+“firmware” blob in the guest is a small stub of a few instructions which
+calls our private H_RTAS hypervisor call to pass the RTAS calls to QEMU.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">r3</span></code>: <code class="docutils literal notranslate"><span class="pre">H_RTAS</span> <span class="pre">(0xf000)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">r4</span></code>: Guest physical address of RTAS parameter block.</p>
+</div></blockquote>
+<p>Returns:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">H_SUCCESS</span></code>: Successfully called the RTAS function (RTAS result will have
+been stored in the parameter block).</p>
+<p><code class="docutils literal notranslate"><span class="pre">H_PARAMETER</span></code>: Unknown token.</p>
+</div></blockquote>
+</section>
+<section id="h-logical-memop-0xf001">
+<h2><code class="docutils literal notranslate"><span class="pre">H_LOGICAL_MEMOP</span> <span class="pre">(0xf001)</span></code><a class="headerlink" href="#h-logical-memop-0xf001" title="Permalink to this heading"></a></h2>
+<p>When the guest runs in “real mode” (in powerpc terminology this means with MMU
+disabled, i.e. guest effective address equals to guest physical address), it
+only has access to a subset of memory and no I/Os.</p>
+<p>PAPR and LoPAR provides a set of hypervisor calls to perform cacheable or
+non-cacheable accesses to any guest physical addresses that the
+guest can use in order to access IO devices while in real mode.</p>
+<p>This is typically used by the firmware running in the guest.</p>
+<p>However, doing a hypercall for each access is extremely inefficient
+(even more so when running KVM) when accessing the frame buffer. In
+that case, things like scrolling become unusably slow.</p>
+<p>This hypercall allows the guest to request a “memory op” to be applied
+to memory. The supported memory ops at this point are to copy a range
+of memory (supports overlap of source and destination) and XOR which
+is used by our SLOF firmware to invert the screen.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">r3</span> <span class="pre">``:</span> <span class="pre">``H_LOGICAL_MEMOP</span> <span class="pre">(0xf001)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">r4</span></code>: Guest physical address of destination.</p>
+<p><code class="docutils literal notranslate"><span class="pre">r5</span></code>: Guest physical address of source.</p>
+<p><code class="docutils literal notranslate"><span class="pre">r6</span></code>: Individual element size, defined by the binary logarithm of the
+desired size. Supported values are:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">0</span></code> = 1 byte</p>
+<p><code class="docutils literal notranslate"><span class="pre">1</span></code> = 2 bytes</p>
+<p><code class="docutils literal notranslate"><span class="pre">2</span></code> = 4 bytes</p>
+<p><code class="docutils literal notranslate"><span class="pre">3</span></code> = 8 bytes</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">r7</span></code>: Number of elements.</p>
+<p><code class="docutils literal notranslate"><span class="pre">r8</span></code>: Operation. Supported values are:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: copy</p>
+<p><code class="docutils literal notranslate"><span class="pre">1</span></code>: xor</p>
+</div></blockquote>
+</div></blockquote>
+<p>Returns:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">H_SUCCESS</span></code>: Success.</p>
+<p><code class="docutils literal notranslate"><span class="pre">H_PARAMETER</span></code>: Invalid argument.</p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ppc-spapr-hotplug.html" class="btn btn-neutral float-left" title="sPAPR Dynamic Reconfiguration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ppc-spapr-numa.html" class="btn btn-neutral float-right" title="NUMA mechanics for sPAPR (pseries machines)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

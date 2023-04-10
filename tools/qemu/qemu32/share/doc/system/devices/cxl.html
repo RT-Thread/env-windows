@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compute Express Link (CXL) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Inter-VM Shared Memory device" href="ivshmem.html" />
+    <link rel="prev" title="Chip Card Interface Device (CCID)" href="ccid.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usb.html">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">Compute Express Link (CXL)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/cxl.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="compute-express-link-cxl">
+<h1>Compute Express Link (CXL)<a class="headerlink" href="#compute-express-link-cxl" title="Permalink to this heading"></a></h1>
+<p>From the view of a single host, CXL is an interconnect standard that
+targets accelerators and memory devices attached to a CXL host.
+This description will focus on those aspects visible either to
+software running on a QEMU emulated host or to the internals of
+functional emulation. As such, it will skip over many of the
+electrical and protocol elements that would be more of interest
+for real hardware and will dominate more general introductions to CXL.
+It will also completely ignore the fabric management aspects of CXL
+by considering only a single host and a static configuration.</p>
+<p>CXL shares many concepts and much of the infrastructure of PCI Express,
+with CXL Host Bridges, which have CXL Root Ports which may be directly
+attached to CXL or PCI End Points. Alternatively there may be CXL Switches
+with CXL and PCI Endpoints attached below them.  In many cases additional
+control and capabilities are exposed via PCI Express interfaces.
+This sharing of interfaces and hence emulation code is reflected
+in how the devices are emulated in QEMU. In most cases the various
+CXL elements are built upon an equivalent PCIe devices.</p>
+<p>CXL devices support the following interfaces:</p>
+<ul class="simple">
+<li><p>Most conventional PCIe interfaces</p>
+<ul>
+<li><p>Configuration space access</p></li>
+<li><p>BAR mapped memory accesses used for registers and mailboxes.</p></li>
+<li><p>MSI/MSI-X</p></li>
+<li><p>AER</p></li>
+<li><p>DOE mailboxes</p></li>
+<li><p>IDE</p></li>
+<li><p>Many other PCI express defined interfaces..</p></li>
+</ul>
+</li>
+<li><p>Memory operations</p>
+<ul>
+<li><p>Equivalent of accessing DRAM / NVDIMMs. Any access / feature
+supported by the host for normal memory should also work for
+CXL attached memory devices.</p></li>
+</ul>
+</li>
+<li><p>Cache operations. The are mostly irrelevant to QEMU emulation as
+QEMU is not emulating a coherency protocol. Any emulation related
+to these will be device specific and is out of the scope of this
+document.</p></li>
+</ul>
+<section id="cxl-2-0-device-types">
+<h2>CXL 2.0 Device Types<a class="headerlink" href="#cxl-2-0-device-types" title="Permalink to this heading"></a></h2>
+<p>CXL 2.0 End Points are often categorized into three types.</p>
+<p><strong>Type 1:</strong> These support coherent caching of host memory.  Example might
+be a crypto accelerators.  May also have device private memory accessible
+via means such as PCI memory reads and writes to BARs.</p>
+<p><strong>Type 2:</strong> These support coherent caching of host memory and host
+managed device memory (HDM) for which the coherency protocol is managed
+by the host. This is a complex topic, so for more information on CXL
+coherency see the CXL 2.0 specification.</p>
+<p><strong>Type 3 Memory devices:</strong>  These devices act as a means of attaching
+additional memory (HDM) to a CXL host including both volatile and
+persistent memory. The CXL topology may support interleaving across a
+number of Type 3 memory devices using HDM Decoders in the host, host
+bridge, switch upstream port and endpoints.</p>
+</section>
+<section id="scope-of-cxl-emulation-in-qemu">
+<h2>Scope of CXL emulation in QEMU<a class="headerlink" href="#scope-of-cxl-emulation-in-qemu" title="Permalink to this heading"></a></h2>
+<p>The focus of CXL emulation is CXL revision 2.0 and later. Earlier CXL
+revisions defined a smaller set of features, leaving much of the control
+interface as implementation defined or device specific, making generic
+emulation challenging with host specific firmware being responsible
+for setup and the Endpoints being presented to operating systems
+as Root Complex Integrated End Points. CXL rev 2.0 looks a lot
+more like PCI Express, with fully specified discoverability
+of the CXL topology.</p>
+</section>
+<section id="cxl-system-components">
+<h2>CXL System components<a class="headerlink" href="#cxl-system-components" title="Permalink to this heading"></a></h2>
+<p>A CXL system is made up a Host with a number of ‘standard components’
+the control and capabilities of which are discoverable by system software
+using means described in the CXL 2.0 specification.</p>
+<section id="cxl-fixed-memory-windows-cfmw">
+<h3>CXL Fixed Memory Windows (CFMW)<a class="headerlink" href="#cxl-fixed-memory-windows-cfmw" title="Permalink to this heading"></a></h3>
+<p>A CFMW consists of a particular range of Host Physical Address space
+which is routed to particular CXL Host Bridges.  At time of generic
+software initialization it will have a particularly interleaving
+configuration and associated Quality of Service Throttling Group (QTG).
+This information is available to system software, when making
+decisions about how to configure interleave across available CXL
+memory devices.  It is provide as CFMW Structures (CFMWS) in
+the CXL Early Discovery Table, an ACPI table.</p>
+<p>Note: QTG 0 is the only one currently supported in QEMU.</p>
+</section>
+<section id="cxl-host-bridge-cxl-hb">
+<h3>CXL Host Bridge (CXL HB)<a class="headerlink" href="#cxl-host-bridge-cxl-hb" title="Permalink to this heading"></a></h3>
+<p>A CXL host bridge is similar to the PCIe equivalent, but with a
+specification defined register interface called CXL Host Bridge
+Component Registers (CHBCR). The location of this CHBCR MMIO
+space is described to system software via a CXL Host Bridge
+Structure (CHBS) in the CEDT ACPI table.  The actual interfaces
+are identical to those used for other parts of the CXL hierarchy
+as CXL Component Registers in PCI BARs.</p>
+<p>Interfaces provided include:</p>
+<ul class="simple">
+<li><p>Configuration of HDM Decoders to route CXL Memory accesses with
+a particularly Host Physical Address range to the target port
+below which the CXL device servicing that address lies.  This
+may be a mapping to a single Root Port (RP) or across a set of
+target RPs.</p></li>
+</ul>
+</section>
+<section id="cxl-root-ports-cxl-rp">
+<h3>CXL Root Ports (CXL RP)<a class="headerlink" href="#cxl-root-ports-cxl-rp" title="Permalink to this heading"></a></h3>
+<p>A CXL Root Port servers te same purpose as a PCIe Root Port.
+There are a number of CXL specific Designated Vendor Specific
+Extended Capabilities (DVSEC) in PCIe Configuration Space
+and associated component register access via PCI bars.</p>
+</section>
+<section id="cxl-switch">
+<h3>CXL Switch<a class="headerlink" href="#cxl-switch" title="Permalink to this heading"></a></h3>
+<p>Here we consider a simple CXL switch with only a single
+virtual hierarchy. Whilst more complex devices exist, their
+visibility to a particular host is generally the same as for
+a simple switch design. Hosts often have no awareness
+of complex rerouting and device pooling, they simply see
+devices being hot added or hot removed.</p>
+<p>A CXL switch has a similar architecture to those in PCIe,
+with a single upstream port, internal PCI bus and multiple
+downstream ports.</p>
+<p>Both the CXL upstream and downstream ports have CXL specific
+DVSECs in configuration space, and component registers in PCI
+BARs.  The Upstream Port has the configuration interfaces for
+the HDM decoders which route incoming memory accesses to the
+appropriate downstream port.</p>
+<p>A CXL switch is created in a similar fashion to PCI switches
+by creating an upstream port (cxl-upstream) and a number of
+downstream ports on the internal switch bus (cxl-downstream).</p>
+</section>
+<section id="cxl-memory-devices-type-3">
+<h3>CXL Memory Devices - Type 3<a class="headerlink" href="#cxl-memory-devices-type-3" title="Permalink to this heading"></a></h3>
+<p>CXL type 3 devices use a PCI class code and are intended to be supported
+by a generic operating system driver. They have HDM decoders
+though in these EP devices, the decoder is responsible not for
+routing but for translation of the incoming host physical address (HPA)
+into a Device Physical Address (DPA).</p>
+</section>
+</section>
+<section id="cxl-memory-interleave">
+<h2>CXL Memory Interleave<a class="headerlink" href="#cxl-memory-interleave" title="Permalink to this heading"></a></h2>
+<p>To understand the interaction of different CXL hardware components which
+are emulated in QEMU, let us consider a memory read in a fully configured
+CXL topology.  Note that system software is responsible for configuration
+of all components with the exception of the CFMWs. System software is
+responsible for allocating appropriate ranges from within the CFMWs
+and exposing those via normal memory configurations as would be done
+for system RAM.</p>
+<p>Example system Topology. x marks the match in each decoder level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|&lt;------------------</span><span class="n">SYSTEM</span> <span class="n">PHYSICAL</span> <span class="n">ADDRESS</span> <span class="n">MAP</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-----------------&gt;|</span>
+<span class="o">|</span>    <span class="n">__________</span>   <span class="n">__________________________________</span>   <span class="n">__________</span>    <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>          <span class="o">|</span> <span class="o">|</span>                                  <span class="o">|</span> <span class="o">|</span>          <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">CFMW</span> <span class="mi">0</span>   <span class="o">|</span> <span class="o">|</span>  <span class="n">CXL</span> <span class="n">Fixed</span> <span class="n">Memory</span> <span class="n">Window</span> <span class="mi">1</span>       <span class="o">|</span> <span class="o">|</span> <span class="n">CFMW</span> <span class="mi">1</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">HB0</span> <span class="n">only</span> <span class="o">|</span> <span class="o">|</span>  <span class="n">Configured</span> <span class="n">to</span> <span class="n">interleave</span> <span class="n">memory</span> <span class="o">|</span> <span class="o">|</span> <span class="n">HB1</span> <span class="n">only</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>          <span class="o">|</span> <span class="o">|</span>  <span class="n">memory</span> <span class="n">accesses</span> <span class="n">across</span> <span class="n">HB0</span><span class="o">/</span><span class="n">HB1</span>  <span class="o">|</span> <span class="o">|</span>          <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span><span class="n">__________</span><span class="o">|</span> <span class="o">|</span><span class="n">_____x____________________________</span><span class="o">|</span> <span class="o">|</span><span class="n">__________</span><span class="o">|</span>   <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>       <span class="n">Interleave</span> <span class="n">Decoder</span>          <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>       <span class="n">Matches</span> <span class="n">this</span> <span class="n">HB</span>             <span class="o">|</span>             <span class="o">|</span>
+         \<span class="n">_____________</span><span class="o">|</span>                     <span class="o">|</span><span class="n">_____________</span><span class="o">/</span>
+             <span class="n">__________</span><span class="o">|</span><span class="n">__________</span>      <span class="n">_____</span><span class="o">|</span><span class="n">_______________</span>
+            <span class="o">|</span>                     <span class="o">|</span>    <span class="o">|</span>                     <span class="o">|</span>
+     <span class="p">(</span><span class="mi">2</span><span class="p">)</span>    <span class="o">|</span> <span class="n">CXL</span> <span class="n">HB</span> <span class="mi">0</span>            <span class="o">|</span>    <span class="o">|</span> <span class="n">CXL</span> <span class="n">HB</span> <span class="mi">1</span>            <span class="o">|</span>
+            <span class="o">|</span> <span class="n">HB</span> <span class="n">IntLv</span> <span class="n">Decoders</span>   <span class="o">|</span>    <span class="o">|</span> <span class="n">HB</span> <span class="n">IntLv</span> <span class="n">Decoders</span>   <span class="o">|</span>
+            <span class="o">|</span> <span class="n">PCI</span><span class="o">/</span><span class="n">CXL</span> <span class="n">Root</span> <span class="n">Bus</span> <span class="mi">0</span><span class="n">c</span> <span class="o">|</span>    <span class="o">|</span> <span class="n">PCI</span><span class="o">/</span><span class="n">CXL</span> <span class="n">Root</span> <span class="n">Bus</span> <span class="mi">0</span><span class="n">d</span> <span class="o">|</span>
+            <span class="o">|</span>                     <span class="o">|</span>    <span class="o">|</span>                     <span class="o">|</span>
+            <span class="o">|</span><span class="n">___x_________________</span><span class="o">|</span>    <span class="o">|</span><span class="n">_____________________</span><span class="o">|</span>
+                <span class="o">|</span>                <span class="o">|</span>       <span class="o">|</span>               <span class="o">|</span>
+                <span class="o">|</span>                <span class="o">|</span>       <span class="o">|</span>               <span class="o">|</span>
+     <span class="n">A</span> <span class="n">HB</span> <span class="mi">0</span> <span class="n">HDM</span> <span class="n">Decoder</span>          <span class="o">|</span>       <span class="o">|</span>               <span class="o">|</span>
+     <span class="n">matches</span> <span class="n">this</span> <span class="n">Port</span>           <span class="o">|</span>       <span class="o">|</span>               <span class="o">|</span>
+                <span class="o">|</span>                <span class="o">|</span>       <span class="o">|</span>               <span class="o">|</span>
+     <span class="n">___________</span><span class="o">|</span><span class="n">___</span>   <span class="n">__________</span><span class="o">|</span><span class="n">__</span>   <span class="n">__</span><span class="o">|</span><span class="n">_________</span>   <span class="n">___</span><span class="o">|</span><span class="n">_________</span>
+ <span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">|</span>  <span class="n">Root</span> <span class="n">Port</span> <span class="mi">0</span>  <span class="o">|</span> <span class="o">|</span> <span class="n">Root</span> <span class="n">Port</span> <span class="mi">1</span> <span class="o">|</span> <span class="o">|</span> <span class="n">Root</span> <span class="n">Port</span> <span class="mi">2</span><span class="o">|</span> <span class="o">|</span> <span class="n">Root</span> <span class="n">Port</span> <span class="mi">3</span> <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">Appears</span> <span class="ow">in</span>   <span class="o">|</span> <span class="o">|</span> <span class="n">Appears</span> <span class="ow">in</span>  <span class="o">|</span> <span class="o">|</span> <span class="n">Appears</span> <span class="ow">in</span> <span class="o">|</span> <span class="o">|</span> <span class="n">Appear</span> <span class="ow">in</span>   <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">PCI</span> <span class="n">topology</span> <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="n">Topology</span><span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="n">Topo</span>   <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="n">Topo</span>    <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">As</span> <span class="mi">0</span><span class="n">c</span><span class="p">:</span><span class="mf">00.0</span>   <span class="o">|</span> <span class="o">|</span> <span class="k">as</span> <span class="mi">0</span><span class="n">c</span><span class="p">:</span><span class="mf">01.0</span>  <span class="o">|</span> <span class="o">|</span> <span class="k">as</span> <span class="n">de</span><span class="p">:</span><span class="mf">00.0</span> <span class="o">|</span> <span class="o">|</span> <span class="k">as</span> <span class="n">de</span><span class="p">:</span><span class="mf">01.0</span>  <span class="o">|</span>
+    <span class="o">|</span><span class="n">_______________</span><span class="o">|</span> <span class="o">|</span><span class="n">_____________</span><span class="o">|</span> <span class="o">|</span><span class="n">____________</span><span class="o">|</span> <span class="o">|</span><span class="n">_____________</span><span class="o">|</span>
+          <span class="o">|</span>                  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>
+          <span class="o">|</span>                  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>
+     <span class="n">_____</span><span class="o">|</span><span class="n">_________</span>   <span class="n">______</span><span class="o">|</span><span class="n">______</span>   <span class="n">______</span><span class="o">|</span><span class="n">_____</span>   <span class="n">______</span><span class="o">|</span><span class="n">_______</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">|</span>     <span class="n">x</span>         <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">CXL</span> <span class="n">Type3</span> <span class="mi">0</span>   <span class="o">|</span> <span class="o">|</span> <span class="n">CXL</span> <span class="n">Type3</span> <span class="mi">1</span> <span class="o">|</span> <span class="o">|</span> <span class="n">CXL</span> <span class="n">type3</span> <span class="mi">2</span><span class="o">|</span> <span class="o">|</span> <span class="n">CLX</span> <span class="n">Type</span> <span class="mi">3</span> <span class="mi">3</span> <span class="o">|</span>
+    <span class="o">|</span>               <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">PMEM0</span><span class="p">(</span><span class="n">Vol</span> <span class="n">LSA</span><span class="p">)</span><span class="o">|</span> <span class="o">|</span> <span class="n">PMEM1</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span> <span class="n">PMEM2</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">|</span> <span class="o">|</span> <span class="n">PMEM3</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="o">|</span>
+    <span class="o">|</span> <span class="n">Decoder</span> <span class="n">to</span> <span class="n">go</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="kn">from</span> <span class="nn">host</span> <span class="n">PA</span>  <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="mi">0</span><span class="n">e</span><span class="p">:</span><span class="mf">00.0</span> <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="n">df</span><span class="p">:</span><span class="mf">00.0</span><span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="n">e0</span><span class="p">:</span><span class="mf">00.0</span>  <span class="o">|</span>
+    <span class="o">|</span> <span class="n">to</span> <span class="n">device</span> <span class="n">PA</span>  <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">PCI</span> <span class="k">as</span> <span class="mi">0</span><span class="n">d</span><span class="p">:</span><span class="mf">00.0</span><span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span><span class="n">_______________</span><span class="o">|</span> <span class="o">|</span><span class="n">_____________</span><span class="o">|</span> <span class="o">|</span><span class="n">____________</span><span class="o">|</span> <span class="o">|</span><span class="n">______________</span><span class="o">|</span>
+</pre></div>
+</div>
+<p>Notes:</p>
+<ol class="arabic simple">
+<li><p><strong>3 CXL Fixed Memory Windows (CFMW)</strong> corresponding to different
+ranges of the system physical address map.  Each CFMW has
+particular interleave setup across the CXL Host Bridges (HB)
+CFMW0 provides uninterleaved access to HB0, CFW2 provides
+uninterleaved access to HB1. CFW1 provides interleaved memory access
+across HB0 and HB1.</p></li>
+<li><p><strong>Two CXL Host Bridges</strong>. Each of these has 2 CXL Root Ports and
+programmable HDM decoders to route memory accesses either to
+a single port or interleave them across multiple ports.
+A complex configuration here, might be to use the following HDM
+decoders in HB0. HDM0 routes CFMW0 requests to RP0 and hence
+part of CXL Type3 0. HDM1 routes CFMW0 requests from a
+different region of the CFMW0 PA range to RP2 and hence part
+of CXL Type 3 1.  HDM2 routes yet another PA range from within
+CFMW0 to be interleaved across RP0 and RP1, providing 2 way
+interleave of part of the memory provided by CXL Type3 0 and
+CXL Type 3 1. HDM3 routes those interleaved accesses from
+CFMW1 that target HB0 to RP 0 and another part of the memory of
+CXL Type 3 0 (as part of a 2 way interleave at the system level
+across for example CXL Type3 0 and CXL Type3 2.
+HDM4 is used to enable system wide 4 way interleave across all
+the present CXL type3 devices, by interleaving those (interleaved)
+requests that HB0 receives from from CFMW1 across RP 0 and
+RP 1 and hence to yet more regions of the memory of the
+attached Type3 devices.  Note this is a representative subset
+of the full range of possible HDM decoder configurations in this
+topology.</p></li>
+<li><p><strong>Four CXL Root Ports.</strong> In this case the CXL Type 3 devices are
+directly attached to these ports.</p></li>
+<li><p><strong>Four CXL Type3 memory expansion devices.</strong>  These will each have
+HDM decoders, but in this case rather than performing interleave
+they will take the Host Physical Addresses of accesses and map
+them to their own local Device Physical Address Space (DPA).</p></li>
+</ol>
+<p>Example topology involving a switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|&lt;------------------</span><span class="n">SYSTEM</span> <span class="n">PHYSICAL</span> <span class="n">ADDRESS</span> <span class="n">MAP</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-----------------&gt;|</span>
+<span class="o">|</span>    <span class="n">__________</span>   <span class="n">__________________________________</span>   <span class="n">__________</span>    <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>          <span class="o">|</span> <span class="o">|</span>                                  <span class="o">|</span> <span class="o">|</span>          <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">CFMW</span> <span class="mi">0</span>   <span class="o">|</span> <span class="o">|</span>  <span class="n">CXL</span> <span class="n">Fixed</span> <span class="n">Memory</span> <span class="n">Window</span> <span class="mi">1</span>       <span class="o">|</span> <span class="o">|</span> <span class="n">CFMW</span> <span class="mi">1</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">HB0</span> <span class="n">only</span> <span class="o">|</span> <span class="o">|</span>  <span class="n">Configured</span> <span class="n">to</span> <span class="n">interleave</span> <span class="n">memory</span> <span class="o">|</span> <span class="o">|</span> <span class="n">HB1</span> <span class="n">only</span> <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>          <span class="o">|</span> <span class="o">|</span>  <span class="n">memory</span> <span class="n">accesses</span> <span class="n">across</span> <span class="n">HB0</span><span class="o">/</span><span class="n">HB1</span>  <span class="o">|</span> <span class="o">|</span>          <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span><span class="n">____x_____</span><span class="o">|</span> <span class="o">|</span><span class="n">__________________________________</span><span class="o">|</span> <span class="o">|</span><span class="n">__________</span><span class="o">|</span>   <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         <span class="o">|</span>             <span class="o">|</span>                     <span class="o">|</span>
+<span class="n">Interleave</span> <span class="n">Decoder</span>     <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+ <span class="n">Matches</span> <span class="n">this</span> <span class="n">HB</span>       <span class="o">|</span>                     <span class="o">|</span>             <span class="o">|</span>
+         \<span class="n">_____________</span><span class="o">|</span>                     <span class="o">|</span><span class="n">_____________</span><span class="o">/</span>
+             <span class="n">__________</span><span class="o">|</span><span class="n">__________</span>      <span class="n">_____</span><span class="o">|</span><span class="n">_______________</span>
+            <span class="o">|</span>                     <span class="o">|</span>    <span class="o">|</span>                     <span class="o">|</span>
+            <span class="o">|</span> <span class="n">CXL</span> <span class="n">HB</span> <span class="mi">0</span>            <span class="o">|</span>    <span class="o">|</span> <span class="n">CXL</span> <span class="n">HB</span> <span class="mi">1</span>            <span class="o">|</span>
+            <span class="o">|</span> <span class="n">HB</span> <span class="n">IntLv</span> <span class="n">Decoders</span>   <span class="o">|</span>    <span class="o">|</span> <span class="n">HB</span> <span class="n">IntLv</span> <span class="n">Decoders</span>   <span class="o">|</span>
+            <span class="o">|</span> <span class="n">PCI</span><span class="o">/</span><span class="n">CXL</span> <span class="n">Root</span> <span class="n">Bus</span> <span class="mi">0</span><span class="n">c</span> <span class="o">|</span>    <span class="o">|</span> <span class="n">PCI</span><span class="o">/</span><span class="n">CXL</span> <span class="n">Root</span> <span class="n">Bus</span> <span class="mi">0</span><span class="n">d</span> <span class="o">|</span>
+            <span class="o">|</span>                     <span class="o">|</span>    <span class="o">|</span>                     <span class="o">|</span>
+            <span class="o">|</span><span class="n">___x_________________</span><span class="o">|</span>    <span class="o">|</span><span class="n">_____________________</span><span class="o">|</span>
+                <span class="o">|</span>              <span class="o">|</span>          <span class="o">|</span>               <span class="o">|</span>
+                <span class="o">|</span>
+     <span class="n">A</span> <span class="n">HB</span> <span class="mi">0</span> <span class="n">HDM</span> <span class="n">Decoder</span>
+     <span class="n">matches</span> <span class="n">this</span> <span class="n">Port</span>
+     <span class="n">___________</span><span class="o">|</span><span class="n">___</span>
+    <span class="o">|</span>  <span class="n">Root</span> <span class="n">Port</span> <span class="mi">0</span>  <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">Appears</span> <span class="ow">in</span>   <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">PCI</span> <span class="n">topology</span> <span class="o">|</span>
+    <span class="o">|</span>  <span class="n">As</span> <span class="mi">0</span><span class="n">c</span><span class="p">:</span><span class="mf">00.0</span>   <span class="o">|</span>
+    <span class="o">|</span><span class="n">___________x___</span><span class="o">|</span>
+                <span class="o">|</span>
+                <span class="o">|</span>
+                \<span class="n">_____________________</span>
+                                      <span class="o">|</span>
+                                      <span class="o">|</span>
+          <span class="o">---------------------------------------------------</span>
+         <span class="o">|</span>    <span class="n">Switch</span> <span class="mi">0</span>  <span class="n">USP</span> <span class="k">as</span> <span class="n">PCI</span> <span class="mi">0</span><span class="n">d</span><span class="p">:</span><span class="mf">00.0</span>                   <span class="o">|</span>
+         <span class="o">|</span>    <span class="n">USP</span> <span class="n">has</span> <span class="n">HDM</span> <span class="n">decoder</span> <span class="n">which</span> <span class="n">direct</span> <span class="n">traffic</span> <span class="n">to</span>    <span class="o">|</span>
+         <span class="o">|</span>    <span class="n">appropriate</span> <span class="n">downstream</span> <span class="n">port</span>                    <span class="o">|</span>
+         <span class="o">|</span>    <span class="n">Switch</span> <span class="n">BUS</span> <span class="n">appears</span> <span class="k">as</span> <span class="mi">0</span><span class="n">e</span>                       <span class="o">|</span>
+         <span class="o">|</span><span class="n">x__________________________________________________</span><span class="o">|</span>
+          <span class="o">|</span>                  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>
+          <span class="o">|</span>                  <span class="o">|</span>               <span class="o">|</span>              <span class="o">|</span>
+     <span class="n">_____</span><span class="o">|</span><span class="n">_________</span>   <span class="n">______</span><span class="o">|</span><span class="n">______</span>   <span class="n">______</span><span class="o">|</span><span class="n">_____</span>   <span class="n">______</span><span class="o">|</span><span class="n">_______</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">|</span>     <span class="n">x</span>         <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">CXL</span> <span class="n">Type3</span> <span class="mi">0</span>   <span class="o">|</span> <span class="o">|</span> <span class="n">CXL</span> <span class="n">Type3</span> <span class="mi">1</span> <span class="o">|</span> <span class="o">|</span> <span class="n">CXL</span> <span class="n">type3</span> <span class="mi">2</span><span class="o">|</span> <span class="o">|</span> <span class="n">CLX</span> <span class="n">Type</span> <span class="mi">3</span> <span class="mi">3</span> <span class="o">|</span>
+    <span class="o">|</span>               <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">PMEM0</span><span class="p">(</span><span class="n">Vol</span> <span class="n">LSA</span><span class="p">)</span><span class="o">|</span> <span class="o">|</span> <span class="n">PMEM1</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span> <span class="n">PMEM2</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">|</span> <span class="o">|</span> <span class="n">PMEM3</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="o">|</span>
+    <span class="o">|</span> <span class="n">Decoder</span> <span class="n">to</span> <span class="n">go</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="kn">from</span> <span class="nn">host</span> <span class="n">PA</span>  <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="mi">10</span><span class="p">:</span><span class="mf">00.0</span> <span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="mi">11</span><span class="p">:</span><span class="mf">00.0</span><span class="o">|</span> <span class="o">|</span> <span class="n">PCI</span> <span class="mi">12</span><span class="p">:</span><span class="mf">00.0</span>  <span class="o">|</span>
+    <span class="o">|</span> <span class="n">to</span> <span class="n">device</span> <span class="n">PA</span>  <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span> <span class="n">PCI</span> <span class="k">as</span> <span class="mi">0</span><span class="n">f</span><span class="p">:</span><span class="mf">00.0</span><span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>            <span class="o">|</span> <span class="o">|</span>              <span class="o">|</span>
+    <span class="o">|</span><span class="n">_______________</span><span class="o">|</span> <span class="o">|</span><span class="n">_____________</span><span class="o">|</span> <span class="o">|</span><span class="n">____________</span><span class="o">|</span> <span class="o">|</span><span class="n">______________</span><span class="o">|</span>
+</pre></div>
+</div>
+</section>
+<section id="example-command-lines">
+<h2>Example command lines<a class="headerlink" href="#example-command-lines" title="Permalink to this heading"></a></h2>
+<p>A very simple setup with just one directly attached CXL Type 3 device:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">aarch64</span> <span class="o">-</span><span class="n">M</span> <span class="n">virt</span><span class="p">,</span><span class="n">gic</span><span class="o">-</span><span class="n">version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">cxl</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">g</span><span class="p">,</span><span class="n">maxmem</span><span class="o">=</span><span class="mi">8</span><span class="n">G</span><span class="p">,</span><span class="n">slots</span><span class="o">=</span><span class="mi">8</span> <span class="o">-</span><span class="n">cpu</span> <span class="nb">max</span> \
+<span class="o">...</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">pxb</span><span class="o">-</span><span class="n">cxl</span><span class="p">,</span><span class="n">bus_nr</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">pcie</span><span class="mf">.0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port13</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">2</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port13</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem0</span> \
+<span class="o">-</span><span class="n">M</span> <span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">targets</span><span class="mf">.0</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span>
+</pre></div>
+</div>
+<p>A setup suitable for 4 way interleave. Only one fixed window provided, to enable 2 way
+interleave across 2 CXL host bridges.  Each host bridge has 2 CXL Root Ports, with
+the CXL Type3 device directly attached (no switches).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">aarch64</span> <span class="o">-</span><span class="n">M</span> <span class="n">virt</span><span class="p">,</span><span class="n">gic</span><span class="o">-</span><span class="n">version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">cxl</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">g</span><span class="p">,</span><span class="n">maxmem</span><span class="o">=</span><span class="mi">8</span><span class="n">G</span><span class="p">,</span><span class="n">slots</span><span class="o">=</span><span class="mi">8</span> <span class="o">-</span><span class="n">cpu</span> <span class="nb">max</span> \
+<span class="o">...</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem2</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest2</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem3</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest3</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem4</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest4</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa2</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa2</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa3</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa3</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa4</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa4</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">pxb</span><span class="o">-</span><span class="n">cxl</span><span class="p">,</span><span class="n">bus_nr</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">pcie</span><span class="mf">.0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">pxb</span><span class="o">-</span><span class="n">cxl</span><span class="p">,</span><span class="n">bus_nr</span><span class="o">=</span><span class="mi">222</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">pcie</span><span class="mf">.0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.2</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port13</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">2</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port13</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem0</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port14</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">3</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port14</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem2</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa2</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem1</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.2</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port15</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">5</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port15</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem3</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa3</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem2</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.2</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port16</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">6</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port16</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem4</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa4</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem3</span> \
+<span class="o">-</span><span class="n">M</span> <span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">targets</span><span class="mf">.0</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">targets</span><span class="mf">.1</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.2</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">interleave</span><span class="o">-</span><span class="n">granularity</span><span class="o">=</span><span class="mi">8</span><span class="n">k</span>
+</pre></div>
+</div>
+<p>An example of 4 devices below a switch suitable for 1, 2 or 4 way interleave:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">aarch64</span> <span class="o">-</span><span class="n">M</span> <span class="n">virt</span><span class="p">,</span><span class="n">gic</span><span class="o">-</span><span class="n">version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">cxl</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">g</span><span class="p">,</span><span class="n">maxmem</span><span class="o">=</span><span class="mi">8</span><span class="n">G</span><span class="p">,</span><span class="n">slots</span><span class="o">=</span><span class="mi">8</span> <span class="o">-</span><span class="n">cpu</span> <span class="nb">max</span> \
+<span class="o">...</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem0</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest1</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem2</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest2</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem3</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cxltest3</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa0</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa0</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa1</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa2</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa2</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa3</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">lsa3</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">pxb</span><span class="o">-</span><span class="n">cxl</span><span class="p">,</span><span class="n">bus_nr</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">pcie</span><span class="mf">.0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port0</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">0</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">rp</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">root_port1</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">1</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">upstream</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">root_port0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">us0</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">downstream</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">us0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">swport0</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">4</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">swport0</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem0</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">downstream</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">us0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">swport1</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">5</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">swport1</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem1</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">downstream</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">us0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">swport2</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">6</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">swport2</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem2</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa2</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">downstream</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">us0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">swport3</span><span class="p">,</span><span class="n">chassis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">slot</span><span class="o">=</span><span class="mi">7</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">cxl</span><span class="o">-</span><span class="n">type3</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">swport3</span><span class="p">,</span><span class="n">memdev</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">mem3</span><span class="p">,</span><span class="n">lsa</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">lsa3</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">cxl</span><span class="o">-</span><span class="n">pmem3</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span> \
+<span class="o">-</span><span class="n">M</span> <span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">targets</span><span class="mf">.0</span><span class="o">=</span><span class="n">cxl</span><span class="mf">.1</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span><span class="n">cxl</span><span class="o">-</span><span class="n">fmw</span><span class="mf">.0</span><span class="o">.</span><span class="n">interleave</span><span class="o">-</span><span class="n">granularity</span><span class="o">=</span><span class="mi">4</span><span class="n">k</span>
+</pre></div>
+</div>
+</section>
+<section id="kernel-configuration-options">
+<h2>Kernel Configuration Options<a class="headerlink" href="#kernel-configuration-options" title="Permalink to this heading"></a></h2>
+<p>In Linux 5.18 the following options are necessary to make use of
+OS management of CXL memory devices as described here.</p>
+<ul class="simple">
+<li><p>CONFIG_CXL_BUS</p></li>
+<li><p>CONFIG_CXL_PCI</p></li>
+<li><p>CONFIG_CXL_ACPI</p></li>
+<li><p>CONFIG_CXL_PMEM</p></li>
+<li><p>CONFIG_CXL_MEM</p></li>
+<li><p>CONFIG_CXL_PORT</p></li>
+<li><p>CONFIG_CXL_REGION</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Consortium website for specifications etc:
+<a class="reference external" href="http://www.computeexpresslink.org">http://www.computeexpresslink.org</a></p></li>
+<li><p>Compute Express link Revision 2 specification, October 2020</p></li>
+<li><p>CEDT CFMWS &amp; QTG _DSM ECN May 2021</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ccid.html" class="btn btn-neutral float-left" title="Chip Card Interface Device (CCID)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ivshmem.html" class="btn btn-neutral float-right" title="Inter-VM Shared Memory device" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

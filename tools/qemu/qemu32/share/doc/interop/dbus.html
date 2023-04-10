@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D-Bus &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="D-Bus VMState" href="dbus-vmstate.html" />
+    <link rel="prev" title="Dirty Bitmaps and Incremental Backup" href="bitmaps.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">D-Bus</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security">Security</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dbus-daemon-policy">dbus-daemon policy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#guidelines">Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qemu-interfaces">QEMU Interfaces</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">D-Bus</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/dbus.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="d-bus">
+<h1>D-Bus<a class="headerlink" href="#d-bus" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>QEMU may be running with various helper processes involved:</dt><dd><ul class="simple">
+<li><p>vhost-user* processes (gpu, virtfs, input, etc…)</p></li>
+<li><p>TPM emulation (or other devices)</p></li>
+<li><p>user networking (slirp)</p></li>
+<li><p>network services (DHCP/DNS, samba/ftp etc)</p></li>
+<li><p>background tasks (compression, streaming etc)</p></li>
+<li><p>client UI</p></li>
+<li><p>admin &amp; cli</p></li>
+</ul>
+</dd>
+</dl>
+<p>Having several processes allows stricter security rules, as well as
+greater modularity.</p>
+<p>While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
+display), D-Bus is the de facto IPC of choice on Unix systems. The
+wire format is machine friendly, good bindings exist for various
+languages, and there are various tools available.</p>
+<p>Using a bus, helper processes can discover and communicate with each
+other easily, without going through QEMU. The bus topology is also
+easier to apprehend and debug than a mesh. However, it is wise to
+consider the security aspects of it.</p>
+</section>
+<section id="security">
+<h2>Security<a class="headerlink" href="#security" title="Permalink to this heading"></a></h2>
+<p>A QEMU D-Bus bus should be private to a single VM. Thus, only
+cooperative tasks are running on the same bus to serve the VM.</p>
+<p>D-Bus, the protocol and standard, doesn’t have mechanisms to enforce
+security between peers once the connection is established. Peers may
+have additional mechanisms to enforce security rules, based for
+example on UNIX credentials.</p>
+<p>The daemon can control which peers can send/recv messages using
+various metadata attributes, however, this is alone is not generally
+sufficient to make the deployment secure.  The semantics of the actual
+methods implemented using D-Bus are just as critical. Peers need to
+carefully validate any information they received from a peer with a
+different trust level.</p>
+<section id="dbus-daemon-policy">
+<h3>dbus-daemon policy<a class="headerlink" href="#dbus-daemon-policy" title="Permalink to this heading"></a></h3>
+<p>dbus-daemon can enforce various policies based on the UID/GID of the
+processes that are connected to it. It is thus a good idea to run
+helpers as different UID from QEMU and set appropriate policies.</p>
+<p>Depending on the use case, you may choose different scenarios:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Everything the same UID</p>
+<ul>
+<li><p>Convenient for developers</p></li>
+<li><p>Improved reliability - crash of one part doesn’t take
+out entire VM</p></li>
+<li><p>No security benefit over traditional QEMU, unless additional
+unless additional controls such as SELinux or AppArmor are
+applied</p></li>
+</ul>
+</li>
+<li><p>Two UIDs, one for QEMU, one for dbus &amp; helpers</p>
+<ul>
+<li><p>Moderately improved user based security isolation</p></li>
+</ul>
+</li>
+<li><p>Many UIDs, one for QEMU one for dbus and one for each helpers</p>
+<ul>
+<li><p>Best user based security isolation</p></li>
+<li><p>Complex to manager distinct UIDs needed for each VM</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>For example, to allow only <code class="docutils literal notranslate"><span class="pre">qemu</span></code> user to talk to <code class="docutils literal notranslate"><span class="pre">qemu-helper</span></code>
+<code class="docutils literal notranslate"><span class="pre">org.qemu.Helper1</span></code> service, a dbus-daemon policy may contain:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;policy</span> <span class="na">user=</span><span class="s">&quot;qemu&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;allow</span> <span class="na">send_destination=</span><span class="s">&quot;org.qemu.Helper1&quot;</span><span class="nt">/&gt;</span>
+   <span class="nt">&lt;allow</span> <span class="na">receive_sender=</span><span class="s">&quot;org.qemu.Helper1&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/policy&gt;</span>
+
+<span class="nt">&lt;policy</span> <span class="na">user=</span><span class="s">&quot;qemu-helper&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;allow</span> <span class="na">own=</span><span class="s">&quot;org.qemu.Helper1&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/policy&gt;</span>
+</pre></div>
+</div>
+<p>dbus-daemon can also perform SELinux checks based on the security
+context of the source and the target. For example, <code class="docutils literal notranslate"><span class="pre">virtiofs_t</span></code>
+could be allowed to send a message to <code class="docutils literal notranslate"><span class="pre">svirt_t</span></code>, but <code class="docutils literal notranslate"><span class="pre">virtiofs_t</span></code>
+wouldn’t be allowed to send a message to <code class="docutils literal notranslate"><span class="pre">virtiofs_t</span></code>.</p>
+<p>See dbus-daemon man page for details.</p>
+</section>
+</section>
+<section id="guidelines">
+<h2>Guidelines<a class="headerlink" href="#guidelines" title="Permalink to this heading"></a></h2>
+<p>When implementing new D-Bus interfaces, it is recommended to follow
+the “D-Bus API Design Guidelines”:
+<a class="reference external" href="https://dbus.freedesktop.org/doc/dbus-api-design.html">https://dbus.freedesktop.org/doc/dbus-api-design.html</a></p>
+<p>The “org.qemu.*” prefix is reserved for services implemented &amp;
+distributed by the QEMU project.</p>
+</section>
+<section id="qemu-interfaces">
+<h2>QEMU Interfaces<a class="headerlink" href="#qemu-interfaces" title="Permalink to this heading"></a></h2>
+<p><a class="reference internal" href="dbus-vmstate.html"><span class="doc">D-Bus VMState</span></a></p>
+<p><a class="reference internal" href="dbus-display.html"><span class="doc">D-Bus display</span></a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="bitmaps.html" class="btn btn-neutral float-left" title="Dirty Bitmaps and Incremental Backup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dbus-vmstate.html" class="btn btn-neutral float-right" title="D-Bus VMState" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Multi-process QEMU" href="multi-process.html" />
+    <link rel="prev" title="Xtensa System emulator" href="target-xtensa.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Security</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-requirements">Security Requirements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#virtualization-use-case">Virtualization Use Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#non-virtualization-use-case">Non-virtualization Use Case</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#guest-isolation">Guest Isolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#principle-of-least-privilege">Principle of Least Privilege</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#isolation-mechanisms">Isolation mechanisms</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sensitive-configurations">Sensitive configurations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#monitor-console-qmp-and-hmp">Monitor console (QMP and HMP)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation</a></li>
+      <li class="breadcrumb-item active">Security</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/security.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="security">
+<h1>Security<a class="headerlink" href="#security" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>This chapter explains the security requirements that QEMU is designed to meet
+and principles for securely deploying QEMU.</p>
+</section>
+<section id="security-requirements">
+<h2>Security Requirements<a class="headerlink" href="#security-requirements" title="Permalink to this heading"></a></h2>
+<p>QEMU supports many different use cases, some of which have stricter security
+requirements than others.  The community has agreed on the overall security
+requirements that users may depend on.  These requirements define what is
+considered supported from a security perspective.</p>
+<section id="virtualization-use-case">
+<h3>Virtualization Use Case<a class="headerlink" href="#virtualization-use-case" title="Permalink to this heading"></a></h3>
+<p>The virtualization use case covers cloud and virtual private server (VPS)
+hosting, as well as traditional data center and desktop virtualization.  These
+use cases rely on hardware virtualization extensions to execute guest code
+safely on the physical CPU at close-to-native speed.</p>
+<p>The following entities are untrusted, meaning that they may be buggy or
+malicious:</p>
+<ul class="simple">
+<li><p>Guest</p></li>
+<li><p>User-facing interfaces (e.g. VNC, SPICE, WebSocket)</p></li>
+<li><p>Network protocols (e.g. NBD, live migration)</p></li>
+<li><p>User-supplied files (e.g. disk images, kernels, device trees)</p></li>
+<li><p>Passthrough devices (e.g. PCI, USB)</p></li>
+</ul>
+<p>Bugs affecting these entities are evaluated on whether they can cause damage in
+real-world use cases and treated as security bugs if this is the case.</p>
+</section>
+<section id="non-virtualization-use-case">
+<h3>Non-virtualization Use Case<a class="headerlink" href="#non-virtualization-use-case" title="Permalink to this heading"></a></h3>
+<p>The non-virtualization use case covers emulation using the Tiny Code Generator
+(TCG).  In principle the TCG and device emulation code used in conjunction with
+the non-virtualization use case should meet the same security requirements as
+the virtualization use case.  However, for historical reasons much of the
+non-virtualization use case code was not written with these security
+requirements in mind.</p>
+<p>Bugs affecting the non-virtualization use case are not considered security
+bugs at this time.  Users with non-virtualization use cases must not rely on
+QEMU to provide guest isolation or any security guarantees.</p>
+</section>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
+<p>This section describes the design principles that ensure the security
+requirements are met.</p>
+<section id="guest-isolation">
+<h3>Guest Isolation<a class="headerlink" href="#guest-isolation" title="Permalink to this heading"></a></h3>
+<p>Guest isolation is the confinement of guest code to the virtual machine.  When
+guest code gains control of execution on the host this is called escaping the
+virtual machine.  Isolation also includes resource limits such as throttling of
+CPU, memory, disk, or network.  Guests must be unable to exceed their resource
+limits.</p>
+<p>QEMU presents an attack surface to the guest in the form of emulated devices.
+The guest must not be able to gain control of QEMU.  Bugs in emulated devices
+could allow malicious guests to gain code execution in QEMU.  At this point the
+guest has escaped the virtual machine and is able to act in the context of the
+QEMU process on the host.</p>
+<p>Guests often interact with other guests and share resources with them.  A
+malicious guest must not gain control of other guests or access their data.
+Disk image files and network traffic must be protected from other guests unless
+explicitly shared between them by the user.</p>
+</section>
+<section id="principle-of-least-privilege">
+<h3>Principle of Least Privilege<a class="headerlink" href="#principle-of-least-privilege" title="Permalink to this heading"></a></h3>
+<p>The principle of least privilege states that each component only has access to
+the privileges necessary for its function.  In the case of QEMU this means that
+each process only has access to resources belonging to the guest.</p>
+<p>The QEMU process should not have access to any resources that are inaccessible
+to the guest.  This way the guest does not gain anything by escaping into the
+QEMU process since it already has access to those same resources from within
+the guest.</p>
+<p>Following the principle of least privilege immediately fulfills guest isolation
+requirements.  For example, guest A only has access to its own disk image file
+<code class="docutils literal notranslate"><span class="pre">a.img</span></code> and not guest B’s disk image file <code class="docutils literal notranslate"><span class="pre">b.img</span></code>.</p>
+<p>In reality certain resources are inaccessible to the guest but must be
+available to QEMU to perform its function.  For example, host system calls are
+necessary for QEMU but are not exposed to guests.  A guest that escapes into
+the QEMU process can then begin invoking host system calls.</p>
+<p>New features must be designed to follow the principle of least privilege.
+Should this not be possible for technical reasons, the security risk must be
+clearly documented so users are aware of the trade-off of enabling the feature.</p>
+</section>
+<section id="isolation-mechanisms">
+<h3>Isolation mechanisms<a class="headerlink" href="#isolation-mechanisms" title="Permalink to this heading"></a></h3>
+<p>Several isolation mechanisms are available to realize this architecture of
+guest isolation and the principle of least privilege.  With the exception of
+Linux seccomp, these mechanisms are all deployed by management tools that
+launch QEMU, such as libvirt.  They are also platform-specific so they are only
+described briefly for Linux here.</p>
+<p>The fundamental isolation mechanism is that QEMU processes must run as
+unprivileged users.  Sometimes it seems more convenient to launch QEMU as
+root to give it access to host devices (e.g. <code class="docutils literal notranslate"><span class="pre">/dev/net/tun</span></code>) but this poses a
+huge security risk.  File descriptor passing can be used to give an otherwise
+unprivileged QEMU process access to host devices without running QEMU as root.
+It is also possible to launch QEMU as a non-root user and configure UNIX groups
+for access to <code class="docutils literal notranslate"><span class="pre">/dev/kvm</span></code>, <code class="docutils literal notranslate"><span class="pre">/dev/net/tun</span></code>, and other device nodes.
+Some Linux distros already ship with UNIX groups for these devices by default.</p>
+<ul class="simple">
+<li><p>SELinux and AppArmor make it possible to confine processes beyond the
+traditional UNIX process and file permissions model.  They restrict the QEMU
+process from accessing processes and files on the host system that are not
+needed by QEMU.</p></li>
+<li><p>Resource limits and cgroup controllers provide throughput and utilization
+limits on key resources such as CPU time, memory, and I/O bandwidth.</p></li>
+<li><p>Linux namespaces can be used to make process, file system, and other system
+resources unavailable to QEMU.  A namespaced QEMU process is restricted to only
+those resources that were granted to it.</p></li>
+<li><p>Linux seccomp is available via the QEMU <code class="docutils literal notranslate"><span class="pre">--sandbox</span></code> option.  It disables
+system calls that are not needed by QEMU, thereby reducing the host kernel
+attack surface.</p></li>
+</ul>
+</section>
+</section>
+<section id="sensitive-configurations">
+<h2>Sensitive configurations<a class="headerlink" href="#sensitive-configurations" title="Permalink to this heading"></a></h2>
+<p>There are aspects of QEMU that can have security implications which users &amp;
+management applications must be aware of.</p>
+<section id="monitor-console-qmp-and-hmp">
+<h3>Monitor console (QMP and HMP)<a class="headerlink" href="#monitor-console-qmp-and-hmp" title="Permalink to this heading"></a></h3>
+<p>The monitor console (whether used with QMP or HMP) provides an interface
+to dynamically control many aspects of QEMU’s runtime operation. Many of the
+commands exposed will instruct QEMU to access content on the host file system
+and/or trigger spawning of external processes.</p>
+<p>For example, the <code class="docutils literal notranslate"><span class="pre">migrate</span></code> command allows for the spawning of arbitrary
+processes for the purpose of tunnelling the migration data stream. The
+<code class="docutils literal notranslate"><span class="pre">blockdev-add</span></code> command instructs QEMU to open arbitrary files, exposing
+their content to the guest as a virtual disk.</p>
+<p>Unless QEMU is otherwise confined using technologies such as SELinux, AppArmor,
+or Linux namespaces, the monitor console should be considered to have privileges
+equivalent to those of the user account QEMU is running under.</p>
+<p>It is further important to consider the security of the character device backend
+over which the monitor console is exposed. It needs to have protection against
+malicious third parties which might try to make unauthorized connections, or
+perform man-in-the-middle attacks. Many of the character device backends do not
+satisfy this requirement and so must not be used for the monitor console.</p>
+<p>The general recommendation is that the monitor console should be exposed over
+a UNIX domain socket backend to the local host only. Use of the TCP based
+character device backend is inappropriate unless configured to use both TLS
+encryption and authorization control policy on client connections.</p>
+<p>In summary, the monitor console is considered a privileged control interface to
+QEMU and as such should only be made accessible to a trusted management
+application or user.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="target-xtensa.html" class="btn btn-neutral float-left" title="Xtensa System emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multi-process.html" class="btn btn-neutral float-right" title="Multi-process QEMU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

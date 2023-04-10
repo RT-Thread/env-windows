@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Emulation &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quick Start" href="quickstart.html" />
+    <link rel="prev" title="License" href="../about/license.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">System Emulation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">System Emulation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/index.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="system-emulation">
+<h1>System Emulation<a class="headerlink" href="#system-emulation" title="Permalink to this heading"></a></h1>
+<p>This section of the manual is the overall guide for users using QEMU
+for full system emulation (as opposed to user-mode emulation).
+This includes working with hypervisors such as KVM, Xen, Hax
+or Hypervisor.Framework.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="invocation.html">Invocation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-0">Standard options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-1">Block device options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-2">USB convenience options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-3">Display options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-4">i386 target only</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-5">Network options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-6">Character device options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-7">TPM device options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-8">Boot Image or Kernel specific</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-9">Debug/Expert options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#hxtool-10">Generic object creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#device-url-syntax">Device URL Syntax</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="device-emulation.html">Device Emulation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html#common-terms">Common Terms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="device-emulation.html#device-front-end">Device Front End</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device-emulation.html#device-buses">Device Buses</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device-emulation.html#device-back-end">Device Back End</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device-emulation.html#device-pass-through">Device Pass Through</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html#emulated-devices">Emulated Devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="devices/can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/net.html">Network emulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/usb.html">USB emulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="devices/canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitor.html">QEMU Monitor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html#integer-expressions">Integer expressions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="images.html">Disk Images</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="images.html#quick-start-for-disk-image-creation">Quick start for disk image creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#snapshot-mode">Snapshot mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#vm-snapshots">VM snapshots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#disk-image-file-formats">Disk image file formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#read-only-formats">Read-only formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#using-host-drives">Using host drives</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="images.html#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#mac-os-x">Mac OS X</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#virtual-fat-disk-images">Virtual FAT disk images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#nbd-access">NBD access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#iscsi-luns">iSCSI LUNs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#glusterfs-disk-images">GlusterFS disk images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#secure-shell-ssh-disk-images">Secure Shell (ssh) disk images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#nvme-disk-images">NVMe disk images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#disk-image-file-locking">Disk image file locking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#filter-drivers">Filter drivers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html#restrictions">Restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html#usecase">Usecase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html#hotplug">Hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html#migration">Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generic-loader.html">Generic Loader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html#loading-data-into-memory-values">Loading Data into Memory Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html#setting-a-cpu-s-program-counter">Setting a CPU’s Program Counter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html#loading-files">Loading Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html#restrictions-and-todos">Restrictions and ToDos</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guest-loader.html">Guest Loader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html#arguments">Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vnc-security.html">VNC security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#without-passwords">Without passwords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-passwords">With passwords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-x509-certificates">With x509 certificates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-x509-certificates-and-client-verification">With x509 certificates and client verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-x509-certificates-client-verification-and-passwords">With x509 certificates, client verification and passwords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-sasl-authentication">With SASL authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#with-x509-certificates-and-sasl-authentication">With x509 certificates and SASL authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html#configuring-sasl-mechanisms">Configuring SASL mechanisms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tls.html">TLS setup for network services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tls.html#setup-the-certificate-authority">Setup the Certificate Authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html#issuing-server-certificates">Issuing server certificates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html#issuing-client-certificates">Issuing client certificates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html#tls-x509-credential-configuration">TLS x509 credential configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html#tls-pre-shared-keys-psk">TLS Pre-Shared Keys (PSK)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html#insecure-passing-secrets-as-clear-text-inline">INSECURE: Passing secrets as clear text inline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html#passing-secrets-as-clear-text-via-a-file">Passing secrets as clear text via a file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html#passing-secrets-as-cipher-text-inline">Passing secrets as cipher text inline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html#passing-secrets-via-the-linux-keyring">Passing secrets via the Linux keyring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html#best-practice">Best practice</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authz.html">Client authorization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authz.html#identity-providers">Identity providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html#authorization-drivers">Authorization drivers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authz.html#simple">Simple</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authz.html#list">List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authz.html#list-file">List file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authz.html#pam">PAM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html#connecting-backends">Connecting backends</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html#debugging-multicore-machines">Debugging multicore machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html#using-unix-sockets">Using unix sockets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html#advanced-debugging-options">Advanced debugging options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gdb.html#changing-single-stepping-behaviour">Changing single-stepping behaviour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdb.html#examining-physical-memory">Examining physical memory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="replay.html">Record/replay</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#core-idea">Core idea</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#instruction-counting">Instruction counting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#block-devices">Block devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#snapshotting">Snapshotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#network-devices">Network devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#audio-devices">Audio devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#serial-ports">Serial ports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html#reverse-debugging">Reverse debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html#mixing-bootindex-and-boot-order-parameters">Mixing bootindex and boot order parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html#vcpu-hotplug">vCPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html#vcpu-hot-unplug">vCPU hot-unplug</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html#defining-a-persistent-reservation-manager">Defining a persistent reservation manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html#multipath-devices-and-persistent-reservations">Multipath devices and persistent reservations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="target-arm.html">Arm System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target-mips.html">MIPS System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-mips.html#supported-cpu-model-configurations-on-mips-hosts">Supported CPU model configurations on MIPS hosts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-mips.html#nanomips-system-emulator">nanoMIPS System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-ppc.html">PowerPC System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-openrisc.html">OpenRISC System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-openrisc.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-openrisc.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-openrisc.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-openrisc.html#openrisc-cpu-features">OpenRISC CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-riscv.html">RISC-V System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-riscv.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-riscv.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-riscv.html#risc-v-cpu-firmware">RISC-V CPU firmware</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-rx.html">RX System emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target-s390x.html">s390x System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-s390x.html#device-support">Device support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-s390x.html#architectural-features">Architectural features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="target-i386.html">x86 System emulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="target-i386.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-i386.html#architectural-features">Architectural features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="target-i386.html#os-requirements">OS requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#security-requirements">Security Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="security.html#virtualization-use-case">Virtualization Use Case</a></li>
+<li class="toctree-l3"><a class="reference internal" href="security.html#non-virtualization-use-case">Non-virtualization Use Case</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#architecture">Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="security.html#guest-isolation">Guest Isolation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="security.html#principle-of-least-privilege">Principle of Least Privilege</a></li>
+<li class="toctree-l3"><a class="reference internal" href="security.html#isolation-mechanisms">Isolation mechanisms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#sensitive-configurations">Sensitive configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="security.html#monitor-console-qmp-and-hmp">Monitor console (QMP and HMP)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#configuration">1) Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#usage">2) Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html#running-a-confidential-guest">Running a Confidential Guest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html#supported-mechanisms">Supported mechanisms</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../about/license.html" class="btn btn-neutral float-left" title="License" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quick Start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

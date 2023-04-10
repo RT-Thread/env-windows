@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chip Card Interface Device (CCID) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Compute Express Link (CXL)" href="cxl.html" />
+    <link rel="prev" title="CAN Bus Emulation Support" href="can.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usb.html">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">Chip Card Interface Device (CCID)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/ccid.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chip-card-interface-device-ccid">
+<h1>Chip Card Interface Device (CCID)<a class="headerlink" href="#chip-card-interface-device-ccid" title="Permalink to this heading"></a></h1>
+<section id="usb-ccid-device">
+<h2>USB CCID device<a class="headerlink" href="#usb-ccid-device" title="Permalink to this heading"></a></h2>
+<p>The USB CCID device is a USB device implementing the CCID specification, which
+lets one connect smart card readers that implement the same spec. For more
+information see the specification:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Universal</span> <span class="n">Serial</span> <span class="n">Bus</span>
+<span class="n">Device</span> <span class="n">Class</span><span class="p">:</span> <span class="n">Smart</span> <span class="n">Card</span>
+<span class="n">CCID</span>
+<span class="n">Specification</span> <span class="k">for</span>
+<span class="n">Integrated</span> <span class="n">Circuit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Cards</span> <span class="n">Interface</span> <span class="n">Devices</span>
+<span class="n">Revision</span> <span class="mf">1.1</span>
+<span class="n">April</span> <span class="mi">22</span><span class="n">rd</span><span class="p">,</span> <span class="mi">2005</span>
+</pre></div>
+</div>
+<p>Smartcards are used for authentication, single sign on, decryption in
+public/private schemes and digital signatures. A smartcard reader on the client
+cannot be used on a guest with simple usb passthrough since it will then not be
+available on the client, possibly locking the computer when it is “removed”. On
+the other hand this device can let you use the smartcard on both the client and
+the guest machine. It is also possible to have a completely virtual smart card
+reader and smart card (i.e. not backed by a physical device) using this device.</p>
+</section>
+<section id="building">
+<h2>Building<a class="headerlink" href="#building" title="Permalink to this heading"></a></h2>
+<p>The cryptographic functions and access to the physical card is done via the
+libcacard library, whose development package must be installed prior to
+building QEMU:</p>
+<p>In redhat/fedora:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">libcacard</span><span class="o">-</span><span class="n">devel</span>
+</pre></div>
+</div>
+<p>In ubuntu:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libcacard</span><span class="o">-</span><span class="n">dev</span>
+</pre></div>
+</div>
+<p>Configuring and building:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">smartcard</span> <span class="o">&amp;&amp;</span> <span class="n">make</span>
+</pre></div>
+</div>
+</section>
+<section id="using-ccid-card-emulated-with-hardware">
+<h2>Using ccid-card-emulated with hardware<a class="headerlink" href="#using-ccid-card-emulated-with-hardware" title="Permalink to this heading"></a></h2>
+<p>Assuming you have a working smartcard on the host with the current
+user, using libcacard, QEMU acts as another client using ccid-card-emulated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span> <span class="o">-</span><span class="n">usb</span> <span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">ccid</span> <span class="o">-</span><span class="n">device</span> <span class="n">ccid</span><span class="o">-</span><span class="n">card</span><span class="o">-</span><span class="n">emulated</span>
+</pre></div>
+</div>
+</section>
+<section id="using-ccid-card-emulated-with-certificates-stored-in-files">
+<h2>Using ccid-card-emulated with certificates stored in files<a class="headerlink" href="#using-ccid-card-emulated-with-certificates-stored-in-files" title="Permalink to this heading"></a></h2>
+<p>You must create the CA and card certificates. This is a one time process.
+We use NSS certificates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir fake-smartcard
+cd fake-smartcard
+certutil -N -d sql:$PWD
+certutil -S -d sql:$PWD -s &quot;CN=Fake Smart Card CA&quot; -x -t TC,TC,TC -n fake-smartcard-ca
+certutil -S -d sql:$PWD -t ,, -s &quot;CN=John Doe&quot; -n id-cert -c fake-smartcard-ca
+certutil -S -d sql:$PWD -t ,, -s &quot;CN=John Doe (signing)&quot; --nsCertType smime -n signing-cert -c fake-smartcard-ca
+certutil -S -d sql:$PWD -t ,, -s &quot;CN=John Doe (encryption)&quot; --nsCertType sslClient -n encryption-cert -c fake-smartcard-ca
+</pre></div>
+</div>
+<p>Note: you must have exactly three certificates.</p>
+<p>You can use the emulated card type with the certificates backend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu -usb -device usb-ccid -device ccid-card-emulated,backend=certificates,db=sql:$PWD,cert1=id-cert,cert2=signing-cert,cert3=encryption-cert
+</pre></div>
+</div>
+<p>To use the certificates in the guest, export the CA certificate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>certutil -L -r -d sql:$PWD -o fake-smartcard-ca.cer -n fake-smartcard-ca
+</pre></div>
+</div>
+<p>and import it in the guest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">certutil</span> <span class="o">-</span><span class="n">A</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span> <span class="o">-</span><span class="n">i</span> <span class="n">fake</span><span class="o">-</span><span class="n">smartcard</span><span class="o">-</span><span class="n">ca</span><span class="o">.</span><span class="n">cer</span> <span class="o">-</span><span class="n">t</span> <span class="n">TC</span><span class="p">,</span><span class="n">TC</span><span class="p">,</span><span class="n">TC</span> <span class="o">-</span><span class="n">n</span> <span class="n">fake</span><span class="o">-</span><span class="n">smartcard</span><span class="o">-</span><span class="n">ca</span>
+</pre></div>
+</div>
+<p>In a Linux guest you can then use the CoolKey PKCS #11 module to access
+the card:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">certutil</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">h</span> <span class="nb">all</span>
+</pre></div>
+</div>
+<p>It will prompt you for the PIN (which is the password you assigned to the
+certificate database early on), and then show you all three certificates
+together with the manually imported CA cert:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Certificate</span> <span class="n">Nickname</span>                        <span class="n">Trust</span> <span class="n">Attributes</span>
+<span class="n">fake</span><span class="o">-</span><span class="n">smartcard</span><span class="o">-</span><span class="n">ca</span>                           <span class="n">CT</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">C</span>
+<span class="n">John</span> <span class="n">Doe</span><span class="p">:</span><span class="n">CAC</span> <span class="n">ID</span> <span class="n">Certificate</span>                 <span class="n">u</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">u</span>
+<span class="n">John</span> <span class="n">Doe</span><span class="p">:</span><span class="n">CAC</span> <span class="n">Email</span> <span class="n">Signature</span> <span class="n">Certificate</span>    <span class="n">u</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">u</span>
+<span class="n">John</span> <span class="n">Doe</span><span class="p">:</span><span class="n">CAC</span> <span class="n">Email</span> <span class="n">Encryption</span> <span class="n">Certificate</span>   <span class="n">u</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">u</span>
+</pre></div>
+</div>
+<p>If this does not happen, CoolKey is not installed or not registered with
+NSS. Registration can be done from Firefox or the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">modutil</span> <span class="o">-</span><span class="n">dbdir</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span> <span class="o">-</span><span class="n">add</span> <span class="s2">&quot;CAC Module&quot;</span> <span class="o">-</span><span class="n">libfile</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">pkcs11</span><span class="o">/</span><span class="n">libcoolkeypk11</span><span class="o">.</span><span class="n">so</span>
+<span class="n">modutil</span> <span class="o">-</span><span class="n">dbdir</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span> <span class="o">-</span><span class="nb">list</span>
+</pre></div>
+</div>
+</section>
+<section id="using-ccid-card-passthru-with-client-side-hardware">
+<h2>Using ccid-card-passthru with client side hardware<a class="headerlink" href="#using-ccid-card-passthru-with-client-side-hardware" title="Permalink to this heading"></a></h2>
+<p>On the host specify the ccid-card-passthru device with a suitable chardev:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span> <span class="o">-</span><span class="n">chardev</span> <span class="n">socket</span><span class="p">,</span><span class="n">server</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="mf">0.0.0.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">2001</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ccid</span><span class="p">,</span><span class="n">wait</span><span class="o">=</span><span class="n">off</span> \
+     <span class="o">-</span><span class="n">usb</span> <span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">ccid</span> <span class="o">-</span><span class="n">device</span> <span class="n">ccid</span><span class="o">-</span><span class="n">card</span><span class="o">-</span><span class="n">passthru</span><span class="p">,</span><span class="n">chardev</span><span class="o">=</span><span class="n">ccid</span>
+</pre></div>
+</div>
+<p>On the client run vscclient, built when you built QEMU:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vscclient</span> <span class="o">&lt;</span><span class="n">qemu</span><span class="o">-</span><span class="n">host</span><span class="o">&gt;</span> <span class="mi">2001</span>
+</pre></div>
+</div>
+</section>
+<section id="using-ccid-card-passthru-with-client-side-certificates">
+<h2>Using ccid-card-passthru with client side certificates<a class="headerlink" href="#using-ccid-card-passthru-with-client-side-certificates" title="Permalink to this heading"></a></h2>
+<p>This case is not particularly useful, but you can use it to debug
+your setup.</p>
+<p>Follow instructions above, except run QEMU and vscclient as follows.</p>
+<p>Run qemu as per above, and run vscclient from the “fake-smartcard”
+directory as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span> <span class="o">-</span><span class="n">chardev</span> <span class="n">socket</span><span class="p">,</span><span class="n">server</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="mf">0.0.0.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">2001</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ccid</span><span class="p">,</span><span class="n">wait</span><span class="o">=</span><span class="n">off</span> \
+     <span class="o">-</span><span class="n">usb</span> <span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">ccid</span> <span class="o">-</span><span class="n">device</span> <span class="n">ccid</span><span class="o">-</span><span class="n">card</span><span class="o">-</span><span class="n">passthru</span><span class="p">,</span><span class="n">chardev</span><span class="o">=</span><span class="n">ccid</span>
+<span class="n">vscclient</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;db=</span><span class="se">\&quot;</span><span class="s2">sql:$PWD</span><span class="se">\&quot;</span><span class="s2"> use_hw=no soft=(,Test,CAC,,id-cert,signing-cert,encryption-cert)&quot;</span> <span class="o">&lt;</span><span class="n">qemu</span><span class="o">-</span><span class="n">host</span><span class="o">&gt;</span> <span class="mi">2001</span>
+</pre></div>
+</div>
+</section>
+<section id="passthrough-protocol-scenario">
+<h2>Passthrough protocol scenario<a class="headerlink" href="#passthrough-protocol-scenario" title="Permalink to this heading"></a></h2>
+<p>This is a typical interchange of messages when using the passthru card device.
+usb-ccid is a usb device. It defaults to an unattached usb device on startup.
+usb-ccid expects a chardev and expects the protocol defined in
+cac_card/vscard_common.h to be passed over that.
+The usb-ccid device can be in one of three modes:</p>
+<ul class="simple">
+<li><p>detached</p></li>
+<li><p>attached with no card</p></li>
+<li><p>attached with card</p></li>
+</ul>
+<p>A typical interchange is (the arrow shows who started each exchange, it can be client
+originated or guest originated):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="n">event</span>        <span class="o">|</span>    <span class="n">vscclient</span>           <span class="o">|</span>    <span class="n">passthru</span>    <span class="o">|</span>    <span class="n">usb</span><span class="o">-</span><span class="n">ccid</span>  <span class="o">|</span>  <span class="n">guest</span> <span class="n">event</span>
+<span class="o">------------------------------------------------------------------------------------------------</span>
+                    <span class="o">|</span>    <span class="n">VSC_Init</span>            <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+                    <span class="o">|</span>    <span class="n">VSC_ReaderAdd</span>       <span class="o">|</span>                <span class="o">|</span>    <span class="n">attach</span>    <span class="o">|</span>
+                    <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>  <span class="n">sees</span> <span class="n">new</span> <span class="n">usb</span> <span class="n">device</span><span class="o">.</span>
+  <span class="n">card</span> <span class="n">inserted</span> <span class="o">-&gt;</span>  <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+                    <span class="o">|</span>    <span class="n">VSC_ATR</span>             <span class="o">|</span>   <span class="n">insert</span>       <span class="o">|</span>    <span class="n">insert</span>    <span class="o">|</span>  <span class="n">see</span> <span class="n">new</span> <span class="n">card</span>
+                    <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+                    <span class="o">|</span>    <span class="n">VSC_APDU</span>            <span class="o">|</span>   <span class="n">VSC_APDU</span>     <span class="o">|</span>              <span class="o">|</span> <span class="o">&lt;-</span> <span class="n">guest</span> <span class="n">sends</span> <span class="n">APDU</span>
+<span class="n">client</span> <span class="o">&lt;-&gt;</span> <span class="n">physical</span> <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+ <span class="n">card</span> <span class="n">APDU</span> <span class="n">exchange</span> <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+ <span class="n">client</span> <span class="n">response</span> <span class="o">-&gt;</span> <span class="o">|</span>    <span class="n">VSC_APDU</span>            <span class="o">|</span>   <span class="n">VSC_APDU</span>     <span class="o">|</span>              <span class="o">|</span>  <span class="n">receive</span> <span class="n">APDU</span> <span class="n">response</span>
+                                                    <span class="o">...</span>
+                                    <span class="p">[</span><span class="n">APDU</span><span class="o">&lt;-&gt;</span><span class="n">APDU</span> <span class="n">repeats</span> <span class="n">several</span> <span class="n">times</span><span class="p">]</span>
+                                                    <span class="o">...</span>
+   <span class="n">card</span> <span class="n">removed</span>  <span class="o">-&gt;</span> <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+                    <span class="o">|</span>    <span class="n">VSC_CardRemove</span>      <span class="o">|</span>   <span class="n">remove</span>       <span class="o">|</span>   <span class="n">remove</span>     <span class="o">|</span>   <span class="n">card</span> <span class="n">removed</span>
+                                                    <span class="o">...</span>
+                                    <span class="p">[(</span><span class="n">card</span> <span class="n">insert</span><span class="p">,</span> <span class="n">apdu</span><span class="s1">&#39;s, card remove) repeat]</span>
+                                                    <span class="o">...</span>
+  <span class="n">kill</span><span class="o">/</span><span class="n">quit</span>         <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+    <span class="n">vscclient</span>       <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>
+                    <span class="o">|</span>    <span class="n">VSC_ReaderRemove</span>    <span class="o">|</span>                <span class="o">|</span>   <span class="n">detach</span>     <span class="o">|</span>
+                    <span class="o">|</span>                        <span class="o">|</span>                <span class="o">|</span>              <span class="o">|</span>   <span class="n">usb</span> <span class="n">device</span> <span class="n">removed</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="libcacard">
+<h2>libcacard<a class="headerlink" href="#libcacard" title="Permalink to this heading"></a></h2>
+<p>Both ccid-card-emulated and vscclient use libcacard as the card emulator.
+libcacard implements a completely virtual CAC (DoD standard for smart
+cards) compliant card and uses NSS to retrieve certificates and do
+any encryption. The backend can then be a real reader and card, or
+certificates stored in files.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="can.html" class="btn btn-neutral float-left" title="CAN Bus Emulation Support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cxl.html" class="btn btn-neutral float-right" title="Compute Express Link (CXL)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

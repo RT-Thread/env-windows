@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supported build platforms &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Deprecated features" href="deprecated.html" />
+    <link rel="prev" title="About QEMU" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">About QEMU</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Supported build platforms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supported-host-architectures">Supported host architectures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linux-os-macos-freebsd-netbsd-openbsd">Linux OS, macOS, FreeBSD, NetBSD, OpenBSD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deprecated.html">Deprecated features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="removed-features.html">Removed features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">About QEMU</a></li>
+      <li class="breadcrumb-item active">Supported build platforms</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/about/build-platforms.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="supported-build-platforms">
+<span id="id1"></span><h1>Supported build platforms<a class="headerlink" href="#supported-build-platforms" title="Permalink to this heading"></a></h1>
+<p>QEMU aims to support building and executing on multiple host OS
+platforms. This appendix outlines which platforms are the major build
+targets. These platforms are used as the basis for deciding upon the
+minimum required versions of 3rd party software QEMU depends on. The
+supported platforms are the targets for automated testing performed by
+the project when patches are submitted for review, and tested before and
+after merge.</p>
+<p>If a platform is not listed here, it does not imply that QEMU won’t
+work. If an unlisted platform has comparable software versions to a
+listed platform, there is every expectation that it will work. Bug
+reports are welcome for problems encountered on unlisted platforms
+unless they are clearly older vintage than what is described here.</p>
+<p>Note that when considering software versions shipped in distros as
+support targets, QEMU considers only the version number, and assumes the
+features in that distro match the upstream release with the same
+version. In other words, if a distro backports extra features to the
+software in their distro, QEMU upstream code will not add explicit
+support for those backports, unless the feature is auto-detectable in a
+manner that works for the upstream releases too.</p>
+<p>The <a class="reference external" href="https://repology.org/">Repology</a> site is a useful resource to identify
+currently shipped versions of software in various operating systems,
+though it does not cover all distros listed below.</p>
+<section id="supported-host-architectures">
+<h2>Supported host architectures<a class="headerlink" href="#supported-host-architectures" title="Permalink to this heading"></a></h2>
+<p>Those hosts are officially supported, with various accelerators:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>CPU Architecture</p></th>
+<th class="head"><p>Accelerators</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Arm</p></td>
+<td><p>kvm (64 bit only), tcg, xen</p></td>
+</tr>
+<tr class="row-odd"><td><p>MIPS (little endian only)</p></td>
+<td><p>kvm, tcg</p></td>
+</tr>
+<tr class="row-even"><td><p>PPC</p></td>
+<td><p>kvm, tcg</p></td>
+</tr>
+<tr class="row-odd"><td><p>RISC-V</p></td>
+<td><p>kvm, tcg</p></td>
+</tr>
+<tr class="row-even"><td><p>s390x</p></td>
+<td><p>kvm, tcg</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPARC</p></td>
+<td><p>tcg</p></td>
+</tr>
+<tr class="row-even"><td><p>x86</p></td>
+<td><p>hax, hvf (64 bit only), kvm, nvmm, tcg, whpx (64 bit only), xen</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Other host architectures are not supported. It is possible to build QEMU system
+emulation on an unsupported host architecture using the configure
+<code class="docutils literal notranslate"><span class="pre">--enable-tcg-interpreter</span></code> option to enable the TCI support, but note that
+this is very slow and is not recommended for normal use. QEMU user emulation
+requires host-specific support for signal handling, therefore TCI won’t help
+on unsupported host architectures.</p>
+<p>Non-supported architectures may be removed in the future following the
+<a class="reference internal" href="deprecated.html#deprecated-features"><span class="std std-ref">deprecation process</span></a>.</p>
+</section>
+<section id="linux-os-macos-freebsd-netbsd-openbsd">
+<h2>Linux OS, macOS, FreeBSD, NetBSD, OpenBSD<a class="headerlink" href="#linux-os-macos-freebsd-netbsd-openbsd" title="Permalink to this heading"></a></h2>
+<p>The project aims to support the most recent major version at all times. Support
+for the previous major version will be dropped 2 years after the new major
+version is released or when the vendor itself drops support, whichever comes
+first. In this context, third-party efforts to extend the lifetime of a distro
+are not considered, even when they are endorsed by the vendor (eg. Debian LTS);
+the same is true of repositories that contain packages backported from later
+releases (e.g. Debian backports). Within each major release, only the most
+recent minor release is considered.</p>
+<p>For the purposes of identifying supported software versions available on Linux,
+the project will look at CentOS, Debian, Fedora, openSUSE, RHEL, SLES and
+Ubuntu LTS. Other distros will be assumed to ship similar software versions.</p>
+<p>For FreeBSD and OpenBSD, decisions will be made based on the contents of the
+respective ports repository, while NetBSD will use the pkgsrc repository.</p>
+<p>For macOS, <a class="reference external" href="https://brew.sh/">Homebrew</a> will be used, although <a class="reference external" href="https://www.macports.org/">MacPorts</a> is expected to carry
+similar versions.</p>
+</section>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Permalink to this heading"></a></h2>
+<p>The project aims to support the two most recent versions of Windows that are
+still supported by the vendor. The minimum Windows API that is currently
+targeted is “Windows 8”, so theoretically the QEMU binaries can still be run
+on older versions of Windows, too. However, such old versions of Windows are
+not tested anymore, so it is recommended to use one of the latest versions of
+Windows instead.</p>
+<p>The project supports building QEMU with current versions of the MinGW
+toolchain, either hosted on Linux (Debian/Fedora) or via <a class="reference external" href="https://www.msys2.org/">MSYS2</a> on Windows.
+A more recent Windows version is always preferred as it is less likely to have
+problems with building via MSYS2. The building process of QEMU involves some
+Python scripts that call os.symlink() which needs special attention for the
+build process to successfully complete. On newer versions of Windows 10,
+unprivileged accounts can create symlinks if Developer Mode is enabled.
+When Developer Mode is not available/enabled, the SeCreateSymbolicLinkPrivilege
+privilege is required, or the process must be run as an administrator.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="About QEMU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deprecated.html" class="btn btn-neutral float-right" title="Deprecated features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

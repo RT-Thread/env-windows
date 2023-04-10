@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VNC security &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="TLS setup for network services" href="tls.html" />
+    <link rel="prev" title="QEMU Barrier Client" href="barrier.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">VNC security</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#without-passwords">Without passwords</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-passwords">With passwords</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-x509-certificates">With x509 certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-x509-certificates-and-client-verification">With x509 certificates and client verification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-x509-certificates-client-verification-and-passwords">With x509 certificates, client verification and passwords</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-sasl-authentication">With SASL authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-x509-certificates-and-sasl-authentication">With x509 certificates and SASL authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-sasl-mechanisms">Configuring SASL mechanisms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation</a></li>
+      <li class="breadcrumb-item active">VNC security</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/vnc-security.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vnc-security">
+<span id="id1"></span><h1>VNC security<a class="headerlink" href="#vnc-security" title="Permalink to this heading"></a></h1>
+<p>The VNC server capability provides access to the graphical console of
+the guest VM across the network. This has a number of security
+considerations depending on the deployment scenarios.</p>
+<section id="without-passwords">
+<span id="vnc-005fsec-005fnone"></span><h2>Without passwords<a class="headerlink" href="#without-passwords" title="Permalink to this heading"></a></h2>
+<p>The simplest VNC server setup does not include any form of
+authentication. For this setup it is recommended to restrict it to
+listen on a UNIX domain socket only. For example</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...] -vnc unix:/home/joebloggs/.qemu-myvm-vnc</pre>
+<p>This ensures that only users on local box with read/write access to that
+path can access the VNC server. To securely access the VNC server from a
+remote machine, a combination of netcat+ssh can be used to provide a
+secure tunnel.</p>
+</section>
+<section id="with-passwords">
+<span id="vnc-005fsec-005fpassword"></span><h2>With passwords<a class="headerlink" href="#with-passwords" title="Permalink to this heading"></a></h2>
+<p>The VNC protocol has limited support for password based authentication.
+Since the protocol limits passwords to 8 characters it should not be
+considered to provide high security. The password can be fairly easily
+brute-forced by a client making repeat connections. For this reason, a
+VNC server using password authentication should be restricted to only
+listen on the loopback interface or UNIX domain sockets. Password
+authentication is not supported when operating in FIPS 140-2 compliance
+mode as it requires the use of the DES cipher. Password authentication
+is requested with the <code class="docutils literal notranslate"><span class="pre">password</span></code> option, and then once QEMU is running
+the password is set with the monitor. Until the monitor is used to set
+the password all clients will be rejected.</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...] -vnc :1,password=on -monitor stdio
+(qemu) change vnc password
+Password: <strong>****</strong>
+(qemu)</pre>
+</section>
+<section id="with-x509-certificates">
+<span id="vnc-005fsec-005fcertificate"></span><h2>With x509 certificates<a class="headerlink" href="#with-x509-certificates" title="Permalink to this heading"></a></h2>
+<p>The QEMU VNC server also implements the VeNCrypt extension allowing use
+of TLS for encryption of the session, and x509 certificates for
+authentication. The use of x509 certificates is strongly recommended,
+because TLS on its own is susceptible to man-in-the-middle attacks.
+Basic x509 certificate support provides a secure session, but no
+authentication. This allows any client to connect, and provides an
+encrypted session.</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...]   -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=off   -vnc :1,tls-creds=tls0 -monitor stdio</pre>
+<p>In the above example <code class="docutils literal notranslate"><span class="pre">/etc/pki/qemu</span></code> should contain at least three
+files, <code class="docutils literal notranslate"><span class="pre">ca-cert.pem</span></code>, <code class="docutils literal notranslate"><span class="pre">server-cert.pem</span></code> and <code class="docutils literal notranslate"><span class="pre">server-key.pem</span></code>.
+Unprivileged users will want to use a private directory, for example
+<code class="docutils literal notranslate"><span class="pre">$HOME/.pki/qemu</span></code>. NB the <code class="docutils literal notranslate"><span class="pre">server-key.pem</span></code> file should be protected
+with file mode 0600 to only be readable by the user owning it.</p>
+</section>
+<section id="with-x509-certificates-and-client-verification">
+<span id="vnc-005fsec-005fcertificate-005fverify"></span><h2>With x509 certificates and client verification<a class="headerlink" href="#with-x509-certificates-and-client-verification" title="Permalink to this heading"></a></h2>
+<p>Certificates can also provide a means to authenticate the client
+connecting. The server will request that the client provide a
+certificate, which it will then validate against the CA certificate.
+This is a good choice if deploying in an environment with a private
+internal certificate authority. It uses the same syntax as previously,
+but with <code class="docutils literal notranslate"><span class="pre">verify-peer</span></code> set to <code class="docutils literal notranslate"><span class="pre">on</span></code> instead.</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...]   -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on   -vnc :1,tls-creds=tls0 -monitor stdio</pre>
+</section>
+<section id="with-x509-certificates-client-verification-and-passwords">
+<span id="vnc-005fsec-005fcertificate-005fpw"></span><h2>With x509 certificates, client verification and passwords<a class="headerlink" href="#with-x509-certificates-client-verification-and-passwords" title="Permalink to this heading"></a></h2>
+<p>Finally, the previous method can be combined with VNC password
+authentication to provide two layers of authentication for clients.</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...]   -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on   -vnc :1,tls-creds=tls0,password=on -monitor stdio
+(qemu) change vnc password
+Password: <strong>****</strong>
+(qemu)</pre>
+</section>
+<section id="with-sasl-authentication">
+<span id="vnc-005fsec-005fsasl"></span><h2>With SASL authentication<a class="headerlink" href="#with-sasl-authentication" title="Permalink to this heading"></a></h2>
+<p>The SASL authentication method is a VNC extension, that provides an
+easily extendable, pluggable authentication method. This allows for
+integration with a wide range of authentication mechanisms, such as PAM,
+GSSAPI/Kerberos, LDAP, SQL databases, one-time keys and more. The
+strength of the authentication depends on the exact mechanism
+configured. If the chosen mechanism also provides a SSF layer, then it
+will encrypt the datastream as well.</p>
+<p>Refer to the later docs on how to choose the exact SASL mechanism used
+for authentication, but assuming use of one supporting SSF, then QEMU
+can be launched with:</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...] -vnc :1,sasl=on -monitor stdio</pre>
+</section>
+<section id="with-x509-certificates-and-sasl-authentication">
+<span id="vnc-005fsec-005fcertificate-005fsasl"></span><h2>With x509 certificates and SASL authentication<a class="headerlink" href="#with-x509-certificates-and-sasl-authentication" title="Permalink to this heading"></a></h2>
+<p>If the desired SASL authentication mechanism does not supported SSF
+layers, then it is strongly advised to run it in combination with TLS
+and x509 certificates. This provides securely encrypted data stream,
+avoiding risk of compromising of the security credentials. This can be
+enabled, by combining the ‘sasl’ option with the aforementioned TLS +
+x509 options:</p>
+<pre class="literal-block">qemu-system-x86_64 [...OPTIONS...]   -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on   -vnc :1,tls-creds=tls0,sasl=on -monitor stdio</pre>
+</section>
+<section id="configuring-sasl-mechanisms">
+<span id="vnc-005fsetup-005fsasl"></span><h2>Configuring SASL mechanisms<a class="headerlink" href="#configuring-sasl-mechanisms" title="Permalink to this heading"></a></h2>
+<p>The following documentation assumes use of the Cyrus SASL implementation
+on a Linux host, but the principles should apply to any other SASL
+implementation or host. When SASL is enabled, the mechanism
+configuration will be loaded from system default SASL service config
+/etc/sasl2/qemu.conf. If running QEMU as an unprivileged user, an
+environment variable SASL_CONF_PATH can be used to make it search
+alternate locations for the service config file.</p>
+<p>If the TLS option is enabled for VNC, then it will provide session
+encryption, otherwise the SASL mechanism will have to provide
+encryption. In the latter case the list of possible plugins that can be
+used is drastically reduced. In fact only the GSSAPI SASL mechanism
+provides an acceptable level of security by modern standards. Previous
+versions of QEMU referred to the DIGEST-MD5 mechanism, however, it has
+multiple serious flaws described in detail in RFC 6331 and thus should
+never be used any more. The SCRAM-SHA-256 mechanism provides a simple
+username/password auth facility similar to DIGEST-MD5, but does not
+support session encryption, so can only be used in combination with TLS.</p>
+<p>When not using TLS the recommended configuration is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mech_list</span><span class="p">:</span> <span class="n">gssapi</span>
+<span class="n">keytab</span><span class="p">:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">qemu</span><span class="o">/</span><span class="n">krb5</span><span class="o">.</span><span class="n">tab</span>
+</pre></div>
+</div>
+<p>This says to use the ‘GSSAPI’ mechanism with the Kerberos v5 protocol,
+with the server principal stored in /etc/qemu/krb5.tab. For this to work
+the administrator of your KDC must generate a Kerberos principal for the
+server, with a name of <a class="reference external" href="mailto:'qemu/somehost&#46;example&#46;com&#37;&#52;&#48;EXAMPLE&#46;COM">‘qemu/somehost<span>&#46;</span>example<span>&#46;</span>com<span>&#64;</span>EXAMPLE<span>&#46;</span>COM</a>’ replacing
+‘somehost.example.com’ with the fully qualified host name of the machine
+running QEMU, and ‘EXAMPLE.COM’ with the Kerberos Realm.</p>
+<p>When using TLS, if username+password authentication is desired, then a
+reasonable configuration is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mech_list</span><span class="p">:</span> <span class="n">scram</span><span class="o">-</span><span class="n">sha</span><span class="o">-</span><span class="mi">256</span>
+<span class="n">sasldb_path</span><span class="p">:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">qemu</span><span class="o">/</span><span class="n">passwd</span><span class="o">.</span><span class="n">db</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">saslpasswd2</span></code> program can be used to populate the <code class="docutils literal notranslate"><span class="pre">passwd.db</span></code>
+file with accounts. Note that the <code class="docutils literal notranslate"><span class="pre">passwd.db</span></code> file stores passwords
+in clear text.</p>
+<p>Other SASL configurations will be left as an exercise for the reader.
+Note that all mechanisms, except GSSAPI, should be combined with use of
+TLS to ensure a secure data channel.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="barrier.html" class="btn btn-neutral float-left" title="QEMU Barrier Client" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tls.html" class="btn btn-neutral float-right" title="TLS setup for network services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

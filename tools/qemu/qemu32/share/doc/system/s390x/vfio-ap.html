@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adjunct Processor (AP) Device &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The virtual channel subsystem" href="css.html" />
+    <link rel="prev" title="s390x System emulator" href="../target-s390x.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../target-s390x.html#device-support">Device support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-s390x.html#architectural-features">Architectural features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-s390x.html">s390x System emulator</a></li>
+      <li class="breadcrumb-item active">Adjunct Processor (AP) Device</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/s390x/vfio-ap.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adjunct-processor-ap-device">
+<h1><a class="toc-backref" href="#id1">Adjunct Processor (AP) Device</a><a class="headerlink" href="#adjunct-processor-ap-device" title="Permalink to this heading"></a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#adjunct-processor-ap-device" id="id1">Adjunct Processor (AP) Device</a></p>
+<ul>
+<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#ap-architectural-overview" id="id3">AP Architectural Overview</a></p></li>
+<li><p><a class="reference internal" href="#start-interpretive-execution-sie-instruction" id="id4">Start Interpretive Execution (SIE) Instruction</a></p>
+<ul>
+<li><p><a class="reference internal" href="#example-1-valid-configuration" id="id5">Example 1: Valid configuration</a></p></li>
+<li><p><a class="reference internal" href="#example-2-valid-configuration" id="id6">Example 2: Valid configuration</a></p></li>
+<li><p><a class="reference internal" href="#example-3-invalid-configuration" id="id7">Example 3: Invalid configuration</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#ap-matrix-configuration-on-linux-host" id="id8">AP Matrix Configuration on Linux Host</a></p>
+<ul>
+<li><p><a class="reference internal" href="#binding-ap-devices-to-device-drivers" id="id9">Binding AP devices to device drivers</a></p></li>
+<li><p><a class="reference internal" href="#configuring-an-ap-matrix-for-a-linux-guest" id="id10">Configuring an AP matrix for a linux guest</a></p></li>
+<li><p><a class="reference internal" href="#starting-a-linux-guest-configured-with-an-ap-matrix" id="id11">Starting a Linux Guest Configured with an AP Matrix</a></p></li>
+<li><p><a class="reference internal" href="#hot-plug-a-vfio-ap-device-into-a-running-guest" id="id12">Hot plug a vfio-ap device into a running guest</a></p></li>
+<li><p><a class="reference internal" href="#hot-unplug-a-vfio-ap-device-from-a-running-guest" id="id13">Hot unplug a vfio-ap device from a running guest</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#example-configure-ap-matrices-for-three-linux-guests" id="id14">Example: Configure AP Matrices for Three Linux Guests</a></p></li>
+<li><p><a class="reference internal" href="#limitations" id="id15">Limitations</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="introduction">
+<h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>The IBM Adjunct Processor (AP) Cryptographic Facility is comprised
+of three AP instructions and from 1 to 256 PCIe cryptographic adapter cards.
+These AP devices provide cryptographic functions to all CPUs assigned to a
+linux system running in an IBM Z system LPAR.</p>
+<p>On s390x, AP adapter cards are exposed via the AP bus. This document
+describes how those cards may be made available to KVM guests using the
+VFIO mediated device framework.</p>
+</section>
+<section id="ap-architectural-overview">
+<h2><a class="toc-backref" href="#id3">AP Architectural Overview</a><a class="headerlink" href="#ap-architectural-overview" title="Permalink to this heading"></a></h2>
+<p>In order understand the terminology used in the rest of this document, let’s
+start with some definitions:</p>
+<ul>
+<li><p>AP adapter</p>
+<p>An AP adapter is an IBM Z adapter card that can perform cryptographic
+functions. There can be from 0 to 256 adapters assigned to an LPAR depending
+on the machine model. Adapters assigned to the LPAR in which a linux host is
+running will be available to the linux host. Each adapter is identified by a
+number from 0 to 255; however, the maximum adapter number allowed is
+determined by machine model. When installed, an AP adapter is accessed by
+AP instructions executed by any CPU.</p>
+</li>
+<li><p>AP domain</p>
+<p>An adapter is partitioned into domains. Each domain can be thought of as
+a set of hardware registers for processing AP instructions. An adapter can
+hold up to 256 domains; however, the maximum domain number allowed is
+determined by machine model. Each domain is identified by a number from 0 to
+255. Domains can be further classified into two types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Usage domains are domains that can be accessed directly to process AP
+commands</p></li>
+<li><p>Control domains are domains that are accessed indirectly by AP
+commands sent to a usage domain to control or change the domain; for
+example, to set a secure private key for the domain.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>AP Queue</p>
+<p>An AP queue is the means by which an AP command-request message is sent to an
+AP usage domain inside a specific AP. An AP queue is identified by a tuple
+comprised of an AP adapter ID (APID) and an AP queue index (APQI). The
+APQI corresponds to a given usage domain number within the adapter. This tuple
+forms an AP Queue Number (APQN) uniquely identifying an AP queue. AP
+instructions include a field containing the APQN to identify the AP queue to
+which the AP command-request message is to be sent for processing.</p>
+</li>
+<li><p>AP Instructions:</p>
+<p>There are three AP instructions:</p>
+<ul class="simple">
+<li><p>NQAP: to enqueue an AP command-request message to a queue</p></li>
+<li><p>DQAP: to dequeue an AP command-reply message from a queue</p></li>
+<li><p>PQAP: to administer the queues</p></li>
+</ul>
+<p>AP instructions identify the domain that is targeted to process the AP
+command; this must be one of the usage domains. An AP command may modify a
+domain that is not one of the usage domains, but the modified domain
+must be one of the control domains.</p>
+</li>
+</ul>
+</section>
+<section id="start-interpretive-execution-sie-instruction">
+<h2><a class="toc-backref" href="#id4">Start Interpretive Execution (SIE) Instruction</a><a class="headerlink" href="#start-interpretive-execution-sie-instruction" title="Permalink to this heading"></a></h2>
+<p>A KVM guest is started by executing the Start Interpretive Execution (SIE)
+instruction. The SIE state description is a control block that contains the
+state information for a KVM guest and is supplied as input to the SIE
+instruction. The SIE state description contains a satellite control block called
+the Crypto Control Block (CRYCB). The CRYCB contains three fields to identify
+the adapters, usage domains and control domains assigned to the KVM guest:</p>
+<ul class="simple">
+<li><p>The AP Mask (APM) field is a bit mask that identifies the AP adapters assigned
+to the KVM guest. Each bit in the mask, from left to right, corresponds to
+an APID from 0-255. If a bit is set, the corresponding adapter is valid for
+use by the KVM guest.</p></li>
+<li><p>The AP Queue Mask (AQM) field is a bit mask identifying the AP usage domains
+assigned to the KVM guest. Each bit in the mask, from left to right,
+corresponds to  an AP queue index (APQI) from 0-255. If a bit is set, the
+corresponding queue is valid for use by the KVM guest.</p></li>
+<li><p>The AP Domain Mask field is a bit mask that identifies the AP control domains
+assigned to the KVM guest. The ADM bit mask controls which domains can be
+changed by an AP command-request message sent to a usage domain from the
+guest. Each bit in the mask, from left to right, corresponds to a domain from
+0-255. If a bit is set, the corresponding domain can be modified by an AP
+command-request message sent to a usage domain.</p></li>
+</ul>
+<p>If you recall from the description of an AP Queue, AP instructions include
+an APQN to identify the AP adapter and AP queue to which an AP command-request
+message is to be sent (NQAP and PQAP instructions), or from which a
+command-reply message is to be received (DQAP instruction). The validity of an
+APQN is defined by the matrix calculated from the APM and AQM; it is the
+cross product of all assigned adapter numbers (APM) with all assigned queue
+indexes (AQM). For example, if adapters 1 and 2 and usage domains 5 and 6 are
+assigned to a guest, the APQNs (1,5), (1,6), (2,5) and (2,6) will be valid for
+the guest.</p>
+<p>The APQNs can provide secure key functionality - i.e., a private key is stored
+on the adapter card for each of its domains - so each APQN must be assigned to
+at most one guest or the linux host.</p>
+<section id="example-1-valid-configuration">
+<h3><a class="toc-backref" href="#id5">Example 1: Valid configuration</a><a class="headerlink" href="#example-1-valid-configuration" title="Permalink to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 31%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Guest1</p></th>
+<th class="head"><p>Guest2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>adapters</p></td>
+<td><p>1, 2</p></td>
+<td><p>1, 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>domains</p></td>
+<td><p>5, 6</p></td>
+<td><p>7</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is valid because both guests have a unique set of APQNs:</p>
+<ul class="simple">
+<li><p>Guest1 has APQNs (1,5), (1,6), (2,5) and (2,6);</p></li>
+<li><p>Guest2 has APQNs (1,7) and (2,7).</p></li>
+</ul>
+</section>
+<section id="example-2-valid-configuration">
+<h3><a class="toc-backref" href="#id6">Example 2: Valid configuration</a><a class="headerlink" href="#example-2-valid-configuration" title="Permalink to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 31%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Guest1</p></th>
+<th class="head"><p>Guest2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>adapters</p></td>
+<td><p>1, 2</p></td>
+<td><p>3, 4</p></td>
+</tr>
+<tr class="row-odd"><td><p>domains</p></td>
+<td><p>5, 6</p></td>
+<td><p>5, 6</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is also valid because both guests have a unique set of APQNs:</p>
+<ul class="simple">
+<li><p>Guest1 has APQNs (1,5), (1,6), (2,5), (2,6);</p></li>
+<li><p>Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)</p></li>
+</ul>
+</section>
+<section id="example-3-invalid-configuration">
+<h3><a class="toc-backref" href="#id7">Example 3: Invalid configuration</a><a class="headerlink" href="#example-3-invalid-configuration" title="Permalink to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 31%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Guest1</p></th>
+<th class="head"><p>Guest2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>adapters</p></td>
+<td><p>1, 2</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>domains</p></td>
+<td><p>5, 6</p></td>
+<td><p>6, 7</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is an invalid configuration because both guests have access to
+APQN (1,6).</p>
+</section>
+</section>
+<section id="ap-matrix-configuration-on-linux-host">
+<h2><a class="toc-backref" href="#id8">AP Matrix Configuration on Linux Host</a><a class="headerlink" href="#ap-matrix-configuration-on-linux-host" title="Permalink to this heading"></a></h2>
+<p>A linux system is a guest of the LPAR in which it is running and has access to
+the AP resources configured for the LPAR. The LPAR’s AP matrix is
+configured via its Activation Profile which can be edited on the HMC. When the
+linux system is started, the AP bus will detect the AP devices assigned to the
+LPAR and create the following in sysfs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">devices</span><span class="p">]</span>
+<span class="o">......</span> <span class="n">xx</span><span class="o">.</span><span class="n">yyyy</span>
+<span class="o">......</span> <span class="o">...</span>
+<span class="o">......</span> <span class="n">cardxx</span>
+<span class="o">......</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">cardxx</span></code></dt><dd><p>is AP adapter number xx (in hex)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">xx.yyyy</span></code></dt><dd><p>is an APQN with xx specifying the APID and yyyy specifying the APQI</p>
+</dd>
+</dl>
+<p>For example, if AP adapters 5 and 6 and domains 4, 71 (0x47), 171 (0xab) and
+255 (0xff) are configured for the LPAR, the sysfs representation on the linux
+host system would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">devices</span><span class="p">]</span>
+<span class="o">......</span> <span class="mf">05.0004</span>
+<span class="o">......</span> <span class="mf">05.0047</span>
+<span class="o">......</span> <span class="mf">05.00</span><span class="n">ab</span>
+<span class="o">......</span> <span class="mf">05.00</span><span class="n">ff</span>
+<span class="o">......</span> <span class="mf">06.0004</span>
+<span class="o">......</span> <span class="mf">06.0047</span>
+<span class="o">......</span> <span class="mf">06.00</span><span class="n">ab</span>
+<span class="o">......</span> <span class="mf">06.00</span><span class="n">ff</span>
+<span class="o">......</span> <span class="n">card05</span>
+<span class="o">......</span> <span class="n">card06</span>
+</pre></div>
+</div>
+<p>A set of default device drivers are also created to control each type of AP
+device that can be assigned to the LPAR on which a linux host is running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">drivers</span><span class="p">]</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">cex2acard</span><span class="p">]</span>        <span class="k">for</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span> <span class="n">accelerator</span> <span class="n">cards</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">cex2aqueue</span><span class="p">]</span>       <span class="k">for</span> <span class="n">AP</span> <span class="n">queues</span> <span class="n">served</span> <span class="n">by</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span>
+                          <span class="n">accelerator</span> <span class="n">cards</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">cex4card</span><span class="p">]</span>         <span class="k">for</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">4</span><span class="o">/</span><span class="mi">5</span><span class="o">/</span><span class="mi">6</span> <span class="n">accelerator</span> <span class="ow">and</span> <span class="n">coprocessor</span>
+                          <span class="n">cards</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">cex4queue</span><span class="p">]</span>        <span class="k">for</span> <span class="n">AP</span> <span class="n">queues</span> <span class="n">served</span> <span class="n">by</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">4</span><span class="o">/</span><span class="mi">5</span><span class="o">/</span><span class="mi">6</span>
+                          <span class="n">accelerator</span> <span class="ow">and</span> <span class="n">coprocessor</span> <span class="n">cards</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">pcixcccard</span><span class="p">]</span>       <span class="k">for</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span> <span class="n">coprocessor</span> <span class="n">cards</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">pcixccqueue</span><span class="p">]</span>      <span class="k">for</span> <span class="n">AP</span> <span class="n">queues</span> <span class="n">served</span> <span class="n">by</span> <span class="n">Crypto</span> <span class="n">Express</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span>
+                          <span class="n">coprocessor</span> <span class="n">cards</span>
+</pre></div>
+</div>
+<section id="binding-ap-devices-to-device-drivers">
+<h3><a class="toc-backref" href="#id9">Binding AP devices to device drivers</a><a class="headerlink" href="#binding-ap-devices-to-device-drivers" title="Permalink to this heading"></a></h3>
+<p>There are two sysfs files that specify bitmasks marking a subset of the APQN
+range as ‘usable by the default AP queue device drivers’ or ‘not usable by the
+default device drivers’ and thus available for use by the alternate device
+driver(s). The sysfs locations of the masks are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span><span class="o">/</span><span class="n">apmask</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span><span class="o">/</span><span class="n">aqmask</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">apmask</span></code> is a 256-bit mask that identifies a set of AP adapter IDs
+(APID). Each bit in the mask, from left to right (i.e., from most significant
+to least significant bit in big endian order), corresponds to an APID from
+0-255. If a bit is set, the APID is marked as usable only by the default AP
+queue device drivers; otherwise, the APID is usable by the vfio_ap
+device driver.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">aqmask</span></code> is a 256-bit mask that identifies a set of AP queue indexes
+(APQI). Each bit in the mask, from left to right (i.e., from most significant
+to least significant bit in big endian order), corresponds to an APQI from
+0-255. If a bit is set, the APQI is marked as usable only by the default AP
+queue device drivers; otherwise, the APQI is usable by the vfio_ap device
+driver.</p>
+<p>Take, for example, the following mask:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x7dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</span>
+</pre></div>
+</div>
+<p>It indicates:</p>
+<blockquote>
+<div><p>1, 2, 3, 4, 5, and 7-255 belong to the default drivers’ pool, and 0 and 6
+belong to the vfio_ap device driver’s pool.</p>
+</div></blockquote>
+<p>The APQN of each AP queue device assigned to the linux host is checked by the
+AP bus against the set of APQNs derived from the cross product of APIDs
+and APQIs marked as usable only by the default AP queue device drivers. If a
+match is detected,  only the default AP queue device drivers will be probed;
+otherwise, the vfio_ap device driver will be probed.</p>
+<p>By default, the two masks are set to reserve all APQNs for use by the default
+AP queue device drivers. There are two ways the default masks can be changed:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>The sysfs mask files can be edited by echoing a string into the
+respective sysfs mask file in one of two formats:</p>
+<ul>
+<li><p>An absolute hex string starting with 0x - like “0x12345678” - sets
+the mask. If the given string is shorter than the mask, it is padded
+with 0s on the right; for example, specifying a mask value of 0x41 is
+the same as specifying:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x4100000000000000000000000000000000000000000000000000000000000000</span>
+</pre></div>
+</div>
+<p>Keep in mind that the mask reads from left to right (i.e., most
+significant to least significant bit in big endian order), so the mask
+above identifies device numbers 1 and 7 (<code class="docutils literal notranslate"><span class="pre">01000001</span></code>).</p>
+<p>If the string is longer than the mask, the operation is terminated with
+an error (EINVAL).</p>
+</li>
+<li><p>Individual bits in the mask can be switched on and off by specifying
+each bit number to be switched in a comma separated list. Each bit
+number string must be prepended with a (<code class="docutils literal notranslate"><span class="pre">+</span></code>) or minus (<code class="docutils literal notranslate"><span class="pre">-</span></code>) to indicate
+the corresponding bit is to be switched on (<code class="docutils literal notranslate"><span class="pre">+</span></code>) or off (<code class="docutils literal notranslate"><span class="pre">-</span></code>). Some
+valid values are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;+0&quot;</span>    <span class="n">switches</span> <span class="n">bit</span> <span class="mi">0</span> <span class="n">on</span>
+<span class="s2">&quot;-13&quot;</span>   <span class="n">switches</span> <span class="n">bit</span> <span class="mi">13</span> <span class="n">off</span>
+<span class="s2">&quot;+0x41&quot;</span> <span class="n">switches</span> <span class="n">bit</span> <span class="mi">65</span> <span class="n">on</span>
+<span class="s2">&quot;-0xff&quot;</span> <span class="n">switches</span> <span class="n">bit</span> <span class="mi">255</span> <span class="n">off</span>
+</pre></div>
+</div>
+<p>The following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span><span class="o">+</span><span class="mh">0x47</span><span class="p">,</span><span class="o">-</span><span class="mh">0xf0</span>
+</pre></div>
+</div>
+<p>Switches bits 0 and 71 (0x47) on
+Switches bits 6 and 240 (0xf0) off</p>
+<p>Note that the bits not specified in the list remain as they were before
+the operation.</p>
+</li>
+</ul>
+</li>
+<li><p>The masks can also be changed at boot time via parameters on the kernel
+command line like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ap</span><span class="o">.</span><span class="n">apmask</span><span class="o">=</span><span class="mh">0xffff</span> <span class="n">ap</span><span class="o">.</span><span class="n">aqmask</span><span class="o">=</span><span class="mh">0x40</span>
+</pre></div>
+</div>
+<p>This would create the following masks:</p>
+<p>apmask:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0xffff000000000000000000000000000000000000000000000000000000000000</span>
+</pre></div>
+</div>
+<p>aqmask:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x4000000000000000000000000000000000000000000000000000000000000000</span>
+</pre></div>
+</div>
+<p>Resulting in these two pools:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="n">drivers</span> <span class="n">pool</span><span class="p">:</span>    <span class="n">adapter</span> <span class="mi">0</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="n">domain</span> <span class="mi">1</span>
+<span class="n">alternate</span> <span class="n">drivers</span> <span class="n">pool</span><span class="p">:</span>  <span class="n">adapter</span> <span class="mi">16</span><span class="o">-</span><span class="mi">255</span><span class="p">,</span> <span class="n">domains</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">-</span><span class="mi">255</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+</section>
+<section id="configuring-an-ap-matrix-for-a-linux-guest">
+<h3><a class="toc-backref" href="#id10">Configuring an AP matrix for a linux guest</a><a class="headerlink" href="#configuring-an-ap-matrix-for-a-linux-guest" title="Permalink to this heading"></a></h3>
+<p>The sysfs interfaces for configuring an AP matrix for a guest are built on the
+VFIO mediated device framework. To configure an AP matrix for a guest, a
+mediated matrix device must first be created for the <code class="docutils literal notranslate"><span class="pre">/sys/devices/vfio_ap/matrix</span></code>
+device. When the vfio_ap device driver is loaded, it registers with the VFIO
+mediated device framework. When the driver registers, the sysfs interfaces for
+creating mediated matrix devices is created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">vfio_ap</span><span class="p">]</span>
+<span class="o">......</span><span class="p">[</span><span class="n">matrix</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="n">mdev_supported_types</span><span class="p">]</span>
+<span class="o">............</span> <span class="p">[</span><span class="n">vfio_ap</span><span class="o">-</span><span class="n">passthrough</span><span class="p">]</span>
+<span class="o">...............</span> <span class="n">create</span>
+<span class="o">...............</span> <span class="p">[</span><span class="n">devices</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A mediated AP matrix device is created by writing a UUID to the attribute file
+named <code class="docutils literal notranslate"><span class="pre">create</span></code>, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uuidgen</span> <span class="o">&gt;</span> <span class="n">create</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>echo $uuid &gt; create
+</pre></div>
+</div>
+<p>When a mediated AP matrix device is created, a sysfs directory named after
+the UUID is created in the <code class="docutils literal notranslate"><span class="pre">devices</span></code> subdirectory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sys/devices
+... [vfio_ap]
+......[matrix]
+......... [mdev_supported_types]
+............ [vfio_ap-passthrough]
+............... create
+............... [devices]
+.................. [$uuid]
+</pre></div>
+</div>
+<p>There will also be three sets of attribute files created in the mediated
+matrix device’s sysfs directory to configure an AP matrix for the
+KVM guest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sys/devices
+... [vfio_ap]
+......[matrix]
+......... [mdev_supported_types]
+............ [vfio_ap-passthrough]
+............... create
+............... [devices]
+.................. [$uuid]
+..................... assign_adapter
+..................... assign_control_domain
+..................... assign_domain
+..................... matrix
+..................... unassign_adapter
+..................... unassign_control_domain
+..................... unassign_domain
+</pre></div>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">assign_adapter</span></code></dt><dd><p>To assign an AP adapter to the mediated matrix device, its APID is written
+to the <code class="docutils literal notranslate"><span class="pre">assign_adapter</span></code> file. This may be done multiple times to assign more
+than one adapter. The APID may be specified using conventional semantics
+as a decimal, hexadecimal, or octal number. For example, to assign adapters
+4, 5 and 16 to a mediated matrix device in decimal, hexadecimal and octal
+respectively:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mh">0x5</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mi">020</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+</pre></div>
+</div>
+<p>In order to successfully assign an adapter:</p>
+<ul class="simple">
+<li><p>The adapter number specified must represent a value from 0 up to the
+maximum adapter number allowed by the machine model. If an adapter number
+higher than the maximum is specified, the operation will terminate with
+an error (ENODEV).</p></li>
+<li><p>All APQNs that can be derived from the adapter ID being assigned and the
+IDs of the previously assigned domains must be bound to the vfio_ap device
+driver. If no domains have yet been assigned, then there must be at least
+one APQN with the specified APID bound to the vfio_ap driver. If no such
+APQNs are bound to the driver, the operation will terminate with an
+error (EADDRNOTAVAIL).</p></li>
+<li><p>No APQN that can be derived from the adapter ID and the IDs of the
+previously assigned domains can be assigned to another mediated matrix
+device. If an APQN is assigned to another mediated matrix device, the
+operation will terminate with an error (EADDRINUSE).</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unassign_adapter</span></code></dt><dd><p>To unassign an AP adapter, its APID is written to the <code class="docutils literal notranslate"><span class="pre">unassign_adapter</span></code>
+file. This may also be done multiple times to unassign more than one adapter.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">assign_domain</span></code></dt><dd><p>To assign a usage domain, the domain number is written into the
+<code class="docutils literal notranslate"><span class="pre">assign_domain</span></code> file. This may be done multiple times to assign more than one
+usage domain. The domain number is specified using conventional semantics as
+a decimal, hexadecimal, or octal number. For example, to assign usage domains
+4, 8, and 71 to a mediated matrix device in decimal, hexadecimal and octal
+respectively:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mh">0x8</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mi">0107</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+</pre></div>
+</div>
+<p>In order to successfully assign a domain:</p>
+<ul class="simple">
+<li><p>The domain number specified must represent a value from 0 up to the
+maximum domain number allowed by the machine model. If a domain number
+higher than the maximum is specified, the operation will terminate with
+an error (ENODEV).</p></li>
+<li><p>All APQNs that can be derived from the domain ID being assigned and the IDs
+of the previously assigned adapters must be bound to the vfio_ap device
+driver. If no domains have yet been assigned, then there must be at least
+one APQN with the specified APQI bound to the vfio_ap driver. If no such
+APQNs are bound to the driver, the operation will terminate with an
+error (EADDRNOTAVAIL).</p></li>
+<li><p>No APQN that can be derived from the domain ID being assigned and the IDs
+of the previously assigned adapters can be assigned to another mediated
+matrix device. If an APQN is assigned to another mediated matrix device,
+the operation will terminate with an error (EADDRINUSE).</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unassign_domain</span></code></dt><dd><p>To unassign a usage domain, the domain number is written into the
+<code class="docutils literal notranslate"><span class="pre">unassign_domain</span></code> file. This may be done multiple times to unassign more than
+one usage domain.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">assign_control_domain</span></code></dt><dd><p>To assign a control domain, the domain number is written into the
+<code class="docutils literal notranslate"><span class="pre">assign_control_domain</span></code> file. This may be done multiple times to
+assign more than one control domain. The domain number may be specified using
+conventional semantics as a decimal, hexadecimal, or octal number. For
+example, to assign  control domains 4, 8, and 71 to  a mediated matrix device
+in decimal, hexadecimal and octal respectively:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mh">0x8</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mi">0107</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+</pre></div>
+</div>
+<p>In order to successfully assign a control domain, the domain number
+specified must represent a value from 0 up to the maximum domain number
+allowed by the machine model. If a control domain number higher than the
+maximum is specified, the operation will terminate with an error (ENODEV).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unassign_control_domain</span></code></dt><dd><p>To unassign a control domain, the domain number is written into the
+<code class="docutils literal notranslate"><span class="pre">unassign_domain</span></code> file. This may be done multiple times to unassign more than
+one control domain.</p>
+</dd>
+</dl>
+<p>Notes: No changes to the AP matrix will be allowed while a guest using
+the mediated matrix device is running. Attempts to assign an adapter,
+domain or control domain will be rejected and an error (EBUSY) returned.</p>
+</section>
+<section id="starting-a-linux-guest-configured-with-an-ap-matrix">
+<h3><a class="toc-backref" href="#id11">Starting a Linux Guest Configured with an AP Matrix</a><a class="headerlink" href="#starting-a-linux-guest-configured-with-an-ap-matrix" title="Permalink to this heading"></a></h3>
+<p>To provide a mediated matrix device for use by a guest, the following option
+must be specified on the QEMU command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>-device vfio_ap,sysfsdev=$path-to-mdev
+</pre></div>
+</div>
+<p>The sysfsdev parameter specifies the path to the mediated matrix device.
+There are a number of ways to specify this path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sys/devices/vfio_ap/matrix/$uuid
+/sys/bus/mdev/devices/$uuid
+/sys/bus/mdev/drivers/vfio_mdev/$uuid
+/sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
+</pre></div>
+</div>
+<p>When the linux guest is started, the guest will open the mediated
+matrix device’s file descriptor to get information about the mediated matrix
+device. The <code class="docutils literal notranslate"><span class="pre">vfio_ap</span></code> device driver will update the APM, AQM, and ADM fields in
+the guest’s CRYCB with the adapter, usage domain and control domains assigned
+via the mediated matrix device’s sysfs attribute files. Programs running on the
+linux guest will then:</p>
+<ol class="arabic simple">
+<li><p>Have direct access to the APQNs derived from the cross product of the AP
+adapter numbers (APID) and queue indexes (APQI) specified in the APM and AQM
+fields of the guests’s CRYCB respectively. These APQNs identify the AP queues
+that are valid for use by the guest; meaning, AP commands can be sent by the
+guest to any of these queues for processing.</p></li>
+<li><p>Have authorization to process AP commands to change a control domain
+identified in the ADM field of the guest’s CRYCB. The AP command must be sent
+to a valid APQN (see 1 above).</p></li>
+</ol>
+<p>CPU model features:</p>
+<p>Three CPU model features are available for controlling guest access to AP
+facilities:</p>
+<ol class="arabic">
+<li><p>AP facilities feature</p>
+<p>The AP facilities feature indicates that AP facilities are installed on the
+guest. This feature will be exposed for use only if the AP facilities
+are installed on the host system. The feature is s390-specific and is
+represented as a parameter of the -cpu option on the QEMU command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu-system-s390x -cpu $model,ap=on|off
+</pre></div>
+</div>
+<p>Where:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">$model</span></code></dt><dd><p>is the CPU model defined for the guest (defaults to the model of
+the host system if not specified).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ap=on|off</span></code></dt><dd><p>indicates whether AP facilities are installed (on) or not
+(off). The default for CPU models zEC12 or newer
+is <code class="docutils literal notranslate"><span class="pre">ap=on</span></code>. AP facilities must be installed on the guest if a
+vfio-ap device (<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">vfio-ap,sysfsdev=$path</span></code>) is configured
+for the guest, or the guest will fail to start.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>Query Configuration Information (QCI) facility</p>
+<p>The QCI facility is used by the AP bus running on the guest to query the
+configuration of the AP facilities. This facility will be available
+only if the QCI facility is installed on the host system. The feature is
+s390-specific and is represented as a parameter of the -cpu option on the
+QEMU command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu-system-s390x -cpu $model,apqci=on|off
+</pre></div>
+</div>
+<p>Where:</p>
+<blockquote>
+<div><dl>
+<dt><code class="docutils literal notranslate"><span class="pre">$model</span></code></dt><dd><p>is the CPU model defined for the guest</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">apqci=on|off</span></code></dt><dd><p>indicates whether the QCI facility is installed (on) or
+not (off). The default for CPU models zEC12 or newer
+is <code class="docutils literal notranslate"><span class="pre">apqci=on</span></code>; for older models, QCI will not be installed.</p>
+<p>If QCI is installed (<code class="docutils literal notranslate"><span class="pre">apqci=on</span></code>) but AP facilities are not
+(<code class="docutils literal notranslate"><span class="pre">ap=off</span></code>), an error message will be logged, but the guest
+will be allowed to start. It makes no sense to have QCI
+installed if the AP facilities are not; this is considered
+an invalid configuration.</p>
+<p>If the QCI facility is not installed, APQNs with an APQI
+greater than 15 will not be detected by the AP bus
+running on the guest.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>Adjunct Process Facility Test (APFT) facility</p>
+<p>The APFT facility is used by the AP bus running on the guest to test the
+AP facilities available for a given AP queue. This facility will be available
+only if the APFT facility is installed on the host system. The feature is
+s390-specific and is represented as a parameter of the -cpu option on the
+QEMU command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu-system-s390x -cpu $model,apft=on|off
+</pre></div>
+</div>
+<p>Where:</p>
+<blockquote>
+<div><dl>
+<dt><code class="docutils literal notranslate"><span class="pre">$model</span></code></dt><dd><p>is the CPU model defined for the guest (defaults to the model of
+the host system if not specified).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">apft=on|off</span></code></dt><dd><p>indicates whether the APFT facility is installed (on) or
+not (off). The default for CPU models zEC12 and
+newer is <code class="docutils literal notranslate"><span class="pre">apft=on</span></code> for older models, APFT will not be
+installed.</p>
+<p>If APFT is installed (<code class="docutils literal notranslate"><span class="pre">apft=on</span></code>) but AP facilities are not
+(<code class="docutils literal notranslate"><span class="pre">ap=off</span></code>), an error message will be logged, but the guest
+will be allowed to start. It makes no sense to have APFT
+installed if the AP facilities are not; this is considered
+an invalid configuration.</p>
+<p>It also makes no sense to turn APFT off because the AP bus
+running on the guest will not detect CEX4 and newer devices
+without it. Since only CEX4 and newer devices are supported
+for guest usage, no AP devices can be made accessible to a
+guest started without APFT installed.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
+</section>
+<section id="hot-plug-a-vfio-ap-device-into-a-running-guest">
+<h3><a class="toc-backref" href="#id12">Hot plug a vfio-ap device into a running guest</a><a class="headerlink" href="#hot-plug-a-vfio-ap-device-into-a-running-guest" title="Permalink to this heading"></a></h3>
+<p>Only one vfio-ap device can be attached to the virtual machine’s ap-bus, so a
+vfio-ap device can be hot plugged if and only if no vfio-ap device is attached
+to the bus already, whether via the QEMU command line or a prior hot plug
+action.</p>
+<p>To hot plug a vfio-ap device, use the QEMU <code class="docutils literal notranslate"><span class="pre">device_add</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">device_add</span> <span class="n">vfio</span><span class="o">-</span><span class="n">ap</span><span class="p">,</span><span class="n">sysfsdev</span><span class="o">=</span><span class="s2">&quot;$path-to-mdev&quot;</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;$id&quot;</span>
+</pre></div>
+</div>
+<p>Where the <code class="docutils literal notranslate"><span class="pre">$path-to-mdev</span></code> value specifies the absolute path to a mediated
+device to which AP resources to be used by the guest have been assigned.
+<code class="docutils literal notranslate"><span class="pre">$id</span></code> is the name value for the optional id parameter.</p>
+<p>Note that on Linux guests, the AP devices will be created in the
+<code class="docutils literal notranslate"><span class="pre">/sys/bus/ap/devices</span></code> directory when the AP bus subsequently performs its periodic
+scan, so there may be a short delay before the AP devices are accessible on the
+guest.</p>
+<p>The command will fail if:</p>
+<ul class="simple">
+<li><p>A vfio-ap device has already been attached to the virtual machine’s ap-bus.</p></li>
+<li><p>The CPU model features for controlling guest access to AP facilities are not
+enabled (see ‘CPU model features’ subsection in the previous section).</p></li>
+</ul>
+</section>
+<section id="hot-unplug-a-vfio-ap-device-from-a-running-guest">
+<h3><a class="toc-backref" href="#id13">Hot unplug a vfio-ap device from a running guest</a><a class="headerlink" href="#hot-unplug-a-vfio-ap-device-from-a-running-guest" title="Permalink to this heading"></a></h3>
+<p>A vfio-ap device can be unplugged from a running KVM guest if a vfio-ap device
+has been attached to the virtual machine’s ap-bus via the QEMU command line
+or a prior hot plug action.</p>
+<p>To hot unplug a vfio-ap device, use the QEMU <code class="docutils literal notranslate"><span class="pre">device_del</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">device_del</span> <span class="s2">&quot;$id&quot;</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">$id</span></code> is the same id that was specified at device creation.</p>
+<p>On a Linux guest, the AP devices will be removed from the <code class="docutils literal notranslate"><span class="pre">/sys/bus/ap/devices</span></code>
+directory on the guest when the AP bus subsequently performs its periodic scan,
+so there may be a short delay before the AP devices are no longer accessible by
+the guest.</p>
+<p>The command will fail if the <code class="docutils literal notranslate"><span class="pre">$path-to-mdev</span></code> specified on the <code class="docutils literal notranslate"><span class="pre">device_del</span></code> command
+does not match the value specified when the vfio-ap device was attached to
+the virtual machine’s ap-bus.</p>
+</section>
+</section>
+<section id="example-configure-ap-matrices-for-three-linux-guests">
+<h2><a class="toc-backref" href="#id14">Example: Configure AP Matrices for Three Linux Guests</a><a class="headerlink" href="#example-configure-ap-matrices-for-three-linux-guests" title="Permalink to this heading"></a></h2>
+<p>Let’s now provide an example to illustrate how KVM guests may be given
+access to AP facilities. For this example, we will show how to configure
+three guests such that executing the lszcrypt command on the guests would
+look like this:</p>
+<p>Guest1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CARD</span><span class="o">.</span><span class="n">DOMAIN</span> <span class="n">TYPE</span>  <span class="n">MODE</span>
+<span class="o">------------------------------</span>
+<span class="mi">05</span>          <span class="n">CEX5C</span> <span class="n">CCA</span><span class="o">-</span><span class="n">Coproc</span>
+<span class="mf">05.0004</span>     <span class="n">CEX5C</span> <span class="n">CCA</span><span class="o">-</span><span class="n">Coproc</span>
+<span class="mf">05.00</span><span class="n">ab</span>     <span class="n">CEX5C</span> <span class="n">CCA</span><span class="o">-</span><span class="n">Coproc</span>
+<span class="mi">06</span>          <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">06.0004</span>     <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">06.00</span><span class="n">ab</span>     <span class="n">CEX5C</span> <span class="n">CCA</span><span class="o">-</span><span class="n">Coproc</span>
+</pre></div>
+</div>
+<p>Guest2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CARD</span><span class="o">.</span><span class="n">DOMAIN</span> <span class="n">TYPE</span>  <span class="n">MODE</span>
+<span class="o">------------------------------</span>
+<span class="mi">05</span>          <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">05.0047</span>     <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">05.00</span><span class="n">ff</span>     <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+</pre></div>
+</div>
+<p>Guest3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CARD</span><span class="o">.</span><span class="n">DOMAIN</span> <span class="n">TYPE</span>  <span class="n">MODE</span>
+<span class="o">------------------------------</span>
+<span class="mi">06</span>          <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">06.0047</span>     <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+<span class="mf">06.00</span><span class="n">ff</span>     <span class="n">CEX5A</span> <span class="n">Accelerator</span>
+</pre></div>
+</div>
+<p>These are the steps:</p>
+<ol class="arabic">
+<li><p>Install the vfio_ap module on the linux host. The dependency chain for the
+vfio_ap module is:</p>
+<ul class="simple">
+<li><p>iommu</p></li>
+<li><p>s390</p></li>
+<li><p>zcrypt</p></li>
+<li><p>vfio</p></li>
+<li><p>vfio_mdev</p></li>
+<li><p>vfio_mdev_device</p></li>
+<li><p>KVM</p></li>
+</ul>
+<p>To build the vfio_ap module, the kernel build must be configured with the
+following Kconfig elements selected:</p>
+<ul class="simple">
+<li><p>IOMMU_SUPPORT</p></li>
+<li><p>S390</p></li>
+<li><p>ZCRYPT</p></li>
+<li><p>S390_AP_IOMMU</p></li>
+<li><p>VFIO</p></li>
+<li><p>VFIO_MDEV</p></li>
+<li><p>VFIO_MDEV_DEVICE</p></li>
+<li><p>KVM</p></li>
+</ul>
+<dl class="simple">
+<dt>If using make menuconfig select the following to build the vfio_ap module::</dt><dd><dl class="simple">
+<dt>-&gt; Device Drivers</dt><dd><dl class="simple">
+<dt>-&gt; IOMMU Hardware Support</dt><dd><p>select S390 AP IOMMU Support</p>
+</dd>
+<dt>-&gt; VFIO Non-Privileged userspace driver framework</dt><dd><dl class="simple">
+<dt>-&gt; Mediated device driver framework</dt><dd><p>-&gt; VFIO driver for Mediated devices</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>-&gt; I/O subsystem</dt><dd><p>-&gt; VFIO support for AP devices</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><p>Secure the AP queues to be used by the three guests so that the host can not
+access them. To secure the AP queues 05.0004, 05.0047, 05.00ab, 05.00ff,
+06.0004, 06.0047, 06.00ab, and 06.00ff for use by the vfio_ap device driver,
+the corresponding APQNs must be removed from the default queue drivers pool
+as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">6</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span><span class="o">/</span><span class="n">apmask</span>
+
+<span class="n">echo</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="o">-</span><span class="mh">0x47</span><span class="p">,</span><span class="o">-</span><span class="mh">0xab</span><span class="p">,</span><span class="o">-</span><span class="mh">0xff</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span><span class="o">/</span><span class="n">aqmask</span>
+</pre></div>
+</div>
+<p>This will result in AP queues 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004,
+06.0047, 06.00ab, and 06.00ff getting bound to the vfio_ap device driver. The
+sysfs directory for the vfio_ap device driver will now contain symbolic links
+to the AP queue devices bound to it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">drivers</span><span class="p">]</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">vfio_ap</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">05.0004</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">05.0047</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">05.00</span><span class="n">ab</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">05.00</span><span class="n">ff</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">06.0004</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">06.0047</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">06.00</span><span class="n">ab</span><span class="p">]</span>
+<span class="o">.........</span> <span class="p">[</span><span class="mf">06.00</span><span class="n">ff</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Keep in mind that only type 10 and newer adapters (i.e., CEX4 and later)
+can be bound to the vfio_ap device driver. The reason for this is to
+simplify the implementation by not needlessly complicating the design by
+supporting older devices that will go out of service in the relatively near
+future, and for which there are few older systems on which to test.</p>
+<p>The administrator, therefore, must take care to secure only AP queues that
+can be bound to the vfio_ap device driver. The device type for a given AP
+queue device can be read from the parent card’s sysfs directory. For example,
+to see the hardware type of the queue 05.0004:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">ap</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">card05</span><span class="o">/</span><span class="n">hwtype</span>
+</pre></div>
+</div>
+<p>The hwtype must be 10 or higher (CEX4 or newer) in order to be bound to the
+vfio_ap device driver.</p>
+</li>
+<li><p>Create the mediated devices needed to configure the AP matrixes for the
+three guests and to provide an interface to the vfio_ap driver for
+use by the guests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">vfio_ap</span><span class="o">/</span><span class="n">matrix</span><span class="o">/</span>
+<span class="o">...</span> <span class="p">[</span><span class="n">mdev_supported_types</span><span class="p">]</span>
+<span class="o">......</span> <span class="p">[</span><span class="n">vfio_ap</span><span class="o">-</span><span class="n">passthrough</span><span class="p">]</span> <span class="p">(</span><span class="n">passthrough</span> <span class="n">mediated</span> <span class="n">matrix</span> <span class="n">device</span> <span class="nb">type</span><span class="p">)</span>
+<span class="o">.........</span> <span class="n">create</span>
+<span class="o">.........</span> <span class="p">[</span><span class="n">devices</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To create the mediated devices for the three guests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uuidgen</span> <span class="o">&gt;</span> <span class="n">create</span>
+<span class="n">uuidgen</span> <span class="o">&gt;</span> <span class="n">create</span>
+<span class="n">uuidgen</span> <span class="o">&gt;</span> <span class="n">create</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>echo $uuid1 &gt; create
+echo $uuid2 &gt; create
+echo $uuid3 &gt; create
+</pre></div>
+</div>
+<p>This will create three mediated devices in the [devices] subdirectory named
+after the UUID used to create the mediated device. We’ll call them $uuid1,
+$uuid2 and $uuid3 and this is the sysfs directory structure after creation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sys/devices/vfio_ap/matrix/
+... [mdev_supported_types]
+...... [vfio_ap-passthrough]
+......... [devices]
+............ [$uuid1]
+............... assign_adapter
+............... assign_control_domain
+............... assign_domain
+............... matrix
+............... unassign_adapter
+............... unassign_control_domain
+............... unassign_domain
+
+............ [$uuid2]
+............... assign_adapter
+............... assign_control_domain
+............... assign_domain
+............... matrix
+............... unassign_adapter
+............... unassign_control_domain
+............... unassign_domain
+
+............ [$uuid3]
+............... assign_adapter
+............... assign_control_domain
+............... assign_domain
+............... matrix
+............... unassign_adapter
+............... unassign_control_domain
+............... unassign_domain
+</pre></div>
+</div>
+</li>
+<li><p>The administrator now needs to configure the matrixes for the mediated
+devices $uuid1 (for Guest1), $uuid2 (for Guest2) and $uuid3 (for Guest3).</p>
+<p>This is how the matrix is configured for Guest1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">5</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mi">6</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mh">0xab</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+</pre></div>
+</div>
+<p>Control domains can similarly be assigned using the assign_control_domain
+sysfs file.</p>
+<p>If a mistake is made configuring an adapter, domain or control domain,
+you can use the <code class="docutils literal notranslate"><span class="pre">unassign_xxx</span></code> interfaces to unassign the adapter, domain or
+control domain.</p>
+<p>To display the matrix configuration for Guest1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">matrix</span>
+</pre></div>
+</div>
+<p>The output will display the APQNs in the format <code class="docutils literal notranslate"><span class="pre">xx.yyyy</span></code>, where xx is
+the adapter number and yyyy is the domain number. The output for Guest1
+will look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">05.0004</span>
+<span class="mf">05.00</span><span class="n">ab</span>
+<span class="mf">06.0004</span>
+<span class="mf">06.00</span><span class="n">ab</span>
+</pre></div>
+</div>
+<p>This is how the matrix is configured for Guest2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">5</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mh">0x47</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mh">0xff</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+</pre></div>
+</div>
+<p>This is how the matrix is configured for Guest3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="mi">6</span> <span class="o">&gt;</span> <span class="n">assign_adapter</span>
+<span class="n">echo</span> <span class="mh">0x47</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+<span class="n">echo</span> <span class="mh">0xff</span> <span class="o">&gt;</span> <span class="n">assign_domain</span>
+</pre></div>
+</div>
+</li>
+<li><p>Start Guest1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on -device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid1 ...
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" start="7">
+<li><p>Start Guest2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on -device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid2 ...
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" start="7">
+<li><p>Start Guest3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on -device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid3 ...
+</pre></div>
+</div>
+</li>
+</ol>
+<p>When the guest is shut down, the mediated matrix devices may be removed.</p>
+<p>Using our example again, to remove the mediated matrix device $uuid1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sys/devices/vfio_ap/matrix/
+... [mdev_supported_types]
+...... [vfio_ap-passthrough]
+......... [devices]
+............ [$uuid1]
+............... remove
+
+
+echo 1 &gt; remove
+</pre></div>
+</div>
+<p>This will remove all of the mdev matrix device’s sysfs structures including
+the mdev device itself. To recreate and reconfigure the mdev matrix device,
+all of the steps starting with step 3 will have to be performed again. Note
+that the remove will fail if a guest using the mdev is still running.</p>
+<p>It is not necessary to remove an mdev matrix device, but one may want to
+remove it if no guest will use it during the remaining lifetime of the linux
+host. If the mdev matrix device is removed, one may want to also reconfigure
+the pool of adapters and queues reserved for use by the default drivers.</p>
+</section>
+<section id="limitations">
+<h2><a class="toc-backref" href="#id15">Limitations</a><a class="headerlink" href="#limitations" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>The KVM/kernel interfaces do not provide a way to prevent restoring an APQN
+to the default drivers pool of a queue that is still assigned to a mediated
+device in use by a guest. It is incumbent upon the administrator to
+ensure there is no mediated device in use by a guest to which the APQN is
+assigned lest the host be given access to the private data of the AP queue
+device, such as a private key configured specifically for the guest.</p></li>
+<li><p>Dynamically assigning AP resources to or unassigning AP resources from a
+mediated matrix device - see <a class="reference internal" href="#configuring-an-ap-matrix-for-a-linux-guest">Configuring an AP matrix for a linux guest</a>
+section above - while a running guest is using it is currently not supported.</p></li>
+<li><p>Live guest migration is not supported for guests using AP devices. If a guest
+is using AP devices, the vfio-ap device configured for the guest must be
+unplugged before migrating the guest (see <a class="reference internal" href="#hot-unplug-a-vfio-ap-device-from-a-running-guest">Hot unplug a vfio-ap device from a
+running guest</a> section above.)</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../target-s390x.html" class="btn btn-neutral float-left" title="s390x System emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="css.html" class="btn btn-neutral float-right" title="The virtual channel subsystem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

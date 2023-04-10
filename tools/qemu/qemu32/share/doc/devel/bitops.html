@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bitwise operations &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Load and Store APIs" href="loads-stores.html" />
+    <link rel="prev" title="Internal QEMU APIs" href="index-api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Bitwise operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="loads-stores.html">Load and Store APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="memory.html">The memory API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html">QEMU modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ui.html">QEMU UI subsystem</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-api.html">Internal QEMU APIs</a></li>
+      <li class="breadcrumb-item active">Bitwise operations</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/bitops.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bitwise-operations">
+<h1>Bitwise operations<a class="headerlink" href="#bitwise-operations" title="Permalink to this heading"></a></h1>
+<p>The header <code class="docutils literal notranslate"><span class="pre">qemu/bitops.h</span></code> provides utility functions for
+performing bitwise operations.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.set_bit">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.set_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set a bit in memory</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>the bit to set</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>the address to start counting from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.set_bit_atomic">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_bit_atomic</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.set_bit_atomic" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set a bit in memory atomically</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>the bit to set</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>the address to start counting from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.clear_bit">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clear_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.clear_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clears a bit in memory</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>Bit to clear</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to start counting from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.change_bit">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">change_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.change_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Toggle a bit in memory</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>Bit to change</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to start counting from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.test_and_set_bit">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_and_set_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.test_and_set_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set a bit and return its old value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>Bit to set</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to count from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.test_and_clear_bit">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_and_clear_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.test_and_clear_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clear a bit and return its old value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>Bit to clear</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to count from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.test_and_change_bit">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_and_change_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.test_and_change_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Change a bit and return its old value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>Bit to change</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to count from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.test_bit">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_bit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">nr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.test_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Determine whether a bit is set</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">nr</span></code></dt><dd><p>bit number to test</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>Address to start counting from</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.find_last_bit">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_last_bit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.find_last_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>find the last set bit in a memory region</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>The address to start the search at</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">size</span></code></dt><dd><p>The maximum size to search</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns the bit number of the last set bit,
+or <strong>size</strong> if there is no set bit in the bitmap.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.find_next_bit">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_next_bit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.find_next_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>find the next set bit in a memory region</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>The address to base the search on</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">size</span></code></dt><dd><p>The bitmap size in bits</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">offset</span></code></dt><dd><p>The bitnumber to start searching at</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns the bit number of the next set bit,
+or <strong>size</strong> if there are no further set bits in the bitmap.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.find_next_zero_bit">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_next_zero_bit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.find_next_zero_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>find the next cleared bit in a memory region</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>The address to base the search on</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">size</span></code></dt><dd><p>The bitmap size in bits</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">offset</span></code></dt><dd><p>The bitnumber to start searching at</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns the bit number of the next cleared bit,
+or <strong>size</strong> if there are no further clear bits in the bitmap.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.find_first_bit">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_first_bit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.find_first_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>find the first set bit in a memory region</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>The address to start the search at</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">size</span></code></dt><dd><p>The maximum size to search</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns the bit number of the first set bit,
+or <strong>size</strong> if there is no set bit in the bitmap.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.find_first_zero_bit">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_first_zero_bit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">addr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.find_first_zero_bit" title="Permalink to this definition"></a><br /></dt>
+<dd><p>find the first cleared bit in a memory region</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">*addr</span></code></dt><dd><p>The address to start the search at</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">size</span></code></dt><dd><p>The maximum size to search</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns the bit number of the first cleared bit,
+or <strong>size</strong> if there is no clear bit in the bitmap.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.rol8">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rol8</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rol8" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate an 8-bit value left</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint8_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ror8">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ror8</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ror8" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate an 8-bit value right</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint8_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.rol16">
+<span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rol16</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rol16" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 16-bit value left</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint16_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ror16">
+<span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ror16</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ror16" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 16-bit value right</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint16_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.rol32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rol32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rol32" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 32-bit value left</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ror32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ror32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ror32" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 32-bit value right</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.rol64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rol64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rol64" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 64-bit value left</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.ror64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ror64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">word</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ror64" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rotate a 64-bit value right</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">word</span></code></dt><dd><p>value to rotate</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">shift</span></code></dt><dd><p>bits to roll</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.hswap32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hswap32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.hswap32" title="Permalink to this definition"></a><br /></dt>
+<dd><p>swap 16-bit halfwords within a 32-bit value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">h</span></code></dt><dd><p>value to swap</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.hswap64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hswap64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.hswap64" title="Permalink to this definition"></a><br /></dt>
+<dd><p>swap 16-bit halfwords within a 64-bit value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">h</span></code></dt><dd><p>value to swap</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.wswap64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wswap64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.wswap64" title="Permalink to this definition"></a><br /></dt>
+<dd><p>swap 32-bit words within a 64-bit value</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">h</span></code></dt><dd><p>value to swap</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.extract32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">extract32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.extract32" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 32 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it. The bit field must
+lie entirely within the 32 bit word. It is valid to request that
+all 32 bits are returned (ie <strong>length</strong> 32 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the value of the bit field extracted from the input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.extract8">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">extract8</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.extract8" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint8_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 8 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it. The bit field must
+lie entirely within the 8 bit word. It is valid to request that
+all 8 bits are returned (ie <strong>length</strong> 8 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the value of the bit field extracted from the input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.extract16">
+<span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">extract16</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.extract16" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint16_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 16 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it. The bit field must
+lie entirely within the 16 bit word. It is valid to request that
+all 16 bits are returned (ie <strong>length</strong> 16 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the value of the bit field extracted from the input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.extract64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">extract64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.extract64" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 64 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it. The bit field must
+lie entirely within the 64 bit word. It is valid to request that
+all 64 bits are returned (ie <strong>length</strong> 64 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the value of the bit field extracted from the input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sextract32">
+<span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sextract32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.sextract32" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 32 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it, sign extended to
+an int32_t (ie with the most significant bit of the field propagated
+to all the upper bits of the return value). The bit field must lie
+entirely within the 32 bit word. It is valid to request that
+all 32 bits are returned (ie <strong>length</strong> 32 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the sign extended value of the bit field extracted from the
+input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sextract64">
+<span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sextract64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.sextract64" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">value</span></code></dt><dd><p>the value to extract the bit field from</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Extract from the 64 bit input <strong>value</strong> the bit field specified by the
+<strong>start</strong> and <strong>length</strong> parameters, and return it, sign extended to
+an int64_t (ie with the most significant bit of the field propagated
+to all the upper bits of the return value). The bit field must lie
+entirely within the 64 bit word. It is valid to request that
+all 64 bits are returned (ie <strong>length</strong> 64 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the sign extended value of the bit field extracted from the
+input value.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.deposit32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deposit32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">fieldval</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.deposit32" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">value</span></code></dt><dd><p>initial value to insert bit field into</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">fieldval</span></code></dt><dd><p>the value to insert into the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Deposit <strong>fieldval</strong> into the 32 bit <strong>value</strong> at the bit field specified
+by the <strong>start</strong> and <strong>length</strong> parameters, and return the modified
+<strong>value</strong>. Bits of <strong>value</strong> outside the bit field are not modified.
+Bits of <strong>fieldval</strong> above the least significant <strong>length</strong> bits are
+ignored. The bit field must lie entirely within the 32 bit word.
+It is valid to request that all 32 bits are modified (ie <strong>length</strong>
+32 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the modified <strong>value</strong>.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.deposit64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deposit64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">value</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">length</span></span>, <span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">fieldval</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.deposit64" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">value</span></code></dt><dd><p>initial value to insert bit field into</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">start</span></code></dt><dd><p>the lowest bit in the bit field (numbered from 0)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">length</span></code></dt><dd><p>the length of the bit field</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">fieldval</span></code></dt><dd><p>the value to insert into the bit field</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Deposit <strong>fieldval</strong> into the 64 bit <strong>value</strong> at the bit field specified
+by the <strong>start</strong> and <strong>length</strong> parameters, and return the modified
+<strong>value</strong>. Bits of <strong>value</strong> outside the bit field are not modified.
+Bits of <strong>fieldval</strong> above the least significant <strong>length</strong> bits are
+ignored. The bit field must lie entirely within the 64 bit word.
+It is valid to request that all 64 bits are modified (ie <strong>length</strong>
+64 and <strong>start</strong> 0).</p>
+<p><strong>Return</strong></p>
+<p>the modified <strong>value</strong>.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.half_shuffle32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">half_shuffle32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.half_shuffle32" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">x</span></code></dt><dd><p>32-bit value (of which only the bottom 16 bits are of interest)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Given an input value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xxxx</span> <span class="n">xxxx</span> <span class="n">xxxx</span> <span class="n">xxxx</span> <span class="n">ABCD</span> <span class="n">EFGH</span> <span class="n">IJKL</span> <span class="n">MNOP</span>
+</pre></div>
+</div>
+<p>return the value where the bottom 16 bits are spread out into
+the odd bits in the word, and the even bits are zeroed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span><span class="n">A0B</span> <span class="mi">0</span><span class="n">C0D</span> <span class="mf">0E0</span><span class="n">F</span> <span class="mi">0</span><span class="n">G0H</span> <span class="mi">0</span><span class="n">I0J</span> <span class="mi">0</span><span class="n">K0L</span> <span class="mi">0</span><span class="n">M0N</span> <span class="mo">0O0</span><span class="n">P</span>
+</pre></div>
+</div>
+<p>Any bits set in the top half of the input are ignored.</p>
+<p><strong>Return</strong></p>
+<p>the shuffled bits.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.half_shuffle64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">half_shuffle64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.half_shuffle64" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">x</span></code></dt><dd><p>64-bit value (of which only the bottom 32 bits are of interest)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Given an input value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xxxx</span> <span class="n">xxxx</span> <span class="n">xxxx</span> <span class="o">....</span> <span class="n">xxxx</span> <span class="n">xxxx</span> <span class="n">ABCD</span> <span class="n">EFGH</span> <span class="n">IJKL</span> <span class="n">MNOP</span> <span class="n">QRST</span> <span class="n">UVWX</span> <span class="n">YZab</span> <span class="n">cdef</span>
+</pre></div>
+</div>
+<p>return the value where the bottom 32 bits are spread out into
+the odd bits in the word, and the even bits are zeroed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span><span class="n">A0B</span> <span class="mi">0</span><span class="n">C0D</span> <span class="mf">0E0</span><span class="n">F</span> <span class="mi">0</span><span class="n">G0H</span> <span class="mi">0</span><span class="n">I0J</span> <span class="mi">0</span><span class="n">K0L</span> <span class="mi">0</span><span class="n">M0N</span> <span class="o">....</span> <span class="mi">0</span><span class="n">U0V</span> <span class="mi">0</span><span class="n">W0X</span> <span class="mi">0</span><span class="n">Y0Z</span> <span class="mi">0</span><span class="n">a0b</span> <span class="mi">0</span><span class="n">c0d</span> <span class="mf">0e0</span><span class="n">f</span>
+</pre></div>
+</div>
+<p>Any bits set in the top half of the input are ignored.</p>
+<p><strong>Return</strong></p>
+<p>the shuffled bits.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.half_unshuffle32">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">half_unshuffle32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.half_unshuffle32" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">x</span></code></dt><dd><p>32-bit value (of which only the odd bits are of interest)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Given an input value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xAxB</span> <span class="n">xCxD</span> <span class="n">xExF</span> <span class="n">xGxH</span> <span class="n">xIxJ</span> <span class="n">xKxL</span> <span class="n">xMxN</span> <span class="n">xOxP</span>
+</pre></div>
+</div>
+<p>return the value where all the odd bits are compressed down
+into the low half of the word, and the high half is zeroed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="n">ABCD</span> <span class="n">EFGH</span> <span class="n">IJKL</span> <span class="n">MNOP</span>
+</pre></div>
+</div>
+<p>Any even bits set in the input are ignored.</p>
+<p><strong>Return</strong></p>
+<p>the unshuffled bits.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.half_unshuffle64">
+<span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">half_unshuffle64</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.half_unshuffle64" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">uint64_t</span> <span class="pre">x</span></code></dt><dd><p>64-bit value (of which only the odd bits are of interest)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Given an input value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xAxB</span> <span class="n">xCxD</span> <span class="n">xExF</span> <span class="n">xGxH</span> <span class="n">xIxJ</span> <span class="n">xKxL</span> <span class="n">xMxN</span> <span class="o">....</span> <span class="n">xUxV</span> <span class="n">xWxX</span> <span class="n">xYxZ</span> <span class="n">xaxb</span> <span class="n">xcxd</span> <span class="n">xexf</span>
+</pre></div>
+</div>
+<p>return the value where all the odd bits are compressed down
+into the low half of the word, and the high half is zeroed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="o">....</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="n">ABCD</span> <span class="n">EFGH</span> <span class="n">IJKL</span> <span class="n">MNOP</span> <span class="n">QRST</span> <span class="n">UVWX</span> <span class="n">YZab</span> <span class="n">cdef</span>
+</pre></div>
+</div>
+<p>Any even bits set in the input are ignored.</p>
+<p><strong>Return</strong></p>
+<p>the unshuffled bits.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index-api.html" class="btn btn-neutral float-left" title="Internal QEMU APIs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="loads-stores.html" class="btn btn-neutral float-right" title="Load and Store APIs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

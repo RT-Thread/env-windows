@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boundary Devices SABRE Lite (sabrelite) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Canon A1100 (canon-a1100)" href="digic.html" />
+    <link rel="prev" title="Aspeed family boards (*-bmc, ast2500-evb, ast2600-evb)" href="aspeed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">Boundary Devices SABRE Lite (<code class="docutils literal notranslate"><span class="pre">sabrelite</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/sabrelite.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="boundary-devices-sabre-lite-sabrelite">
+<h1>Boundary Devices SABRE Lite (<code class="docutils literal notranslate"><span class="pre">sabrelite</span></code>)<a class="headerlink" href="#boundary-devices-sabre-lite-sabrelite" title="Permalink to this heading"></a></h1>
+<p>Boundary Devices SABRE Lite i.MX6 Development Board is a low-cost development
+platform featuring the powerful Freescale / NXP Semiconductor’s i.MX 6 Quad
+Applications Processor.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<p>The SABRE Lite machine supports the following devices:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Up to 4 Cortex-A9 cores</p></li>
+<li><p>Generic Interrupt Controller</p></li>
+<li><p>1 Clock Controller Module</p></li>
+<li><p>1 System Reset Controller</p></li>
+<li><p>5 UARTs</p></li>
+<li><p>2 EPIC timers</p></li>
+<li><p>1 GPT timer</p></li>
+<li><p>2 Watchdog timers</p></li>
+<li><p>1 FEC Ethernet controller</p></li>
+<li><p>3 I2C controllers</p></li>
+<li><p>7 GPIO controllers</p></li>
+<li><p>4 SDHC storage controllers</p></li>
+<li><p>4 USB 2.0 host controllers</p></li>
+<li><p>5 ECSPI controllers</p></li>
+<li><p>1 SST 25VF016B flash</p></li>
+</ul>
+</div></blockquote>
+<p>Please note above list is a complete superset the QEMU SABRE Lite machine can
+support. For a normal use case, a device tree blob that represents a real world
+SABRE Lite board, only exposes a subset of devices to the guest software.</p>
+</section>
+<section id="boot-options">
+<h2>Boot options<a class="headerlink" href="#boot-options" title="Permalink to this heading"></a></h2>
+<p>The SABRE Lite machine can start using the standard -kernel functionality
+for loading a Linux kernel, U-Boot bootloader or ELF executable.</p>
+</section>
+<section id="running-linux-kernel">
+<h2>Running Linux kernel<a class="headerlink" href="#running-linux-kernel" title="Permalink to this heading"></a></h2>
+<p>Linux mainline v5.10 release is tested at the time of writing. To build a Linux
+mainline kernel that can be booted by the SABRE Lite machine, simply configure
+the kernel using the imx_v6_v7_defconfig configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">ARCH</span><span class="o">=</span>arm
+$ <span class="nb">export</span> <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabihf-
+$ make imx_v6_v7_defconfig
+$ make
+</pre></div>
+</div>
+<p>To boot the newly built Linux kernel in QEMU with the SABRE Lite machine, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M sabrelite -smp <span class="m">4</span> -m 1G <span class="se">\</span>
+    -display none -serial null -serial stdio <span class="se">\</span>
+    -kernel arch/arm/boot/zImage <span class="se">\</span>
+    -dtb arch/arm/boot/dts/imx6q-sabrelite.dtb <span class="se">\</span>
+    -initrd /path/to/rootfs.ext4 <span class="se">\</span>
+    -append <span class="s2">&quot;root=/dev/ram&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="running-u-boot">
+<h2>Running U-Boot<a class="headerlink" href="#running-u-boot" title="Permalink to this heading"></a></h2>
+<p>U-Boot mainline v2020.10 release is tested at the time of writing. To build a
+U-Boot mainline bootloader that can be booted by the SABRE Lite machine, use
+the mx6qsabrelite_defconfig with similar commands as described above for Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabihf-
+$ make mx6qsabrelite_defconfig
+</pre></div>
+</div>
+<p>Note we need to adjust settings by:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make menuconfig
+</pre></div>
+</div>
+<p>then manually select the following configuration in U-Boot:</p>
+<blockquote>
+<div><p>Device Tree Control &gt; Provider of DTB for DT Control &gt; Embedded DTB</p>
+</div></blockquote>
+<p>To start U-Boot using the SABRE Lite machine, provide the u-boot binary to
+the -kernel argument, along with an SD card image with rootfs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M sabrelite -smp <span class="m">4</span> -m 1G <span class="se">\</span>
+    -display none -serial null -serial stdio <span class="se">\</span>
+    -kernel u-boot
+</pre></div>
+</div>
+<p>The following example shows booting Linux kernel from dhcp, and uses the
+rootfs on an SD card. This requires some additional command line parameters
+for QEMU:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-nic user,tftp=/path/to/kernel/zImage \
+-drive file=sdcard.img,id=rootfs -device sd-card,drive=rootfs
+</pre></div>
+</div>
+<p>The directory for the built-in TFTP server should also contain the device tree
+blob of the SABRE Lite board. The sample SD card image was populated with the
+root file system with one single partition. You may adjust the kernel “root=”
+boot parameter accordingly.</p>
+<p>After U-Boot boots, type the following commands in the U-Boot command shell to
+boot the Linux kernel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>=&gt; setenv ethaddr 00:11:22:33:44:55
+=&gt; setenv bootfile zImage
+=&gt; dhcp
+=&gt; tftpboot 14000000 imx6q-sabrelite.dtb
+=&gt; setenv bootargs root=/dev/mmcblk3p1
+=&gt; bootz 12000000 - 14000000
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aspeed.html" class="btn btn-neutral float-left" title="Aspeed family boards (*-bmc, ast2500-evb, ast2600-evb)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="digic.html" class="btn btn-neutral float-right" title="Canon A1100 (canon-a1100)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

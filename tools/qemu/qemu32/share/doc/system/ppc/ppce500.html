@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ppce500 generic platform (ppce500) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Prep machine (40p)" href="prep.html" />
+    <link rel="prev" title="PowerNV family boards (powernv8, powernv9, powernv10)" href="powernv.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-ppc.html">PowerPC System emulator</a></li>
+      <li class="breadcrumb-item active">ppce500 generic platform (<code class="docutils literal notranslate"><span class="pre">ppce500</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/ppc/ppce500.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ppce500-generic-platform-ppce500">
+<h1>ppce500 generic platform (<code class="docutils literal notranslate"><span class="pre">ppce500</span></code>)<a class="headerlink" href="#ppce500-generic-platform-ppce500" title="Permalink to this heading"></a></h1>
+<p>QEMU for PPC supports a special <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine designed for emulation and
+virtualization purposes.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine supports the following devices:</p>
+<ul class="simple">
+<li><p>PowerPC e500 series core (e500v2/e500mc/e5500/e6500)</p></li>
+<li><p>Configuration, Control, and Status Register (CCSR)</p></li>
+<li><p>Multicore Programmable Interrupt Controller (MPIC) with MSI support</p></li>
+<li><p>1 16550A UART device</p></li>
+<li><p>1 Freescale MPC8xxx I2C controller</p></li>
+<li><p>1 Pericom pt7c4338 RTC via I2C</p></li>
+<li><p>1 Freescale MPC8xxx GPIO controller</p></li>
+<li><p>Power-off functionality via one GPIO pin</p></li>
+<li><p>1 Freescale MPC8xxx PCI host controller</p></li>
+<li><p>VirtIO devices via PCI bus</p></li>
+<li><p>1 Freescale Enhanced Triple Speed Ethernet controller (eTSEC)</p></li>
+</ul>
+</section>
+<section id="hardware-configuration-information">
+<h2>Hardware configuration information<a class="headerlink" href="#hardware-configuration-information" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine automatically generates a device tree blob (“dtb”)
+which it passes to the guest, if there is no <code class="docutils literal notranslate"><span class="pre">-dtb</span></code> option. This provides
+information about the addresses, interrupt lines and other configuration of
+the various devices in the system.</p>
+<p>If users want to provide their own DTB, they can use the <code class="docutils literal notranslate"><span class="pre">-dtb</span></code> option.
+These DTBs should have the following requirements:</p>
+<ul class="simple">
+<li><p>The number of subnodes under /cpus node should match QEMU’s <code class="docutils literal notranslate"><span class="pre">-smp</span></code> option</p></li>
+<li><p>The /memory reg size should match QEMU’s selected ram_size via <code class="docutils literal notranslate"><span class="pre">-m</span></code></p></li>
+</ul>
+<p>Both <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc</span></code> and <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc64</span></code> provide emulation for the
+following 32-bit PowerPC CPUs:</p>
+<ul class="simple">
+<li><p>e500v2</p></li>
+<li><p>e500mc</p></li>
+</ul>
+<p>Additionally <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc64</span></code> provides support for the following 64-bit
+PowerPC CPUs:</p>
+<ul class="simple">
+<li><p>e5500</p></li>
+<li><p>e6500</p></li>
+</ul>
+<p>The CPU type can be specified via the <code class="docutils literal notranslate"><span class="pre">-cpu</span></code> command line. If not specified,
+it creates a machine with e500v2 core. The following example shows an e6500
+based machine creation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 -nographic -M ppce500 -cpu e6500
+</pre></div>
+</div>
+</section>
+<section id="boot-options">
+<h2>Boot options<a class="headerlink" href="#boot-options" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine can start using the standard -kernel functionality
+for loading a payload like an OS kernel (e.g.: Linux), or U-Boot firmware.</p>
+<p>When -bios is omitted, the default pc-bios/u-boot.e500 firmware image is used
+as the BIOS. QEMU follows below truth table to select which payload to execute:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>-bios</p></th>
+<th class="head"><p>-kernel</p></th>
+<th class="head"><p>payload</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>N</p></td>
+<td><p>N</p></td>
+<td><p>u-boot</p></td>
+</tr>
+<tr class="row-odd"><td><p>N</p></td>
+<td><p>Y</p></td>
+<td><p>kernel</p></td>
+</tr>
+<tr class="row-even"><td><p>Y</p></td>
+<td><p>don’t care</p></td>
+<td><p>u-boot</p></td>
+</tr>
+</tbody>
+</table>
+<p>When both -bios and -kernel are present, QEMU loads U-Boot and U-Boot in turns
+automatically loads the kernel image specified by the -kernel parameter via
+U-Boot’s built-in “bootm” command, hence a legacy uImage format is required in
+such scenario.</p>
+</section>
+<section id="running-linux-kernel">
+<h2>Running Linux kernel<a class="headerlink" href="#running-linux-kernel" title="Permalink to this heading"></a></h2>
+<p>Linux mainline v5.11 release is tested at the time of writing. To build a
+Linux mainline kernel that can be booted by the <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine in
+64-bit mode, simply configure the kernel using the defconfig configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">ARCH</span><span class="o">=</span>powerpc
+$ <span class="nb">export</span> <span class="nv">CROSS_COMPILE</span><span class="o">=</span>powerpc-linux-
+$ make corenet64_smp_defconfig
+$ make menuconfig
+</pre></div>
+</div>
+<p>then manually select the following configuration:</p>
+<blockquote>
+<div><p>Platform support &gt; Freescale Book-E Machine Type &gt; QEMU generic e500 platform</p>
+</div></blockquote>
+<p>To boot the newly built Linux kernel in QEMU with the <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 -M ppce500 -cpu e5500 -smp <span class="m">4</span> -m 2G <span class="se">\</span>
+    -display none -serial stdio <span class="se">\</span>
+    -kernel vmlinux <span class="se">\</span>
+    -initrd /path/to/rootfs.cpio <span class="se">\</span>
+    -append <span class="s2">&quot;root=/dev/ram&quot;</span>
+</pre></div>
+</div>
+<p>To build a Linux mainline kernel that can be booted by the <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine
+in 32-bit mode, use the same 64-bit configuration steps except the defconfig
+file should use corenet32_smp_defconfig.</p>
+<p>To boot the 32-bit Linux kernel:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 -M ppce500 -cpu e500mc -smp <span class="m">4</span> -m 2G <span class="se">\</span>
+    -display none -serial stdio <span class="se">\</span>
+    -kernel vmlinux <span class="se">\</span>
+    -initrd /path/to/rootfs.cpio <span class="se">\</span>
+    -append <span class="s2">&quot;root=/dev/ram&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="running-u-boot">
+<h2>Running U-Boot<a class="headerlink" href="#running-u-boot" title="Permalink to this heading"></a></h2>
+<p>U-Boot mainline v2021.07 release is tested at the time of writing. To build a
+U-Boot mainline bootloader that can be booted by the <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine, use
+the qemu-ppce500_defconfig with similar commands as described above for Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">CROSS_COMPILE</span><span class="o">=</span>powerpc-linux-
+$ make qemu-ppce500_defconfig
+</pre></div>
+</div>
+<p>You will get u-boot file in the build tree.</p>
+<p>When U-Boot boots, you will notice the following if using with <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">e6500</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>CPU:   Unknown, Version: 0.0, (0x00000000)
+Core:  e6500, Version: 2.0, (0x80400020)
+</pre></div>
+</div>
+<p>This is because we only specified a core name to QEMU and it does not have a
+meaningful SVR value which represents an actual SoC that integrates such core.
+You can specify a real world SoC device that QEMU has built-in support but all
+these SoCs are e500v2 based MPC85xx series, hence you cannot test anything
+built for P4080 (e500mc), P5020 (e5500) and T2080 (e6500).</p>
+</section>
+<section id="networking">
+<h2>Networking<a class="headerlink" href="#networking" title="Permalink to this heading"></a></h2>
+<p>By default a VirtIO standard PCI networking device is connected as an ethernet
+interface at PCI address 0.1.0, but we can switch that to an e1000 NIC by:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 -M ppce500 -smp <span class="m">4</span> -m 2G <span class="se">\</span>
+                    -display none -serial stdio <span class="se">\</span>
+                    -bios u-boot <span class="se">\</span>
+                    -nic tap,ifname<span class="o">=</span>tap0,script<span class="o">=</span>no,downscript<span class="o">=</span>no,model<span class="o">=</span>e1000
+</pre></div>
+</div>
+<p>The QEMU <code class="docutils literal notranslate"><span class="pre">ppce500</span></code> machine can also dynamically instantiate an eTSEC device
+if “-device eTSEC” is given to QEMU:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-netdev tap,ifname<span class="o">=</span>tap0,script<span class="o">=</span>no,downscript<span class="o">=</span>no,id<span class="o">=</span>net0 -device eTSEC,netdev<span class="o">=</span>net0
+</pre></div>
+</div>
+</section>
+<section id="root-file-system-on-flash-drive">
+<h2>Root file system on flash drive<a class="headerlink" href="#root-file-system-on-flash-drive" title="Permalink to this heading"></a></h2>
+<p>Rather than using a root file system on ram disk, it is possible to have it on
+CFI flash. Given an ext2 image whose size must be a power of two, it can be used
+as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 -M ppce500 -cpu e500mc -smp <span class="m">4</span> -m 2G <span class="se">\</span>
+    -display none -serial stdio <span class="se">\</span>
+    -kernel vmlinux <span class="se">\</span>
+    -drive <span class="k">if</span><span class="o">=</span>pflash,file<span class="o">=</span>/path/to/rootfs.ext2,format<span class="o">=</span>raw <span class="se">\</span>
+    -append <span class="s2">&quot;rootwait root=/dev/mtdblock0&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="powernv.html" class="btn btn-neutral float-left" title="PowerNV family boards (powernv8, powernv9, powernv10)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="prep.html" class="btn btn-neutral float-right" title="Prep machine (40p)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

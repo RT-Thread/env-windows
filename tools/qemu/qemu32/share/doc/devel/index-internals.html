@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Internal Subsystem Information &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The QEMU Object Model (QOM)" href="qom.html" />
+    <link rel="prev" title="QEMU UI subsystem" href="ui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Internal Subsystem Information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+      <li class="breadcrumb-item active">Internal Subsystem Information</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/index-internals.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="internal-subsystem-information">
+<h1>Internal Subsystem Information<a class="headerlink" href="#internal-subsystem-information" title="Permalink to this heading"></a></h1>
+<p>Details about QEMU’s various subsystems including how to add features to them.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qom.html#class-initialization">Class Initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qom.html#interfaces">Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qom.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qom.html#standard-type-declaration-and-definition-macros">Standard type declaration and definition macros</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="atomics.html#compiler-memory-barrier">Compiler memory barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atomics.html#sequentially-consistent-atomic-access">Sequentially consistent atomic access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atomics.html#weak-atomic-access-and-manual-memory-barriers">Weak atomic access and manual memory barriers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atomics.html#comparison-with-linux-kernel-primitives">Comparison with Linux kernel primitives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="atomics.html#sources">Sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="block-coroutine-wrapper.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block-coroutine-wrapper.html#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#what-are-clocks">What are clocks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#the-clock-state">The clock state</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#adding-a-new-clock">Adding a new clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#clock-callbacks">Clock callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#retrieving-clocks-from-a-device">Retrieving clocks from a device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#connecting-two-clocks-together">Connecting two clocks together</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#clock-multiplier-and-divider-settings">Clock multiplier and divider settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#unconnected-input-clocks">Unconnected input clocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#fetching-clock-frequency-period">Fetching clock frequency/period</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#calculating-expiry-deadlines">Calculating expiry deadlines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#obtaining-tick-counts">Obtaining tick counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#changing-a-clock-period">Changing a clock period</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#aliasing-clocks">Aliasing clocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html#migration">Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ebpf_rss.html#rss-ebpf-program">RSS eBPF program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ebpf_rss.html#ebpf-rss-implementation">eBPF RSS implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#transports">Transports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#debugging">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#common-infrastructure">Common infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#saving-the-state-of-one-device">Saving the state of one device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#stream-structure">Stream structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#postcopy">Postcopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#firmware">Firmware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#qemu-services">QEMU services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#separating-io-services">Separating IO services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#new-separation-model-based-on-proxy-objects">New separation model based on proxy objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#disaggregated-cpu-emulation">Disaggregated CPU emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html#host-access-controls">Host access controls</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reset.html#triggering-reset">Triggering reset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reset.html#multi-phase-mechanism">Multi-phase mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reset.html#handling-reset-in-a-resettable-object">Handling reset in a resettable object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reset.html#base-class-handling-of-reset">Base class handling of reset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="s390-dasd-ipl.html#s390-hardware-ipl">s390 hardware IPL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="s390-dasd-ipl.html#how-this-all-pertains-to-qemu-and-the-kernel">How this all pertains to QEMU (and the kernel)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="s390-dasd-ipl.html#what-qemu-does">What QEMU does</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">Tracing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#trace-events">Trace events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#generic-interface-and-monitor-commands">Generic interface and monitor commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#trace-backends">Trace backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#trace-event-properties">Trace event properties</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vfio-migration.html#system-memory-dirty-pages-tracking">System memory dirty pages tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vfio-migration.html#system-memory-dirty-pages-tracking-when-viommu-is-enabled">System memory dirty pages tracking when vIOMMU is enabled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vfio-migration.html#live-migration-save-path">Live migration save path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vfio-migration.html#live-migration-resume-path">Live migration resume path</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing-monitor-commands.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-monitor-commands.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-monitor-commands.html#writing-a-simple-command-hello-world">Writing a simple command: hello-world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-monitor-commands.html#writing-more-complex-commands">Writing more complex commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-monitor-commands.html#writing-a-debugging-aid-returning-unstructured-text">Writing a debugging aid returning unstructured text</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="virtio-backends.html#virtio-transports">VirtIO Transports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-backends.html#using-the-qemu-object-model-qom">Using the QEMU Object Model (QOM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-backends.html#back-end-implementations">Back End Implementations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ui.html" class="btn btn-neutral float-left" title="QEMU UI subsystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qom.html" class="btn btn-neutral float-right" title="The QEMU Object Model (QOM)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

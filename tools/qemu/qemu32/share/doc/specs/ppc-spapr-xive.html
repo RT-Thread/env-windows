@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XIVE for sPAPR (pseries machines) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OpenRISC System emulator" href="../system/target-openrisc.html" />
+    <link rel="prev" title="Hypervisor calls and the Ultravisor" href="ppc-spapr-uv-hcalls.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../system/index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../system/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../system/targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../system/target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../system/target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../system/target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../system/security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../system/index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../system/targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../system/target-ppc.html">PowerPC System emulator</a></li>
+          <li class="breadcrumb-item"><a href="../system/ppc/pseries.html">pSeries family boards (<code class="docutils literal notranslate"><span class="pre">pseries</span></code>)</a></li>
+      <li class="breadcrumb-item active">XIVE for sPAPR (pseries machines)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/ppc-spapr-xive.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="xive-for-spapr-pseries-machines">
+<h1>XIVE for sPAPR (pseries machines)<a class="headerlink" href="#xive-for-spapr-pseries-machines" title="Permalink to this heading"></a></h1>
+<p>The POWER9 processor comes with a new interrupt controller
+architecture, called XIVE as “eXternal Interrupt Virtualization
+Engine”. It supports a larger number of interrupt sources and offers
+virtualization features which enables the HW to deliver interrupts
+directly to virtual processors without hypervisor assistance.</p>
+<p>A QEMU <code class="docutils literal notranslate"><span class="pre">pseries</span></code> machine (which is PAPR compliant) using POWER9
+processors can run under two interrupt modes:</p>
+<ul>
+<li><p><em>Legacy Compatibility Mode</em></p>
+<p>the hypervisor provides identical interfaces and similar
+functionality to PAPR+ Version 2.7.  This is the default mode</p>
+<p>It is also referred as <em>XICS</em> in QEMU.</p>
+</li>
+<li><p><em>XIVE native exploitation mode</em></p>
+<p>the hypervisor provides new interfaces to manage the XIVE control
+structures, and provides direct control for interrupt management
+through MMIO pages.</p>
+</li>
+</ul>
+<p>Which interrupt modes can be used by the machine is negotiated with
+the guest O/S during the Client Architecture Support negotiation
+sequence. The two modes are mutually exclusive.</p>
+<p>Both interrupt mode share the same IRQ number space. See below for the
+layout.</p>
+<section id="cas-negotiation">
+<h2>CAS Negotiation<a class="headerlink" href="#cas-negotiation" title="Permalink to this heading"></a></h2>
+<p>QEMU advertises the supported interrupt modes in the device tree
+property <code class="docutils literal notranslate"><span class="pre">ibm,arch-vec-5-platform-support</span></code> in byte 23 and the OS
+Selection for XIVE is indicated in the <code class="docutils literal notranslate"><span class="pre">ibm,architecture-vec-5</span></code>
+property byte 23.</p>
+<p>The interrupt modes supported by the machine depend on the CPU type
+(POWER9 is required for XIVE) but also on the machine property
+<code class="docutils literal notranslate"><span class="pre">ic-mode</span></code> which can be set on the command line. It can take the
+following values: <code class="docutils literal notranslate"><span class="pre">xics</span></code>, <code class="docutils literal notranslate"><span class="pre">xive</span></code>, and <code class="docutils literal notranslate"><span class="pre">dual</span></code> which is the
+default mode. <code class="docutils literal notranslate"><span class="pre">dual</span></code> means that both modes XICS <strong>and</strong> XIVE are
+supported and if the guest OS supports XIVE, this mode will be
+selected.</p>
+<p>The chosen interrupt mode is activated after a reconfiguration done
+in a machine reset.</p>
+</section>
+<section id="kvm-negotiation">
+<h2>KVM negotiation<a class="headerlink" href="#kvm-negotiation" title="Permalink to this heading"></a></h2>
+<p>When the guest starts under KVM, the capabilities of the host kernel
+and QEMU are also negotiated. Depending on the version of the host
+kernel, KVM will advertise the XIVE capability to QEMU or not.</p>
+<p>Nevertheless, the available interrupt modes in the machine should not
+depend on the XIVE KVM capability of the host. On older kernels
+without XIVE KVM support, QEMU will use the emulated XIVE device as a
+fallback and on newer kernels (&gt;=5.2), the KVM XIVE device.</p>
+<p>XIVE native exploitation mode is not supported for KVM nested guests,
+VMs running under a L1 hypervisor (KVM on pSeries). In that case, the
+hypervisor will not advertise the KVM capability and QEMU will use the
+emulated XIVE device, same as for older versions of KVM.</p>
+<p>As a final refinement, the user can also switch the use of the KVM
+device with the machine option <code class="docutils literal notranslate"><span class="pre">kernel_irqchip</span></code>.</p>
+<section id="xive-support-in-kvm">
+<h3>XIVE support in KVM<a class="headerlink" href="#xive-support-in-kvm" title="Permalink to this heading"></a></h3>
+<p>For guest OSes supporting XIVE, the resulting interrupt modes on host
+kernels with XIVE KVM support are the following:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ic-mode</p></th>
+<th class="head" colspan="3"><p>kernel_irqchip</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>/</p></th>
+<th class="head"><p>allowed
+(default)</p></th>
+<th class="head"><p>off</p></th>
+<th class="head"><p>on</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>dual (default)</p></td>
+<td><p>XIVE KVM</p></td>
+<td><p>XIVE emul.</p></td>
+<td><p>XIVE KVM</p></td>
+</tr>
+<tr class="row-even"><td><p>xive</p></td>
+<td><p>XIVE KVM</p></td>
+<td><p>XIVE emul.</p></td>
+<td><p>XIVE KVM</p></td>
+</tr>
+<tr class="row-odd"><td><p>xics</p></td>
+<td><p>XICS KVM</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>XICS KVM</p></td>
+</tr>
+</tbody>
+</table>
+<p>For legacy guest OSes without XIVE support, the resulting interrupt
+modes are the following:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ic-mode</p></th>
+<th class="head" colspan="3"><p>kernel_irqchip</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>/</p></th>
+<th class="head"><p>allowed
+(default)</p></th>
+<th class="head"><p>off</p></th>
+<th class="head"><p>on</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>dual (default)</p></td>
+<td><p>XICS KVM</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>XICS KVM</p></td>
+</tr>
+<tr class="row-even"><td><p>xive</p></td>
+<td><p>QEMU error(3)</p></td>
+<td><p>QEMU error(3)</p></td>
+<td><p>QEMU error(3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>xics</p></td>
+<td><p>XICS KVM</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>XICS KVM</p></td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple" start="3">
+<li><p>QEMU fails at CAS with <code class="docutils literal notranslate"><span class="pre">Guest</span> <span class="pre">requested</span> <span class="pre">unavailable</span> <span class="pre">interrupt</span>
+<span class="pre">mode</span> <span class="pre">(XICS),</span> <span class="pre">either</span> <span class="pre">don't</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">ic-mode</span> <span class="pre">machine</span> <span class="pre">property</span> <span class="pre">or</span> <span class="pre">try</span>
+<span class="pre">ic-mode=xics</span> <span class="pre">or</span> <span class="pre">ic-mode=dual</span></code></p></li>
+</ol>
+</section>
+<section id="no-xive-support-in-kvm">
+<h3>No XIVE support in KVM<a class="headerlink" href="#no-xive-support-in-kvm" title="Permalink to this heading"></a></h3>
+<p>For guest OSes supporting XIVE, the resulting interrupt modes on host
+kernels without XIVE KVM support are the following:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ic-mode</p></th>
+<th class="head" colspan="3"><p>kernel_irqchip</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>/</p></th>
+<th class="head"><p>allowed
+(default)</p></th>
+<th class="head"><p>off</p></th>
+<th class="head"><p>on</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>dual (default)</p></td>
+<td><p>XIVE emul.(1)</p></td>
+<td><p>XIVE emul.</p></td>
+<td><p>QEMU error (2)</p></td>
+</tr>
+<tr class="row-even"><td><p>xive</p></td>
+<td><p>XIVE emul.(1)</p></td>
+<td><p>XIVE emul.</p></td>
+<td><p>QEMU error (2)</p></td>
+</tr>
+<tr class="row-odd"><td><p>xics</p></td>
+<td><p>XICS KVM</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>XICS KVM</p></td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li><p>QEMU warns with <code class="docutils literal notranslate"><span class="pre">warning:</span> <span class="pre">kernel_irqchip</span> <span class="pre">requested</span> <span class="pre">but</span> <span class="pre">unavailable:</span>
+<span class="pre">IRQ_XIVE</span> <span class="pre">capability</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">present</span> <span class="pre">for</span> <span class="pre">KVM</span></code>
+In some cases (old host kernels or KVM nested guests), one may hit a
+QEMU/KVM incompatibility due to device destruction in reset. QEMU fails
+with <code class="docutils literal notranslate"><span class="pre">KVM</span> <span class="pre">is</span> <span class="pre">incompatible</span> <span class="pre">with</span> <span class="pre">ic-mode=dual,kernel-irqchip=on</span></code></p></li>
+<li><p>QEMU fails with <code class="docutils literal notranslate"><span class="pre">kernel_irqchip</span> <span class="pre">requested</span> <span class="pre">but</span> <span class="pre">unavailable:</span>
+<span class="pre">IRQ_XIVE</span> <span class="pre">capability</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">present</span> <span class="pre">for</span> <span class="pre">KVM</span></code></p></li>
+</ol>
+<p>For legacy guest OSes without XIVE support, the resulting interrupt
+modes are the following:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ic-mode</p></th>
+<th class="head" colspan="3"><p>kernel_irqchip</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>/</p></th>
+<th class="head"><p>allowed
+(default)</p></th>
+<th class="head"><p>off</p></th>
+<th class="head"><p>on</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>dual (default)</p></td>
+<td><p>QEMU error(4)</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>QEMU error(4)</p></td>
+</tr>
+<tr class="row-even"><td><p>xive</p></td>
+<td><p>QEMU error(3)</p></td>
+<td><p>QEMU error(3)</p></td>
+<td><p>QEMU error(3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>xics</p></td>
+<td><p>XICS KVM</p></td>
+<td><p>XICS emul.</p></td>
+<td><p>XICS KVM</p></td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple" start="3">
+<li><p>QEMU fails at CAS with <code class="docutils literal notranslate"><span class="pre">Guest</span> <span class="pre">requested</span> <span class="pre">unavailable</span> <span class="pre">interrupt</span>
+<span class="pre">mode</span> <span class="pre">(XICS),</span> <span class="pre">either</span> <span class="pre">don't</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">ic-mode</span> <span class="pre">machine</span> <span class="pre">property</span> <span class="pre">or</span> <span class="pre">try</span>
+<span class="pre">ic-mode=xics</span> <span class="pre">or</span> <span class="pre">ic-mode=dual</span></code></p></li>
+<li><p>QEMU/KVM incompatibility due to device destruction in reset. QEMU fails
+with <code class="docutils literal notranslate"><span class="pre">KVM</span> <span class="pre">is</span> <span class="pre">incompatible</span> <span class="pre">with</span> <span class="pre">ic-mode=dual,kernel-irqchip=on</span></code></p></li>
+</ol>
+</section>
+</section>
+<section id="xive-device-tree-properties">
+<h2>XIVE Device tree properties<a class="headerlink" href="#xive-device-tree-properties" title="Permalink to this heading"></a></h2>
+<p>The properties for the PAPR interrupt controller node when the <em>XIVE
+native exploitation mode</em> is selected should contain:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">device_type</span></code></p>
+<p>value should be “power-ivpe”.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compatible</span></code></p>
+<p>value should be “ibm,power-ivpe”.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code></p>
+<p>contains the base address and size of the thread interrupt
+managnement areas (TIMA), for the User level and for the Guest OS
+level. Only the Guest OS level is taken into account today.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibm,xive-eq-sizes</span></code></p>
+<p>the size of the event queues. One cell per size supported, contains
+log2 of size, in ascending order.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibm,xive-lisn-ranges</span></code></p>
+<p>the IRQ interrupt number ranges assigned to the guest for the IPIs.</p>
+</li>
+</ul>
+<p>The root node also exports :</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibm,plat-res-int-priorities</span></code></p>
+<p>contains a list of priorities that the hypervisor has reserved for
+its own use.</p>
+</li>
+</ul>
+</section>
+<section id="irq-number-space">
+<h2>IRQ number space<a class="headerlink" href="#irq-number-space" title="Permalink to this heading"></a></h2>
+<p>IRQ Number space of the <code class="docutils literal notranslate"><span class="pre">pseries</span></code> machine is 8K wide and is the same
+for both interrupt mode. The different ranges are defined as follow :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0x0000</span> <span class="pre">..</span> <span class="pre">0x0FFF</span></code> 4K CPU IPIs (only used under XIVE)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1000</span> <span class="pre">..</span> <span class="pre">0x1000</span></code> 1 EPOW</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1001</span> <span class="pre">..</span> <span class="pre">0x1001</span></code> 1 HOTPLUG</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1002</span> <span class="pre">..</span> <span class="pre">0x10FF</span></code> unused</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1100</span> <span class="pre">..</span> <span class="pre">0x11FF</span></code> 256 VIO devices</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1200</span> <span class="pre">..</span> <span class="pre">0x127F</span></code> 32x4 LSIs for PHB devices</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1280</span> <span class="pre">..</span> <span class="pre">0x12FF</span></code> unused</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1300</span> <span class="pre">..</span> <span class="pre">0x1FFF</span></code> PHB MSIs (dynamically allocated)</p></li>
+</ul>
+</section>
+<section id="monitoring-xive">
+<h2>Monitoring XIVE<a class="headerlink" href="#monitoring-xive" title="Permalink to this heading"></a></h2>
+<p>The state of the XIVE interrupt controller can be queried through the
+monitor commands <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">pic</span></code>. The output comes in two parts.</p>
+<p>First, the state of the thread interrupt context registers is dumped
+for each CPU :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">pic</span>
+<span class="n">CPU</span><span class="p">[</span><span class="mi">0000</span><span class="p">]:</span>   <span class="n">QW</span>   <span class="n">NSR</span> <span class="n">CPPR</span> <span class="n">IPB</span> <span class="n">LSMFB</span> <span class="n">ACK</span><span class="c1"># INC AGE PIPR  W2</span>
+<span class="n">CPU</span><span class="p">[</span><span class="mi">0000</span><span class="p">]:</span> <span class="n">USER</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>  <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00000000</span>
+<span class="n">CPU</span><span class="p">[</span><span class="mi">0000</span><span class="p">]:</span>   <span class="n">OS</span>    <span class="mi">00</span>   <span class="n">ff</span>  <span class="mi">00</span>    <span class="mi">00</span>   <span class="n">ff</span>  <span class="mi">00</span>  <span class="n">ff</span>   <span class="n">ff</span>  <span class="mi">80000400</span>
+<span class="n">CPU</span><span class="p">[</span><span class="mi">0000</span><span class="p">]:</span> <span class="n">POOL</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>  <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00000000</span>
+<span class="n">CPU</span><span class="p">[</span><span class="mi">0000</span><span class="p">]:</span> <span class="n">PHYS</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>    <span class="mi">00</span>   <span class="mi">00</span>  <span class="mi">00</span>  <span class="mi">00</span>   <span class="n">ff</span>  <span class="mi">00000000</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>In the case of a <code class="docutils literal notranslate"><span class="pre">pseries</span></code> machine, QEMU acts as the hypervisor and only
+the O/S and USER register rings make sense. <code class="docutils literal notranslate"><span class="pre">W2</span></code> contains the vCPU CAM
+line which is set to the VP identifier.</p>
+<p>Then comes the routing information which aggregates the EAS and the
+END configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">LISN</span>         <span class="n">PQ</span>    <span class="n">EISN</span>     <span class="n">CPU</span><span class="o">/</span><span class="n">PRIO</span> <span class="n">EQ</span>
+<span class="mi">00000000</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000010</span>   <span class="mi">0</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">380</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fe3e0000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00000001</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000010</span>   <span class="mi">1</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">305</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc230000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00000002</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000010</span>   <span class="mi">2</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">220</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc2f0000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00000003</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000010</span>   <span class="mi">3</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">201</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc390000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00000004</span> <span class="n">MSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00000005</span> <span class="n">MSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00000006</span> <span class="n">MSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00000007</span> <span class="n">MSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001000</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000012</span>   <span class="mi">0</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">380</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fe3e0000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00001001</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000013</span>   <span class="mi">0</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">380</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fe3e0000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00001100</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000100</span>   <span class="mi">1</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">305</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc230000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00001101</span> <span class="n">MSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001200</span> <span class="n">LSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001201</span> <span class="n">LSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001202</span> <span class="n">LSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001203</span> <span class="n">LSI</span> <span class="o">-</span><span class="n">Q</span>  <span class="n">M</span> <span class="mi">00000000</span>
+<span class="mi">00001300</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000102</span>   <span class="mi">1</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">305</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc230000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00001301</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000103</span>   <span class="mi">2</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">220</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc2f0000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+<span class="mi">00001302</span> <span class="n">MSI</span> <span class="o">--</span>    <span class="mi">00000104</span>   <span class="mi">3</span><span class="o">/</span><span class="mi">6</span>    <span class="mi">201</span><span class="o">/</span><span class="mi">16384</span> <span class="o">@</span><span class="mi">1</span><span class="n">fc390000</span> <span class="o">^</span><span class="mi">1</span> <span class="p">[</span> <span class="mi">80000010</span> <span class="o">...</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The source information and configuration:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">LISN</span></code> column outputs the interrupt number of the source in
+range <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">0x0</span> <span class="pre">...</span> <span class="pre">0x1FFF</span> <span class="pre">]</span></code> and its type : <code class="docutils literal notranslate"><span class="pre">MSI</span></code> or <code class="docutils literal notranslate"><span class="pre">LSI</span></code></p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">PQ</span></code> column reflects the state of the PQ bits of the source :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--</span></code> source is ready to take events</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">P-</span></code> an event was sent and an EOI is PENDING</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PQ</span></code> an event was QUEUED</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-Q</span></code> source is OFF</p></li>
+</ul>
+<p>a <code class="docutils literal notranslate"><span class="pre">M</span></code> indicates that source is <em>MASKED</em> at the EAS level,</p>
+</li>
+</ul>
+<p>The targeting configuration :</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">EISN</span></code> column is the event data that will be queued in the event
+queue of the O/S.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">CPU/PRIO</span></code> column is the tuple defining the CPU number and
+priority queue serving the source.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">EQ</span></code> column outputs :</p>
+<ul>
+<li><p>the current index of the event queue/ the max number of entries</p></li>
+<li><p>the O/S event queue address</p></li>
+<li><p>the toggle bit</p></li>
+<li><p>the last entries that were pushed in the event queue.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ppc-spapr-uv-hcalls.html" class="btn btn-neutral float-left" title="Hypervisor calls and the Ultravisor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../system/target-openrisc.html" class="btn btn-neutral float-right" title="OpenRISC System emulator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

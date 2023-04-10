@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paravirtualized KVM features &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Software Guard eXtensions (SGX)" href="sgx.html" />
+    <link rel="prev" title="Hyper-V Enlightenments" href="hyperv.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-i386.html">x86 System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-i386.html#architectural-features">Architectural features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#os-requirements">OS requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-i386.html">x86 System emulator</a></li>
+      <li class="breadcrumb-item active">Paravirtualized KVM features</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/i386/kvm-pv.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="paravirtualized-kvm-features">
+<h1>Paravirtualized KVM features<a class="headerlink" href="#paravirtualized-kvm-features" title="Permalink to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h2>
+<p>In some cases when implementing hardware interfaces in software is slow, <code class="docutils literal notranslate"><span class="pre">KVM</span></code>
+implements its own paravirtualized interfaces.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading"></a></h2>
+<p>Paravirtualized <code class="docutils literal notranslate"><span class="pre">KVM</span></code> features are represented as CPU flags. The following
+features are enabled by default for any CPU model when <code class="docutils literal notranslate"><span class="pre">KVM</span></code> acceleration is
+enabled:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">kvmclock</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kvm-nopiodelay</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kvm-asyncpf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kvm-steal-time</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kvm-pv-eoi</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kvmclock-stable-bit</span></code></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">kvm-msi-ext-dest-id</span></code> feature is enabled by default in x2apic mode with split
+irqchip (e.g. “-machine …,kernel-irqchip=split -cpu …,x2apic”).</p>
+<p>Note: when CPU model <code class="docutils literal notranslate"><span class="pre">host</span></code> is used, QEMU passes through all supported
+paravirtualized <code class="docutils literal notranslate"><span class="pre">KVM</span></code> features to the guest.</p>
+</section>
+<section id="existing-features">
+<h2>Existing features<a class="headerlink" href="#existing-features" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">kvmclock</span></code></dt><dd><p>Expose a <code class="docutils literal notranslate"><span class="pre">KVM</span></code> specific paravirtualized clocksource to the guest. Supported
+since Linux v2.6.26.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-nopiodelay</span></code></dt><dd><p>The guest doesn’t need to perform delays on PIO operations. Supported since
+Linux v2.6.26.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-mmu</span></code></dt><dd><p>This feature is deprecated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-asyncpf</span></code></dt><dd><p>Enable asynchronous page fault mechanism. Supported since Linux v2.6.38.
+Note: since Linux v5.10 the feature is deprecated and not enabled by <code class="docutils literal notranslate"><span class="pre">KVM</span></code>.
+Use <code class="docutils literal notranslate"><span class="pre">kvm-asyncpf-int</span></code> instead.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-steal-time</span></code></dt><dd><p>Enable stolen (when guest vCPU is not running) time accounting. Supported
+since Linux v3.1.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-eoi</span></code></dt><dd><p>Enable paravirtualized end-of-interrupt signaling. Supported since Linux
+v3.10.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-unhalt</span></code></dt><dd><p>Enable paravirtualized spinlocks support. Supported since Linux v3.12.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-tlb-flush</span></code></dt><dd><p>Enable paravirtualized TLB flush mechanism. Supported since Linux v4.16.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-ipi</span></code></dt><dd><p>Enable paravirtualized IPI mechanism. Supported since Linux v4.19.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-poll-control</span></code></dt><dd><p>Enable host-side polling on HLT control from the guest. Supported since Linux
+v5.10.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-sched-yield</span></code></dt><dd><p>Enable paravirtualized sched yield feature. Supported since Linux v5.10.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-asyncpf-int</span></code></dt><dd><p>Enable interrupt based asynchronous page fault mechanism. Supported since Linux
+v5.10.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-msi-ext-dest-id</span></code></dt><dd><p>Support ‘Extended Destination ID’ for external interrupts. The feature allows
+to use up to 32768 CPUs without IRQ remapping (but other limits may apply making
+the number of supported vCPUs for a given configuration lower). Supported since
+Linux v5.10.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kvmclock-stable-bit</span></code></dt><dd><p>Tell the guest that guest visible TSC value can be fully trusted for kvmclock
+computations and no warps are expected. Supported since Linux v2.6.35.</p>
+</dd>
+</dl>
+</section>
+<section id="supplementary-features">
+<h2>Supplementary features<a class="headerlink" href="#supplementary-features" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">kvm-pv-enforce-cpuid</span></code></dt><dd><p>Limit the supported paravirtualized feature set to the exposed features only.
+Note, by default, <code class="docutils literal notranslate"><span class="pre">KVM</span></code> allows the guest to use all currently supported
+paravirtualized features even when they were not announced in guest visible
+CPUIDs. Supported since Linux v5.10.</p>
+</dd>
+</dl>
+</section>
+<section id="useful-links">
+<h2>Useful links<a class="headerlink" href="#useful-links" title="Permalink to this heading"></a></h2>
+<p>Please refer to Documentation/virt/kvm in Linux for additional details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hyperv.html" class="btn btn-neutral float-left" title="Hyper-V Enlightenments" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sgx.html" class="btn btn-neutral float-right" title="Software Guard eXtensions (SGX)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

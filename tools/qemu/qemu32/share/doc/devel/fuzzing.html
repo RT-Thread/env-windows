@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuzzing &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Control-Flow Integrity (CFI)" href="control-flow-integrity.html" />
+    <link rel="prev" title="How to use the QAPI code generator" href="qapi-code-gen.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Fuzzing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basics">Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#building-the-fuzzers">Building the fuzzers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#useful-libfuzzer-flags">Useful libFuzzer flags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generating-coverage-reports">Generating Coverage Reports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adding-a-new-fuzzer">Adding a new fuzzer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-generic-fuzzer">The Generic Fuzzer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#oss-fuzz">OSS-Fuzz</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#building-crash-reproducers">Building Crash Reproducers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implementation-details-fuzzer-lifecycle">Implementation Details / Fuzzer Lifecycle</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">Fuzzing</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/fuzzing.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fuzzing">
+<h1>Fuzzing<a class="headerlink" href="#fuzzing" title="Permalink to this heading"></a></h1>
+<p>This document describes the virtual-device fuzzing infrastructure in QEMU and
+how to use it to implement additional fuzzers.</p>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this heading"></a></h2>
+<p>Fuzzing operates by passing inputs to an entry point/target function. The
+fuzzer tracks the code coverage triggered by the input. Based on these
+findings, the fuzzer mutates the input and repeats the fuzzing.</p>
+<p>To fuzz QEMU, we rely on libfuzzer. Unlike other fuzzers such as AFL, libfuzzer
+is an <em>in-process</em> fuzzer. For the developer, this means that it is their
+responsibility to ensure that state is reset between fuzzing-runs.</p>
+</section>
+<section id="building-the-fuzzers">
+<h2>Building the fuzzers<a class="headerlink" href="#building-the-fuzzers" title="Permalink to this heading"></a></h2>
+<p><em>NOTE</em>: If possible, build a 32-bit binary. When forking, the 32-bit fuzzer is
+much faster, since the page-map has a smaller size. This is due to the fact that
+AddressSanitizer maps ~20TB of memory, as part of its detection. This results
+in a large page-map, and a much slower <code class="docutils literal notranslate"><span class="pre">fork()</span></code>.</p>
+<p>To build the fuzzers, install a recent version of clang:
+Configure with (substitute the clang binaries with the version you installed).
+Here, enable-sanitizers, is optional but it allows us to reliably detect bugs
+such as out-of-bounds accesses, use-after-frees, double-frees etc.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CC</span><span class="o">=</span><span class="n">clang</span><span class="o">-</span><span class="mi">8</span> <span class="n">CXX</span><span class="o">=</span><span class="n">clang</span><span class="o">++-</span><span class="mi">8</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">fuzzing</span> \
+                                            <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">sanitizers</span>
+</pre></div>
+</div>
+<p>Fuzz targets are built similarly to system targets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span>
+</pre></div>
+</div>
+<p>This builds <code class="docutils literal notranslate"><span class="pre">./qemu-fuzz-i386</span></code></p>
+<p>The first option to this command is: <code class="docutils literal notranslate"><span class="pre">--fuzz-target=FUZZ_NAME</span></code>
+To list all of the available fuzzers run <code class="docutils literal notranslate"><span class="pre">qemu-fuzz-i386</span></code> with no arguments.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span> <span class="o">--</span><span class="n">fuzz</span><span class="o">-</span><span class="n">target</span><span class="o">=</span><span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span><span class="o">-</span><span class="n">fuzz</span>
+</pre></div>
+</div>
+<p>Internally, libfuzzer parses all arguments that do not begin with <code class="docutils literal notranslate"><span class="pre">&quot;--&quot;</span></code>.
+Information about these is available by passing <code class="docutils literal notranslate"><span class="pre">-help=1</span></code></p>
+<p>Now the only thing left to do is wait for the fuzzer to trigger potential
+crashes.</p>
+</section>
+<section id="useful-libfuzzer-flags">
+<h2>Useful libFuzzer flags<a class="headerlink" href="#useful-libfuzzer-flags" title="Permalink to this heading"></a></h2>
+<p>As mentioned above, libFuzzer accepts some arguments. Passing <code class="docutils literal notranslate"><span class="pre">-help=1</span></code> will
+list the available arguments. In particular, these arguments might be helpful:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CORPUS_DIR/</span></code> : Specify a directory as the last argument to libFuzzer.
+libFuzzer stores each “interesting” input in this corpus directory. The next
+time you run libFuzzer, it will read all of the inputs from the corpus, and
+continue fuzzing from there. You can also specify multiple directories.
+libFuzzer loads existing inputs from all specified directories, but will only
+write new ones to the first one specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-max_len=4096</span></code> : specify the maximum byte-length of the inputs libFuzzer
+will generate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-close_fd_mask={1,2,3}</span></code> : close, stderr, or both. Useful for targets that
+trigger many debug/error messages, or create output on the serial console.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-jobs=4</span> <span class="pre">-workers=4</span></code> : These arguments configure libFuzzer to run 4 fuzzers in
+parallel (4 fuzzing jobs in 4 worker processes). Alternatively, with only
+<code class="docutils literal notranslate"><span class="pre">-jobs=N</span></code>, libFuzzer automatically spawns a number of workers less than or equal
+to half the available CPU cores. Replace 4 with a number appropriate for your
+machine. Make sure to specify a <code class="docutils literal notranslate"><span class="pre">CORPUS_DIR</span></code>, which will allow the parallel
+fuzzers to share information about the interesting inputs they find.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-use_value_profile=1</span></code> : For each comparison operation, libFuzzer computes
+<code class="docutils literal notranslate"><span class="pre">(caller_pc&amp;4095)</span> <span class="pre">|</span> <span class="pre">(popcnt(Arg1</span> <span class="pre">^</span> <span class="pre">Arg2)</span> <span class="pre">&lt;&lt;</span> <span class="pre">12)</span></code> and places this in the
+coverage table. Useful for targets with “magic” constants. If Arg1 came from
+the fuzzer’s input and Arg2 is a magic constant, then each time the Hamming
+distance between Arg1 and Arg2 decreases, libFuzzer adds the input to the
+corpus.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-shrink=1</span></code> : Tries to make elements of the corpus “smaller”. Might lead to
+better coverage performance, depending on the target.</p></li>
+</ul>
+<p>Note that libFuzzer’s exact behavior will depend on the version of
+clang and libFuzzer used to build the device fuzzers.</p>
+</section>
+<section id="generating-coverage-reports">
+<h2>Generating Coverage Reports<a class="headerlink" href="#generating-coverage-reports" title="Permalink to this heading"></a></h2>
+<p>Code coverage is a crucial metric for evaluating a fuzzer’s performance.
+libFuzzer’s output provides a “cov: ” column that provides a total number of
+unique blocks/edges covered. To examine coverage on a line-by-line basis we
+can use Clang coverage:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Configure libFuzzer to store a corpus of all interesting inputs (see
+CORPUS_DIR above)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./configure</span></code> the QEMU build with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">fuzzing</span> \
+<span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">cflags</span><span class="o">=</span><span class="s2">&quot;-fprofile-instr-generate -fcoverage-mapping&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Re-run the fuzzer. Specify $CORPUS_DIR/* as an argument, telling libfuzzer
+to execute all of the inputs in $CORPUS_DIR and exit. Once the process
+exits, you should find a file, “default.profraw” in the working directory.</p></li>
+<li><p>Execute these commands to generate a detailed HTML coverage-report:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">llvm</span><span class="o">-</span><span class="n">profdata</span> <span class="n">merge</span> <span class="o">-</span><span class="n">output</span><span class="o">=</span><span class="n">default</span><span class="o">.</span><span class="n">profdata</span> <span class="n">default</span><span class="o">.</span><span class="n">profraw</span>
+<span class="n">llvm</span><span class="o">-</span><span class="n">cov</span> <span class="n">show</span> <span class="o">./</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span> <span class="o">-</span><span class="n">instr</span><span class="o">-</span><span class="n">profile</span><span class="o">=</span><span class="n">default</span><span class="o">.</span><span class="n">profdata</span> \
+<span class="o">--</span><span class="nb">format</span> <span class="n">html</span> <span class="o">-</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">output</span><span class="o">/</span><span class="n">report</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+</section>
+<section id="adding-a-new-fuzzer">
+<h2>Adding a new fuzzer<a class="headerlink" href="#adding-a-new-fuzzer" title="Permalink to this heading"></a></h2>
+<p>Coverage over virtual devices can be improved by adding additional fuzzers.
+Fuzzers are kept in <code class="docutils literal notranslate"><span class="pre">tests/qtest/fuzz/</span></code> and should be added to
+<code class="docutils literal notranslate"><span class="pre">tests/qtest/fuzz/meson.build</span></code></p>
+<p>Fuzzers can rely on both qtest and libqos to communicate with virtual devices.</p>
+<ol class="arabic simple">
+<li><p>Create a new source file. For example <code class="docutils literal notranslate"><span class="pre">tests/qtest/fuzz/foo-device-fuzz.c</span></code>.</p></li>
+<li><p>Write the fuzzing code using the libqtest/libqos API. See existing fuzzers
+for reference.</p></li>
+<li><p>Add the fuzzer to <code class="docutils literal notranslate"><span class="pre">tests/qtest/fuzz/meson.build</span></code>.</p></li>
+</ol>
+<p>Fuzzers can be more-or-less thought of as special qtest programs which can
+modify the qtest commands and/or qtest command arguments based on inputs
+provided by libfuzzer. Libfuzzer passes a byte array and length. Commonly the
+fuzzer loops over the byte-array interpreting it as a list of qtest commands,
+addresses, or values.</p>
+</section>
+<section id="the-generic-fuzzer">
+<h2>The Generic Fuzzer<a class="headerlink" href="#the-generic-fuzzer" title="Permalink to this heading"></a></h2>
+<p>Writing a fuzz target can be a lot of effort (especially if a device driver has
+not be built-out within libqos). Many devices can be fuzzed to some degree,
+without any device-specific code, using the generic-fuzz target.</p>
+<p>The generic-fuzz target is capable of fuzzing devices over their PIO, MMIO,
+and DMA input-spaces. To apply the generic-fuzz to a device, we need to define
+two env-variables, at minimum:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">QEMU_FUZZ_ARGS=</span></code> is the set of QEMU arguments used to configure a machine, with
+the device attached. For example, if we want to fuzz the virtio-net device
+attached to a pc-i440fx machine, we can specify:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QEMU_FUZZ_ARGS</span><span class="o">=</span><span class="s2">&quot;-M pc -nodefaults -netdev user,id=user0 </span><span class="se">\</span>
+<span class="s2">-device virtio-net,netdev=user0&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QEMU_FUZZ_OBJECTS=</span></code> is a set of space-delimited strings used to identify
+the MemoryRegions that will be fuzzed. These strings are compared against
+MemoryRegion names and MemoryRegion owner names, to decide whether each
+MemoryRegion should be fuzzed. These strings support globbing. For the
+virtio-net example, we could use one of</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QEMU_FUZZ_OBJECTS</span><span class="o">=</span><span class="s1">&#39;virtio-net&#39;</span>
+<span class="n">QEMU_FUZZ_OBJECTS</span><span class="o">=</span><span class="s1">&#39;virtio*&#39;</span>
+<span class="n">QEMU_FUZZ_OBJECTS</span><span class="o">=</span><span class="s1">&#39;virtio* pcspk&#39;</span> <span class="c1"># Fuzz the virtio devices and the speaker</span>
+<span class="n">QEMU_FUZZ_OBJECTS</span><span class="o">=</span><span class="s1">&#39;*&#39;</span> <span class="c1"># Fuzz the whole machine``</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;info</span> <span class="pre">mtree&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;info</span> <span class="pre">qom-tree&quot;</span></code> monitor commands can be especially
+useful for identifying the <code class="docutils literal notranslate"><span class="pre">MemoryRegion</span></code> and <code class="docutils literal notranslate"><span class="pre">Object</span></code> names used for
+matching.</p>
+<p>As a generic rule-of-thumb, the more <code class="docutils literal notranslate"><span class="pre">MemoryRegions</span></code>/Devices we match, the
+greater the input-space, and the smaller the probability of finding crashing
+inputs for individual devices. As such, it is usually a good idea to limit the
+fuzzer to only a few <code class="docutils literal notranslate"><span class="pre">MemoryRegions</span></code>.</p>
+<p>To ensure that these env variables have been configured correctly, we can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span> <span class="o">--</span><span class="n">fuzz</span><span class="o">-</span><span class="n">target</span><span class="o">=</span><span class="n">generic</span><span class="o">-</span><span class="n">fuzz</span> <span class="o">-</span><span class="n">runs</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>The output should contain a complete list of matched MemoryRegions.</p>
+</section>
+<section id="oss-fuzz">
+<h2>OSS-Fuzz<a class="headerlink" href="#oss-fuzz" title="Permalink to this heading"></a></h2>
+<p>QEMU is continuously fuzzed on <a class="reference external" href="https://github.com/google/oss-fuzz">OSS-Fuzz</a>.  By default, the OSS-Fuzz build
+will try to fuzz every fuzz-target. Since the generic-fuzz target
+requires additional information provided in environment variables, we
+pre-define some generic-fuzz configs in
+<code class="docutils literal notranslate"><span class="pre">tests/qtest/fuzz/generic_fuzz_configs.h</span></code>. Each config must specify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.name</span></code>: To identify the fuzzer config</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.args</span></code> OR <code class="docutils literal notranslate"><span class="pre">.argfunc</span></code>: A string or pointer to a function returning a
+string.  These strings are used to specify the <code class="docutils literal notranslate"><span class="pre">QEMU_FUZZ_ARGS</span></code>
+environment variable.  <code class="docutils literal notranslate"><span class="pre">argfunc</span></code> is useful when the config relies on e.g.
+a dynamically created temp directory, or a free tcp/udp port.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.objects</span></code>: A string that specifies the <code class="docutils literal notranslate"><span class="pre">QEMU_FUZZ_OBJECTS</span></code> environment
+variable.</p></li>
+</ul>
+<p>To fuzz additional devices/device configuration on OSS-Fuzz, send patches for
+either a new device-specific fuzzer or a new generic-fuzz config.</p>
+<p>Build details:</p>
+<ul class="simple">
+<li><p>The Dockerfile that sets up the environment for building QEMU’s
+fuzzers on OSS-Fuzz can be fund in the OSS-Fuzz repository
+__(<a class="reference external" href="https://github.com/google/oss-fuzz/blob/master/projects/qemu/Dockerfile">https://github.com/google/oss-fuzz/blob/master/projects/qemu/Dockerfile</a>)</p></li>
+<li><p>The script responsible for building the fuzzers can be found in the
+QEMU source tree at <code class="docutils literal notranslate"><span class="pre">scripts/oss-fuzz/build.sh</span></code></p></li>
+</ul>
+</section>
+<section id="building-crash-reproducers">
+<h2>Building Crash Reproducers<a class="headerlink" href="#building-crash-reproducers" title="Permalink to this heading"></a></h2>
+<p>When we find a crash, we should try to create an independent reproducer, that
+can be used on a non-fuzzer build of QEMU. This filters out any potential
+false-positives, and improves the debugging experience for developers.
+Here are the steps for building a reproducer for a crash found by the
+generic-fuzz target.</p>
+<ul>
+<li><p>Ensure the crash reproduces:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span> <span class="o">--</span><span class="n">fuzz</span><span class="o">-</span><span class="n">target</span><span class="o">...</span> <span class="o">./</span><span class="n">crash</span><span class="o">-...</span>
+</pre></div>
+</div>
+</li>
+<li><p>Gather the QTest output for the crash:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QEMU_FUZZ_TIMEOUT</span><span class="o">=</span><span class="mi">0</span> <span class="n">QTEST_LOG</span><span class="o">=</span><span class="mi">1</span> <span class="n">FUZZ_SERIALIZE_QTEST</span><span class="o">=</span><span class="mi">1</span> \
+<span class="n">qemu</span><span class="o">-</span><span class="n">fuzz</span><span class="o">-</span><span class="n">i386</span> <span class="o">--</span><span class="n">fuzz</span><span class="o">-</span><span class="n">target</span><span class="o">...</span> <span class="o">./</span><span class="n">crash</span><span class="o">-...</span> <span class="o">&amp;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">trace</span>
+</pre></div>
+</div>
+</li>
+<li><p>Reorder and clean-up the resulting trace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scripts</span><span class="o">/</span><span class="n">oss</span><span class="o">-</span><span class="n">fuzz</span><span class="o">/</span><span class="n">reorder_fuzzer_qtest_trace</span><span class="o">.</span><span class="n">py</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">trace</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">reproducer</span>
+</pre></div>
+</div>
+</li>
+<li><p>Get the arguments needed to start qemu, and provide a path to qemu:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">less</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">trace</span> <span class="c1"># The args should be logged at the top of this file</span>
+<span class="n">export</span> <span class="n">QEMU_ARGS</span><span class="o">=</span><span class="s2">&quot;-machine ...&quot;</span>
+<span class="n">export</span> <span class="n">QEMU_PATH</span><span class="o">=</span><span class="s2">&quot;path/to/qemu-system&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Ensure the crash reproduces in qemu-system:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$QEMU_PATH $QEMU_ARGS -qtest stdio &lt; /tmp/reproducer
+</pre></div>
+</div>
+</li>
+<li><p>From the crash output, obtain some string that identifies the crash. This
+can be a line in the stack-trace, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">CRASH_TOKEN</span><span class="o">=</span><span class="s2">&quot;hw/usb/hcd-xhci.c:1865&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Minimize the reproducer:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scripts</span><span class="o">/</span><span class="n">oss</span><span class="o">-</span><span class="n">fuzz</span><span class="o">/</span><span class="n">minimize_qtest_trace</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">M1</span> <span class="o">-</span><span class="n">M2</span> \
+  <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">reproducer</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">reproducer</span><span class="o">-</span><span class="n">minimized</span>
+</pre></div>
+</div>
+</li>
+<li><p>Confirm that the minimized reproducer still crashes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$QEMU_PATH $QEMU_ARGS -qtest stdio &lt; /tmp/reproducer-minimized
+</pre></div>
+</div>
+</li>
+<li><p>Create a one-liner reproducer that can be sent over email:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">oss</span><span class="o">-</span><span class="n">fuzz</span><span class="o">/</span><span class="n">output_reproducer</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">bash</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">reproducer</span><span class="o">-</span><span class="n">minimized</span>
+</pre></div>
+</div>
+</li>
+<li><p>Output the C source code for a test case that will reproduce the bug:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">oss</span><span class="o">-</span><span class="n">fuzz</span><span class="o">/</span><span class="n">output_reproducer</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">owner</span> <span class="s2">&quot;John Smith &lt;john@smith.com&gt;&quot;</span>\
+  <span class="o">-</span><span class="n">name</span> <span class="s2">&quot;test_function_name&quot;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">reproducer</span><span class="o">-</span><span class="n">minimized</span>
+</pre></div>
+</div>
+</li>
+<li><p>Report the bug and send a patch with the C reproducer upstream</p></li>
+</ul>
+</section>
+<section id="implementation-details-fuzzer-lifecycle">
+<h2>Implementation Details / Fuzzer Lifecycle<a class="headerlink" href="#implementation-details-fuzzer-lifecycle" title="Permalink to this heading"></a></h2>
+<p>The fuzzer has two entrypoints that libfuzzer calls. libfuzzer provides it’s
+own <code class="docutils literal notranslate"><span class="pre">main()</span></code>, which performs some setup, and calls the entrypoints:</p>
+<p><code class="docutils literal notranslate"><span class="pre">LLVMFuzzerInitialize</span></code>: called prior to fuzzing. Used to initialize all of the
+necessary state</p>
+<p><code class="docutils literal notranslate"><span class="pre">LLVMFuzzerTestOneInput</span></code>: called for each fuzzing run. Processes the input and
+resets the state at the end of each run.</p>
+<p>In more detail:</p>
+<p><code class="docutils literal notranslate"><span class="pre">LLVMFuzzerInitialize</span></code> parses the arguments to the fuzzer (must start with two
+dashes, so they are ignored by libfuzzer <code class="docutils literal notranslate"><span class="pre">main()</span></code>). Currently, the arguments
+select the fuzz target. Then, the qtest client is initialized. If the target
+requires qos, qgraph is set up and the QOM/LIBQOS modules are initialized.
+Then the QGraph is walked and the QEMU cmd_line is determined and saved.</p>
+<p>After this, the <code class="docutils literal notranslate"><span class="pre">vl.c:main</span></code> is called to set up the guest. There are
+target-specific hooks that can be called before and after main, for
+additional setup(e.g. PCI setup, or VM snapshotting).</p>
+<p><code class="docutils literal notranslate"><span class="pre">LLVMFuzzerTestOneInput</span></code>: Uses qtest/qos functions to act based on the fuzz
+input. It is also responsible for manually calling <code class="docutils literal notranslate"><span class="pre">main_loop_wait</span></code> to ensure
+that bottom halves are executed and any cleanup required before the next input.</p>
+<p>Since the same process is reused for many fuzzing runs, QEMU state needs to
+be reset at the end of each run. There are currently two implemented
+options for resetting state:</p>
+<ul>
+<li><p>Reboot the guest between runs.
+- <em>Pros</em>: Straightforward and fast for simple fuzz targets.</p>
+<ul class="simple">
+<li><p><em>Cons</em>: Depending on the device, does not reset all device state. If the
+device requires some initialization prior to being ready for fuzzing (common
+for QOS-based targets), this initialization needs to be done after each
+reboot.</p></li>
+<li><p><em>Example target</em>: <code class="docutils literal notranslate"><span class="pre">i440fx-qtest-reboot-fuzz</span></code></p></li>
+</ul>
+</li>
+<li><dl class="simple">
+<dt>Run each test case in a separate forked process and copy the coverage</dt><dd><p>information back to the parent. This is fairly similar to AFL’s “deferred”
+fork-server mode [3]</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><em>Pros</em>: Relatively fast. Devices only need to be initialized once. No need to
+do slow reboots or vmloads.</p></li>
+<li><dl class="simple">
+<dt><em>Cons</em>: Not officially supported by libfuzzer. Does not work well for</dt><dd><p>devices that rely on dedicated threads.</p>
+</dd>
+</dl>
+</li>
+<li><p><em>Example target</em>: <code class="docutils literal notranslate"><span class="pre">virtio-net-fork-fuzz</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qapi-code-gen.html" class="btn btn-neutral float-left" title="How to use the QAPI code generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="control-flow-integrity.html" class="btn btn-neutral float-right" title="Control-Flow Integrity (CFI)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACPI ERST DEVICE &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU/Guest Firmware Interface for AMD SEV and SEV-ES" href="sev-guest-firmware.html" />
+    <link rel="prev" title="QEMU&lt;-&gt;ACPI BIOS NVDIMM interface" href="acpi_nvdimm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ACPI ERST DEVICE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#background-motivation">Background/Motivation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-usage">Configuration|Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pci-interface">PCI Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backend-storage-format">Backend Storage Format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Guest Hardware Specifications</a></li>
+      <li class="breadcrumb-item active">ACPI ERST DEVICE</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/acpi_erst.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="acpi-erst-device">
+<h1>ACPI ERST DEVICE<a class="headerlink" href="#acpi-erst-device" title="Permalink to this heading"></a></h1>
+<p>The ACPI ERST device is utilized to support the ACPI Error Record
+Serialization Table, ERST, functionality. This feature is designed for
+storing error records in persistent storage for future reference
+and/or debugging.</p>
+<p>The ACPI specification[1], in Chapter “ACPI Platform Error Interfaces
+(APEI)”, and specifically subsection “Error Serialization”, outlines a
+method for storing error records into persistent storage.</p>
+<p>The format of error records is described in the UEFI specification[2],
+in Appendix N “Common Platform Error Record”.</p>
+<p>While the ACPI specification allows for an NVRAM “mode” (see
+GET_ERROR_LOG_ADDRESS_RANGE_ATTRIBUTES) where non-volatile RAM is
+directly exposed for direct access by the OS/guest, this device
+implements the non-NVRAM “mode”. This non-NVRAM “mode” is what is
+implemented by most BIOS (since flash memory requires programming
+operations in order to update its contents). Furthermore, as of the
+time of this writing, Linux only supports the non-NVRAM “mode”.</p>
+<section id="background-motivation">
+<h2>Background/Motivation<a class="headerlink" href="#background-motivation" title="Permalink to this heading"></a></h2>
+<p>Linux uses the persistent storage filesystem, pstore, to record
+information (eg. dmesg tail) upon panics and shutdowns.  Pstore is
+independent of, and runs before, kdump.  In certain scenarios (ie.
+hosts/guests with root filesystems on NFS/iSCSI where networking
+software and/or hardware fails, and thus kdump fails), pstore may
+contain information available for post-mortem debugging.</p>
+<p>Two common storage backends for the pstore filesystem are ACPI ERST
+and UEFI. Most BIOS implement ACPI ERST. UEFI is not utilized in all
+guests. With QEMU supporting ACPI ERST, it becomes a viable pstore
+storage backend for virtual machines (as it is now for bare metal
+machines).</p>
+<p>Enabling support for ACPI ERST facilitates a consistent method to
+capture kernel panic information in a wide range of guests: from
+resource-constrained microvms to very large guests, and in particular,
+in direct-boot environments (which would lack UEFI run-time services).</p>
+<p>Note that Microsoft Windows also utilizes the ACPI ERST for certain
+crash information, if available[3].</p>
+</section>
+<section id="configuration-usage">
+<h2>Configuration|Usage<a class="headerlink" href="#configuration-usage" title="Permalink to this heading"></a></h2>
+<p>To use ACPI ERST, a memory-backend-file object and acpi-erst device
+can be created, for example:</p>
+<blockquote>
+<div><p>qemu …
+-object memory-backend-file,id=erstnvram,mem-path=acpi-erst.backing,size=0x10000,share=on -device acpi-erst,memdev=erstnvram</p>
+</div></blockquote>
+<p>For proper operation, the ACPI ERST device needs a memory-backend-file
+object with the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>id: The id of the memory-backend-file object is used to associate
+this memory with the acpi-erst device.</p></li>
+<li><p>size: The size of the ACPI ERST backing storage. This parameter is
+required.</p></li>
+<li><p>mem-path: The location of the ACPI ERST backing storage file. This
+parameter is also required.</p></li>
+<li><p>share: The share=on parameter is required so that updates to the
+ERST backing store are written to the file.</p></li>
+</ul>
+</div></blockquote>
+<p>and ERST device:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>memdev: Is the object id of the memory-backend-file.</p></li>
+<li><p>record_size: Specifies the size of the records (or slots) in the
+backend storage. Must be a power of two value greater than or
+equal to 4096 (PAGE_SIZE).</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="pci-interface">
+<h2>PCI Interface<a class="headerlink" href="#pci-interface" title="Permalink to this heading"></a></h2>
+<p>The ERST device is a PCI device with two BARs, one for accessing the
+programming registers, and the other for accessing the record exchange
+buffer.</p>
+<p>BAR0 contains the programming interface consisting of ACTION and VALUE
+64-bit registers.  All ERST actions/operations/side effects happen on
+the write to the ACTION, by design. Any data needed by the action must
+be placed into VALUE prior to writing ACTION.  Reading the VALUE
+simply returns the register contents, which can be updated by a
+previous ACTION.</p>
+<p>BAR1 contains the 8KiB record exchange buffer, which is the
+implemented maximum record size.</p>
+</section>
+<section id="backend-storage-format">
+<h2>Backend Storage Format<a class="headerlink" href="#backend-storage-format" title="Permalink to this heading"></a></h2>
+<p>The backend storage is divided into fixed size “slots”, 8KiB in
+length, with each slot storing a single record.  Not all slots need to
+be occupied, and they need not be occupied in a contiguous fashion.
+The ability to clear/erase specific records allows for the formation
+of unoccupied slots.</p>
+<p>Slot 0 contains a backend storage header that identifies the contents
+as ERST and also facilitates efficient access to the records.
+Depending upon the size of the backend storage, additional slots will
+be designated to be a part of the slot 0 header. For example, at 8KiB,
+the slot 0 header can accommodate 1021 records. Thus a storage size
+of 8MiB (8KiB * 1024) requires an additional slot for use by the
+header. In this scenario, slot 0 and slot 1 form the backend storage
+header, and records can be stored starting at slot 2.</p>
+<p>Below is an example layout of the backend storage format (for storage
+size less than 8MiB). The size of the storage is a multiple of 8KiB,
+and contains N number of slots to store records. The example below
+shows two records (in CPER format) in the backend storage, while the
+remaining slots are empty/available.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Slot</span>   <span class="n">Record</span>
+       <span class="o">&lt;------------------</span> <span class="mi">8</span><span class="n">KiB</span> <span class="o">--------------------&gt;</span>
+       <span class="o">+--------------------------------------------+</span>
+   <span class="mi">0</span>   <span class="o">|</span> <span class="n">storage</span> <span class="n">header</span>                             <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+   <span class="mi">1</span>   <span class="o">|</span> <span class="n">empty</span><span class="o">/</span><span class="n">available</span>                            <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+   <span class="mi">2</span>   <span class="o">|</span> <span class="n">CPER</span>                                       <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+   <span class="mi">3</span>   <span class="o">|</span> <span class="n">CPER</span>                                       <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+ <span class="o">...</span>   <span class="o">|</span>                                            <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+   <span class="n">N</span>   <span class="o">|</span> <span class="n">empty</span><span class="o">/</span><span class="n">available</span>                            <span class="o">|</span>
+       <span class="o">+--------------------------------------------+</span>
+</pre></div>
+</div>
+<p>The storage header consists of some basic information and an array
+of CPER record_id’s to efficiently access records in the backend
+storage.</p>
+<p>All fields in the header are stored in little endian format.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">magic</span>                                      <span class="o">|</span> <span class="mh">0x0000</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_offset</span>        <span class="o">|</span> <span class="n">record_size</span>         <span class="o">|</span> <span class="mh">0x0008</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_count</span>         <span class="o">|</span> <span class="n">reserved</span> <span class="o">|</span> <span class="n">version</span>  <span class="o">|</span> <span class="mh">0x0010</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                               <span class="o">|</span> <span class="mh">0x0018</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>                               <span class="o">|</span> <span class="mh">0x0020</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_id</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>                             <span class="o">|</span>
+<span class="o">+--------------------------------------------+</span>
+<span class="o">|</span> <span class="n">record_id</span><span class="p">[</span><span class="n">N</span><span class="p">]</span>                               <span class="o">|</span> <span class="mh">0x1FF8</span>
+<span class="o">+--------------------------------------------+</span>
+</pre></div>
+</div>
+<p>The ‘magic’ field contains the value 0x524F545354535245.</p>
+<p>The ‘record_size’ field contains the value 0x2000, 8KiB.</p>
+<p>The ‘record_offset’ field points to the first record_id in the array,
+0x0018.</p>
+<p>The ‘version’ field contains 0x0100, the first version.</p>
+<p>The ‘record_count’ field contains the number of valid records in the
+backend storage.</p>
+<p>The ‘record_id’ array fields are the 64-bit record identifiers of the
+CPER record in the corresponding slot. Stated differently, the
+location of a CPER record_id in the record_id[] array provides the
+slot index for the corresponding record in the backend storage.</p>
+<p>Note that, for example, with a backend storage less than 8MiB, slot 0
+contains the header, so the record_id[0] will never contain a valid
+CPER record_id. Instead slot 1 is the first available slot and thus
+record_id_[1] may contain a CPER.</p>
+<p>A ‘record_id’ of all 0s or all 1s indicates an invalid record (ie. the
+slot is available).</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>[1] “Advanced Configuration and Power Interface Specification”,</dt><dd><p>version 4.0, June 2009.</p>
+</dd>
+<dt>[2] “Unified Extensible Firmware Interface Specification”,</dt><dd><p>version 2.1, October 2008.</p>
+</dd>
+<dt>[3] “Windows Hardware Error Architecture”, specifically</dt><dd><p>“Error Record Persistence Mechanism”.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="acpi_nvdimm.html" class="btn btn-neutral float-left" title="QEMU&lt;-&gt;ACPI BIOS NVDIMM interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sev-guest-firmware.html" class="btn btn-neutral float-right" title="QEMU/Guest Firmware Interface for AMD SEV and SEV-ES" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

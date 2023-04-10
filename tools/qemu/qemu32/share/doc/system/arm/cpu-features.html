@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arm CPU Features &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="AVR System emulator" href="../target-avr.html" />
+    <link rel="prev" title="A-profile CPU architecture support" href="emulation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">Arm CPU Features</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/cpu-features.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arm-cpu-features">
+<h1>Arm CPU Features<a class="headerlink" href="#arm-cpu-features" title="Permalink to this heading"></a></h1>
+<p>CPU features are optional features that a CPU of supporting type may
+choose to implement or not.  In QEMU, optional CPU features have
+corresponding boolean CPU proprieties that, when enabled, indicate
+that the feature is implemented, and, conversely, when disabled,
+indicate that it is not implemented. An example of an Arm CPU feature
+is the Performance Monitoring Unit (PMU).  CPU types such as the
+Cortex-A15 and the Cortex-A57, which respectively implement Arm
+architecture reference manuals ARMv7-A and ARMv8-A, may both optionally
+implement PMUs.  For example, if a user wants to use a Cortex-A15 without
+a PMU, then the <code class="docutils literal notranslate"><span class="pre">-cpu</span></code> parameter should contain <code class="docutils literal notranslate"><span class="pre">pmu=off</span></code> on the QEMU
+command line, i.e. <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">cortex-a15,pmu=off</span></code>.</p>
+<p>As not all CPU types support all optional CPU features, then whether or
+not a CPU property exists depends on the CPU type.  For example, CPUs
+that implement the ARMv8-A architecture reference manual may optionally
+support the AArch32 CPU feature, which may be enabled by disabling the
+<code class="docutils literal notranslate"><span class="pre">aarch64</span></code> CPU property.  A CPU type such as the Cortex-A15, which does
+not implement ARMv8-A, will not have the <code class="docutils literal notranslate"><span class="pre">aarch64</span></code> CPU property.</p>
+<p>QEMU’s support may be limited for some CPU features, only partially
+supporting the feature or only supporting the feature under certain
+configurations.  For example, the <code class="docutils literal notranslate"><span class="pre">aarch64</span></code> CPU feature, which, when
+disabled, enables the optional AArch32 CPU feature, is only supported
+when using the KVM accelerator and when running on a host CPU type that
+supports the feature.  While <code class="docutils literal notranslate"><span class="pre">aarch64</span></code> currently only works with KVM,
+it could work with TCG.  CPU features that are specific to KVM are
+prefixed with “kvm-” and are described in “KVM VCPU Features”.</p>
+</section>
+<section id="cpu-feature-probing">
+<h1>CPU Feature Probing<a class="headerlink" href="#cpu-feature-probing" title="Permalink to this heading"></a></h1>
+<p>Determining which CPU features are available and functional for a given
+CPU type is possible with the <code class="docutils literal notranslate"><span class="pre">query-cpu-model-expansion</span></code> QMP command.
+Below are some examples where <code class="docutils literal notranslate"><span class="pre">scripts/qmp/qmp-shell</span></code> (see the top comment
+block in the script for usage) is used to issue the QMP commands.</p>
+<ol class="arabic">
+<li><p>Determine which CPU features are available for the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU type
+(Note, we started QEMU with qemu-system-aarch64, so <code class="docutils literal notranslate"><span class="pre">max</span></code> is
+implementing the ARMv8-A reference manual in this case):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">cpu</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">expansion</span> <span class="nb">type</span><span class="o">=</span><span class="n">full</span> <span class="n">model</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;max&quot;</span><span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sve1664&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;pmu&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1792&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1920&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve128&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;aarch64&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1024&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve640&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve768&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1408&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve256&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve1152&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve512&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve384&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1536&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve896&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1280&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve2048&quot;</span><span class="p">:</span> <span class="n">true</span>
+<span class="p">}}}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>We see that the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU type has the <code class="docutils literal notranslate"><span class="pre">pmu</span></code>, <code class="docutils literal notranslate"><span class="pre">aarch64</span></code>, <code class="docutils literal notranslate"><span class="pre">sve</span></code>, and many
+<code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU features.  We also see that all the CPU features are
+enabled, as they are all <code class="docutils literal notranslate"><span class="pre">true</span></code>.  (The <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU features are all
+optional SVE vector lengths (see “SVE CPU Properties”).  While with TCG
+all SVE vector lengths can be supported, when KVM is in use it’s more
+likely that only a few lengths will be supported, if SVE is supported at
+all.)</p>
+<ol class="arabic" start="2">
+<li><p>Let’s try to disable the PMU:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">cpu</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">expansion</span> <span class="nb">type</span><span class="o">=</span><span class="n">full</span> <span class="n">model</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;max&quot;</span><span class="p">,</span><span class="s2">&quot;props&quot;</span><span class="p">:{</span><span class="s2">&quot;pmu&quot;</span><span class="p">:</span><span class="n">false</span><span class="p">}}</span>
+<span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sve1664&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;pmu&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve1792&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1920&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve128&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;aarch64&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1024&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve640&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve768&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1408&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve256&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve1152&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve512&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve384&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1536&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;sve896&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1280&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve2048&quot;</span><span class="p">:</span> <span class="n">true</span>
+<span class="p">}}}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>We see it worked, as <code class="docutils literal notranslate"><span class="pre">pmu</span></code> is now <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<ol class="arabic" start="3">
+<li><p>Let’s try to disable <code class="docutils literal notranslate"><span class="pre">aarch64</span></code>, which enables the AArch32 CPU feature:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">cpu</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">expansion</span> <span class="nb">type</span><span class="o">=</span><span class="n">full</span> <span class="n">model</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;max&quot;</span><span class="p">,</span><span class="s2">&quot;props&quot;</span><span class="p">:{</span><span class="s2">&quot;aarch64&quot;</span><span class="p">:</span><span class="n">false</span><span class="p">}}</span>
+<span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
+ <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;GenericError&quot;</span><span class="p">,</span> <span class="s2">&quot;desc&quot;</span><span class="p">:</span>
+ <span class="s2">&quot;&#39;aarch64&#39; feature cannot be disabled unless KVM is enabled and 32-bit EL1 is supported&quot;</span>
+<span class="p">}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>It looks like this feature is limited to a configuration we do not
+currently have.</p>
+<ol class="arabic" start="4">
+<li><p>Let’s disable <code class="docutils literal notranslate"><span class="pre">sve</span></code> and see what happens to all the optional SVE
+vector lengths:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">cpu</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">expansion</span> <span class="nb">type</span><span class="o">=</span><span class="n">full</span> <span class="n">model</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;max&quot;</span><span class="p">,</span><span class="s2">&quot;props&quot;</span><span class="p">:{</span><span class="s2">&quot;sve&quot;</span><span class="p">:</span><span class="n">false</span><span class="p">}}</span>
+<span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;sve1664&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;pmu&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1792&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve1920&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;sve128&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;aarch64&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="s2">&quot;sve1024&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;sve640&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve768&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve1408&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve256&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;sve1152&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve512&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve384&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve1536&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;sve896&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve1280&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span> <span class="s2">&quot;sve2048&quot;</span><span class="p">:</span> <span class="n">false</span>
+<span class="p">}}}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>As expected they are now all <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<ol class="arabic" start="5">
+<li><p>Let’s try probing CPU features for the Cortex-A15 CPU type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">QEMU</span><span class="p">)</span> <span class="n">query</span><span class="o">-</span><span class="n">cpu</span><span class="o">-</span><span class="n">model</span><span class="o">-</span><span class="n">expansion</span> <span class="nb">type</span><span class="o">=</span><span class="n">full</span> <span class="n">model</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;cortex-a15&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;cortex-a15&quot;</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;pmu&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">}}}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Only the <code class="docutils literal notranslate"><span class="pre">pmu</span></code> CPU feature is available.</p>
+<section id="a-note-about-cpu-feature-dependencies">
+<h2>A note about CPU feature dependencies<a class="headerlink" href="#a-note-about-cpu-feature-dependencies" title="Permalink to this heading"></a></h2>
+<p>It’s possible for features to have dependencies on other features. I.e.
+it may be possible to change one feature at a time without error, but
+when attempting to change all features at once an error could occur
+depending on the order they are processed.  It’s also possible changing
+all at once doesn’t generate an error, because a feature’s dependencies
+are satisfied with other features, but the same feature cannot be changed
+independently without error.  For these reasons callers should always
+attempt to make their desired changes all at once in order to ensure the
+collection is valid.</p>
+</section>
+<section id="a-note-about-cpu-models-and-kvm">
+<h2>A note about CPU models and KVM<a class="headerlink" href="#a-note-about-cpu-models-and-kvm" title="Permalink to this heading"></a></h2>
+<p>Named CPU models generally do not work with KVM.  There are a few cases
+that do work, e.g. using the named CPU model <code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code> with KVM on a
+seattle host, but mostly if KVM is enabled the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type must be
+used.  This means the guest is provided all the same CPU features as the
+host CPU type has.  And, for this reason, the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type should
+enable all CPU features that the host has by default.  Indeed it’s even
+a bit strange to allow disabling CPU features that the host has when using
+the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type, but in the absence of CPU models it’s the best we can
+do if we want to launch guests without all the host’s CPU features enabled.</p>
+<p>Enabling KVM also affects the <code class="docutils literal notranslate"><span class="pre">query-cpu-model-expansion</span></code> QMP command.  The
+affect is not only limited to specific features, as pointed out in example
+(3) of “CPU Feature Probing”, but also to which CPU types may be expanded.
+When KVM is enabled, only the <code class="docutils literal notranslate"><span class="pre">max</span></code>, <code class="docutils literal notranslate"><span class="pre">host</span></code>, and current CPU type may be
+expanded.  This restriction is necessary as it’s not possible to know all
+CPU types that may work with KVM, but it does impose a small risk of users
+experiencing unexpected errors.  For example on a seattle, as mentioned
+above, the <code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code> CPU type is also valid when KVM is enabled.
+Therefore a user could use the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type for the current type, but
+then attempt to query <code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code>, however that query will fail with our
+restrictions.  This shouldn’t be an issue though as management layers and
+users have been preferring the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type for use with KVM for quite
+some time.  Additionally, if the KVM-enabled QEMU instance running on a
+seattle host is using the <code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code> CPU type, then querying <code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code>
+will work.</p>
+</section>
+</section>
+<section id="using-cpu-features">
+<h1>Using CPU Features<a class="headerlink" href="#using-cpu-features" title="Permalink to this heading"></a></h1>
+<p>After determining which CPU features are available and supported for a
+given CPU type, then they may be selectively enabled or disabled on the
+QEMU command line with that CPU type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,pmu=off,sve=on,sve128=on,sve256=on
+</pre></div>
+</div>
+<p>The example above disables the PMU and enables the first two SVE vector
+lengths for the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU type.  Note, the <code class="docutils literal notranslate"><span class="pre">sve=on</span></code> isn’t actually
+necessary, because, as we observed above with our probe of the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU
+type, <code class="docutils literal notranslate"><span class="pre">sve</span></code> is already on by default.  Also, based on our probe of
+defaults, it would seem we need to disable many SVE vector lengths, rather
+than only enabling the two we want.  This isn’t the case, because, as
+disabling many SVE vector lengths would be quite verbose, the <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU
+properties have special semantics (see “SVE CPU Property Parsing
+Semantics”).</p>
+</section>
+<section id="kvm-vcpu-features">
+<h1>KVM VCPU Features<a class="headerlink" href="#kvm-vcpu-features" title="Permalink to this heading"></a></h1>
+<p>KVM VCPU features are CPU features that are specific to KVM, such as
+paravirt features or features that enable CPU virtualization extensions.
+The features’ CPU properties are only available when KVM is enabled and
+are named with the prefix “kvm-”.  KVM VCPU features may be probed,
+enabled, and disabled in the same way as other CPU features.  Below is
+the list of KVM VCPU features and their descriptions.</p>
+<blockquote>
+<div><dl>
+<dt>kvm-no-adjvtime          By default kvm-no-adjvtime is disabled.  This</dt><dd><p>means that by default the virtual time
+adjustment is enabled (vtime is not <em>not</em>
+adjusted).</p>
+<p>When virtual time adjustment is enabled each
+time the VM transitions back to running state
+the VCPU’s virtual counter is updated to ensure
+stopped time is not counted.  This avoids time
+jumps surprising guest OSes and applications,
+as long as they use the virtual counter for
+timekeeping.  However it has the side effect of
+the virtual and physical counters diverging.
+All timekeeping based on the virtual counter
+will appear to lag behind any timekeeping that
+does not subtract VM stopped time.  The guest
+may resynchronize its virtual counter with
+other time sources as needed.</p>
+<p>Enable kvm-no-adjvtime to disable virtual time
+adjustment, also restoring the legacy (pre-5.0)
+behavior.</p>
+</dd>
+<dt>kvm-steal-time           Since v5.2, kvm-steal-time is enabled by</dt><dd><p>default when KVM is enabled, the feature is
+supported, and the guest is 64-bit.</p>
+<p>When kvm-steal-time is enabled a 64-bit guest
+can account for time its CPUs were not running
+due to the host not scheduling the corresponding
+VCPU threads.  The accounting statistics may
+influence the guest scheduler behavior and/or be
+exposed to the guest userspace.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="tcg-vcpu-features">
+<h1>TCG VCPU Features<a class="headerlink" href="#tcg-vcpu-features" title="Permalink to this heading"></a></h1>
+<p>TCG VCPU features are CPU features that are specific to TCG.
+Below is the list of TCG VCPU features and their descriptions.</p>
+<blockquote>
+<div><dl>
+<dt>pauth-impdef             When <code class="docutils literal notranslate"><span class="pre">FEAT_Pauth</span></code> is enabled, either the</dt><dd><p><em>impdef</em> (Implementation Defined) algorithm
+is enabled or the <em>architected</em> QARMA algorithm
+is enabled.  By default the impdef algorithm
+is disabled, and QARMA is enabled.</p>
+<p>The architected QARMA algorithm has good
+cryptographic properties, but can be quite slow
+to emulate.  The impdef algorithm used by QEMU
+is non-cryptographic but significantly faster.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="sve-cpu-properties">
+<h1>SVE CPU Properties<a class="headerlink" href="#sve-cpu-properties" title="Permalink to this heading"></a></h1>
+<p>There are two types of SVE CPU properties: <code class="docutils literal notranslate"><span class="pre">sve</span></code> and <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code>.  The first
+is used to enable or disable the entire SVE feature, just as the <code class="docutils literal notranslate"><span class="pre">pmu</span></code>
+CPU property completely enables or disables the PMU.  The second type
+is used to enable or disable specific vector lengths, where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the
+number of bits of the length.  The <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU properties have special
+dependencies and constraints, see “SVE CPU Property Dependencies and
+Constraints” below.  Additionally, as we want all supported vector lengths
+to be enabled by default, then, in order to avoid overly verbose command
+lines (command lines full of <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;=off</span></code>, for all <code class="docutils literal notranslate"><span class="pre">N</span></code> not wanted), we
+provide the parsing semantics listed in “SVE CPU Property Parsing
+Semantics”.</p>
+<section id="sve-cpu-property-dependencies-and-constraints">
+<h2>SVE CPU Property Dependencies and Constraints<a class="headerlink" href="#sve-cpu-property-dependencies-and-constraints" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>At least one vector length must be enabled when <code class="docutils literal notranslate"><span class="pre">sve</span></code> is enabled.</p></li>
+<li><p>If a vector length <code class="docutils literal notranslate"><span class="pre">N</span></code> is enabled, then, when KVM is enabled, all
+smaller, host supported vector lengths must also be enabled.  If
+KVM is not enabled, then only all the smaller, power-of-two vector
+lengths must be enabled.  E.g. with KVM if the host supports all
+vector lengths up to 512-bits (128, 256, 384, 512), then if <code class="docutils literal notranslate"><span class="pre">sve512</span></code>
+is enabled, the 128-bit vector length, 256-bit vector length, and
+384-bit vector length must also be enabled. Without KVM, the 384-bit
+vector length would not be required.</p></li>
+<li><p>If KVM is enabled then only vector lengths that the host CPU type
+support may be enabled.  If SVE is not supported by the host, then
+no <code class="docutils literal notranslate"><span class="pre">sve*</span></code> properties may be enabled.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="sve-cpu-property-parsing-semantics">
+<h2>SVE CPU Property Parsing Semantics<a class="headerlink" href="#sve-cpu-property-parsing-semantics" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>If SVE is disabled (<code class="docutils literal notranslate"><span class="pre">sve=off</span></code>), then which SVE vector lengths
+are enabled or disabled is irrelevant to the guest, as the entire
+SVE feature is disabled and that disables all vector lengths for
+the guest.  However QEMU will still track any <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU
+properties provided by the user.  If later an <code class="docutils literal notranslate"><span class="pre">sve=on</span></code> is provided,
+then the guest will get only the enabled lengths.  If no <code class="docutils literal notranslate"><span class="pre">sve=on</span></code>
+is provided and there are explicitly enabled vector lengths, then
+an error is generated.</p></li>
+<li><p>If SVE is enabled (<code class="docutils literal notranslate"><span class="pre">sve=on</span></code>), but no <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU properties are
+provided, then all supported vector lengths are enabled, which when
+KVM is not in use means including the non-power-of-two lengths, and,
+when KVM is in use, it means all vector lengths supported by the host
+processor.</p></li>
+<li><p>If SVE is enabled, then an error is generated when attempting to
+disable the last enabled vector length (see constraint (1) of “SVE
+CPU Property Dependencies and Constraints”).</p></li>
+<li><p>If one or more vector lengths have been explicitly enabled and at
+least one of the dependency lengths of the maximum enabled length
+has been explicitly disabled, then an error is generated (see
+constraint (2) of “SVE CPU Property Dependencies and Constraints”).</p></li>
+<li><p>When KVM is enabled, if the host does not support SVE, then an error
+is generated when attempting to enable any <code class="docutils literal notranslate"><span class="pre">sve*</span></code> properties (see
+constraint (3) of “SVE CPU Property Dependencies and Constraints”).</p></li>
+<li><p>When KVM is enabled, if the host does support SVE, then an error is
+generated when attempting to enable any vector lengths not supported
+by the host (see constraint (3) of “SVE CPU Property Dependencies and
+Constraints”).</p></li>
+<li><p>If one or more <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU properties are set <code class="docutils literal notranslate"><span class="pre">off</span></code>, but no <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code>,
+CPU properties are set <code class="docutils literal notranslate"><span class="pre">on</span></code>, then the specified vector lengths are
+disabled but the default for any unspecified lengths remains enabled.
+When KVM is not enabled, disabling a power-of-two vector length also
+disables all vector lengths larger than the power-of-two length.
+When KVM is enabled, then disabling any supported vector length also
+disables all larger vector lengths (see constraint (2) of “SVE CPU
+Property Dependencies and Constraints”).</p></li>
+<li><p>If one or more <code class="docutils literal notranslate"><span class="pre">sve&lt;N&gt;</span></code> CPU properties are set to <code class="docutils literal notranslate"><span class="pre">on</span></code>, then they
+are enabled and all unspecified lengths default to disabled, except
+for the required lengths per constraint (2) of “SVE CPU Property
+Dependencies and Constraints”, which will even be auto-enabled if
+they were not explicitly enabled.</p></li>
+<li><p>If SVE was disabled (<code class="docutils literal notranslate"><span class="pre">sve=off</span></code>), allowing all vector lengths to be
+explicitly disabled (i.e. avoiding the error specified in (3) of
+“SVE CPU Property Parsing Semantics”), then if later an <code class="docutils literal notranslate"><span class="pre">sve=on</span></code> is
+provided an error will be generated.  To avoid this error, one must
+enable at least one vector length prior to enabling SVE.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="sve-cpu-property-examples">
+<h2>SVE CPU Property Examples<a class="headerlink" href="#sve-cpu-property-examples" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Disable SVE:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve=off
+</pre></div>
+</div>
+</li>
+<li><p>Implicitly enable all vector lengths for the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max
+</pre></div>
+</div>
+</li>
+<li><p>When KVM is enabled, implicitly enable all host CPU supported vector
+lengths with the <code class="docutils literal notranslate"><span class="pre">host</span></code> CPU type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt,accel=kvm -cpu host
+</pre></div>
+</div>
+</li>
+<li><p>Only enable the 128-bit vector length:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve128=on
+</pre></div>
+</div>
+</li>
+<li><p>Disable the 512-bit vector length and all larger vector lengths,
+since 512 is a power-of-two.  This results in all the smaller,
+uninitialized lengths (128, 256, and 384) defaulting to enabled:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve512=off
+</pre></div>
+</div>
+</li>
+<li><p>Enable the 128-bit, 256-bit, and 512-bit vector lengths:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve128=on,sve256=on,sve512=on
+</pre></div>
+</div>
+</li>
+<li><p>The same as (6), but since the 128-bit and 256-bit vector
+lengths are required for the 512-bit vector length to be enabled,
+then allow them to be auto-enabled:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve512=on
+</pre></div>
+</div>
+</li>
+<li><p>Do the same as (7), but by first disabling SVE and then re-enabling it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve=off,sve512=on,sve=on
+</pre></div>
+</div>
+</li>
+<li><p>Force errors regarding the last vector length:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve128=off
+$ qemu-system-aarch64 -M virt -cpu max,sve=off,sve128=off,sve=on
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+</section>
+<section id="sve-cpu-property-recommendations">
+<h2>SVE CPU Property Recommendations<a class="headerlink" href="#sve-cpu-property-recommendations" title="Permalink to this heading"></a></h2>
+<p>The examples in “SVE CPU Property Examples” exhibit many ways to select
+vector lengths which developers may find useful in order to avoid overly
+verbose command lines.  However, the recommended way to select vector
+lengths is to explicitly enable each desired length.  Therefore only
+example’s (1), (4), and (6) exhibit recommended uses of the properties.</p>
+</section>
+<section id="sme-cpu-property-examples">
+<h2>SME CPU Property Examples<a class="headerlink" href="#sme-cpu-property-examples" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Disable SME:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sme=off
+</pre></div>
+</div>
+</li>
+<li><p>Implicitly enable all vector lengths for the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max
+</pre></div>
+</div>
+</li>
+<li><p>Only enable the 256-bit vector length:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sme256=on
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" start="3">
+<li><p>Enable the 256-bit and 1024-bit vector lengths:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sme256=on,sme1024=on
+</pre></div>
+</div>
+</li>
+<li><p>Disable the 512-bit vector length.  This results in all the other
+lengths supported by <code class="docutils literal notranslate"><span class="pre">max</span></code> defaulting to enabled
+(128, 256, 1024 and 2048):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 -M virt -cpu max,sve512=off
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+</section>
+<section id="sve-user-mode-default-vector-length-property">
+<h2>SVE User-mode Default Vector Length Property<a class="headerlink" href="#sve-user-mode-default-vector-length-property" title="Permalink to this heading"></a></h2>
+<p>For qemu-aarch64, the cpu property <code class="docutils literal notranslate"><span class="pre">sve-default-vector-length=N</span></code> is
+defined to mirror the Linux kernel parameter file
+<code class="docutils literal notranslate"><span class="pre">/proc/sys/abi/sve_default_vector_length</span></code>.  The default length, <code class="docutils literal notranslate"><span class="pre">N</span></code>,
+is in units of bytes and must be between 16 and 8192.
+If not specified, the default vector length is 64.</p>
+<p>If the default length is larger than the maximum vector length enabled,
+the actual vector length will be reduced.  Note that the maximum vector
+length supported by QEMU is 256.</p>
+<p>If this property is set to <code class="docutils literal notranslate"><span class="pre">-1</span></code> then the default vector length
+is set to the maximum possible length.</p>
+</section>
+</section>
+<section id="sme-cpu-properties">
+<h1>SME CPU Properties<a class="headerlink" href="#sme-cpu-properties" title="Permalink to this heading"></a></h1>
+<p>The SME CPU properties are much like the SVE properties: <code class="docutils literal notranslate"><span class="pre">sme</span></code> is
+used to enable or disable the entire SME feature, and <code class="docutils literal notranslate"><span class="pre">sme&lt;N&gt;</span></code> is
+used to enable or disable specific vector lengths.  Finally,
+<code class="docutils literal notranslate"><span class="pre">sme_fa64</span></code> is used to enable or disable <code class="docutils literal notranslate"><span class="pre">FEAT_SME_FA64</span></code>, which
+allows execution of the “full a64” instruction set while Streaming
+SVE mode is enabled.</p>
+<p>SME is not supported by KVM at this time.</p>
+<p>At least one vector length must be enabled when <code class="docutils literal notranslate"><span class="pre">sme</span></code> is enabled,
+and all vector lengths must be powers of 2.  The maximum vector
+length supported by qemu is 2048 bits.  Otherwise, there are no
+additional constraints on the set of vector lengths supported by SME.</p>
+<section id="sme-user-mode-default-vector-length-property">
+<h2>SME User-mode Default Vector Length Property<a class="headerlink" href="#sme-user-mode-default-vector-length-property" title="Permalink to this heading"></a></h2>
+<p>For qemu-aarch64, the cpu property <code class="docutils literal notranslate"><span class="pre">sme-default-vector-length=N</span></code> is
+defined to mirror the Linux kernel parameter file
+<code class="docutils literal notranslate"><span class="pre">/proc/sys/abi/sme_default_vector_length</span></code>.  The default length, <code class="docutils literal notranslate"><span class="pre">N</span></code>,
+is in units of bytes and must be between 16 and 8192.
+If not specified, the default vector length is 32.</p>
+<p>As with <code class="docutils literal notranslate"><span class="pre">sve-default-vector-length</span></code>, if the default length is larger
+than the maximum vector length enabled, the actual vector length will
+be reduced.  If this property is set to <code class="docutils literal notranslate"><span class="pre">-1</span></code> then the default vector
+length is set to the maximum possible length.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="emulation.html" class="btn btn-neutral float-left" title="A-profile CPU architecture support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../target-avr.html" class="btn btn-neutral float-right" title="AVR System emulator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

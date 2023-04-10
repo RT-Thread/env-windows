@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VFIO device Migration &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to write monitor commands" href="writing-monitor-commands.html" />
+    <link rel="prev" title="Tracing" href="tracing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">VFIO device Migration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#system-memory-dirty-pages-tracking">System memory dirty pages tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#system-memory-dirty-pages-tracking-when-viommu-is-enabled">System memory dirty pages tracking when vIOMMU is enabled</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#live-migration-save-path">Live migration save path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#live-migration-resume-path">Live migration resume path</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-internals.html">Internal Subsystem Information</a></li>
+      <li class="breadcrumb-item active">VFIO device Migration</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/vfio-migration.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vfio-device-migration">
+<h1>VFIO device Migration<a class="headerlink" href="#vfio-device-migration" title="Permalink to this heading"></a></h1>
+<p>Migration of virtual machine involves saving the state for each device that
+the guest is running on source host and restoring this saved state on the
+destination host. This document details how saving and restoring of VFIO
+devices is done in QEMU.</p>
+<p>Migration of VFIO devices consists of two phases: the optional pre-copy phase,
+and the stop-and-copy phase. The pre-copy phase is iterative and allows to
+accommodate VFIO devices that have a large amount of data that needs to be
+transferred. The iterative pre-copy phase of migration allows for the guest to
+continue whilst the VFIO device state is transferred to the destination, this
+helps to reduce the total downtime of the VM. VFIO devices can choose to skip
+the pre-copy phase of migration by returning pending_bytes as zero during the
+pre-copy phase.</p>
+<p>A detailed description of the UAPI for VFIO device migration can be found in
+the comment for the <code class="docutils literal notranslate"><span class="pre">vfio_device_migration_info</span></code> structure in the header
+file linux-headers/linux/vfio.h.</p>
+<p>VFIO implements the device hooks for the iterative approach as follows:</p>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_setup</span></code> function that sets up the migration region and sets _SAVING
+flag in the VFIO device state.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">load_setup</span></code> function that sets up the migration region on the
+destination and sets _RESUMING flag in the VFIO device state.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_live_pending</span></code> function that reads pending_bytes from the vendor
+driver, which indicates the amount of data that the vendor driver has yet to
+save for the VFIO device.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_live_iterate</span></code> function that reads the VFIO device’s data from the
+vendor driver through the migration region during iterative phase.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_state</span></code> function to save the device config space if it is present.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_live_complete_precopy</span></code> function that resets _RUNNING flag from the
+VFIO device state and iteratively copies the remaining data for the VFIO
+device until the vendor driver indicates that no data remains (pending bytes
+is zero).</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">load_state</span></code> function that loads the config section and the data
+sections that are generated by the save functions above</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cleanup</span></code> functions for both save and load that perform any migration
+related cleanup, including unmapping the migration region</p></li>
+</ul>
+<p>The VFIO migration code uses a VM state change handler to change the VFIO
+device state when the VM state changes from running to not-running, and
+vice versa.</p>
+<p>Similarly, a migration state change handler is used to trigger a transition of
+the VFIO device state when certain changes of the migration state occur. For
+example, the VFIO device state is transitioned back to _RUNNING in case a
+migration failed or was canceled.</p>
+<section id="system-memory-dirty-pages-tracking">
+<h2>System memory dirty pages tracking<a class="headerlink" href="#system-memory-dirty-pages-tracking" title="Permalink to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">log_global_start</span></code> and <code class="docutils literal notranslate"><span class="pre">log_global_stop</span></code> memory listener callback informs
+the VFIO IOMMU module to start and stop dirty page tracking. A <code class="docutils literal notranslate"><span class="pre">log_sync</span></code>
+memory listener callback marks those system memory pages as dirty which are
+used for DMA by the VFIO device. The dirty pages bitmap is queried per
+container. All pages pinned by the vendor driver through external APIs have to
+be marked as dirty during migration. When there are CPU writes, CPU dirty page
+tracking can identify dirtied pages, but any page pinned by the vendor driver
+can also be written by the device. There is currently no device or IOMMU
+support for dirty page tracking in hardware.</p>
+<p>By default, dirty pages are tracked when the device is in pre-copy as well as
+stop-and-copy phase. So, a page pinned by the vendor driver will be copied to
+the destination in both phases. Copying dirty pages in pre-copy phase helps
+QEMU to predict if it can achieve its downtime tolerances. If QEMU during
+pre-copy phase keeps finding dirty pages continuously, then it understands
+that even in stop-and-copy phase, it is likely to find dirty pages and can
+predict the downtime accordingly.</p>
+<p>QEMU also provides a per device opt-out option <code class="docutils literal notranslate"><span class="pre">pre-copy-dirty-page-tracking</span></code>
+which disables querying the dirty bitmap during pre-copy phase. If it is set to
+off, all dirty pages will be copied to the destination in stop-and-copy phase
+only.</p>
+</section>
+<section id="system-memory-dirty-pages-tracking-when-viommu-is-enabled">
+<h2>System memory dirty pages tracking when vIOMMU is enabled<a class="headerlink" href="#system-memory-dirty-pages-tracking-when-viommu-is-enabled" title="Permalink to this heading"></a></h2>
+<p>With vIOMMU, an IO virtual address range can get unmapped while in pre-copy
+phase of migration. In that case, the unmap ioctl returns any dirty pages in
+that range and QEMU reports corresponding guest physical pages dirty. During
+stop-and-copy phase, an IOMMU notifier is used to get a callback for mapped
+pages and then dirty pages bitmap is fetched from VFIO IOMMU modules for those
+mapped ranges.</p>
+<section id="flow-of-state-changes-during-live-migration">
+<h3>Flow of state changes during Live migration<a class="headerlink" href="#flow-of-state-changes-during-live-migration" title="Permalink to this heading"></a></h3>
+<p>Below is the flow of state change during live migration.
+The values in the brackets represent the VM state, the migration state, and
+the VFIO device state, respectively.</p>
+</section>
+</section>
+<section id="live-migration-save-path">
+<h2>Live migration save path<a class="headerlink" href="#live-migration-save-path" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                      <span class="n">QEMU</span> <span class="n">normal</span> <span class="n">running</span> <span class="n">state</span>
+                      <span class="p">(</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">_NONE</span><span class="p">,</span> <span class="n">_RUNNING</span><span class="p">)</span>
+                                <span class="o">|</span>
+                   <span class="n">migrate_init</span> <span class="n">spawns</span> <span class="n">migration_thread</span>
+              <span class="n">Migration</span> <span class="n">thread</span> <span class="n">then</span> <span class="n">calls</span> <span class="n">each</span> <span class="n">device</span><span class="s1">&#39;s .save_setup()</span>
+                  <span class="p">(</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">_SETUP</span><span class="p">,</span> <span class="n">_RUNNING</span><span class="o">|</span><span class="n">_SAVING</span><span class="p">)</span>
+                                <span class="o">|</span>
+                  <span class="p">(</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">_ACTIVE</span><span class="p">,</span> <span class="n">_RUNNING</span><span class="o">|</span><span class="n">_SAVING</span><span class="p">)</span>
+           <span class="n">If</span> <span class="n">device</span> <span class="ow">is</span> <span class="n">active</span><span class="p">,</span> <span class="n">get</span> <span class="n">pending_bytes</span> <span class="n">by</span> <span class="o">.</span><span class="n">save_live_pending</span><span class="p">()</span>
+        <span class="n">If</span> <span class="n">total</span> <span class="n">pending_bytes</span> <span class="o">&gt;=</span> <span class="n">threshold_size</span><span class="p">,</span> <span class="n">call</span> <span class="o">.</span><span class="n">save_live_iterate</span><span class="p">()</span>
+                <span class="n">Data</span> <span class="n">of</span> <span class="n">VFIO</span> <span class="n">device</span> <span class="k">for</span> <span class="n">pre</span><span class="o">-</span><span class="n">copy</span> <span class="n">phase</span> <span class="ow">is</span> <span class="n">copied</span>
+      <span class="n">Iterate</span> <span class="n">till</span> <span class="n">total</span> <span class="n">pending</span> <span class="nb">bytes</span> <span class="n">converge</span> <span class="ow">and</span> <span class="n">are</span> <span class="n">less</span> <span class="n">than</span> <span class="n">threshold</span>
+                                <span class="o">|</span>
+<span class="n">On</span> <span class="n">migration</span> <span class="n">completion</span><span class="p">,</span> <span class="n">vCPU</span> <span class="n">stops</span> <span class="ow">and</span> <span class="n">calls</span> <span class="o">.</span><span class="n">save_live_complete_precopy</span> <span class="k">for</span>
+ <span class="n">each</span> <span class="n">active</span> <span class="n">device</span><span class="o">.</span> <span class="n">The</span> <span class="n">VFIO</span> <span class="n">device</span> <span class="ow">is</span> <span class="n">then</span> <span class="n">transitioned</span> <span class="n">into</span> <span class="n">_SAVING</span> <span class="n">state</span>
+                 <span class="p">(</span><span class="n">FINISH_MIGRATE</span><span class="p">,</span> <span class="n">_DEVICE</span><span class="p">,</span> <span class="n">_SAVING</span><span class="p">)</span>
+                                <span class="o">|</span>
+   <span class="n">For</span> <span class="n">the</span> <span class="n">VFIO</span> <span class="n">device</span><span class="p">,</span> <span class="n">iterate</span> <span class="ow">in</span> <span class="o">.</span><span class="n">save_live_complete_precopy</span> <span class="n">until</span>
+                       <span class="n">pending</span> <span class="n">data</span> <span class="ow">is</span> <span class="mi">0</span>
+                 <span class="p">(</span><span class="n">FINISH_MIGRATE</span><span class="p">,</span> <span class="n">_DEVICE</span><span class="p">,</span> <span class="n">_STOPPED</span><span class="p">)</span>
+                                <span class="o">|</span>
+               <span class="p">(</span><span class="n">FINISH_MIGRATE</span><span class="p">,</span> <span class="n">_COMPLETED</span><span class="p">,</span> <span class="n">_STOPPED</span><span class="p">)</span>
+           <span class="n">Migraton</span> <span class="n">thread</span> <span class="n">schedules</span> <span class="n">cleanup</span> <span class="n">bottom</span> <span class="n">half</span> <span class="ow">and</span> <span class="n">exits</span>
+</pre></div>
+</div>
+</section>
+<section id="live-migration-resume-path">
+<h2>Live migration resume path<a class="headerlink" href="#live-migration-resume-path" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>          <span class="n">Incoming</span> <span class="n">migration</span> <span class="n">calls</span> <span class="o">.</span><span class="n">load_setup</span> <span class="k">for</span> <span class="n">each</span> <span class="n">device</span>
+                   <span class="p">(</span><span class="n">RESTORE_VM</span><span class="p">,</span> <span class="n">_ACTIVE</span><span class="p">,</span> <span class="n">_STOPPED</span><span class="p">)</span>
+                             <span class="o">|</span>
+   <span class="n">For</span> <span class="n">each</span> <span class="n">device</span><span class="p">,</span> <span class="o">.</span><span class="n">load_state</span> <span class="ow">is</span> <span class="n">called</span> <span class="k">for</span> <span class="n">that</span> <span class="n">device</span> <span class="n">section</span> <span class="n">data</span>
+                   <span class="p">(</span><span class="n">RESTORE_VM</span><span class="p">,</span> <span class="n">_ACTIVE</span><span class="p">,</span> <span class="n">_RESUMING</span><span class="p">)</span>
+                             <span class="o">|</span>
+<span class="n">At</span> <span class="n">the</span> <span class="n">end</span><span class="p">,</span> <span class="o">.</span><span class="n">load_cleanup</span> <span class="ow">is</span> <span class="n">called</span> <span class="k">for</span> <span class="n">each</span> <span class="n">device</span> <span class="ow">and</span> <span class="n">vCPUs</span> <span class="n">are</span> <span class="n">started</span>
+                   <span class="p">(</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">_NONE</span><span class="p">,</span> <span class="n">_RUNNING</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="postcopy">
+<h3>Postcopy<a class="headerlink" href="#postcopy" title="Permalink to this heading"></a></h3>
+<p>Postcopy migration is currently not supported for VFIO devices.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tracing.html" class="btn btn-neutral float-left" title="Tracing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="writing-monitor-commands.html" class="btn btn-neutral float-right" title="How to write monitor commands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

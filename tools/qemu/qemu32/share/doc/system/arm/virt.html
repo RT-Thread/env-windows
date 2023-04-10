@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>‘virt’ generic virtual platform (virt) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Xilinx Versal Virt (xlnx-versal-virt)" href="xlnx-versal-virt.html" />
+    <link rel="prev" title="STMicroelectronics STM32 boards (netduino2, netduinoplus2, stm32vldiscovery)" href="stm32.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">‘virt’ generic virtual platform (<code class="docutils literal notranslate"><span class="pre">virt</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/virt.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="virt-generic-virtual-platform-virt">
+<h1>‘virt’ generic virtual platform (<code class="docutils literal notranslate"><span class="pre">virt</span></code>)<a class="headerlink" href="#virt-generic-virtual-platform-virt" title="Permalink to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">virt</span></code> board is a platform which does not correspond to any
+real hardware; it is designed for use in virtual machines.
+It is the recommended board type if you simply want to run
+a guest such as Linux and do not care about reproducing the
+idiosyncrasies and limitations of a particular bit of real-world
+hardware.</p>
+<p>This is a “versioned” board model, so as well as the <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine
+type itself (which may have improvements, bugfixes and other minor
+changes between QEMU versions) a version is provided that guarantees
+to have the same behaviour as that of previous QEMU releases, so
+that VM migration will work between QEMU versions. For instance the
+<code class="docutils literal notranslate"><span class="pre">virt-5.0</span></code> machine type will behave like the <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine from
+the QEMU 5.0 release, and migration should work between <code class="docutils literal notranslate"><span class="pre">virt-5.0</span></code>
+of the 5.0 release and <code class="docutils literal notranslate"><span class="pre">virt-5.0</span></code> of the 5.1 release. Migration
+is not guaranteed to work between different QEMU releases for
+the non-versioned <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine type.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<p>The virt board supports:</p>
+<ul class="simple">
+<li><p>PCI/PCIe devices</p></li>
+<li><p>Flash memory</p></li>
+<li><p>One PL011 UART</p></li>
+<li><p>An RTC</p></li>
+<li><p>The fw_cfg device that allows a guest to obtain data from QEMU</p></li>
+<li><p>A PL061 GPIO controller</p></li>
+<li><p>An optional SMMUv3 IOMMU</p></li>
+<li><p>hotpluggable DIMMs</p></li>
+<li><p>hotpluggable NVDIMMs</p></li>
+<li><p>An MSI controller (GICv2M or ITS). GICv2M is selected by default along
+with GICv2. ITS is selected by default with GICv3 (&gt;= virt-2.7). Note
+that ITS is not modeled in TCG mode.</p></li>
+<li><p>32 virtio-mmio transport devices</p></li>
+<li><p>running guests using the KVM accelerator on aarch64 hardware</p></li>
+<li><p>large amounts of RAM (at least 255GB, and more if using highmem)</p></li>
+<li><p>many CPUs (up to 512 if using a GICv3 and highmem)</p></li>
+<li><p>Secure-World-only devices if the CPU has TrustZone:</p>
+<ul>
+<li><p>A second PL011 UART</p></li>
+<li><p>A second PL061 GPIO controller, with GPIO lines for triggering
+a system reset or system poweroff</p></li>
+<li><p>A secure flash memory</p></li>
+<li><p>16MB of secure RAM</p></li>
+</ul>
+</li>
+</ul>
+<p>Supported guest CPU types:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a7</span></code> (32-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a15</span></code> (32-bit; the default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a35</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a53</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a57</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a72</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cortex-a76</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">a64fx</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">host</span></code> (with KVM only)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neoverse-n1</span></code> (64-bit)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code> (same as <code class="docutils literal notranslate"><span class="pre">host</span></code> for KVM; best possible emulation with TCG)</p></li>
+</ul>
+<p>Note that the default is <code class="docutils literal notranslate"><span class="pre">cortex-a15</span></code>, so for an AArch64 guest you must
+specify a CPU type.</p>
+<p>Graphics output is available, but unlike the x86 PC machine types
+there is no default display device enabled: you should select one from
+the Display devices section of “-device help”. The recommended option
+is <code class="docutils literal notranslate"><span class="pre">virtio-gpu-pci</span></code>; this is the only one which will work correctly
+with KVM. You may also need to ensure your guest kernel is configured
+with support for this; see below.</p>
+</section>
+<section id="machine-specific-options">
+<h2>Machine-specific options<a class="headerlink" href="#machine-specific-options" title="Permalink to this heading"></a></h2>
+<p>The following machine-specific options are supported:</p>
+<dl>
+<dt>secure</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable emulating a guest CPU which implements the
+Arm Security Extensions (TrustZone). The default is <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</dd>
+<dt>virtualization</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable emulating a guest CPU which implements the
+Arm Virtualization Extensions. The default is <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</dd>
+<dt>mte</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable emulating a guest CPU which implements the
+Arm Memory Tagging Extensions. The default is <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</dd>
+<dt>highmem</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable placing devices and RAM in physical
+address space above 32 bits. The default is <code class="docutils literal notranslate"><span class="pre">on</span></code> for machine types
+later than <code class="docutils literal notranslate"><span class="pre">virt-2.12</span></code>.</p>
+</dd>
+<dt>gic-version</dt><dd><p>Specify the version of the Generic Interrupt Controller (GIC) to provide.
+Valid values are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">2</span></code></dt><dd><p>GICv2. Note that this limits the number of CPUs to 8.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">3</span></code></dt><dd><p>GICv3. This allows up to 512 CPUs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">4</span></code></dt><dd><p>GICv4. Requires <code class="docutils literal notranslate"><span class="pre">virtualization</span></code> to be <code class="docutils literal notranslate"><span class="pre">on</span></code>; allows up to 317 CPUs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">host</span></code></dt><dd><p>Use the same GIC version the host provides, when using KVM</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">max</span></code></dt><dd><p>Use the best GIC version possible (same as host when using KVM;
+with TCG this is currently <code class="docutils literal notranslate"><span class="pre">3</span></code> if <code class="docutils literal notranslate"><span class="pre">virtualization</span></code> is <code class="docutils literal notranslate"><span class="pre">off</span></code> and
+<code class="docutils literal notranslate"><span class="pre">4</span></code> if <code class="docutils literal notranslate"><span class="pre">virtualization</span></code> is <code class="docutils literal notranslate"><span class="pre">on</span></code>, but this may change in future)</p>
+</dd>
+</dl>
+</dd>
+<dt>its</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable ITS instantiation. The default is <code class="docutils literal notranslate"><span class="pre">on</span></code>
+for machine types later than <code class="docutils literal notranslate"><span class="pre">virt-2.7</span></code>.</p>
+</dd>
+<dt>iommu</dt><dd><p>Set the IOMMU type to create for the guest. Valid values are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">none</span></code></dt><dd><p>Don’t create an IOMMU (the default)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">smmuv3</span></code></dt><dd><p>Create an SMMUv3</p>
+</dd>
+</dl>
+</dd>
+<dt>ras</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to enable/disable reporting host memory errors to a guest
+using ACPI and guest external abort exceptions. The default is off.</p>
+</dd>
+<dt>dtb-randomness</dt><dd><p>Set <code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> to pass random seeds via the guest DTB
+rng-seed and kaslr-seed nodes (in both “/chosen” and
+“/secure-chosen”) to use for features like the random number
+generator and address space randomisation. The default is
+<code class="docutils literal notranslate"><span class="pre">on</span></code>. You will want to disable it if your trusted boot chain
+will verify the DTB it is passed, since this option causes the
+DTB to be non-deterministic. It would be the responsibility of
+the firmware to come up with a seed and pass it on if it wants to.</p>
+</dd>
+<dt>dtb-kaslr-seed</dt><dd><p>A deprecated synonym for dtb-randomness.</p>
+</dd>
+</dl>
+</section>
+<section id="linux-guest-kernel-configuration">
+<h2>Linux guest kernel configuration<a class="headerlink" href="#linux-guest-kernel-configuration" title="Permalink to this heading"></a></h2>
+<p>The ‘defconfig’ for Linux arm and arm64 kernels should include the
+right device drivers for virtio and the PCI controller; however some older
+kernel versions, especially for 32-bit Arm, did not have everything
+enabled by default. If you’re not seeing PCI devices that you expect,
+then check that your guest config has:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONFIG_PCI</span><span class="o">=</span><span class="n">y</span>
+<span class="n">CONFIG_VIRTIO_PCI</span><span class="o">=</span><span class="n">y</span>
+<span class="n">CONFIG_PCI_HOST_GENERIC</span><span class="o">=</span><span class="n">y</span>
+</pre></div>
+</div>
+<p>If you want to use the <code class="docutils literal notranslate"><span class="pre">virtio-gpu-pci</span></code> graphics device you will also
+need:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONFIG_DRM</span><span class="o">=</span><span class="n">y</span>
+<span class="n">CONFIG_DRM_VIRTIO_GPU</span><span class="o">=</span><span class="n">y</span>
+</pre></div>
+</div>
+</section>
+<section id="hardware-configuration-information-for-bare-metal-programming">
+<h2>Hardware configuration information for bare-metal programming<a class="headerlink" href="#hardware-configuration-information-for-bare-metal-programming" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">virt</span></code> board automatically generates a device tree blob (“dtb”)
+which it passes to the guest. This provides information about the
+addresses, interrupt lines and other configuration of the various devices
+in the system. Guest code can rely on and hard-code the following
+addresses:</p>
+<ul class="simple">
+<li><p>Flash memory starts at address 0x0000_0000</p></li>
+<li><p>RAM starts at 0x4000_0000</p></li>
+</ul>
+<p>All other information about device locations may change between
+QEMU versions, so guest code must look in the DTB.</p>
+<p>QEMU supports two types of guest image boot for <code class="docutils literal notranslate"><span class="pre">virt</span></code>, and
+the way for the guest code to locate the dtb binary differs:</p>
+<ul class="simple">
+<li><p>For guests using the Linux kernel boot protocol (this means any
+non-ELF file passed to the QEMU <code class="docutils literal notranslate"><span class="pre">-kernel</span></code> option) the address
+of the DTB is passed in a register (<code class="docutils literal notranslate"><span class="pre">r2</span></code> for 32-bit guests,
+or <code class="docutils literal notranslate"><span class="pre">x0</span></code> for 64-bit guests)</p></li>
+<li><p>For guests booting as “bare-metal” (any other kind of boot),
+the DTB is at the start of RAM (0x4000_0000)</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stm32.html" class="btn btn-neutral float-left" title="STMicroelectronics STM32 boards (netduino2, netduinoplus2, stm32vldiscovery)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xlnx-versal-virt.html" class="btn btn-neutral float-right" title="Xilinx Versal Virt (xlnx-versal-virt)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

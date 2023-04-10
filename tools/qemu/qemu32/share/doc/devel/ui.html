@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU UI subsystem &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Internal Subsystem Information" href="index-internals.html" />
+    <link rel="prev" title="QEMU modules" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="bitops.html">Bitwise operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="loads-stores.html">Load and Store APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="memory.html">The memory API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html">QEMU modules</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">QEMU UI subsystem</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-clipboard">QEMU Clipboard</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-api.html">Internal QEMU APIs</a></li>
+      <li class="breadcrumb-item active">QEMU UI subsystem</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/ui.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-ui-subsystem">
+<h1>QEMU UI subsystem<a class="headerlink" href="#qemu-ui-subsystem" title="Permalink to this heading"></a></h1>
+<section id="qemu-clipboard">
+<h2>QEMU Clipboard<a class="headerlink" href="#qemu-clipboard" title="Permalink to this heading"></a></h2>
+<p><strong>Introduction</strong></p>
+<p>The header <code class="docutils literal notranslate"><span class="pre">ui/clipboard.h</span></code> declares the qemu clipboard interface.</p>
+<p>All qemu elements which want use the clipboard can register as
+clipboard peer.  Subsequently they can set the clipboard content
+and get notifications for clipboard updates.</p>
+<p>Typical users are user interfaces (gtk), remote access protocols
+(vnc) and devices talking to the guest (vdagent).</p>
+<p>Even though the design allows different data types only plain text
+is supported for now.</p>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.QemuClipboardType">
+<span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardType</span></span></span><a class="headerlink" href="#c.QemuClipboardType" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Constants</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_TYPE_TEXT</span></code></dt><dd><p>text/plain; charset=utf-8</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_TYPE__COUNT</span></code></dt><dd><p>type count.</p>
+</dd>
+</dl>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.QemuClipboardSelection">
+<span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardSelection</span></span></span><a class="headerlink" href="#c.QemuClipboardSelection" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Constants</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_SELECTION_CLIPBOARD</span></code></dt><dd><p>clipboard (explitcit cut+paste).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_SELECTION_PRIMARY</span></code></dt><dd><p>primary selection (select + middle mouse button).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_SELECTION_SECONDARY</span></code></dt><dd><p>secondary selection (dunno).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_SELECTION__COUNT</span></code></dt><dd><p>selection count.</p>
+</dd>
+</dl>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QemuClipboardPeer">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardPeer</span></span></span><a class="headerlink" href="#c.QemuClipboardPeer" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QemuClipboardPeer</span> <span class="p">{</span>
+  <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
+  <span class="n">Notifier</span> <span class="n">notifier</span><span class="p">;</span>
+  <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">request</span><span class="p">)(</span><span class="n">QemuClipboardInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">,</span> <span class="n">QemuClipboardType</span> <span class="nb">type</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt><dd><p>peer name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">notifier</span></code></dt><dd><p>notifier for clipboard updates.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">request</span></code></dt><dd><p>callback for clipboard data requests.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Clipboard peer description.</p>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.QemuClipboardNotifyType">
+<span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardNotifyType</span></span></span><a class="headerlink" href="#c.QemuClipboardNotifyType" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Constants</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_UPDATE_INFO</span></code></dt><dd><p>clipboard info update</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QEMU_CLIPBOARD_RESET_SERIAL</span></code></dt><dd><p>reset clipboard serial</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Clipboard notify type.</p>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QemuClipboardNotify">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardNotify</span></span></span><a class="headerlink" href="#c.QemuClipboardNotify" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QemuClipboardNotify</span> <span class="p">{</span>
+  <span class="n">QemuClipboardNotifyType</span> <span class="nb">type</span><span class="p">;</span>
+  <span class="n">union</span> <span class="p">{</span>
+    <span class="n">QemuClipboardInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt><dd><p>the type of event.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{unnamed_union}</span></code></dt><dd><p>anonymous</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">info</span></code></dt><dd><p>a QemuClipboardInfo event.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Clipboard notify data.</p>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QemuClipboardInfo">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QemuClipboardInfo</span></span></span><a class="headerlink" href="#c.QemuClipboardInfo" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QemuClipboardInfo</span> <span class="p">{</span>
+  <span class="n">uint32_t</span> <span class="n">refcount</span><span class="p">;</span>
+  <span class="n">QemuClipboardPeer</span> <span class="o">*</span><span class="n">owner</span><span class="p">;</span>
+  <span class="n">QemuClipboardSelection</span> <span class="n">selection</span><span class="p">;</span>
+  <span class="nb">bool</span> <span class="n">has_serial</span><span class="p">;</span>
+  <span class="n">uint32_t</span> <span class="n">serial</span><span class="p">;</span>
+  <span class="n">struct</span> <span class="p">{</span>
+    <span class="nb">bool</span> <span class="n">available</span><span class="p">;</span>
+    <span class="nb">bool</span> <span class="n">requested</span><span class="p">;</span>
+    <span class="n">size_t</span> <span class="n">size</span><span class="p">;</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+  <span class="p">}</span> <span class="n">types</span><span class="p">[</span><span class="n">QEMU_CLIPBOARD_TYPE__COUNT</span><span class="p">];</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">refcount</span></code></dt><dd><p>reference counter.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">owner</span></code></dt><dd><p>clipboard owner.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">selection</span></code></dt><dd><p>clipboard selection.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">has_serial</span></code></dt><dd><p>whether <strong>serial</strong> is available.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">serial</span></code></dt><dd><p>the grab serial counter.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">types</span></code></dt><dd><p>clipboard data array (one entry per type).</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Clipboard content data and metadata.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_peer_register">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_peer_register</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">peer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_peer_register" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*peer</span></code></dt><dd><p>peer information.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Register clipboard peer.  Registering is needed for both active
+(set+grab clipboard) and passive (watch clipboard for updates)
+interaction with the qemu clipboard.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_peer_unregister">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_peer_unregister</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">peer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_peer_unregister" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*peer</span></code></dt><dd><p>peer information.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Unregister clipboard peer.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_peer_owns">
+<span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_peer_owns</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">peer</span></span>, <a class="reference internal" href="#c.QemuClipboardSelection" title="QemuClipboardSelection"><span class="n"><span class="pre">QemuClipboardSelection</span></span></a><span class="w"> </span><span class="n"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_peer_owns" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*peer</span></code></dt><dd><p>peer information.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardSelection</span> <span class="pre">selection</span></code></dt><dd><p>clipboard selection.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Return TRUE if the peer owns the clipboard.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_peer_release">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_peer_release</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">peer</span></span>, <a class="reference internal" href="#c.QemuClipboardSelection" title="QemuClipboardSelection"><span class="n"><span class="pre">QemuClipboardSelection</span></span></a><span class="w"> </span><span class="n"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_peer_release" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*peer</span></code></dt><dd><p>peer information.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardSelection</span> <span class="pre">selection</span></code></dt><dd><p>clipboard selection.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>If the peer owns the clipboard, release it.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_info">
+<a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_info</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardSelection" title="QemuClipboardSelection"><span class="n"><span class="pre">QemuClipboardSelection</span></span></a><span class="w"> </span><span class="n"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_info" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardSelection</span> <span class="pre">selection</span></code></dt><dd><p>clipboard selection.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Return the current clipboard data &amp; owner informations.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_check_serial">
+<span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_check_serial</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n"><span class="pre">client</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_check_serial" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">client</span></code></dt><dd><p>whether to check from the client context and priority.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Return TRUE if the <strong>info</strong> has a higher serial than the current clipboard.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_info_new">
+<a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_info_new</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">owner</span></span>, <a class="reference internal" href="#c.QemuClipboardSelection" title="QemuClipboardSelection"><span class="n"><span class="pre">QemuClipboardSelection</span></span></a><span class="w"> </span><span class="n"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_info_new" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*owner</span></code></dt><dd><p>clipboard owner.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardSelection</span> <span class="pre">selection</span></code></dt><dd><p>clipboard selection.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Allocate a new QemuClipboardInfo and initialize it with the given
+<strong>owner</strong> and <strong>selection</strong>.</p>
+<p>QemuClipboardInfo is a reference-counted struct.  The new struct is
+returned with a reference already taken (i.e. reference count is
+one).</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_info_ref">
+<a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_info_ref</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_info_ref" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Increase <strong>info</strong> reference count.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_info_unref">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_info_unref</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_info_unref" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Decrease <strong>info</strong> reference count.  When the count goes down to zero
+free the <strong>info</strong> struct itself and all clipboard data.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_update</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_update" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Update the qemu clipboard.  Notify all registered peers (including
+the clipboard owner) that the qemu clipboard has been updated.</p>
+<p>This is used for both new completely clipboard content and for
+clipboard data updates in response to qemu_clipboard_request()
+calls.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_reset_serial">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_reset_serial</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_reset_serial" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Reset the clipboard serial.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_request">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_request</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span>, <a class="reference internal" href="#c.QemuClipboardType" title="QemuClipboardType"><span class="n"><span class="pre">QemuClipboardType</span></span></a><span class="w"> </span><span class="n"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_request" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardType</span> <span class="pre">type</span></code></dt><dd><p>clipboard data type.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Request clipboard content.  Typically the clipboard owner only
+advertises the available data types and provides the actual data
+only on request.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_clipboard_set_data">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_clipboard_set_data</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QemuClipboardPeer" title="QemuClipboardPeer"><span class="n"><span class="pre">QemuClipboardPeer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">peer</span></span>, <a class="reference internal" href="#c.QemuClipboardInfo" title="QemuClipboardInfo"><span class="n"><span class="pre">QemuClipboardInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">info</span></span>, <a class="reference internal" href="#c.QemuClipboardType" title="QemuClipboardType"><span class="n"><span class="pre">QemuClipboardType</span></span></a><span class="w"> </span><span class="n"><span class="pre">type</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n"><span class="pre">update</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_clipboard_set_data" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardPeer</span> <span class="pre">*peer</span></code></dt><dd><p>clipboard peer.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardInfo</span> <span class="pre">*info</span></code></dt><dd><p>clipboard info.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QemuClipboardType</span> <span class="pre">type</span></code></dt><dd><p>clipboard data type.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">size</span></code></dt><dd><p>data size.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">void</span> <span class="pre">*data</span></code></dt><dd><p>data blob.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">update</span></code></dt><dd><p>notify peers about the update.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Set clipboard content for the given <strong>type</strong>.  This function will make
+a copy of the content data and store that.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="QEMU modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index-internals.html" class="btn btn-neutral float-right" title="Internal Subsystem Information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barrier client protocol &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dirty Bitmaps and Incremental Backup" href="bitmaps.html" />
+    <link rel="prev" title="System Emulation Management and Interoperability" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Barrier client protocol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#message-format">Message format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#protocol-description">Protocol Description</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdhello-barrier">barrierCmdHello  “Barrier”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdhelloback-barrier">barrierCmdHelloBack  “Barrier”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddinfo-dinf">barrierCmdDInfo  “DINF”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcnoop-cnop">barrierCmdCNoop  “CNOP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcclose-cbye">barrierCmdCClose “CBYE”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcenter-cinn">barrierCmdCEnter “CINN”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcleave-cout">barrierCmdCLeave “COUT”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcclipboard-cclp">barrierCmdCClipboard “CCLP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcscreensaver-csec">barrierCmdCScreenSaver   “CSEC”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcresetoptions-crop">barrierCmdCResetOptions  “CROP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdcinfoack-ciak">barrierCmdCInfoAck   “CIAK”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdckeepalive-calv">barrierCmdCKeepAlive “CALV”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddkeydown-dkdn">barrierCmdDKeyDown   “DKDN”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddkeyrepeat-dkrp">barrierCmdDKeyRepeat “DKRP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddkeyup-dkup">barrierCmdDKeyUp “DKUP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddmousedown-dmdn">barrierCmdDMouseDown “DMDN”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddmouseup-dmup">barrierCmdDMouseUp   “DMUP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddmousemove-dmmv">barrierCmdDMouseMove “DMMV”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddmouserelmove-dmrm">barrierCmdDMouseRelMove  “DMRM”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddmousewheel-dmwm">barrierCmdDMouseWheel “DMWM”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddclipboard-dclp">barrierCmdDClipboard “DCLP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddsetoptions-dsop">barrierCmdDSetOptions “DSOP”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmddfiletransfer-dftr">barrierCmdDFileTransfer “DFTR”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdddraginfo-ddrg">barrierCmdDDragInfo  “DDRG”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdqinfo-qinf">barrierCmdQInfo  “QINF”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdeincompatible-eicv">barrierCmdEIncompatible  “EICV”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdebusy-ebsy">barrierCmdEBusy  “EBSY”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdeunknown-eunk">barrierCmdEUnknown   “EUNK”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barriercmdebad-ebad">barrierCmdEBad   “EBAD”</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">Barrier client protocol</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/barrier.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="barrier-client-protocol">
+<h1>Barrier client protocol<a class="headerlink" href="#barrier-client-protocol" title="Permalink to this heading"></a></h1>
+<p>QEMU’s <code class="docutils literal notranslate"><span class="pre">input-barrier</span></code> device implements the client end of
+the KVM (Keyboard-Video-Mouse) software
+<a class="reference external" href="https://github.com/debauchee/barrier">Barrier</a>.</p>
+<p>This document briefly describes the protocol as we implement it.</p>
+<section id="message-format">
+<h2>Message format<a class="headerlink" href="#message-format" title="Permalink to this heading"></a></h2>
+<p>Message format between the server and client is in two parts:</p>
+<ol class="arabic simple">
+<li><p>the payload length, a 32bit integer in network endianness</p></li>
+<li><p>the payload</p></li>
+</ol>
+<p>The payload starts with a 4byte string (without NUL) which is the
+command. The first command between the server and the client
+is the only command not encoded on 4 bytes (“Barrier”).
+The remaining part of the payload is decoded according to the command.</p>
+</section>
+<section id="protocol-description">
+<h2>Protocol Description<a class="headerlink" href="#protocol-description" title="Permalink to this heading"></a></h2>
+<p>This comes from <code class="docutils literal notranslate"><span class="pre">barrier/src/lib/barrier/protocol_types.h</span></code>.</p>
+<section id="barriercmdhello-barrier">
+<h3>barrierCmdHello  “Barrier”<a class="headerlink" href="#barriercmdhello-barrier" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">minor,</span> <span class="pre">int16_t</span> <span class="pre">major</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Say hello to client</p>
+<p><code class="docutils literal notranslate"><span class="pre">minor</span></code> = protocol major version number supported by server</p>
+<p><code class="docutils literal notranslate"><span class="pre">major</span></code> = protocol minor version number supported by server</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdhelloback-barrier">
+<h3>barrierCmdHelloBack  “Barrier”<a class="headerlink" href="#barriercmdhelloback-barrier" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>client -&gt;server</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">minor,</span> <span class="pre">int16_t</span> <span class="pre">major,</span> <span class="pre">char</span> <span class="pre">*name}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Respond to hello from server</p>
+<p><code class="docutils literal notranslate"><span class="pre">minor</span></code> = protocol major version number supported by client</p>
+<p><code class="docutils literal notranslate"><span class="pre">major</span></code> = protocol minor version number supported by client</p>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code>  = client name</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddinfo-dinf">
+<h3>barrierCmdDInfo  “DINF”<a class="headerlink" href="#barriercmddinfo-dinf" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>client -&gt;server</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">x_origin,</span> <span class="pre">int16_t</span> <span class="pre">y_origin,</span> <span class="pre">int16_t</span> <span class="pre">width,</span> <span class="pre">int16_t</span> <span class="pre">height,</span> <span class="pre">int16_t</span> <span class="pre">x,</span> <span class="pre">int16_t</span> <span class="pre">y}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>The client screen must send this message in response to the
+barrierCmdQInfo message.  It must also send this message when the
+screen’s resolution changes.  In this case, the client screen should
+ignore any barrierCmdDMouseMove messages until it receives a
+barrierCmdCInfoAck in order to prevent attempts to move the mouse off
+the new screen area.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcnoop-cnop">
+<h3>barrierCmdCNoop  “CNOP”<a class="headerlink" href="#barriercmdcnoop-cnop" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>client -&gt; server</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>No operation</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcclose-cbye">
+<h3>barrierCmdCClose “CBYE”<a class="headerlink" href="#barriercmdcclose-cbye" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Close connection</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcenter-cinn">
+<h3>barrierCmdCEnter “CINN”<a class="headerlink" href="#barriercmdcenter-cinn" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">x,</span> <span class="pre">int16_t</span> <span class="pre">y,</span> <span class="pre">int32_t</span> <span class="pre">seq,</span> <span class="pre">int16_t</span> <span class="pre">modifier</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Enter screen.</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>  = entering screen absolute coordinates</p>
+<p><code class="docutils literal notranslate"><span class="pre">seq</span></code>  = sequence number, which is used to order messages between
+screens.  the secondary screen must return this number
+with some messages</p>
+<p><code class="docutils literal notranslate"><span class="pre">modifier</span></code> = modifier key mask.  this will have bits set for each
+toggle modifier key that is activated on entry to the
+screen.  the secondary screen should adjust its toggle
+modifiers to reflect that state.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcleave-cout">
+<h3>barrierCmdCLeave “COUT”<a class="headerlink" href="#barriercmdcleave-cout" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Leaving screen.  the secondary screen should send clipboard data in
+response to this message for those clipboards that it has grabbed
+(i.e. has sent a barrierCmdCClipboard for and has not received a
+barrierCmdCClipboard for with a greater sequence number) and that
+were grabbed or have changed since the last leave.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcclipboard-cclp">
+<h3>barrierCmdCClipboard “CCLP”<a class="headerlink" href="#barriercmdcclipboard-cclp" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">id,</span> <span class="pre">int32_t</span> <span class="pre">seq</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Grab clipboard. Sent by screen when some other app on that screen
+grabs a clipboard.</p>
+<p><code class="docutils literal notranslate"><span class="pre">id</span></code>  = the clipboard identifier</p>
+<p><code class="docutils literal notranslate"><span class="pre">seq</span></code> = sequence number. Client must use the sequence number passed in
+the most recent barrierCmdCEnter.  the server always sends 0.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcscreensaver-csec">
+<h3>barrierCmdCScreenSaver   “CSEC”<a class="headerlink" href="#barriercmdcscreensaver-csec" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">started</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Screensaver change.</p>
+<p><code class="docutils literal notranslate"><span class="pre">started</span></code> = Screensaver on primary has started (1) or closed (0)</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcresetoptions-crop">
+<h3>barrierCmdCResetOptions  “CROP”<a class="headerlink" href="#barriercmdcresetoptions-crop" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Reset options. Client should reset all of its options to their
+defaults.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdcinfoack-ciak">
+<h3>barrierCmdCInfoAck   “CIAK”<a class="headerlink" href="#barriercmdcinfoack-ciak" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Resolution change acknowledgment. Sent by server in response to a
+client screen’s barrierCmdDInfo. This is sent for every
+barrierCmdDInfo, whether or not the server had sent a barrierCmdQInfo.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdckeepalive-calv">
+<h3>barrierCmdCKeepAlive “CALV”<a class="headerlink" href="#barriercmdckeepalive-calv" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Keep connection alive. Sent by the server periodically to verify
+that connections are still up and running.  clients must reply in
+kind on receipt.  if the server gets an error sending the message or
+does not receive a reply within a reasonable time then the server
+disconnects the client.  if the client doesn’t receive these (or any
+message) periodically then it should disconnect from the server.  the
+appropriate interval is defined by an option.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddkeydown-dkdn">
+<h3>barrierCmdDKeyDown   “DKDN”<a class="headerlink" href="#barriercmddkeydown-dkdn" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">keyid,</span> <span class="pre">int16_t</span> <span class="pre">modifier</span> <span class="pre">[,int16_t</span> <span class="pre">button]</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Key pressed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">keyid</span></code> = X11 key id</p>
+<p><code class="docutils literal notranslate"><span class="pre">modified</span></code> = modified mask</p>
+<p><code class="docutils literal notranslate"><span class="pre">button</span></code> = X11 Xkb keycode (optional)</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddkeyrepeat-dkrp">
+<h3>barrierCmdDKeyRepeat “DKRP”<a class="headerlink" href="#barriercmddkeyrepeat-dkrp" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">keyid,</span> <span class="pre">int16_t</span> <span class="pre">modifier,</span> <span class="pre">int16_t</span> <span class="pre">repeat</span> <span class="pre">[,int16_t</span> <span class="pre">button]</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Key auto-repeat.</p>
+<p><code class="docutils literal notranslate"><span class="pre">keyid</span></code> = X11 key id</p>
+<p><code class="docutils literal notranslate"><span class="pre">modified</span></code> = modified mask</p>
+<p><code class="docutils literal notranslate"><span class="pre">repeat</span></code>   = number of repeats</p>
+<p><code class="docutils literal notranslate"><span class="pre">button</span></code>   = X11 Xkb keycode (optional)</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddkeyup-dkup">
+<h3>barrierCmdDKeyUp “DKUP”<a class="headerlink" href="#barriercmddkeyup-dkup" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">keyid,</span> <span class="pre">int16_t</span> <span class="pre">modifier</span> <span class="pre">[,int16_t</span> <span class="pre">button]</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Key released.</p>
+<p><code class="docutils literal notranslate"><span class="pre">keyid</span></code> = X11 key id</p>
+<p><code class="docutils literal notranslate"><span class="pre">modified</span></code> = modified mask</p>
+<p><code class="docutils literal notranslate"><span class="pre">button</span></code> = X11 Xkb keycode (optional)</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddmousedown-dmdn">
+<h3>barrierCmdDMouseDown “DMDN”<a class="headerlink" href="#barriercmddmousedown-dmdn" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">button</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Mouse button pressed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">button</span></code> = button id</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddmouseup-dmup">
+<h3>barrierCmdDMouseUp   “DMUP”<a class="headerlink" href="#barriercmddmouseup-dmup" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">button</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Mouse button release.</p>
+<p><code class="docutils literal notranslate"><span class="pre">button</span></code> = button id</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddmousemove-dmmv">
+<h3>barrierCmdDMouseMove “DMMV”<a class="headerlink" href="#barriercmddmousemove-dmmv" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">x,</span> <span class="pre">int16_t</span> <span class="pre">y</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Absolute mouse moved.</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> = absolute screen coordinates</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddmouserelmove-dmrm">
+<h3>barrierCmdDMouseRelMove  “DMRM”<a class="headerlink" href="#barriercmddmouserelmove-dmrm" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">x,</span> <span class="pre">int16_t</span> <span class="pre">y</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Relative mouse moved.</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> = r relative screen coordinates</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddmousewheel-dmwm">
+<h3>barrierCmdDMouseWheel “DMWM”<a class="headerlink" href="#barriercmddmousewheel-dmwm" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">x</span> <span class="pre">,</span> <span class="pre">int16_t</span> <span class="pre">y</span> <span class="pre">}</span></code> or <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">y</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Mouse scroll. The delta should be +120 for one tick forward (away
+from the user) or right and -120 for one tick backward (toward the
+user) or left.</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code> = x delta</p>
+<p><code class="docutils literal notranslate"><span class="pre">y</span></code> = y delta</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddclipboard-dclp">
+<h3>barrierCmdDClipboard “DCLP”<a class="headerlink" href="#barriercmddclipboard-dclp" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">id,</span> <span class="pre">int32_t</span> <span class="pre">seq,</span> <span class="pre">int8_t</span> <span class="pre">mark,</span> <span class="pre">char</span> <span class="pre">*data</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Clipboard data.</p>
+<p><code class="docutils literal notranslate"><span class="pre">id</span></code>  = clipboard id</p>
+<p><code class="docutils literal notranslate"><span class="pre">seq</span></code> = sequence number. The sequence number is 0 when sent by the
+server.  Client screens should use the/ sequence number from
+the most recent barrierCmdCEnter.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddsetoptions-dsop">
+<h3>barrierCmdDSetOptions “DSOP”<a class="headerlink" href="#barriercmddsetoptions-dsop" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int32</span> <span class="pre">t</span> <span class="pre">nb,</span> <span class="pre">{</span> <span class="pre">int32_t</span> <span class="pre">id,</span> <span class="pre">int32_t</span> <span class="pre">val</span> <span class="pre">}[]</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Set options. Client should set the given option/value pairs.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nb</span></code>  = numbers of <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">id,</span> <span class="pre">val</span> <span class="pre">}</span></code> entries</p>
+<p><code class="docutils literal notranslate"><span class="pre">id</span></code>  = option id</p>
+<p><code class="docutils literal notranslate"><span class="pre">val</span></code> = option new value</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmddfiletransfer-dftr">
+<h3>barrierCmdDFileTransfer “DFTR”<a class="headerlink" href="#barriercmddfiletransfer-dftr" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int8_t</span> <span class="pre">mark,</span> <span class="pre">char</span> <span class="pre">*content</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Transfer file data.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mark</span></code> = 0 means the content followed is the file size</p></li>
+<li><p>1 means the content followed is the chunk data</p></li>
+<li><p>2 means the file transfer is finished</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="barriercmdddraginfo-ddrg">
+<h3>barrierCmdDDragInfo  “DDRG”<a class="headerlink" href="#barriercmdddraginfo-ddrg" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">nb,</span> <span class="pre">char</span> <span class="pre">*content</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Drag information.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nb</span></code>  = number of dragging objects</p>
+<p><code class="docutils literal notranslate"><span class="pre">content</span></code> = object’s directory</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdqinfo-qinf">
+<h3>barrierCmdQInfo  “QINF”<a class="headerlink" href="#barriercmdqinfo-qinf" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Query screen info</p>
+<p>Client should reply with a barrierCmdDInfo</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdeincompatible-eicv">
+<h3>barrierCmdEIncompatible  “EICV”<a class="headerlink" href="#barriercmdeincompatible-eicv" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">int16_t</span> <span class="pre">nb,</span> <span class="pre">major</span> <span class="pre">*minor</span> <span class="pre">}</span></code></p>
+</dd>
+<dt>Description:</dt><dd><p>Incompatible version.</p>
+<p><code class="docutils literal notranslate"><span class="pre">major</span></code> = major version</p>
+<p><code class="docutils literal notranslate"><span class="pre">minor</span></code> = minor version</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdebusy-ebsy">
+<h3>barrierCmdEBusy  “EBSY”<a class="headerlink" href="#barriercmdebusy-ebsy" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Name provided when connecting is already in use.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdeunknown-eunk">
+<h3>barrierCmdEUnknown   “EUNK”<a class="headerlink" href="#barriercmdeunknown-eunk" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Unknown client. Name provided when connecting is not in primary’s
+screen configuration map.</p>
+</dd>
+</dl>
+</section>
+<section id="barriercmdebad-ebad">
+<h3>barrierCmdEBad   “EBAD”<a class="headerlink" href="#barriercmdebad-ebad" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>Direction:</dt><dd><p>server -&gt; client</p>
+</dd>
+<dt>Parameters:</dt><dd><p>None</p>
+</dd>
+<dt>Description:</dt><dd><p>Protocol violation. Server should disconnect after sending this
+message.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="System Emulation Management and Interoperability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="bitmaps.html" class="btn btn-neutral float-right" title="Dirty Bitmaps and Incremental Backup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

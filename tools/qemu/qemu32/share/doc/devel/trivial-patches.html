@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivial Patches &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU and the stable process" href="stable-process.html" />
+    <link rel="prev" title="Submitting a Patch" href="submitting-a-patch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index-process.html">QEMU Community Processes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="code-of-conduct.html">Code of Conduct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="conflict-resolution.html">Conflict Resolution Policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maintainers.html">The Role of Maintainers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="style.html">QEMU Coding Style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="submitting-a-patch.html">Submitting a Patch</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Trivial Patches</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repositories">Repositories</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#workflow">Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#team">Team</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="stable-process.html">QEMU and the stable process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="submitting-a-pull-request.html">Submitting a Pull Request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secure-coding-practices.html">Secure Coding Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-process.html">QEMU Community Processes</a></li>
+      <li class="breadcrumb-item active">Trivial Patches</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/trivial-patches.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trivial-patches">
+<span id="id1"></span><h1>Trivial Patches<a class="headerlink" href="#trivial-patches" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>Trivial patches that change just a few lines of code sometimes languish
+on the mailing list even though they require only a small amount of
+review. This is often the case for patches that do not fall under an
+actively maintained subsystem and therefore fall through the cracks.</p>
+<p>The trivial patches team take on the task of reviewing and building pull
+requests for patches that:</p>
+<ul class="simple">
+<li><p>Do not fall under an actively maintained subsystem.</p></li>
+<li><p>Are single patches or short series (max 2-4 patches).</p></li>
+<li><p>Only touch a few lines of code.</p></li>
+</ul>
+<p><strong>You should hint that your patch is a candidate by CCing
+qemu-trivial&#64;nongnu.org.</strong></p>
+</section>
+<section id="repositories">
+<h2>Repositories<a class="headerlink" href="#repositories" title="Permalink to this heading"></a></h2>
+<p>Since the trivial patch team rotates maintainership there is only one
+active repository at a time:</p>
+<ul class="simple">
+<li><p>git://github.com/vivier/qemu.git trivial-patches - <a class="reference external" href="https://github.com/vivier/qemu/tree/trivial-patches">browse</a></p></li>
+</ul>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Permalink to this heading"></a></h2>
+<p>The trivial patches team rotates the duty of collecting trivial patches
+amongst its members. A team member’s job is to:</p>
+<ol class="arabic simple">
+<li><p>Identify trivial patches on the development mailing list.</p></li>
+<li><p>Review trivial patches, merge them into a git tree, and reply to state
+that the patch is queued.</p></li>
+<li><p>Send pull requests to the development mailing list once a week.</p></li>
+</ol>
+<p>A single team member can be on duty as long as they like. The suggested
+time is 1 week before handing off to the next member.</p>
+</section>
+<section id="team">
+<h2>Team<a class="headerlink" href="#team" title="Permalink to this heading"></a></h2>
+<p>If you would like to join the trivial patches team, contact Laurent
+Vivier. The current team includes:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="mailto:laurent&#37;&#52;&#48;vivier&#46;eu">Laurent Vivier</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="submitting-a-patch.html" class="btn btn-neutral float-left" title="Submitting a Patch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stable-process.html" class="btn btn-neutral float-right" title="QEMU and the stable process" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

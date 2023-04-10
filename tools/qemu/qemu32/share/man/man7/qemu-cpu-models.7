@@ -1,0 +1,1337 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "QEMU-CPU-MODELS" "7" "Dec 30, 2022" "7.2.0" "QEMU"
+.SH NAME
+qemu-cpu-models \- QEMU CPU Models
+.SH SYNOPSIS
+.sp
+QEMU CPU Modelling Infrastructure manual
+.SH DESCRIPTION
+.SS Recommendations for KVM CPU model configuration on x86 hosts
+.sp
+The information that follows provides recommendations for configuring
+CPU models on x86 hosts. The goals are to maximise performance, while
+protecting guest OS against various CPU hardware flaws, and optionally
+enabling live migration between hosts with heterogeneous CPU models.
+.SS Two ways to configure CPU models with QEMU / KVM
+.INDENT 0.0
+.IP 1. 3
+\fBHost passthrough\fP
+.sp
+This passes the host CPU model features, model, stepping, exactly to
+the guest. Note that KVM may filter out some host CPU model features
+if they cannot be supported with virtualization. Live migration is
+unsafe when this mode is used as libvirt / QEMU cannot guarantee a
+stable CPU is exposed to the guest across hosts. This is the
+recommended CPU to use, provided live migration is not required.
+.IP 2. 3
+\fBNamed model\fP
+.sp
+QEMU comes with a number of predefined named CPU models, that
+typically refer to specific generations of hardware released by
+Intel and AMD.  These allow the guest VMs to have a degree of
+isolation from the host CPU, allowing greater flexibility in live
+migrating between hosts with differing hardware.  @end table
+.UNINDENT
+.sp
+In both cases, it is possible to optionally add or remove individual CPU
+features, to alter what is presented to the guest by default.
+.sp
+Libvirt supports a third way to configure CPU models known as "Host
+model".  This uses the QEMU "Named model" feature, automatically picking
+a CPU model that is similar the host CPU, and then adding extra features
+to approximate the host model as closely as possible. This does not
+guarantee the CPU family, stepping, etc will precisely match the host
+CPU, as they would with "Host passthrough", but gives much of the
+benefit of passthrough, while making live migration safe.
+.SS ABI compatibility levels for CPU models
+.sp
+The x86_64 architecture has a number of \fI\%ABI compatibility levels\fP
+defined. Traditionally most operating systems and toolchains would
+only target the original baseline ABI. It is expected that in
+future OS and toolchains are likely to target newer ABIs. The
+table that follows illustrates which ABI compatibility levels
+can be satisfied by the QEMU CPU models. Note that the table only
+lists the long term stable CPU model versions (eg Haswell\-v4).
+In addition to what is listed, there are also many CPU model
+aliases which resolve to a different CPU model version,
+depending on the machine type is in use.
+.SS x86\-64 ABI compatibility levels
+.TS
+center;
+|l|l|l|l|l|.
+_
+T{
+Model
+T}	T{
+baseline
+T}	T{
+v2
+T}	T{
+v3
+T}	T{
+v4
+T}
+_
+T{
+486\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+Broadwell\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Broadwell\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Broadwell\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Broadwell\-v4
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Cascadelake\-Server\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Cascadelake\-Server\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Cascadelake\-Server\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Cascadelake\-Server\-v4
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Conroe\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+Cooperlake\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Denverton\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Denverton\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Dhyana\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-Milan\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-Rome\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-Rome\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+EPYC\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Haswell\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Haswell\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Haswell\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Haswell\-v4
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Icelake\-Client\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Icelake\-Client\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Icelake\-Server\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Icelake\-Server\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Icelake\-Server\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Icelake\-Server\-v4
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+IvyBridge\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+IvyBridge\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+KnightsMill\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Nehalem\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Nehalem\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Opteron_G1\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+Opteron_G2\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+Opteron_G3\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+Opteron_G4\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Opteron_G5\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Penryn\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+SandyBridge\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+SandyBridge\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Skylake\-Client\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Skylake\-Client\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Skylake\-Client\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}
+_
+T{
+Skylake\-Server\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Skylake\-Server\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Skylake\-Server\-v3
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Skylake\-Server\-v4
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+✅
+T}
+_
+T{
+Snowridge\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Snowridge\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Westmere\-v1
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+Westmere\-v2
+T}	T{
+✅
+T}	T{
+✅
+T}	T{
+T}	T{
+T}
+_
+T{
+athlon\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+core2duo\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+coreduo\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+kvm32\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+kvm64\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+n270\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+pentium\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+pentium2\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+pentium3\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+phenom\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+qemu32\-v1
+T}	T{
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+T{
+qemu64\-v1
+T}	T{
+✅
+T}	T{
+T}	T{
+T}	T{
+T}
+_
+.TE
+.SS Preferred CPU models for Intel x86 hosts
+.sp
+The following CPU models are preferred for use on Intel hosts.
+Administrators / applications are recommended to use the CPU model that
+matches the generation of the host CPUs in use. In a deployment with a
+mixture of host CPU models between machines, if live migration
+compatibility is required, use the newest CPU model that is compatible
+across all desired hosts.
+.INDENT 0.0
+.TP
+.B \fBCascadelake\-Server\fP, \fBCascadelake\-Server\-noTSX\fP
+Intel Xeon Processor (Cascade Lake, 2019), with "stepping" levels 6
+or 7 only.  (The Cascade Lake Xeon processor with \fIstepping 5 is
+vulnerable to MDS variants\fP\&.)
+.TP
+.B \fBSkylake\-Server\fP, \fBSkylake\-Server\-IBRS\fP, \fBSkylake\-Server\-IBRS\-noTSX\fP
+Intel Xeon Processor (Skylake, 2016)
+.TP
+.B \fBSkylake\-Client\fP, \fBSkylake\-Client\-IBRS\fP, \fBSkylake\-Client\-noTSX\-IBRS}\fP
+Intel Core Processor (Skylake, 2015)
+.TP
+.B \fBBroadwell\fP, \fBBroadwell\-IBRS\fP, \fBBroadwell\-noTSX\fP, \fBBroadwell\-noTSX\-IBRS\fP
+Intel Core Processor (Broadwell, 2014)
+.TP
+.B \fBHaswell\fP, \fBHaswell\-IBRS\fP, \fBHaswell\-noTSX\fP, \fBHaswell\-noTSX\-IBRS\fP
+Intel Core Processor (Haswell, 2013)
+.TP
+.B \fBIvyBridge\fP, \fBIvyBridge\-IBR\fP
+Intel Xeon E3\-12xx v2 (Ivy Bridge, 2012)
+.TP
+.B \fBSandyBridge\fP, \fBSandyBridge\-IBRS\fP
+Intel Xeon E312xx (Sandy Bridge, 2011)
+.TP
+.B \fBWestmere\fP, \fBWestmere\-IBRS\fP
+Westmere E56xx/L56xx/X56xx (Nehalem\-C, 2010)
+.TP
+.B \fBNehalem\fP, \fBNehalem\-IBRS\fP
+Intel Core i7 9xx (Nehalem Class Core i7, 2008)
+.TP
+.B \fBPenryn\fP
+Intel Core 2 Duo P9xxx (Penryn Class Core 2, 2007)
+.TP
+.B \fBConroe\fP
+Intel Celeron_4x0 (Conroe/Merom Class Core 2, 2006)
+.UNINDENT
+.SS Important CPU features for Intel x86 hosts
+.sp
+The following are important CPU features that should be used on Intel
+x86 hosts, when available in the host CPU. Some of them require explicit
+configuration to enable, as they are not included by default in some, or
+all, of the named CPU models listed above. In general all of these
+features are included if using "Host passthrough" or "Host model".
+.INDENT 0.0
+.TP
+.B \fBpcid\fP
+Recommended to mitigate the cost of the Meltdown (CVE\-2017\-5754) fix.
+.sp
+Included by default in Haswell, Broadwell & Skylake Intel CPU models.
+.sp
+Should be explicitly turned on for Westmere, SandyBridge, and
+IvyBridge Intel CPU models. Note that some desktop/mobile Westmere
+CPUs cannot support this feature.
+.TP
+.B \fBspec\-ctrl\fP
+Required to enable the Spectre v2 (CVE\-2017\-5715) fix.
+.sp
+Included by default in Intel CPU models with \-IBRS suffix.
+.sp
+Must be explicitly turned on for Intel CPU models without \-IBRS
+suffix.
+.sp
+Requires the host CPU microcode to support this feature before it
+can be used for guest CPUs.
+.TP
+.B \fBstibp\fP
+Required to enable stronger Spectre v2 (CVE\-2017\-5715) fixes in some
+operating systems.
+.sp
+Must be explicitly turned on for all Intel CPU models.
+.sp
+Requires the host CPU microcode to support this feature before it can
+be used for guest CPUs.
+.TP
+.B \fBssbd\fP
+Required to enable the CVE\-2018\-3639 fix.
+.sp
+Not included by default in any Intel CPU model.
+.sp
+Must be explicitly turned on for all Intel CPU models.
+.sp
+Requires the host CPU microcode to support this feature before it
+can be used for guest CPUs.
+.TP
+.B \fBpdpe1gb\fP
+Recommended to allow guest OS to use 1GB size pages.
+.sp
+Not included by default in any Intel CPU model.
+.sp
+Should be explicitly turned on for all Intel CPU models.
+.sp
+Note that not all CPU hardware will support this feature.
+.TP
+.B \fBmd\-clear\fP
+Required to confirm the MDS (CVE\-2018\-12126, CVE\-2018\-12127,
+CVE\-2018\-12130, CVE\-2019\-11091) fixes.
+.sp
+Not included by default in any Intel CPU model.
+.sp
+Must be explicitly turned on for all Intel CPU models.
+.sp
+Requires the host CPU microcode to support this feature before it
+can be used for guest CPUs.
+.TP
+.B \fBmds\-no\fP
+Recommended to inform the guest OS that the host is \fInot\fP vulnerable
+to any of the MDS variants ([MFBDS] CVE\-2018\-12130, [MLPDS]
+CVE\-2018\-12127, [MSBDS] CVE\-2018\-12126).
+.sp
+This is an MSR (Model\-Specific Register) feature rather than a CPUID feature,
+so it will not appear in the Linux \fB/proc/cpuinfo\fP in the host or
+guest.  Instead, the host kernel uses it to populate the MDS
+vulnerability file in \fBsysfs\fP\&.
+.sp
+So it should only be enabled for VMs if the host reports @code{Not
+affected} in the \fB/sys/devices/system/cpu/vulnerabilities/mds\fP file.
+.TP
+.B \fBtaa\-no\fP
+Recommended to inform that the guest that the host is \fBnot\fP
+vulnerable to CVE\-2019\-11135, TSX Asynchronous Abort (TAA).
+.sp
+This too is an MSR feature, so it does not show up in the Linux
+\fB/proc/cpuinfo\fP in the host or guest.
+.sp
+It should only be enabled for VMs if the host reports \fBNot affected\fP
+in the \fB/sys/devices/system/cpu/vulnerabilities/tsx_async_abort\fP
+file.
+.TP
+.B \fBtsx\-ctrl\fP
+Recommended to inform the guest that it can disable the Intel TSX
+(Transactional Synchronization Extensions) feature; or, if the
+processor is vulnerable, use the Intel VERW instruction (a
+processor\-level instruction that performs checks on memory access) as
+a mitigation for the TAA vulnerability.  (For details, refer to
+Intel\(aqs \fI\%deep dive into MDS\fP\&.)
+.sp
+Expose this to the guest OS if and only if: (a) the host has TSX
+enabled; \fIand\fP (b) the guest has \fBrtm\fP CPU flag enabled.
+.sp
+By disabling TSX, KVM\-based guests can avoid paying the price of
+mitigating TSX\-based attacks.
+.sp
+Note that \fBtsx\-ctrl\fP too is an MSR feature, so it does not show
+up in the Linux \fB/proc/cpuinfo\fP in the host or guest.
+.sp
+To validate that Intel TSX is indeed disabled for the guest, there are
+two ways: (a) check for the \fIabsence\fP of \fBrtm\fP in the guest\(aqs
+\fB/proc/cpuinfo\fP; or (b) the
+\fB/sys/devices/system/cpu/vulnerabilities/tsx_async_abort\fP file in
+the guest should report \fBMitigation: TSX disabled\fP\&.
+.UNINDENT
+.SS Preferred CPU models for AMD x86 hosts
+.sp
+The following CPU models are preferred for use on AMD hosts.
+Administrators / applications are recommended to use the CPU model that
+matches the generation of the host CPUs in use. In a deployment with a
+mixture of host CPU models between machines, if live migration
+compatibility is required, use the newest CPU model that is compatible
+across all desired hosts.
+.INDENT 0.0
+.TP
+.B \fBEPYC\fP, \fBEPYC\-IBPB\fP
+AMD EPYC Processor (2017)
+.TP
+.B \fBOpteron_G5\fP
+AMD Opteron 63xx class CPU (2012)
+.TP
+.B \fBOpteron_G4\fP
+AMD Opteron 62xx class CPU (2011)
+.TP
+.B \fBOpteron_G3\fP
+AMD Opteron 23xx (Gen 3 Class Opteron, 2009)
+.TP
+.B \fBOpteron_G2\fP
+AMD Opteron 22xx (Gen 2 Class Opteron, 2006)
+.TP
+.B \fBOpteron_G1\fP
+AMD Opteron 240 (Gen 1 Class Opteron, 2004)
+.UNINDENT
+.SS Important CPU features for AMD x86 hosts
+.sp
+The following are important CPU features that should be used on AMD x86
+hosts, when available in the host CPU. Some of them require explicit
+configuration to enable, as they are not included by default in some, or
+all, of the named CPU models listed above. In general all of these
+features are included if using "Host passthrough" or "Host model".
+.INDENT 0.0
+.TP
+.B \fBibpb\fP
+Required to enable the Spectre v2 (CVE\-2017\-5715) fix.
+.sp
+Included by default in AMD CPU models with \-IBPB suffix.
+.sp
+Must be explicitly turned on for AMD CPU models without \-IBPB suffix.
+.sp
+Requires the host CPU microcode to support this feature before it
+can be used for guest CPUs.
+.TP
+.B \fBstibp\fP
+Required to enable stronger Spectre v2 (CVE\-2017\-5715) fixes in some
+operating systems.
+.sp
+Must be explicitly turned on for all AMD CPU models.
+.sp
+Requires the host CPU microcode to support this feature before it
+can be used for guest CPUs.
+.TP
+.B \fBvirt\-ssbd\fP
+Required to enable the CVE\-2018\-3639 fix
+.sp
+Not included by default in any AMD CPU model.
+.sp
+Must be explicitly turned on for all AMD CPU models.
+.sp
+This should be provided to guests, even if amd\-ssbd is also provided,
+for maximum guest compatibility.
+.sp
+Note for some QEMU / libvirt versions, this must be force enabled when
+when using "Host model", because this is a virtual feature that
+doesn\(aqt exist in the physical host CPUs.
+.TP
+.B \fBamd\-ssbd\fP
+Required to enable the CVE\-2018\-3639 fix
+.sp
+Not included by default in any AMD CPU model.
+.sp
+Must be explicitly turned on for all AMD CPU models.
+.sp
+This provides higher performance than \fBvirt\-ssbd\fP so should be
+exposed to guests whenever available in the host. \fBvirt\-ssbd\fP should
+none the less also be exposed for maximum guest compatibility as some
+kernels only know about \fBvirt\-ssbd\fP\&.
+.TP
+.B \fBamd\-no\-ssb\fP
+Recommended to indicate the host is not vulnerable CVE\-2018\-3639
+.sp
+Not included by default in any AMD CPU model.
+.sp
+Future hardware generations of CPU will not be vulnerable to
+CVE\-2018\-3639, and thus the guest should be told not to enable
+its mitigations, by exposing amd\-no\-ssb. This is mutually
+exclusive with virt\-ssbd and amd\-ssbd.
+.TP
+.B \fBpdpe1gb\fP
+Recommended to allow guest OS to use 1GB size pages
+.sp
+Not included by default in any AMD CPU model.
+.sp
+Should be explicitly turned on for all AMD CPU models.
+.sp
+Note that not all CPU hardware will support this feature.
+.UNINDENT
+.SS Default x86 CPU models
+.sp
+The default QEMU CPU models are designed such that they can run on all
+hosts.  If an application does not wish to do perform any host
+compatibility checks before launching guests, the default is guaranteed
+to work.
+.sp
+The default CPU models will, however, leave the guest OS vulnerable to
+various CPU hardware flaws, so their use is strongly discouraged.
+Applications should follow the earlier guidance to setup a better CPU
+configuration, with host passthrough recommended if live migration is
+not needed.
+.INDENT 0.0
+.TP
+.B \fBqemu32\fP, \fBqemu64\fP
+QEMU Virtual CPU version 2.5+ (32 & 64 bit variants)
+.UNINDENT
+.sp
+\fBqemu64\fP is used for x86_64 guests and \fBqemu32\fP is used for i686
+guests, when no \fB\-cpu\fP argument is given to QEMU, or no \fB<cpu>\fP is
+provided in libvirt XML.
+.SS Other non\-recommended x86 CPUs
+.sp
+The following CPUs models are compatible with most AMD and Intel x86
+hosts, but their usage is discouraged, as they expose a very limited
+featureset, which prevents guests having optimal performance.
+.INDENT 0.0
+.TP
+.B \fBkvm32\fP, \fBkvm64\fP
+Common KVM processor (32 & 64 bit variants).
+.sp
+Legacy models just for historical compatibility with ancient QEMU
+versions.
+.TP
+.B \fB486\fP, \fBathlon\fP, \fBphenom\fP, \fBcoreduo\fP, \fBcore2duo\fP, \fBn270\fP, \fBpentium\fP, \fBpentium2\fP, \fBpentium3\fP
+Various very old x86 CPU models, mostly predating the introduction
+of hardware assisted virtualization, that should thus not be
+required for running virtual machines.
+.UNINDENT
+.SS Syntax for configuring CPU models
+.sp
+The examples below illustrate the approach to configuring the various
+CPU models / features in QEMU and libvirt.
+.SS QEMU command line
+.sp
+Host passthrough:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-system\-x86_64 \-cpu host
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Host passthrough with feature customization:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-system\-x86_64 \-cpu host,vmx=off,...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Named CPU models:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-system\-x86_64 \-cpu Westmere
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Named CPU models with feature customization:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-system\-x86_64 \-cpu Westmere,pcid=on,...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Libvirt guest XML
+.sp
+Host passthrough:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqhost\-passthrough\(aq/>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Host passthrough with feature customization:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqhost\-passthrough\(aq>
+    <feature name="vmx" policy="disable"/>
+    ...
+</cpu>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Host model:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqhost\-model\(aq/>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Host model with feature customization:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqhost\-model\(aq>
+    <feature name="vmx" policy="disable"/>
+    ...
+</cpu>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Named model:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqcustom\(aq>
+    <model name="Westmere"/>
+</cpu>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Named model with feature customization:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+<cpu mode=\(aqcustom\(aq>
+    <model name="Westmere"/>
+    <feature name="pcid" policy="require"/>
+    ...
+</cpu>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Supported CPU model configurations on MIPS hosts
+.sp
+QEMU supports variety of MIPS CPU models:
+.SS Supported CPU models for MIPS32 hosts
+.sp
+The following CPU models are supported for use on MIPS32 hosts.
+Administrators / applications are recommended to use the CPU model that
+matches the generation of the host CPUs in use. In a deployment with a
+mixture of host CPU models between machines, if live migration
+compatibility is required, use the newest CPU model that is compatible
+across all desired hosts.
+.INDENT 0.0
+.TP
+.B \fBmips32r6\-generic\fP
+MIPS32 Processor (Release 6, 2015)
+.TP
+.B \fBP5600\fP
+MIPS32 Processor (P5600, 2014)
+.TP
+.B \fBM14K\fP, \fBM14Kc\fP
+MIPS32 Processor (M14K, 2009)
+.TP
+.B \fB74Kf\fP
+MIPS32 Processor (74K, 2007)
+.TP
+.B \fB34Kf\fP
+MIPS32 Processor (34K, 2006)
+.TP
+.B \fB24Kc\fP, \fB24KEc\fP, \fB24Kf\fP
+MIPS32 Processor (24K, 2003)
+.TP
+.B \fB4Kc\fP, \fB4Km\fP, \fB4KEcR1\fP, \fB4KEmR1\fP, \fB4KEc\fP, \fB4KEm\fP
+MIPS32 Processor (4K, 1999)
+.UNINDENT
+.SS Supported CPU models for MIPS64 hosts
+.sp
+The following CPU models are supported for use on MIPS64 hosts.
+Administrators / applications are recommended to use the CPU model that
+matches the generation of the host CPUs in use. In a deployment with a
+mixture of host CPU models between machines, if live migration
+compatibility is required, use the newest CPU model that is compatible
+across all desired hosts.
+.INDENT 0.0
+.TP
+.B \fBI6400\fP
+MIPS64 Processor (Release 6, 2014)
+.TP
+.B \fBLoongson\-2E\fP
+MIPS64 Processor (Loongson 2, 2006)
+.TP
+.B \fBLoongson\-2F\fP
+MIPS64 Processor (Loongson 2, 2008)
+.TP
+.B \fBLoongson\-3A1000\fP
+MIPS64 Processor (Loongson 3, 2010)
+.TP
+.B \fBLoongson\-3A4000\fP
+MIPS64 Processor (Loongson 3, 2018)
+.TP
+.B \fBmips64dspr2\fP
+MIPS64 Processor (Release 2, 2006)
+.TP
+.B \fBMIPS64R2\-generic\fP, \fB5KEc\fP, \fB5KEf\fP
+MIPS64 Processor (Release 2, 2002)
+.TP
+.B \fB20Kc\fP
+MIPS64 Processor (20K, 2000
+.TP
+.B \fB5Kc\fP, \fB5Kf\fP
+MIPS64 Processor (5K, 1999)
+.TP
+.B \fBVR5432\fP
+MIPS64 Processor (VR, 1998)
+.TP
+.B \fBR4000\fP
+MIPS64 Processor (MIPS III, 1991)
+.UNINDENT
+.SS Supported CPU models for nanoMIPS hosts
+.sp
+The following CPU models are supported for use on nanoMIPS hosts.
+Administrators / applications are recommended to use the CPU model that
+matches the generation of the host CPUs in use. In a deployment with a
+mixture of host CPU models between machines, if live migration
+compatibility is required, use the newest CPU model that is compatible
+across all desired hosts.
+.INDENT 0.0
+.TP
+.B \fBI7200\fP
+MIPS I7200 (nanoMIPS, 2018)
+.UNINDENT
+.SS Preferred CPU models for MIPS hosts
+.sp
+The following CPU models are preferred for use on different MIPS hosts:
+.INDENT 0.0
+.TP
+.B \fBMIPS III\fP
+R4000
+.TP
+.B \fBMIPS32R2\fP
+34Kf
+.TP
+.B \fBMIPS64R6\fP
+I6400
+.TP
+.B \fBnanoMIPS\fP
+I7200
+.UNINDENT
+.SH SEE ALSO
+.sp
+The HTML documentation of QEMU for more precise information and Linux user mode emulator invocation.
+.SH AUTHOR
+The QEMU Project developers
+.SH COPYRIGHT
+2022, The QEMU Project Developers
+.\" Generated by docutils manpage writer.
+.

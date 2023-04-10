@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing VirtIO backends for QEMU &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="TCG Emulation" href="index-tcg.html" />
+    <link rel="prev" title="How to write monitor commands" href="writing-monitor-commands.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing VirtIO backends for QEMU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#virtio-transports">VirtIO Transports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-the-qemu-object-model-qom">Using the QEMU Object Model (QOM)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#back-end-implementations">Back End Implementations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-internals.html">Internal Subsystem Information</a></li>
+      <li class="breadcrumb-item active">Writing VirtIO backends for QEMU</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/virtio-backends.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="writing-virtio-backends-for-qemu">
+<h1>Writing VirtIO backends for QEMU<a class="headerlink" href="#writing-virtio-backends-for-qemu" title="Permalink to this heading"></a></h1>
+<p>This document attempts to outline the information a developer needs to
+know to write device emulations in QEMU. It is specifically focused on
+implementing VirtIO devices. For VirtIO the frontend is the driver
+running on the guest. The backend is the everything that QEMU needs to
+do to handle the emulation of the VirtIO device. This can be done
+entirely in QEMU, divided between QEMU and the kernel (vhost) or
+handled by a separate process which is configured by QEMU
+(vhost-user).</p>
+<section id="virtio-transports">
+<h2>VirtIO Transports<a class="headerlink" href="#virtio-transports" title="Permalink to this heading"></a></h2>
+<p>VirtIO supports a number of different transports. While the details of
+the configuration and operation of the device will generally be the
+same QEMU represents them as different devices depending on the
+transport they use. For example -device virtio-foo represents the foo
+device using mmio and -device virtio-foo-pci is the same class of
+device using the PCI transport.</p>
+</section>
+<section id="using-the-qemu-object-model-qom">
+<h2>Using the QEMU Object Model (QOM)<a class="headerlink" href="#using-the-qemu-object-model-qom" title="Permalink to this heading"></a></h2>
+<p>Generally all devices in QEMU are super classes of <code class="docutils literal notranslate"><span class="pre">TYPE_DEVICE</span></code>
+however VirtIO devices should be based on <code class="docutils literal notranslate"><span class="pre">TYPE_VIRTIO_DEVICE</span></code> which
+itself is derived from the base class. For example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">virtio_blk_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_BLK</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_DEVICE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOBlock</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_blk_instance_init</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_blk_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The author may decide to have a more expansive class hierarchy to
+support multiple device types. For example the Virtio GPU device:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">virtio_gpu_base_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_GPU_BASE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_DEVICE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOGPUBase</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOGPUBaseClass</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_gpu_base_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">abstract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">vhost_user_gpu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VHOST_USER_GPU</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_GPU_BASE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VhostUserGPU</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_instance_init</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_finalize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_instance_finalize</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">virtio_gpu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_GPU</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_GPU_BASE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOGPU</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOGPUClass</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_gpu_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<p>defines a base class for the VirtIO GPU and then specialises two
+versions, one for the internal implementation and the other for the
+vhost-user version.</p>
+<section id="virtiopciproxy">
+<h3>VirtIOPCIProxy<a class="headerlink" href="#virtiopciproxy" title="Permalink to this heading"></a></h3>
+<p>[AJB: the following is supposition and welcomes more informed
+opinions]</p>
+<p>Probably due to legacy from the pre-QOM days PCI VirtIO devices don’t
+follow the normal hierarchy. Instead the a standalone object is based
+on the VirtIOPCIProxy class and the specific VirtIO instance is
+manually instantiated:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * virtio-blk-pci: This extends VirtioPCIProxy.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#define TYPE_VIRTIO_BLK_PCI &quot;virtio-blk-pci-base&quot;</span>
+<span class="n">DECLARE_INSTANCE_CHECKER</span><span class="p">(</span><span class="n">VirtIOBlkPCI</span><span class="p">,</span><span class="w"> </span><span class="n">VIRTIO_BLK_PCI</span><span class="p">,</span><span class="w"></span>
+<span class="w">                         </span><span class="n">TYPE_VIRTIO_BLK_PCI</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">VirtIOBlkPCI</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">VirtIOPCIProxy</span><span class="w"> </span><span class="n">parent_obj</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">VirtIOBlock</span><span class="w"> </span><span class="n">vdev</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">Property</span><span class="w"> </span><span class="n">virtio_blk_pci_properties</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">DEFINE_PROP_UINT32</span><span class="p">(</span><span class="s">&quot;class&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">VirtIOPCIProxy</span><span class="p">,</span><span class="w"> </span><span class="n">class_code</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DEFINE_PROP_BIT</span><span class="p">(</span><span class="s">&quot;ioeventfd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">VirtIOPCIProxy</span><span class="p">,</span><span class="w"> </span><span class="n">flags</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DEFINE_PROP_UINT32</span><span class="p">(</span><span class="s">&quot;vectors&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">VirtIOPCIProxy</span><span class="p">,</span><span class="w"> </span><span class="n">nvectors</span><span class="p">,</span><span class="w"></span>
+<span class="w">                       </span><span class="n">DEV_NVECTORS_UNSPECIFIED</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DEFINE_PROP_END_OF_LIST</span><span class="p">(),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">virtio_blk_pci_realize</span><span class="p">(</span><span class="n">VirtIOPCIProxy</span><span class="w"> </span><span class="o">*</span><span class="n">vpci_dev</span><span class="p">,</span><span class="w"> </span><span class="n">Error</span><span class="w"> </span><span class="o">**</span><span class="n">errp</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">VirtIOBlkPCI</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VIRTIO_BLK_PCI</span><span class="p">(</span><span class="n">vpci_dev</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeviceState</span><span class="w"> </span><span class="o">*</span><span class="n">vdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEVICE</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">vdev</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">qdev_realize</span><span class="p">(</span><span class="n">vdev</span><span class="p">,</span><span class="w"> </span><span class="n">BUS</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vpci_dev</span><span class="o">-&gt;</span><span class="n">bus</span><span class="p">),</span><span class="w"> </span><span class="n">errp</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">virtio_blk_pci_class_init</span><span class="p">(</span><span class="n">ObjectClass</span><span class="w"> </span><span class="o">*</span><span class="n">klass</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeviceClass</span><span class="w"> </span><span class="o">*</span><span class="n">dc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEVICE_CLASS</span><span class="p">(</span><span class="n">klass</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">VirtioPCIClass</span><span class="w"> </span><span class="o">*</span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VIRTIO_PCI_CLASS</span><span class="p">(</span><span class="n">klass</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">PCIDeviceClass</span><span class="w"> </span><span class="o">*</span><span class="n">pcidev_k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PCI_DEVICE_CLASS</span><span class="p">(</span><span class="n">klass</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">set_bit</span><span class="p">(</span><span class="n">DEVICE_CATEGORY_STORAGE</span><span class="p">,</span><span class="w"> </span><span class="n">dc</span><span class="o">-&gt;</span><span class="n">categories</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">device_class_set_props</span><span class="p">(</span><span class="n">dc</span><span class="p">,</span><span class="w"> </span><span class="n">virtio_blk_pci_properties</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">k</span><span class="o">-&gt;</span><span class="n">realize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_blk_pci_realize</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcidev_k</span><span class="o">-&gt;</span><span class="n">vendor_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PCI_VENDOR_ID_REDHAT_QUMRANET</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcidev_k</span><span class="o">-&gt;</span><span class="n">device_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PCI_DEVICE_ID_VIRTIO_BLOCK</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcidev_k</span><span class="o">-&gt;</span><span class="n">revision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VIRTIO_PCI_ABI_VERSION</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcidev_k</span><span class="o">-&gt;</span><span class="n">class_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PCI_CLASS_STORAGE_SCSI</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">virtio_blk_pci_instance_init</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">VirtIOBlkPCI</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VIRTIO_BLK_PCI</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">virtio_instance_init_common</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">vdev</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">vdev</span><span class="p">),</span><span class="w"></span>
+<span class="w">                                </span><span class="n">TYPE_VIRTIO_BLK</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">object_property_add_alias</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bootindex&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">OBJECT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">vdev</span><span class="p">),</span><span class="w"></span>
+<span class="w">                              </span><span class="s">&quot;bootindex&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">VirtioPCIDeviceTypeInfo</span><span class="w"> </span><span class="n">virtio_blk_pci_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">base_name</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_BLK_PCI</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">generic_name</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;virtio-blk-pci&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">transitional_name</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;virtio-blk-pci-transitional&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">non_transitional_name</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;virtio-blk-pci-non-transitional&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VirtIOBlkPCI</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_blk_pci_instance_init</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">virtio_blk_pci_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Here you can see the instance_init has to manually instantiate the
+underlying <code class="docutils literal notranslate"><span class="pre">TYPE_VIRTIO_BLOCK</span></code> object and link an alias for one of
+it’s properties to the PCI device.</p>
+</section>
+</section>
+<section id="back-end-implementations">
+<h2>Back End Implementations<a class="headerlink" href="#back-end-implementations" title="Permalink to this heading"></a></h2>
+<p>There are a number of places where the implementation of the backend
+can be done:</p>
+<ul class="simple">
+<li><p>in QEMU itself</p></li>
+<li><p>in the host kernel (a.k.a vhost)</p></li>
+<li><p>in a separate process (a.k.a. vhost-user)</p></li>
+</ul>
+<section id="vhost-ops-vs-type-vhost-user-backend">
+<h3>vhost_ops vs TYPE_VHOST_USER_BACKEND<a class="headerlink" href="#vhost-ops-vs-type-vhost-user-backend" title="Permalink to this heading"></a></h3>
+<p>There are two choices to how to implement vhost code. Most of the code
+which has to work with either vhost or vhost-user uses
+<code class="docutils literal notranslate"><span class="pre">vhost_dev_init()</span></code> to instantiate the appropriate backend. This
+means including a <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_dev</span></code> in the main object structure.</p>
+<p>For vhost-user devices you also need to add code to track the
+initialisation of the <code class="docutils literal notranslate"><span class="pre">chardev</span></code> device used for the control socket
+between QEMU and the external vhost-user process.</p>
+<p>If you only need to implement a vhost-user backed the other option is
+a use a QOM-ified version of vhost-user.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"></span>
+<span class="nf">vhost_user_gpu_instance_init</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">VhostUserGPU</span><span class="w"> </span><span class="o">*</span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VHOST_USER_GPU</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">g</span><span class="o">-&gt;</span><span class="n">vhost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VHOST_USER_BACKEND</span><span class="p">(</span><span class="n">object_new</span><span class="p">(</span><span class="n">TYPE_VHOST_USER_BACKEND</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">object_property_add_alias</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;chardev&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                              </span><span class="n">OBJECT</span><span class="p">(</span><span class="n">g</span><span class="o">-&gt;</span><span class="n">vhost</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;chardev&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">vhost_user_gpu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VHOST_USER_GPU</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_VIRTIO_GPU_BASE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">VhostUserGPU</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_instance_init</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">instance_finalize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_instance_finalize</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">class_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vhost_user_gpu_class_init</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Using it this way entails adding a <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">VhostUserBackend</span></code> to your
+core object structure and manually instantiating the backend. This
+sub-structure tracks both the <code class="docutils literal notranslate"><span class="pre">vhost_dev</span></code> and <code class="docutils literal notranslate"><span class="pre">CharDev</span></code> types
+needed for the connection. Instead of calling <code class="docutils literal notranslate"><span class="pre">vhost_dev_init</span></code> you
+would call <code class="docutils literal notranslate"><span class="pre">vhost_user_backend_dev_init</span></code> which does what is needed
+on your behalf.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="writing-monitor-commands.html" class="btn btn-neutral float-left" title="How to write monitor commands" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index-tcg.html" class="btn btn-neutral float-right" title="TCG Emulation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

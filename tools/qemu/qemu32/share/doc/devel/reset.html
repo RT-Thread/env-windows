@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset in QEMU: the Resettable interface &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Booting from real channel-attached devices on s390x" href="s390-dasd-ipl.html" />
+    <link rel="prev" title="Multi-process QEMU" href="multi-process.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Reset in QEMU: the Resettable interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#triggering-reset">Triggering reset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multi-phase-mechanism">Multi-phase mechanism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#handling-reset-in-a-resettable-object">Handling reset in a resettable object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#base-class-handling-of-reset">Base class handling of reset</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-internals.html">Internal Subsystem Information</a></li>
+      <li class="breadcrumb-item active">Reset in QEMU: the Resettable interface</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/reset.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reset-in-qemu-the-resettable-interface">
+<h1>Reset in QEMU: the Resettable interface<a class="headerlink" href="#reset-in-qemu-the-resettable-interface" title="Permalink to this heading"></a></h1>
+<p>The reset of qemu objects is handled using the resettable interface declared
+in <code class="docutils literal notranslate"><span class="pre">include/hw/resettable.h</span></code>.</p>
+<p>This interface allows objects to be grouped (on a tree basis); so that the
+whole group can be reset consistently. Each individual member object does not
+have to care about others; in particular, problems of order (which object is
+reset first) are addressed.</p>
+<p>As of now DeviceClass and BusClass implement this interface.</p>
+<section id="triggering-reset">
+<h2>Triggering reset<a class="headerlink" href="#triggering-reset" title="Permalink to this heading"></a></h2>
+<p>This section documents the APIs which “users” of a resettable object should use
+to control it. All resettable control functions must be called while holding
+the iothread lock.</p>
+<p>You can apply a reset to an object using <code class="docutils literal notranslate"><span class="pre">resettable_assert_reset()</span></code>. You need
+to call <code class="docutils literal notranslate"><span class="pre">resettable_release_reset()</span></code> to release the object from reset. To
+instantly reset an object, without keeping it in reset state, just call
+<code class="docutils literal notranslate"><span class="pre">resettable_reset()</span></code>. These functions take two parameters: a pointer to the
+object to reset and a reset type.</p>
+<p>Several types of reset will be supported. For now only cold reset is defined;
+others may be added later. The Resettable interface handles reset types with an
+enum:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">RESET_TYPE_COLD</span></code></dt><dd><p>Cold reset is supported by every resettable object. In QEMU, it means we reset
+to the initial state corresponding to the start of QEMU; this might differ
+from what is a real hardware cold reset. It differs from other resets (like
+warm or bus resets) which may keep certain parts untouched.</p>
+</dd>
+</dl>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">resettable_reset()</span></code> is equivalent to calling
+<code class="docutils literal notranslate"><span class="pre">resettable_assert_reset()</span></code> then <code class="docutils literal notranslate"><span class="pre">resettable_release_reset()</span></code>. It is
+possible to interleave multiple calls to these three functions. There may
+be several reset sources/controllers of a given object. The interface handles
+everything and the different reset controllers do not need to know anything
+about each others. The object will leave reset state only when each other
+controllers end their reset operation. This point is handled internally by
+maintaining a count of in-progress resets; it is crucial to call
+<code class="docutils literal notranslate"><span class="pre">resettable_release_reset()</span></code> one time and only one time per
+<code class="docutils literal notranslate"><span class="pre">resettable_assert_reset()</span></code> call.</p>
+<p>For now migration of a device or bus in reset is not supported. Care must be
+taken not to delay <code class="docutils literal notranslate"><span class="pre">resettable_release_reset()</span></code> after its
+<code class="docutils literal notranslate"><span class="pre">resettable_assert_reset()</span></code> counterpart.</p>
+<p>Note that, since resettable is an interface, the API takes a simple Object as
+parameter. Still, it is a programming error to call a resettable function on a
+non-resettable object and it will trigger a run time assert error. Since most
+calls to resettable interface are done through base class functions, such an
+error is not likely to happen.</p>
+<p>For Devices and Buses, the following helper functions exist:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">device_cold_reset()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bus_cold_reset()</span></code></p></li>
+</ul>
+<p>These are simple wrappers around resettable_reset() function; they only cast the
+Device or Bus into an Object and pass the cold reset type. When possible
+prefer to use these functions instead of <code class="docutils literal notranslate"><span class="pre">resettable_reset()</span></code>.</p>
+<p>Device and bus functions co-exist because there can be semantic differences
+between resetting a bus and resetting the controller bridge which owns it.
+For example, consider a SCSI controller. Resetting the controller puts all
+its registers back to what reset state was as well as reset everything on the
+SCSI bus, whereas resetting just the SCSI bus only resets everything that’s on
+it but not the controller.</p>
+</section>
+<section id="multi-phase-mechanism">
+<h2>Multi-phase mechanism<a class="headerlink" href="#multi-phase-mechanism" title="Permalink to this heading"></a></h2>
+<p>This section documents the internals of the resettable interface.</p>
+<p>The resettable interface uses a multi-phase system to relieve objects and
+machines from reset ordering problems. To address this, the reset operation
+of an object is split into three well defined phases.</p>
+<p>When resetting several objects (for example the whole machine at simulation
+startup), all first phases of all objects are executed, then all second phases
+and then all third phases.</p>
+<p>The three phases are:</p>
+<ol class="arabic simple">
+<li><p>The <strong>enter</strong> phase is executed when the object enters reset. It resets only
+local state of the object; it must not do anything that has a side-effect
+on other objects, such as raising or lowering a qemu_irq line or reading or
+writing guest memory.</p></li>
+<li><p>The <strong>hold</strong> phase is executed for entry into reset, once every object in the
+group which is being reset has had its <em>enter</em> phase executed. At this point
+devices can do actions that affect other objects.</p></li>
+<li><p>The <strong>exit</strong> phase is executed when the object leaves the reset state.
+Actions affecting other objects are permitted.</p></li>
+</ol>
+<p>As said in previous section, the interface maintains a count of reset. This
+count is used to ensure phases are executed only when required. <em>enter</em> and
+<em>hold</em> phases are executed only when asserting reset for the first time
+(if an object is already in reset state when calling
+<code class="docutils literal notranslate"><span class="pre">resettable_assert_reset()</span></code> or <code class="docutils literal notranslate"><span class="pre">resettable_reset()</span></code>, they are not
+executed).
+The <em>exit</em> phase is executed only when the last reset operation ends. Therefore
+the object does not need to care how many of reset controllers it has and how
+many of them have started a reset.</p>
+</section>
+<section id="handling-reset-in-a-resettable-object">
+<h2>Handling reset in a resettable object<a class="headerlink" href="#handling-reset-in-a-resettable-object" title="Permalink to this heading"></a></h2>
+<p>This section documents the APIs that an implementation of a resettable object
+must provide and what functions it has access to. It is intended for people
+who want to implement or convert a class which has the resettable interface;
+for example when specializing an existing device or bus.</p>
+<section id="methods-to-implement">
+<h3>Methods to implement<a class="headerlink" href="#methods-to-implement" title="Permalink to this heading"></a></h3>
+<p>Three methods should be defined or left empty. Each method corresponds to a
+phase of the reset; they are name <code class="docutils literal notranslate"><span class="pre">phases.enter()</span></code>, <code class="docutils literal notranslate"><span class="pre">phases.hold()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">phases.exit()</span></code>. They all take the object as parameter. The <em>enter</em> method
+also take the reset type as second parameter.</p>
+<p>When extending an existing class, these methods may need to be extended too.
+The <code class="docutils literal notranslate"><span class="pre">resettable_class_set_parent_phases()</span></code> class function may be used to
+backup parent class methods.</p>
+<p>Here follows an example to implement reset for a Device which sets an IO while
+in reset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">void</span> <span class="n">mydev_reset_enter</span><span class="p">(</span><span class="n">Object</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span> <span class="n">ResetType</span> <span class="nb">type</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">MyDevClass</span> <span class="o">*</span><span class="n">myclass</span> <span class="o">=</span> <span class="n">MYDEV_GET_CLASS</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="n">MyDevState</span> <span class="o">*</span><span class="n">mydev</span> <span class="o">=</span> <span class="n">MYDEV</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="o">/*</span> <span class="n">call</span> <span class="n">parent</span> <span class="k">class</span> <span class="nc">enter</span> <span class="n">phase</span> <span class="o">*/</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">enter</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">enter</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">/*</span> <span class="n">initialize</span> <span class="n">local</span> <span class="n">state</span> <span class="n">only</span> <span class="o">*/</span>
+    <span class="n">mydev</span><span class="o">-&gt;</span><span class="n">var</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">static</span> <span class="n">void</span> <span class="n">mydev_reset_hold</span><span class="p">(</span><span class="n">Object</span> <span class="o">*</span><span class="n">obj</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">MyDevClass</span> <span class="o">*</span><span class="n">myclass</span> <span class="o">=</span> <span class="n">MYDEV_GET_CLASS</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="n">MyDevState</span> <span class="o">*</span><span class="n">mydev</span> <span class="o">=</span> <span class="n">MYDEV</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="o">/*</span> <span class="n">call</span> <span class="n">parent</span> <span class="k">class</span> <span class="nc">hold</span> <span class="n">phase</span> <span class="o">*/</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">hold</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">/*</span> <span class="nb">set</span> <span class="n">an</span> <span class="n">IO</span> <span class="o">*/</span>
+    <span class="n">qemu_set_irq</span><span class="p">(</span><span class="n">mydev</span><span class="o">-&gt;</span><span class="n">irq</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">static</span> <span class="n">void</span> <span class="n">mydev_reset_exit</span><span class="p">(</span><span class="n">Object</span> <span class="o">*</span><span class="n">obj</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">MyDevClass</span> <span class="o">*</span><span class="n">myclass</span> <span class="o">=</span> <span class="n">MYDEV_GET_CLASS</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="n">MyDevState</span> <span class="o">*</span><span class="n">mydev</span> <span class="o">=</span> <span class="n">MYDEV</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="o">/*</span> <span class="n">call</span> <span class="n">parent</span> <span class="k">class</span> <span class="nc">exit</span> <span class="n">phase</span> <span class="o">*/</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">exit</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">/*</span> <span class="n">clear</span> <span class="n">an</span> <span class="n">IO</span> <span class="o">*/</span>
+    <span class="n">qemu_set_irq</span><span class="p">(</span><span class="n">mydev</span><span class="o">-&gt;</span><span class="n">irq</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">typedef</span> <span class="n">struct</span> <span class="n">MyDevClass</span> <span class="p">{</span>
+    <span class="n">MyParentClass</span> <span class="n">parent_class</span><span class="p">;</span>
+    <span class="o">/*</span> <span class="n">to</span> <span class="n">store</span> <span class="n">eventual</span> <span class="n">parent</span> <span class="n">reset</span> <span class="n">methods</span> <span class="o">*/</span>
+    <span class="n">ResettablePhases</span> <span class="n">parent_phases</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">MyDevClass</span><span class="p">;</span>
+
+<span class="n">static</span> <span class="n">void</span> <span class="n">mydev_class_init</span><span class="p">(</span><span class="n">ObjectClass</span> <span class="o">*</span><span class="n">class</span><span class="p">,</span> <span class="n">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">MyDevClass</span> <span class="o">*</span><span class="n">myclass</span> <span class="o">=</span> <span class="n">MYDEV_CLASS</span><span class="p">(</span><span class="n">class</span><span class="p">);</span>
+    <span class="n">ResettableClass</span> <span class="o">*</span><span class="n">rc</span> <span class="o">=</span> <span class="n">RESETTABLE_CLASS</span><span class="p">(</span><span class="n">class</span><span class="p">);</span>
+    <span class="n">resettable_class_set_parent_reset_phases</span><span class="p">(</span><span class="n">rc</span><span class="p">,</span>
+                                             <span class="n">mydev_reset_enter</span><span class="p">,</span>
+                                             <span class="n">mydev_reset_hold</span><span class="p">,</span>
+                                             <span class="n">mydev_reset_exit</span><span class="p">,</span>
+                                             <span class="o">&amp;</span><span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the above example, we override all three phases. It is possible to override
+only some of them by passing NULL instead of a function pointer to
+<code class="docutils literal notranslate"><span class="pre">resettable_class_set_parent_reset_phases()</span></code>. For example, the following will
+only override the <em>enter</em> phase and leave <em>hold</em> and <em>exit</em> untouched:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">resettable_class_set_parent_reset_phases</span><span class="p">(</span><span class="n">rc</span><span class="p">,</span> <span class="n">mydev_reset_enter</span><span class="p">,</span>
+                                         <span class="n">NULL</span><span class="p">,</span> <span class="n">NULL</span><span class="p">,</span>
+                                         <span class="o">&amp;</span><span class="n">myclass</span><span class="o">-&gt;</span><span class="n">parent_phases</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is equivalent to providing a trivial implementation of the hold and exit
+phases which does nothing but call the parent class’s implementation of the
+phase.</p>
+</section>
+<section id="polling-the-reset-state">
+<h3>Polling the reset state<a class="headerlink" href="#polling-the-reset-state" title="Permalink to this heading"></a></h3>
+<p>Resettable interface provides the <code class="docutils literal notranslate"><span class="pre">resettable_is_in_reset()</span></code> function.
+This function returns true if the object parameter is currently under reset.</p>
+<p>An object is under reset from the beginning of the <em>enter</em> phase (before
+either its children or its own enter method is called) to the <em>exit</em>
+phase. During <em>enter</em> and <em>hold</em> phase only, the function will return that the
+object is in reset. The state is changed after the <em>exit</em> is propagated to
+its children and just before calling the object’s own <em>exit</em> method.</p>
+<p>This function may be used if the object behavior has to be adapted
+while in reset state. For example if a device has an irq input,
+it will probably need to ignore it while in reset; then it can for
+example check the reset state at the beginning of the irq callback.</p>
+<p>Note that until migration of the reset state is supported, an object
+should not be left in reset. So apart from being currently executing
+one of the reset phases, the only cases when this function will return
+true is if an external interaction (like changing an io) is made during
+<em>hold</em> or <em>exit</em> phase of another object in the same reset group.</p>
+<p>Helpers <code class="docutils literal notranslate"><span class="pre">device_is_in_reset()</span></code> and <code class="docutils literal notranslate"><span class="pre">bus_is_in_reset()</span></code> are also provided
+for devices and buses and should be preferred.</p>
+</section>
+</section>
+<section id="base-class-handling-of-reset">
+<h2>Base class handling of reset<a class="headerlink" href="#base-class-handling-of-reset" title="Permalink to this heading"></a></h2>
+<p>This section documents parts of the reset mechanism that you only need to know
+about if you are extending it to work with a new base class other than
+DeviceClass or BusClass, or maintaining the existing code in those classes. Most
+people can ignore it.</p>
+<section id="id1">
+<h3>Methods to implement<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<p>There are two other methods that need to exist in a class implementing the
+interface: <code class="docutils literal notranslate"><span class="pre">get_state()</span></code> and <code class="docutils literal notranslate"><span class="pre">child_foreach()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_state()</span></code> is simple. <em>resettable</em> is an interface and, as a consequence,
+does not have any class state structure. But in order to factorize the code, we
+need one. This method must return a pointer to <code class="docutils literal notranslate"><span class="pre">ResettableState</span></code> structure.
+The structure must be allocated by the base class; preferably it should be
+located inside the object instance structure.</p>
+<p><code class="docutils literal notranslate"><span class="pre">child_foreach()</span></code> is more complex. It should execute the given callback on
+every reset child of the given resettable object. All children must be
+resettable too. Additional parameters (a reset type and an opaque pointer) must
+be passed to the callback too.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">DeviceClass</span></code> and <code class="docutils literal notranslate"><span class="pre">BusClass</span></code> the <code class="docutils literal notranslate"><span class="pre">ResettableState</span></code> is located
+<code class="docutils literal notranslate"><span class="pre">DeviceState</span></code> and <code class="docutils literal notranslate"><span class="pre">BusState</span></code> structure. <code class="docutils literal notranslate"><span class="pre">child_foreach()</span></code> is implemented
+to follow the bus hierarchy; for a bus, it calls the function on every child
+device; for a device, it calls the function on every bus child. When we reset
+the main system bus, we reset the whole machine bus tree.</p>
+</section>
+<section id="changing-a-resettable-parent">
+<h3>Changing a resettable parent<a class="headerlink" href="#changing-a-resettable-parent" title="Permalink to this heading"></a></h3>
+<p>One thing which should be taken care of by the base class is handling reset
+hierarchy changes.</p>
+<p>The reset hierarchy is supposed to be static and built during machine creation.
+But there are actually some exceptions. To cope with this, the resettable API
+provides <code class="docutils literal notranslate"><span class="pre">resettable_change_parent()</span></code>. This function allows to set, update or
+remove the parent of a resettable object after machine creation is done. As
+parameters, it takes the object being moved, the old parent if any and the new
+parent if any.</p>
+<p>This function can be used at any time when not in a reset operation. During
+a reset operation it must be used only in <em>hold</em> phase. Using it in <em>enter</em> or
+<em>exit</em> phase is an error.
+Also it should not be used during machine creation, although it is harmless to
+do so: the function is a no-op as long as old and new parent are NULL or not
+in reset.</p>
+<p>There is currently 2 cases where this function is used:</p>
+<ol class="arabic simple">
+<li><p><em>device hotplug</em>; it means a new device is introduced on a live bus.</p></li>
+<li><p><em>hot bus change</em>; it means an existing live device is added, moved or
+removed in the bus hierarchy. At the moment, it occurs only in the raspi
+machines for changing the sdbus used by sd card.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="multi-process.html" class="btn btn-neutral float-left" title="Multi-process QEMU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="s390-dasd-ipl.html" class="btn btn-neutral float-right" title="Booting from real channel-attached devices on s390x" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

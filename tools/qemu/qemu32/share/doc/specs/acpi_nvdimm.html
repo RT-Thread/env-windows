@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU&lt;-&gt;ACPI BIOS NVDIMM interface &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ACPI ERST DEVICE" href="acpi_erst.html" />
+    <link rel="prev" title="QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface" href="acpi_pci_hotplug.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nvdimm-acpi-background">NVDIMM ACPI Background</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#methods-supported-on-both-nvdimm-root-device-and-nvdimm-device">Methods supported on both NVDIMM root device and NVDIMM device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#methods-on-nvdimm-root-device">Methods on NVDIMM ROOT Device</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qemu-nvdimm-implementation">QEMU NVDIMM Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dsm-process-diagram">_DSM process diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nvdimm-hotplug">NVDIMM hotplug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qemu-internal-use-only-dsm-functions">QEMU internal use only _DSM functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#read-fit">Read FIT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Guest Hardware Specifications</a></li>
+      <li class="breadcrumb-item active">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/acpi_nvdimm.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-acpi-bios-nvdimm-interface">
+<h1>QEMU&lt;-&gt;ACPI BIOS NVDIMM interface<a class="headerlink" href="#qemu-acpi-bios-nvdimm-interface" title="Permalink to this heading"></a></h1>
+<p>QEMU supports NVDIMM via ACPI. This document describes the basic concepts of
+NVDIMM ACPI and the interface between QEMU and the ACPI BIOS.</p>
+<section id="nvdimm-acpi-background">
+<h2>NVDIMM ACPI Background<a class="headerlink" href="#nvdimm-acpi-background" title="Permalink to this heading"></a></h2>
+<p>NVDIMM is introduced in ACPI 6.0 which defines an NVDIMM root device under
+_SB scope with a _HID of “ACPI0012”. For each NVDIMM present or intended
+to be supported by platform, platform firmware also exposes an ACPI
+Namespace Device under the root device.</p>
+<p>The NVDIMM child devices under the NVDIMM root device are defined with _ADR
+corresponding to the NFIT device handle. The NVDIMM root device and the
+NVDIMM devices can have device specific methods (_DSM) to provide additional
+functions specific to a particular NVDIMM implementation.</p>
+<p>This is an example from ACPI 6.0, a platform contains one NVDIMM:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scope</span> <span class="p">(</span>\<span class="n">_SB</span><span class="p">){</span>
+   <span class="n">Device</span> <span class="p">(</span><span class="n">NVDR</span><span class="p">)</span> <span class="o">//</span> <span class="n">Root</span> <span class="n">device</span>
+   <span class="p">{</span>
+      <span class="n">Name</span> <span class="p">(</span><span class="n">_HID</span><span class="p">,</span> <span class="s2">&quot;ACPI0012&quot;</span><span class="p">)</span>
+      <span class="n">Method</span> <span class="p">(</span><span class="n">_STA</span><span class="p">)</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+      <span class="n">Method</span> <span class="p">(</span><span class="n">_FIT</span><span class="p">)</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+      <span class="n">Method</span> <span class="p">(</span><span class="n">_DSM</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+      <span class="n">Device</span> <span class="p">(</span><span class="n">NVD</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="n">Name</span><span class="p">(</span><span class="n">_ADR</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">//</span><span class="n">where</span> <span class="n">h</span> <span class="ow">is</span> <span class="n">NFIT</span> <span class="n">Device</span> <span class="n">Handle</span> <span class="k">for</span> <span class="n">this</span> <span class="n">NVDIMM</span>
+         <span class="n">Method</span> <span class="p">(</span><span class="n">_DSM</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+      <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="methods-supported-on-both-nvdimm-root-device-and-nvdimm-device">
+<h3>Methods supported on both NVDIMM root device and NVDIMM device<a class="headerlink" href="#methods-supported-on-both-nvdimm-root-device-and-nvdimm-device" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>_DSM (Device Specific Method)</dt><dd><p>It is a control method that enables devices to provide device specific
+control functions that are consumed by the device driver.
+The NVDIMM DSM specification can be found at
+<a class="reference external" href="http://pmem.io/documents/NVDIMM_DSM_Interface_Example.pdf">http://pmem.io/documents/NVDIMM_DSM_Interface_Example.pdf</a></p>
+<p>Arguments:</p>
+<dl class="simple">
+<dt>Arg0</dt><dd><p>A Buffer containing a UUID (16 Bytes)</p>
+</dd>
+<dt>Arg1</dt><dd><p>An Integer containing the Revision ID (4 Bytes)</p>
+</dd>
+<dt>Arg2</dt><dd><p>An Integer containing the Function Index (4 Bytes)</p>
+</dd>
+<dt>Arg3</dt><dd><p>A package containing parameters for the function specified by the
+UUID, Revision ID, and Function Index</p>
+</dd>
+</dl>
+<p>Return Value:</p>
+<p>If Function Index = 0, a Buffer containing a function index bitfield.
+Otherwise, the return value and type depends on the UUID, revision ID
+and function index which are described in the DSM specification.</p>
+</dd>
+</dl>
+</section>
+<section id="methods-on-nvdimm-root-device">
+<h3>Methods on NVDIMM ROOT Device<a class="headerlink" href="#methods-on-nvdimm-root-device" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>_FIT(Firmware Interface Table)</dt><dd><p>It evaluates to a buffer returning data in the format of a series of NFIT
+Type Structure.</p>
+<p>Arguments: None</p>
+<p>Return Value:
+A Buffer containing a list of NFIT Type structure entries.</p>
+<p>The detailed definition of the structure can be found at ACPI 6.0: 5.2.25
+NVDIMM Firmware Interface Table (NFIT).</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="qemu-nvdimm-implementation">
+<h2>QEMU NVDIMM Implementation<a class="headerlink" href="#qemu-nvdimm-implementation" title="Permalink to this heading"></a></h2>
+<p>QEMU uses 4 bytes IO Port starting from 0x0a18 and a RAM-based memory page
+for NVDIMM ACPI.</p>
+<dl>
+<dt>Memory:</dt><dd><p>QEMU uses BIOS Linker/loader feature to ask BIOS to allocate a memory
+page and dynamically patch its address into an int32 object named “MEMA”
+in ACPI.</p>
+<p>This page is RAM-based and it is used to transfer data between _DSM
+method and QEMU. If ACPI has control, this pages is owned by ACPI which
+writes _DSM input data to it, otherwise, it is owned by QEMU which
+emulates _DSM access and writes the output data to it.</p>
+<p>ACPI writes _DSM Input Data (based on the offset in the page):</p>
+<dl>
+<dt>[0x0 - 0x3]</dt><dd><p>4 bytes, NVDIMM Device Handle.</p>
+<p>The handle is completely QEMU internal thing, the values in
+range [1, 0xFFFF] indicate nvdimm device. Other values are
+reserved for other purposes.</p>
+<p>Reserved handles:</p>
+<ul class="simple">
+<li><p>0 is reserved for nvdimm root device named NVDR.</p></li>
+<li><p>0x10000 is reserved for QEMU internal DSM function called on
+the root device.</p></li>
+</ul>
+</dd>
+<dt>[0x4 - 0x7]</dt><dd><p>4 bytes, Revision ID, that is the Arg1 of _DSM method.</p>
+</dd>
+<dt>[0x8 - 0xB]</dt><dd><p>4 bytes. Function Index, that is the Arg2 of _DSM method.</p>
+</dd>
+<dt>[0xC - 0xFFF]</dt><dd><p>4084 bytes, the Arg3 of _DSM method.</p>
+</dd>
+</dl>
+<p>QEMU writes Output Data (based on the offset in the page):</p>
+<dl class="simple">
+<dt>[0x0 - 0x3]</dt><dd><p>4 bytes, the length of result</p>
+</dd>
+<dt>[0x4 - 0xFFF]</dt><dd><p>4092 bytes, the DSM result filled by QEMU</p>
+</dd>
+</dl>
+</dd>
+<dt>IO Port 0x0a18 - 0xa1b:</dt><dd><p>ACPI writes the address of the memory page allocated by BIOS to this
+port then QEMU gets the control and fills the result in the memory page.</p>
+<p>Write Access:</p>
+<dl class="simple">
+<dt>[0x0a18 - 0xa1b]</dt><dd><p>4 bytes, the address of the memory page allocated by BIOS.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="dsm-process-diagram">
+<h2>_DSM process diagram<a class="headerlink" href="#dsm-process-diagram" title="Permalink to this heading"></a></h2>
+<p>“MEMA” indicates the address of memory page allocated by BIOS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------------+</span>      <span class="o">+-----------------------+</span>
+<span class="o">|</span>    <span class="mf">1.</span> <span class="n">OSPM</span>           <span class="o">|</span>      <span class="o">|</span>    <span class="mf">2.</span> <span class="n">OSPM</span>            <span class="o">|</span>
+<span class="o">|</span> <span class="n">save</span> <span class="n">_DSM</span> <span class="nb">input</span> <span class="n">data</span> <span class="o">|</span>      <span class="o">|</span>  <span class="n">write</span> <span class="s2">&quot;MEMA&quot;</span> <span class="n">to</span>      <span class="o">|</span> <span class="n">Exit</span> <span class="n">to</span> <span class="n">QEMU</span>
+<span class="o">|</span> <span class="n">to</span> <span class="n">the</span> <span class="n">page</span>          <span class="o">+-----&gt;|</span>  <span class="n">IO</span> <span class="n">port</span> <span class="mh">0x0a18</span>       <span class="o">+------------+</span>
+<span class="o">|</span> <span class="n">indicated</span> <span class="n">by</span> <span class="s2">&quot;MEMA&quot;</span>  <span class="o">|</span>      <span class="o">|</span>                       <span class="o">|</span>            <span class="o">|</span>
+<span class="o">+----------------------+</span>      <span class="o">+-----------------------+</span>            <span class="o">|</span>
+                                                                   <span class="o">|</span>
+                                                                   <span class="n">v</span>
+<span class="o">+--------------------+</span>       <span class="o">+-----------+</span>      <span class="o">+------------------+--------+</span>
+<span class="o">|</span>      <span class="mi">5</span> <span class="n">QEMU</span>        <span class="o">|</span>       <span class="o">|</span> <span class="mi">4</span> <span class="n">QEMU</span>    <span class="o">|</span>      <span class="o">|</span>        <span class="mf">3.</span> <span class="n">QEMU</span>            <span class="o">|</span>
+<span class="o">|</span> <span class="n">write</span> <span class="n">_DSM</span> <span class="n">result</span>  <span class="o">|</span>       <span class="o">|</span>  <span class="n">emulate</span>  <span class="o">|</span>      <span class="o">|</span> <span class="n">get</span> <span class="n">_DSM</span> <span class="nb">input</span> <span class="n">data</span> <span class="kn">from</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">to</span> <span class="n">the</span> <span class="n">page</span>        <span class="o">+&lt;------+</span> <span class="n">_DSM</span>      <span class="o">+&lt;-----+</span> <span class="n">the</span> <span class="n">page</span> <span class="n">indicated</span> <span class="n">by</span> <span class="n">the</span> <span class="o">|</span>
+<span class="o">|</span>                    <span class="o">|</span>       <span class="o">|</span>           <span class="o">|</span>      <span class="o">|</span> <span class="n">value</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">IO</span> <span class="n">port</span>    <span class="o">|</span>
+<span class="o">+--------+-----------+</span>       <span class="o">+-----------+</span>      <span class="o">+---------------------------+</span>
+         <span class="o">|</span>
+         <span class="o">|</span> <span class="n">Enter</span> <span class="n">Guest</span>
+         <span class="o">|</span>
+         <span class="n">v</span>
+<span class="o">+--------------------------+</span>      <span class="o">+--------------+</span>
+<span class="o">|</span>     <span class="mi">6</span> <span class="n">OSPM</span>               <span class="o">|</span>      <span class="o">|</span>   <span class="mi">7</span> <span class="n">OSPM</span>     <span class="o">|</span>
+<span class="o">|</span> <span class="n">result</span> <span class="n">size</span> <span class="ow">is</span> <span class="n">returned</span>  <span class="o">|</span>      <span class="o">|</span>  <span class="n">_DSM</span> <span class="k">return</span> <span class="o">|</span>
+<span class="o">|</span> <span class="n">by</span> <span class="n">reading</span>  <span class="n">DSM</span>          <span class="o">+-----&gt;+</span>              <span class="o">|</span>
+<span class="o">|</span> <span class="n">result</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">page</span>     <span class="o">|</span>      <span class="o">|</span>              <span class="o">|</span>
+<span class="o">+--------------------------+</span>      <span class="o">+--------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="nvdimm-hotplug">
+<h2>NVDIMM hotplug<a class="headerlink" href="#nvdimm-hotplug" title="Permalink to this heading"></a></h2>
+<p>ACPI BIOS GPE.4 handler is dedicated for notifying OS about nvdimm device
+hot-add event.</p>
+</section>
+<section id="qemu-internal-use-only-dsm-functions">
+<h2>QEMU internal use only _DSM functions<a class="headerlink" href="#qemu-internal-use-only-dsm-functions" title="Permalink to this heading"></a></h2>
+<section id="read-fit">
+<h3>Read FIT<a class="headerlink" href="#read-fit" title="Permalink to this heading"></a></h3>
+<p>_FIT method uses _DSM method to fetch NFIT structures blob from QEMU
+in 1 page sized increments which are then concatenated and returned
+as _FIT method result.</p>
+<p>Input parameters:</p>
+<dl>
+<dt>Arg0</dt><dd><p>UUID {set to 648B9CF2-CDA1-4312-8AD9-49C4AF32BD62}</p>
+</dd>
+<dt>Arg1</dt><dd><p>Revision ID (set to 1)</p>
+</dd>
+<dt>Arg2</dt><dd><p>Function Index, 0x1</p>
+</dd>
+<dt>Arg3</dt><dd><p>A package containing a buffer whose layout is as follows:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 62%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Field</p></td>
+<td><p>Length</p></td>
+<td><p>Offset</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p>offset</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>offset in QEMU’s NFIT structures blob to
+read from</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd>
+</dl>
+<p>Output layout in the dsm memory page:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 62%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Field</p></td>
+<td><p>Length</p></td>
+<td><p>Offset</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p>length</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>length of entire returned data
+(including this header)</p></td>
+</tr>
+<tr class="row-odd"><td><p>status</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>return status codes</p>
+<ul class="simple">
+<li><p>0x0 - success</p></li>
+<li><p>0x100 - error caused by NFIT update
+while read by _FIT wasn’t completed</p></li>
+<li><p>other codes follow Chapter 3 in
+DSM Spec Rev1</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>fit data</p></td>
+<td><p>Varies</p></td>
+<td><p>8</p></td>
+<td><p>contains FIT data. This field is present
+if status field is 0.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The FIT offset is maintained by the OSPM itself, current offset plus
+the size of the fit data returned by the function is the next offset
+OSPM should read. When all FIT data has been read out, zero fit data
+size is returned.</p>
+<p>If it returns status code 0x100, OSPM should restart to read FIT (read
+from offset 0 again).</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="acpi_pci_hotplug.html" class="btn btn-neutral float-left" title="QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acpi_erst.html" class="btn btn-neutral float-right" title="ACPI ERST DEVICE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

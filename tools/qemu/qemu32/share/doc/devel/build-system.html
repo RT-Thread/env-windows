@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The QEMU build system architecture &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU and Kconfig" href="kconfig.html" />
+    <link rel="prev" title="QEMU Build and Test System" href="index-build.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The QEMU build system architecture</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stage-1-configure">Stage 1: configure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stage-2-meson">Stage 2: Meson</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stage-3-makefiles">Stage 3: makefiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#important-files-for-the-build-system">Important files for the build system</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">The QEMU build system architecture</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/build-system.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-qemu-build-system-architecture">
+<h1>The QEMU build system architecture<a class="headerlink" href="#the-qemu-build-system-architecture" title="Permalink to this heading"></a></h1>
+<p>This document aims to help developers understand the architecture of the
+QEMU build system. As with projects using GNU autotools, the QEMU build
+system has two stages, first the developer runs the “configure” script
+to determine the local build environment characteristics, then they run
+“make” to build the project. There is about where the similarities with
+GNU autotools end, so try to forget what you know about them.</p>
+<section id="stage-1-configure">
+<h2>Stage 1: configure<a class="headerlink" href="#stage-1-configure" title="Permalink to this heading"></a></h2>
+<p>The QEMU configure script is written directly in shell, and should be
+compatible with any POSIX shell, hence it uses #!/bin/sh. An important
+implication of this is that it is important to avoid using bash-isms on
+development platforms where bash is the primary host.</p>
+<p>In contrast to autoconf scripts, QEMU’s configure is expected to be
+silent while it is checking for features. It will only display output
+when an error occurs, or to show the final feature enablement summary
+on completion.</p>
+<p>Because QEMU uses the Meson build system under the hood, only VPATH
+builds are supported.  There are two general ways to invoke configure &amp;
+perform a build:</p>
+<blockquote>
+<div><ul>
+<li><p>VPATH, build artifacts outside of QEMU source tree entirely:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">../</span>
+<span class="n">mkdir</span> <span class="n">build</span>
+<span class="n">cd</span> <span class="n">build</span>
+<span class="o">../</span><span class="n">qemu</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+</pre></div>
+</div>
+</li>
+<li><p>VPATH, build artifacts in a subdir of QEMU source tree:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">build</span>
+<span class="n">cd</span> <span class="n">build</span>
+<span class="o">../</span><span class="n">configure</span>
+<span class="n">make</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>The configure script automatically recognizes
+command line options for which a same-named Meson option exists;
+dashes in the command line are replaced with underscores.</p>
+<p>Many checks on the compilation environment are still found in configure
+rather than <code class="docutils literal notranslate"><span class="pre">meson.build</span></code>, but new checks should be added directly to
+<code class="docutils literal notranslate"><span class="pre">meson.build</span></code>.</p>
+<p>Patches are also welcome to move existing checks from the configure
+phase to <code class="docutils literal notranslate"><span class="pre">meson.build</span></code>.  When doing so, ensure that <code class="docutils literal notranslate"><span class="pre">meson.build</span></code> does
+not use anymore the keys that you have removed from <code class="docutils literal notranslate"><span class="pre">config-host.mak</span></code>.
+Typically these will be replaced in <code class="docutils literal notranslate"><span class="pre">meson.build</span></code> by boolean variables,
+<code class="docutils literal notranslate"><span class="pre">get_option('optname')</span></code> invocations, or <code class="docutils literal notranslate"><span class="pre">dep.found()</span></code> expressions.
+In general, the remaining checks have little or no interdependencies,
+so they can be moved one by one.</p>
+<section id="helper-functions">
+<h3>Helper functions<a class="headerlink" href="#helper-functions" title="Permalink to this heading"></a></h3>
+<p>The configure script provides a variety of helper functions to assist
+developers in checking for system features:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">do_cc</span> <span class="pre">$ARGS...</span></code></dt><dd><p>Attempt to run the system C compiler passing it $ARGS…</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">do_cxx</span> <span class="pre">$ARGS...</span></code></dt><dd><p>Attempt to run the system C++ compiler passing it $ARGS…</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">compile_object</span> <span class="pre">$CFLAGS</span></code></dt><dd><p>Attempt to compile a test program with the system C compiler using
+$CFLAGS. The test program must have been previously written to a file
+called $TMPC.  The replacement in Meson is the compiler object <code class="docutils literal notranslate"><span class="pre">cc</span></code>,
+which has methods such as <code class="docutils literal notranslate"><span class="pre">cc.compiles()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cc.check_header()</span></code>, <code class="docutils literal notranslate"><span class="pre">cc.has_function()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">compile_prog</span> <span class="pre">$CFLAGS</span> <span class="pre">$LDFLAGS</span></code></dt><dd><p>Attempt to compile a test program with the system C compiler using
+$CFLAGS and link it with the system linker using $LDFLAGS. The test
+program must have been previously written to a file called $TMPC.
+The replacement in Meson is <code class="docutils literal notranslate"><span class="pre">cc.find_library()</span></code> and <code class="docutils literal notranslate"><span class="pre">cc.links()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">has</span> <span class="pre">$COMMAND</span></code></dt><dd><p>Determine if $COMMAND exists in the current environment, either as a
+shell builtin, or executable binary, returning 0 on success.  The
+replacement in Meson is <code class="docutils literal notranslate"><span class="pre">find_program()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">check_define</span> <span class="pre">$NAME</span></code></dt><dd><p>Determine if the macro $NAME is defined by the system C compiler</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">check_include</span> <span class="pre">$NAME</span></code></dt><dd><p>Determine if the include $NAME file is available to the system C
+compiler.  The replacement in Meson is <code class="docutils literal notranslate"><span class="pre">cc.has_header()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">write_c_skeleton</span></code></dt><dd><p>Write a minimal C program main() function to the temporary file
+indicated by $TMPC</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">error_exit</span> <span class="pre">$MESSAGE</span> <span class="pre">$MORE...</span></code></dt><dd><p>Print $MESSAGE to stderr, followed by $MORE… and then exit from the
+configure script with non-zero status</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">query_pkg_config</span> <span class="pre">$ARGS...</span></code></dt><dd><p>Run pkg-config passing it $ARGS. If QEMU is doing a static build,
+then –static will be automatically added to $ARGS</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="stage-2-meson">
+<h2>Stage 2: Meson<a class="headerlink" href="#stage-2-meson" title="Permalink to this heading"></a></h2>
+<p>The Meson build system is currently used to describe the build
+process for:</p>
+<ol class="arabic simple">
+<li><p>executables, which include:</p>
+<ul class="simple">
+<li><p>Tools - <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>, <code class="docutils literal notranslate"><span class="pre">qemu-nbd</span></code>, <code class="docutils literal notranslate"><span class="pre">qga</span></code> (guest agent), etc</p></li>
+<li><p>System emulators - <code class="docutils literal notranslate"><span class="pre">qemu-system-$ARCH</span></code></p></li>
+<li><p>Userspace emulators - <code class="docutils literal notranslate"><span class="pre">qemu-$ARCH</span></code></p></li>
+<li><p>Unit tests</p></li>
+</ul>
+</li>
+<li><p>documentation</p></li>
+<li><p>ROMs, which can be either installed as binary blobs or compiled</p></li>
+<li><p>other data files, such as icons or desktop files</p></li>
+</ol>
+<p>All executables are built by default, except for some <code class="docutils literal notranslate"><span class="pre">contrib/</span></code>
+binaries that are known to fail to build on some platforms (for example
+32-bit or big-endian platforms).  Tests are also built by default,
+though that might change in the future.</p>
+<p>The source code is highly modularized, split across many files to
+facilitate building of all of these components with as little duplicated
+compilation as possible. Using the Meson “sourceset” functionality,
+<code class="docutils literal notranslate"><span class="pre">meson.build</span></code> files group the source files in rules that are
+enabled according to the available system libraries and to various
+configuration symbols.  Sourcesets belong to one of four groups:</p>
+<dl>
+<dt>Subsystem sourcesets:</dt><dd><p>Various subsystems that are common to both tools and emulators have
+their own sourceset, for example <code class="docutils literal notranslate"><span class="pre">block_ss</span></code> for the block device subsystem,
+<code class="docutils literal notranslate"><span class="pre">chardev_ss</span></code> for the character device subsystem, etc.  These sourcesets
+are then turned into static libraries as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">libchardev</span> <span class="o">=</span> <span class="n">static_library</span><span class="p">(</span><span class="s1">&#39;chardev&#39;</span><span class="p">,</span> <span class="n">chardev_ss</span><span class="o">.</span><span class="n">sources</span><span class="p">(),</span>
+                            <span class="n">name_suffix</span><span class="p">:</span> <span class="s1">&#39;fa&#39;</span><span class="p">,</span>
+                            <span class="n">build_by_default</span><span class="p">:</span> <span class="n">false</span><span class="p">)</span>
+
+<span class="n">chardev</span> <span class="o">=</span> <span class="n">declare_dependency</span><span class="p">(</span><span class="n">link_whole</span><span class="p">:</span> <span class="n">libchardev</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As of Meson 0.55.1, the special <code class="docutils literal notranslate"><span class="pre">.fa</span></code> suffix should be used for everything
+that is used with <code class="docutils literal notranslate"><span class="pre">link_whole</span></code>, to ensure that the link flags are placed
+correctly in the command line.</p>
+</dd>
+<dt>Target-independent emulator sourcesets:</dt><dd><p>Various general purpose helper code is compiled only once and
+the .o files are linked into all output binaries that need it.
+This includes error handling infrastructure, standard data structures,
+platform portability wrapper functions, etc.</p>
+<p>Target-independent code lives in the <code class="docutils literal notranslate"><span class="pre">common_ss</span></code>, <code class="docutils literal notranslate"><span class="pre">softmmu_ss</span></code> and
+<code class="docutils literal notranslate"><span class="pre">user_ss</span></code> sourcesets.  <code class="docutils literal notranslate"><span class="pre">common_ss</span></code> is linked into all emulators,
+<code class="docutils literal notranslate"><span class="pre">softmmu_ss</span></code> only in system emulators, <code class="docutils literal notranslate"><span class="pre">user_ss</span></code> only in user-mode
+emulators.</p>
+<p>Target-independent sourcesets must exercise particular care when using
+<code class="docutils literal notranslate"><span class="pre">if_false</span></code> rules.  The <code class="docutils literal notranslate"><span class="pre">if_false</span></code> rule will be used correctly when linking
+emulator binaries; however, when <em>compiling</em> target-independent files
+into .o files, Meson may need to pick <em>both</em> the <code class="docutils literal notranslate"><span class="pre">if_true</span></code> and
+<code class="docutils literal notranslate"><span class="pre">if_false</span></code> sides to cater for targets that want either side.  To
+achieve that, you can add a special rule using the <code class="docutils literal notranslate"><span class="pre">CONFIG_ALL</span></code>
+symbol:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some targets have CONFIG_ACPI, some don&#39;t, so this is not enough</span>
+<span class="n">softmmu_ss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">when</span><span class="p">:</span> <span class="s1">&#39;CONFIG_ACPI&#39;</span><span class="p">,</span> <span class="n">if_true</span><span class="p">:</span> <span class="n">files</span><span class="p">(</span><span class="s1">&#39;acpi.c&#39;</span><span class="p">),</span>
+                                    <span class="n">if_false</span><span class="p">:</span> <span class="n">files</span><span class="p">(</span><span class="s1">&#39;acpi-stub.c&#39;</span><span class="p">))</span>
+
+<span class="c1"># This is required as well:</span>
+<span class="n">softmmu_ss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">when</span><span class="p">:</span> <span class="s1">&#39;CONFIG_ALL&#39;</span><span class="p">,</span> <span class="n">if_true</span><span class="p">:</span> <span class="n">files</span><span class="p">(</span><span class="s1">&#39;acpi-stub.c&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+<dt>Target-dependent emulator sourcesets:</dt><dd><p>In the target-dependent set lives CPU emulation, some device emulation and
+much glue code. This sometimes also has to be compiled multiple times,
+once for each target being built.  Target-dependent files are included
+in the <code class="docutils literal notranslate"><span class="pre">specific_ss</span></code> sourceset.</p>
+<p>Each emulator also includes sources for files in the <code class="docutils literal notranslate"><span class="pre">hw/</span></code> and <code class="docutils literal notranslate"><span class="pre">target/</span></code>
+subdirectories.  The subdirectory used for each emulator comes
+from the target’s definition of <code class="docutils literal notranslate"><span class="pre">TARGET_BASE_ARCH</span></code> or (if missing)
+<code class="docutils literal notranslate"><span class="pre">TARGET_ARCH</span></code>, as found in <code class="docutils literal notranslate"><span class="pre">default-configs/targets/*.mak</span></code>.</p>
+<p>Each subdirectory in <code class="docutils literal notranslate"><span class="pre">hw/</span></code> adds one sourceset to the <code class="docutils literal notranslate"><span class="pre">hw_arch</span></code> dictionary,
+for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arm_ss</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">source_set</span><span class="p">()</span>
+<span class="n">arm_ss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;boot.c&#39;</span><span class="p">),</span> <span class="n">fdt</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">hw_arch</span> <span class="o">+=</span> <span class="p">{</span><span class="s1">&#39;arm&#39;</span><span class="p">:</span> <span class="n">arm_ss</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The sourceset is only used for system emulators.</p>
+<p>Each subdirectory in <code class="docutils literal notranslate"><span class="pre">target/</span></code> instead should add one sourceset to each
+of the <code class="docutils literal notranslate"><span class="pre">target_arch</span></code> and <code class="docutils literal notranslate"><span class="pre">target_softmmu_arch</span></code>, which are used respectively
+for all emulators and for system emulators only.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arm_ss</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">source_set</span><span class="p">()</span>
+<span class="n">arm_softmmu_ss</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">source_set</span><span class="p">()</span>
+<span class="o">...</span>
+<span class="n">target_arch</span> <span class="o">+=</span> <span class="p">{</span><span class="s1">&#39;arm&#39;</span><span class="p">:</span> <span class="n">arm_ss</span><span class="p">}</span>
+<span class="n">target_softmmu_arch</span> <span class="o">+=</span> <span class="p">{</span><span class="s1">&#39;arm&#39;</span><span class="p">:</span> <span class="n">arm_softmmu_ss</span><span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>Module sourcesets:</dt><dd><p>There are two dictionaries for modules: <code class="docutils literal notranslate"><span class="pre">modules</span></code> is used for
+target-independent modules and <code class="docutils literal notranslate"><span class="pre">target_modules</span></code> is used for
+target-dependent modules.  When modules are disabled the <code class="docutils literal notranslate"><span class="pre">module</span></code>
+source sets are added to <code class="docutils literal notranslate"><span class="pre">softmmu_ss</span></code> and the <code class="docutils literal notranslate"><span class="pre">target_modules</span></code>
+source sets are added to <code class="docutils literal notranslate"><span class="pre">specific_ss</span></code>.</p>
+<p>Both dictionaries are nested.  One dictionary is created per
+subdirectory, and these per-subdirectory dictionaries are added to
+the toplevel dictionaries.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hw_display_modules</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">qxl_ss</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">source_set</span><span class="p">()</span>
+<span class="o">...</span>
+<span class="n">hw_display_modules</span> <span class="o">+=</span> <span class="p">{</span> <span class="s1">&#39;qxl&#39;</span><span class="p">:</span> <span class="n">qxl_ss</span> <span class="p">}</span>
+<span class="n">modules</span> <span class="o">+=</span> <span class="p">{</span> <span class="s1">&#39;hw-display&#39;</span><span class="p">:</span> <span class="n">hw_display_modules</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>Utility sourcesets:</dt><dd><p>All binaries link with a static library <code class="docutils literal notranslate"><span class="pre">libqemuutil.a</span></code>.  This library
+is built from several sourcesets; most of them however host generated
+code, and the only two of general interest are <code class="docutils literal notranslate"><span class="pre">util_ss</span></code> and <code class="docutils literal notranslate"><span class="pre">stub_ss</span></code>.</p>
+<p>The separation between these two is purely for documentation purposes.
+<code class="docutils literal notranslate"><span class="pre">util_ss</span></code> contains generic utility files.  Even though this code is only
+linked in some binaries, sometimes it requires hooks only in some of
+these and depend on other functions that are not fully implemented by
+all QEMU binaries.  <code class="docutils literal notranslate"><span class="pre">stub_ss</span></code> links dummy stubs that will only be linked
+into the binary if the real implementation is not present.  In a way,
+the stubs can be thought of as a portable implementation of the weak
+symbols concept.</p>
+</dd>
+</dl>
+<p>The following files concur in the definition of which files are linked
+into each emulator:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">default-configs/devices/*.mak</span></code></dt><dd><p>The files under <code class="docutils literal notranslate"><span class="pre">default-configs/devices/</span></code> control the boards and devices
+that are built into each QEMU system emulation targets. They merely contain
+a list of config variable definitions such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">include</span> <span class="n">arm</span><span class="o">-</span><span class="n">softmmu</span><span class="o">.</span><span class="n">mak</span>
+<span class="n">CONFIG_XLNX_ZYNQMP_ARM</span><span class="o">=</span><span class="n">y</span>
+<span class="n">CONFIG_XLNX_VERSAL</span><span class="o">=</span><span class="n">y</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">*/Kconfig</span></code></dt><dd><p>These files are processed together with <code class="docutils literal notranslate"><span class="pre">default-configs/devices/*.mak</span></code> and
+describe the dependencies between various features, subsystems and
+device models.  They are described in <a class="reference internal" href="kconfig.html#kconfig"><span class="std std-ref">QEMU and Kconfig</span></a></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">default-configs/targets/*.mak</span></code></dt><dd><p>These files mostly define symbols that appear in the <code class="docutils literal notranslate"><span class="pre">*-config-target.h</span></code>
+file for each emulator <a class="footnote-reference brackets" href="#cfgtarget" id="id1">1</a>.  However, the <code class="docutils literal notranslate"><span class="pre">TARGET_ARCH</span></code>
+and <code class="docutils literal notranslate"><span class="pre">TARGET_BASE_ARCH</span></code> will also be used to select the <code class="docutils literal notranslate"><span class="pre">hw/</span></code> and
+<code class="docutils literal notranslate"><span class="pre">target/</span></code> subdirectories that are compiled into each target.</p>
+</dd>
+</dl>
+<dl class="footnote brackets">
+<dt class="label" id="cfgtarget"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>This header is included by <code class="docutils literal notranslate"><span class="pre">qemu/osdep.h</span></code> when
+compiling files from the target-specific sourcesets.</p>
+</dd>
+</dl>
+<p>These files rarely need changing unless you are adding a completely
+new target, or enabling new devices or hardware for a particular
+system/userspace emulation target</p>
+<section id="adding-checks">
+<h3>Adding checks<a class="headerlink" href="#adding-checks" title="Permalink to this heading"></a></h3>
+<p>New checks should be added to Meson.  Compiler checks can be as simple as
+the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config_host_data</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;HAVE_BTRFS_H&#39;</span><span class="p">,</span> <span class="n">cc</span><span class="o">.</span><span class="n">has_header</span><span class="p">(</span><span class="s1">&#39;linux/btrfs.h&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>A more complex task such as adding a new dependency usually
+comprises the following tasks:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Add a Meson build option to meson_options.txt.</p></li>
+<li><p>Add code to perform the actual feature check.</p></li>
+<li><p>Add code to include the feature status in <code class="docutils literal notranslate"><span class="pre">config-host.h</span></code></p></li>
+<li><p>Add code to print out the feature status in the configure summary
+upon completion.</p></li>
+</ul>
+</div></blockquote>
+<p>Taking the probe for SDL2_Image as an example, we have the following
+in <code class="docutils literal notranslate"><span class="pre">meson_options.txt</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;sdl_image&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="p">:</span> <span class="s1">&#39;feature&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="p">:</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+       <span class="n">description</span><span class="p">:</span> <span class="s1">&#39;SDL Image support for icons&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Unless the option was given a non-<code class="docutils literal notranslate"><span class="pre">auto</span></code> value (on the configure
+command line), the detection code must be performed only if the
+dependency will be used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sdl_image</span> <span class="o">=</span> <span class="n">not_found</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;sdl_image&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span> <span class="ow">or</span> <span class="n">have_system</span>
+  <span class="n">sdl_image</span> <span class="o">=</span> <span class="n">dependency</span><span class="p">(</span><span class="s1">&#39;SDL2_image&#39;</span><span class="p">,</span> <span class="n">required</span><span class="p">:</span> <span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;sdl_image&#39;</span><span class="p">),</span>
+                         <span class="n">method</span><span class="p">:</span> <span class="s1">&#39;pkg-config&#39;</span><span class="p">,</span>
+                         <span class="n">static</span><span class="p">:</span> <span class="n">enable_static</span><span class="p">)</span>
+<span class="n">endif</span>
+</pre></div>
+</div>
+<p>This avoids warnings on static builds of user-mode emulators, for example.
+Most of the libraries used by system-mode emulators are not available for
+static linking.</p>
+<p>The other supporting code is generally simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create config-host.h (if applicable)</span>
+<span class="n">config_host_data</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;CONFIG_SDL_IMAGE&#39;</span><span class="p">,</span> <span class="n">sdl_image</span><span class="o">.</span><span class="n">found</span><span class="p">())</span>
+
+<span class="c1"># Summary</span>
+<span class="n">summary_info</span> <span class="o">+=</span> <span class="p">{</span><span class="s1">&#39;SDL image support&#39;</span><span class="p">:</span> <span class="n">sdl_image</span><span class="o">.</span><span class="n">found</span><span class="p">()}</span>
+</pre></div>
+</div>
+<p>For the configure script to parse the new option, the
+<code class="docutils literal notranslate"><span class="pre">scripts/meson-buildoptions.sh</span></code> file must be up-to-date; <code class="docutils literal notranslate"><span class="pre">make</span>
+<span class="pre">update-buildoptions</span></code> (or just <code class="docutils literal notranslate"><span class="pre">make</span></code>) will take care of updating it.</p>
+</section>
+<section id="support-scripts">
+<h3>Support scripts<a class="headerlink" href="#support-scripts" title="Permalink to this heading"></a></h3>
+<p>Meson has a special convention for invoking Python scripts: if their
+first line is <code class="docutils literal notranslate"><span class="pre">#!</span> <span class="pre">/usr/bin/env</span> <span class="pre">python3</span></code> and the file is <em>not</em> executable,
+find_program() arranges to invoke the script under the same Python
+interpreter that was used to invoke Meson.  This is the most common
+and preferred way to invoke support scripts from Meson build files,
+because it automatically uses the value of configure’s –python= option.</p>
+<p>In case the script is not written in Python, use a <code class="docutils literal notranslate"><span class="pre">#!</span> <span class="pre">/usr/bin/env</span> <span class="pre">...</span></code>
+line and make the script executable.</p>
+<p>Scripts written in Python, where it is desirable to make the script
+executable (for example for test scripts that developers may want to
+invoke from the command line, such as tests/qapi-schema/test-qapi.py),
+should be invoked through the <code class="docutils literal notranslate"><span class="pre">python</span></code> variable in meson.build. For
+example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test</span><span class="p">(</span><span class="s1">&#39;QAPI schema regression tests&#39;</span><span class="p">,</span> <span class="n">python</span><span class="p">,</span>
+     <span class="n">args</span><span class="p">:</span> <span class="n">files</span><span class="p">(</span><span class="s1">&#39;test-qapi.py&#39;</span><span class="p">),</span>
+     <span class="n">env</span><span class="p">:</span> <span class="n">test_env</span><span class="p">,</span> <span class="n">suite</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;qapi-schema&#39;</span><span class="p">,</span> <span class="s1">&#39;qapi-frontend&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This is needed to obey the –python= option passed to the configure
+script, which may point to something other than the first python3
+binary on the path.</p>
+</section>
+</section>
+<section id="stage-3-makefiles">
+<h2>Stage 3: makefiles<a class="headerlink" href="#stage-3-makefiles" title="Permalink to this heading"></a></h2>
+<p>The use of GNU make is required with the QEMU build system.</p>
+<p>The output of Meson is a build.ninja file, which is used with the Ninja
+build system.  QEMU uses a different approach, where Makefile rules are
+synthesized from the build.ninja file.  The main Makefile includes these
+rules and wraps them so that e.g. submodules are built before QEMU.
+The resulting build system is largely non-recursive in nature, in
+contrast to common practices seen with automake.</p>
+<p>Tests are also ran by the Makefile with the traditional <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check</span></code>
+phony target, while benchmarks are run with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">bench</span></code>.  Meson test
+suites such as <code class="docutils literal notranslate"><span class="pre">unit</span></code> can be ran with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-unit</span></code> too.  It is also
+possible to run tests defined in meson.build with <code class="docutils literal notranslate"><span class="pre">meson</span> <span class="pre">test</span></code>.</p>
+<section id="useful-make-targets">
+<h3>Useful make targets<a class="headerlink" href="#useful-make-targets" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">help</span></code></dt><dd><p>Print a help message for the most common build targets.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">print-VAR</span></code></dt><dd><p>Print the value of the variable VAR. Useful for debugging the build
+system.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="important-files-for-the-build-system">
+<h2>Important files for the build system<a class="headerlink" href="#important-files-for-the-build-system" title="Permalink to this heading"></a></h2>
+<section id="statically-defined-files">
+<h3>Statically defined files<a class="headerlink" href="#statically-defined-files" title="Permalink to this heading"></a></h3>
+<p>The following key files are statically defined in the source tree, with
+the rules needed to build QEMU. Their behaviour is influenced by a
+number of dynamically created files listed later.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Makefile</span></code></dt><dd><p>The main entry point used when invoking make to build all the components
+of QEMU. The default ‘all’ target will naturally result in the build of
+every component. Makefile takes care of recursively building submodules
+directly via a non-recursive set of rules.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">*/meson.build</span></code></dt><dd><p>The meson.build file in the root directory is the main entry point for the
+Meson build system, and it coordinates the configuration and build of all
+executables.  Build rules for various subdirectories are included in
+other meson.build files spread throughout the QEMU source tree.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tests/Makefile.include</span></code></dt><dd><p>Rules for external test harnesses. These include the TCG tests,
+<code class="docutils literal notranslate"><span class="pre">qemu-iotests</span></code> and the Avocado-based integration tests.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tests/docker/Makefile.include</span></code></dt><dd><p>Rules for Docker tests. Like tests/Makefile, this file is included
+directly by the top level Makefile, anything defined in this file will
+influence the entire build system.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tests/vm/Makefile.include</span></code></dt><dd><p>Rules for VM-based tests. Like tests/Makefile, this file is included
+directly by the top level Makefile, anything defined in this file will
+influence the entire build system.</p>
+</dd>
+</dl>
+</section>
+<section id="dynamically-created-files">
+<h3>Dynamically created files<a class="headerlink" href="#dynamically-created-files" title="Permalink to this heading"></a></h3>
+<p>The following files are generated dynamically by configure in order to
+control the behaviour of the statically defined makefiles. This avoids
+the need for QEMU makefiles to go through any pre-processing as seen
+with autotools, where Makefile.am generates Makefile.in which generates
+Makefile.</p>
+<p>Built by configure:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">config-host.mak</span></code></dt><dd><p>When configure has determined the characteristics of the build host it
+will write a long list of variables to config-host.mak file. This
+provides the various install directories, compiler / linker flags and a
+variety of <code class="docutils literal notranslate"><span class="pre">CONFIG_*</span></code> variables related to optionally enabled features.
+This is imported by the top level Makefile and meson.build in order to
+tailor the build output.</p>
+<p>config-host.mak is also used as a dependency checking mechanism. If make
+sees that the modification timestamp on configure is newer than that on
+config-host.mak, then configure will be re-run.</p>
+<p>The variables defined here are those which are applicable to all QEMU
+build outputs. Variables which are potentially different for each
+emulator target are defined by the next file…</p>
+</dd>
+</dl>
+<p>Built by Meson:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">${TARGET-NAME}-config-devices.mak</span></code></dt><dd><p>TARGET-NAME is again the name of a system or userspace emulator. The
+config-devices.mak file is automatically generated by make using the
+scripts/make_device_config.sh program, feeding it the
+default-configs/$TARGET-NAME file as input.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">config-host.h</span></code>, <code class="docutils literal notranslate"><span class="pre">$TARGET_NAME-config-target.h</span></code>, <code class="docutils literal notranslate"><span class="pre">$TARGET_NAME-config-devices.h</span></code></dt><dd><p>These files are used by source code to determine what features are
+enabled.  They are generated from the contents of the corresponding
+<code class="docutils literal notranslate"><span class="pre">*.mak</span></code> files using Meson’s <code class="docutils literal notranslate"><span class="pre">configure_file()</span></code> function.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">build.ninja</span></code></dt><dd><p>The build rules.</p>
+</dd>
+</dl>
+<p>Built by Makefile:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Makefile.ninja</span></code></dt><dd><p>A Makefile include that bridges to ninja for the actual build.  The
+Makefile is mostly a list of targets that Meson included in build.ninja.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Makefile.mtest</span></code></dt><dd><p>The Makefile definitions that let “make check” run tests defined in
+meson.build.  The rules are produced from Meson’s JSON description of
+tests (obtained with “meson introspect –tests”) through the script
+scripts/mtest2make.py.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index-build.html" class="btn btn-neutral float-left" title="QEMU Build and Test System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kconfig.html" class="btn btn-neutral float-right" title="QEMU and Kconfig" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

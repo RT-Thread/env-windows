@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU and Kconfig &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Testing in QEMU" href="testing.html" />
+    <link rel="prev" title="The QEMU build system architecture" href="build-system.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">QEMU and Kconfig</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-kconfig-language">The Kconfig language</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#guidelines-for-writing-kconfig-files">Guidelines for writing Kconfig files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-and-modifying-default-configurations">Writing and modifying default configurations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kconfig-host"><code class="docutils literal notranslate"><span class="pre">Kconfig.host</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">QEMU and Kconfig</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/kconfig.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-and-kconfig">
+<span id="kconfig"></span><h1>QEMU and Kconfig<a class="headerlink" href="#qemu-and-kconfig" title="Permalink to this heading"></a></h1>
+<p>QEMU is a very versatile emulator; it can be built for a variety of
+targets, where each target can emulate various boards and at the same
+time different targets can share large amounts of code.  For example,
+a POWER and an x86 board can run the same code to emulate a PCI network
+card, even though the boards use different PCI host bridges, and they
+can run the same code to emulate a SCSI disk while using different
+SCSI adapters.  Arm, s390 and x86 boards can all present a virtio-blk
+disk to their guests, but with three different virtio guest interfaces.</p>
+<p>Each QEMU target enables a subset of the boards, devices and buses that
+are included in QEMU’s source code.  As a result, each QEMU executable
+only links a small subset of the files that form QEMU’s source code;
+anything that is not needed to support a particular target is culled.</p>
+<p>QEMU uses a simple domain-specific language to describe the dependencies
+between components.  This is useful for two reasons:</p>
+<ul class="simple">
+<li><p>new targets and boards can be added without knowing in detail the
+architecture of the hardware emulation subsystems.  Boards only have
+to list the components they need, and the compiled executable will
+include all the required dependencies and all the devices that the
+user can add to that board;</p></li>
+<li><p>users can easily build reduced versions of QEMU that support only a subset
+of boards or devices.  For example, by default most targets will include
+all emulated PCI devices that QEMU supports, but the build process is
+configurable and it is easy to drop unnecessary (or otherwise unwanted)
+code to make a leaner binary.</p></li>
+</ul>
+<p>This domain-specific language is based on the Kconfig language that
+originated in the Linux kernel, though it was heavily simplified and
+the handling of dependencies is stricter in QEMU.</p>
+<p>Unlike Linux, there is no user interface to edit the configuration, which
+is instead specified in per-target files under the <code class="docutils literal notranslate"><span class="pre">default-configs/</span></code>
+directory of the QEMU source tree.  This is because, unlike Linux,
+configuration and dependencies can be treated as a black box when building
+QEMU; the default configuration that QEMU ships with should be okay in
+almost all cases.</p>
+<section id="the-kconfig-language">
+<h2>The Kconfig language<a class="headerlink" href="#the-kconfig-language" title="Permalink to this heading"></a></h2>
+<p>Kconfig defines configurable components in files named <code class="docutils literal notranslate"><span class="pre">hw/*/Kconfig</span></code>.
+Note that configurable components are _not_ visible in C code as preprocessor
+symbols; they are only visible in the Makefile.  Each configurable component
+defines a Makefile variable whose name starts with <code class="docutils literal notranslate"><span class="pre">CONFIG_</span></code>.</p>
+<p>All elements have boolean (true/false) type; truth is written as <code class="docutils literal notranslate"><span class="pre">y</span></code>, while
+falsehood is written <code class="docutils literal notranslate"><span class="pre">n</span></code>.  They are defined in a Kconfig
+stanza like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">ARM_VIRT</span>
+   <span class="nb">bool</span>
+   <span class="n">imply</span> <span class="n">PCI_DEVICES</span>
+   <span class="n">imply</span> <span class="n">VFIO_AMD_XGBE</span>
+   <span class="n">imply</span> <span class="n">VFIO_XGMAC</span>
+   <span class="n">select</span> <span class="n">A15MPCORE</span>
+   <span class="n">select</span> <span class="n">ACPI</span>
+   <span class="n">select</span> <span class="n">ARM_SMMUV3</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">config</span></code> keyword introduces a new configuration element.  In the example
+above, Makefiles will have access to a variable named <code class="docutils literal notranslate"><span class="pre">CONFIG_ARM_VIRT</span></code>,
+with value <code class="docutils literal notranslate"><span class="pre">y</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code> (respectively for boolean true and false).</p>
+<p>Boolean expressions can be used within the language, whenever <code class="docutils literal notranslate"><span class="pre">&lt;expr&gt;</span></code>
+is written in the remainder of this section.  The <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">||</span></code> and
+<code class="docutils literal notranslate"><span class="pre">!</span></code> operators respectively denote conjunction (AND), disjunction (OR)
+and negation (NOT).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">bool</span></code> data type declaration is optional, but it is suggested to
+include it for clarity and future-proofing.  After <code class="docutils literal notranslate"><span class="pre">bool</span></code> the following
+directives can be included:</p>
+<p><strong>dependencies</strong>: <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span> <span class="pre">&lt;expr&gt;</span></code></p>
+<blockquote>
+<div><p>This defines a dependency for this configurable element. Dependencies
+evaluate an expression and force the value of the variable to false
+if the expression is false.</p>
+</div></blockquote>
+<p><strong>reverse dependencies</strong>: <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">&lt;symbol&gt;</span> <span class="pre">[if</span> <span class="pre">&lt;expr&gt;]</span></code></p>
+<blockquote>
+<div><p>While <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span></code> can force a symbol to false, reverse dependencies can
+be used to force another symbol to true.  In the following example,
+<code class="docutils literal notranslate"><span class="pre">CONFIG_BAZ</span></code> will be true whenever <code class="docutils literal notranslate"><span class="pre">CONFIG_FOO</span></code> is true:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">FOO</span>
+  <span class="n">select</span> <span class="n">BAZ</span>
+</pre></div>
+</div>
+<p>The optional expression will prevent <code class="docutils literal notranslate"><span class="pre">select</span></code> from having any effect
+unless it is true.</p>
+<p>Note that unlike Linux’s Kconfig implementation, QEMU will detect
+contradictions between <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span></code> and <code class="docutils literal notranslate"><span class="pre">select</span></code> statements and prevent
+you from building such a configuration.</p>
+</div></blockquote>
+<p><strong>default value</strong>: <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">&lt;value&gt;</span> <span class="pre">[if</span> <span class="pre">&lt;expr&gt;]</span></code></p>
+<blockquote>
+<div><p>Default values are assigned to the config symbol if no other value was
+set by the user via <code class="docutils literal notranslate"><span class="pre">default-configs/*.mak</span></code> files, and only if
+<code class="docutils literal notranslate"><span class="pre">select</span></code> or <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span></code> directives do not force the value to true
+or false respectively.  <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> can be <code class="docutils literal notranslate"><span class="pre">y</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code>; it cannot
+be an arbitrary Boolean expression.  However, a condition for applying
+the default value can be added with <code class="docutils literal notranslate"><span class="pre">if</span></code>.</p>
+<p>A configuration element can have any number of default values (usually,
+if more than one default is present, they will have different
+conditions). If multiple default values satisfy their condition,
+only the first defined one is active.</p>
+</div></blockquote>
+<p><strong>reverse default</strong> (weak reverse dependency): <code class="docutils literal notranslate"><span class="pre">imply</span> <span class="pre">&lt;symbol&gt;</span> <span class="pre">[if</span> <span class="pre">&lt;expr&gt;]</span></code></p>
+<blockquote>
+<div><p>This is similar to <code class="docutils literal notranslate"><span class="pre">select</span></code> as it applies a lower limit of <code class="docutils literal notranslate"><span class="pre">y</span></code>
+to another symbol.  However, the lower limit is only a default
+and the “implied” symbol’s value may still be set to <code class="docutils literal notranslate"><span class="pre">n</span></code> from a
+<code class="docutils literal notranslate"><span class="pre">default-configs/*.mak</span></code> files.  The following two examples are
+equivalent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">FOO</span>
+  <span class="nb">bool</span>
+  <span class="n">imply</span> <span class="n">BAZ</span>
+
+<span class="n">config</span> <span class="n">BAZ</span>
+  <span class="nb">bool</span>
+  <span class="n">default</span> <span class="n">y</span> <span class="k">if</span> <span class="n">FOO</span>
+</pre></div>
+</div>
+<p>The next section explains where to use <code class="docutils literal notranslate"><span class="pre">imply</span></code> or <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">y</span></code>.</p>
+</div></blockquote>
+</section>
+<section id="guidelines-for-writing-kconfig-files">
+<h2>Guidelines for writing Kconfig files<a class="headerlink" href="#guidelines-for-writing-kconfig-files" title="Permalink to this heading"></a></h2>
+<p>Configurable elements in QEMU fall under five broad groups.  Each group
+declares its dependencies in different ways:</p>
+<p><strong>subsystems</strong>, of which <strong>buses</strong> are a special case</p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">SCSI</span>
+  <span class="nb">bool</span>
+</pre></div>
+</div>
+<p>Subsystems always default to false (they have no <code class="docutils literal notranslate"><span class="pre">default</span></code> directive)
+and are never visible in <code class="docutils literal notranslate"><span class="pre">default-configs/*.mak</span></code> files.  It’s
+up to other symbols to <code class="docutils literal notranslate"><span class="pre">select</span></code> whatever subsystems they require.</p>
+<p>They sometimes have <code class="docutils literal notranslate"><span class="pre">select</span></code> directives to bring in other required
+subsystems or buses.  For example, <code class="docutils literal notranslate"><span class="pre">AUX</span></code> (the DisplayPort auxiliary
+channel “bus”) selects <code class="docutils literal notranslate"><span class="pre">I2C</span></code> because it can act as an I2C master too.</p>
+</div></blockquote>
+<p><strong>devices</strong></p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">MEGASAS_SCSI_PCI</span>
+  <span class="nb">bool</span>
+  <span class="n">default</span> <span class="n">y</span> <span class="k">if</span> <span class="n">PCI_DEVICES</span>
+  <span class="n">depends</span> <span class="n">on</span> <span class="n">PCI</span>
+  <span class="n">select</span> <span class="n">SCSI</span>
+</pre></div>
+</div>
+<p>Devices are the most complex of the five.  They can have a variety
+of directives that cooperate so that a default configuration includes
+all the devices that can be accessed from QEMU.</p>
+<p>Devices <em>depend on</em> the bus that they lie on, for example a PCI
+device would specify <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span> <span class="pre">PCI</span></code>.  An MMIO device will likely
+have no <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span></code> directive.  Devices also <em>select</em> the buses
+that the device provides, for example a SCSI adapter would specify
+<code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">SCSI</span></code>.  Finally, devices are usually <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">y</span></code> if and
+only if they have at least one <code class="docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span></code>; the default could be
+conditional on a device group.</p>
+<p>Devices also select any optional subsystem that they use; for example
+a video card might specify <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">EDID</span></code> if it needs to build EDID
+information and publish it to the guest.</p>
+</div></blockquote>
+<p><strong>device groups</strong></p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">PCI_DEVICES</span>
+  <span class="nb">bool</span>
+</pre></div>
+</div>
+<p>Device groups provide a convenient mechanism to enable/disable many
+devices in one go.  This is useful when a set of devices is likely to
+be enabled/disabled by several targets.  Device groups usually need
+no directive and are not used in the Makefile either; they only appear
+as conditions for <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">y</span></code> directives.</p>
+<p>QEMU currently has three device groups, <code class="docutils literal notranslate"><span class="pre">PCI_DEVICES</span></code>, <code class="docutils literal notranslate"><span class="pre">I2C_DEVICES</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">TEST_DEVICES</span></code>.  PCI devices usually have a <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">y</span> <span class="pre">if</span>
+<span class="pre">PCI_DEVICES</span></code> directive rather than just <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">y</span></code>.  This lets
+some boards (notably s390) easily support a subset of PCI devices,
+for example only VFIO (passthrough) and virtio-pci devices.
+<code class="docutils literal notranslate"><span class="pre">I2C_DEVICES</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">PCI_DEVICES</span></code>. It contains i2c devices
+that users might reasonably want to plug in to an i2c bus on any
+board (and not ones which are very board-specific or that need
+to be wired up in a way that can’t be done on the command line).
+<code class="docutils literal notranslate"><span class="pre">TEST_DEVICES</span></code> instead is used for devices that are rarely used on
+production virtual machines, but provide useful hooks to test QEMU
+or KVM.</p>
+</div></blockquote>
+<p><strong>boards</strong></p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">SUN4M</span>
+  <span class="nb">bool</span>
+  <span class="n">imply</span> <span class="n">TCX</span>
+  <span class="n">imply</span> <span class="n">CG3</span>
+  <span class="n">select</span> <span class="n">CS4231</span>
+  <span class="n">select</span> <span class="n">ECCMEMCTL</span>
+  <span class="n">select</span> <span class="n">EMPTY_SLOT</span>
+  <span class="n">select</span> <span class="n">ESCC</span>
+  <span class="n">select</span> <span class="n">ESP</span>
+  <span class="n">select</span> <span class="n">FDC</span>
+  <span class="n">select</span> <span class="n">SLAVIO</span>
+  <span class="n">select</span> <span class="n">LANCE</span>
+  <span class="n">select</span> <span class="n">M48T59</span>
+  <span class="n">select</span> <span class="n">STP2000</span>
+</pre></div>
+</div>
+<p>Boards specify their constituent devices using <code class="docutils literal notranslate"><span class="pre">imply</span></code> and <code class="docutils literal notranslate"><span class="pre">select</span></code>
+directives.  A device should be listed under <code class="docutils literal notranslate"><span class="pre">select</span></code> if the board
+cannot be started at all without it.  It should be listed under
+<code class="docutils literal notranslate"><span class="pre">imply</span></code> if (depending on the QEMU command line) the board may or
+may not be started without it.  Boards also default to false; they are
+enabled by the <code class="docutils literal notranslate"><span class="pre">default-configs/*.mak</span></code> for the target they apply to.</p>
+</div></blockquote>
+<p><strong>internal elements</strong></p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">ECCMEMCTL</span>
+  <span class="nb">bool</span>
+  <span class="n">select</span> <span class="n">ECC</span>
+</pre></div>
+</div>
+<p>Internal elements group code that is useful in several boards or
+devices.  They are usually enabled with <code class="docutils literal notranslate"><span class="pre">select</span></code> and in turn select
+other elements; they are never visible in <code class="docutils literal notranslate"><span class="pre">default-configs/*.mak</span></code>
+files, and often not even in the Makefile.</p>
+</div></blockquote>
+</section>
+<section id="writing-and-modifying-default-configurations">
+<h2>Writing and modifying default configurations<a class="headerlink" href="#writing-and-modifying-default-configurations" title="Permalink to this heading"></a></h2>
+<p>In addition to the Kconfig files under hw/, each target also includes
+a file called <code class="docutils literal notranslate"><span class="pre">default-configs/TARGETNAME-softmmu.mak</span></code>.  These files
+initialize some Kconfig variables to non-default values and provide the
+starting point to turn on devices and subsystems.</p>
+<p>A file in <code class="docutils literal notranslate"><span class="pre">default-configs/</span></code> looks like the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Default configuration for alpha-softmmu</span>
+
+<span class="c1"># Uncomment the following lines to disable these optional devices:</span>
+<span class="c1">#</span>
+<span class="c1">#CONFIG_PCI_DEVICES=n</span>
+<span class="c1">#CONFIG_TEST_DEVICES=n</span>
+
+<span class="c1"># Boards:</span>
+<span class="c1">#</span>
+<span class="n">CONFIG_DP264</span><span class="o">=</span><span class="n">y</span>
+</pre></div>
+</div>
+<p>The first part, consisting of commented-out <code class="docutils literal notranslate"><span class="pre">=n</span></code> assignments, tells
+the user which devices or device groups are implied by the boards.
+The second part, consisting of <code class="docutils literal notranslate"><span class="pre">=y</span></code> assignments, tells the user which
+boards are supported by the target.  The user will typically modify
+the default configuration by uncommenting lines in the first group,
+or commenting out lines in the second group.</p>
+<p>It is also possible to run QEMU’s configure script with the
+<code class="docutils literal notranslate"><span class="pre">--without-default-devices</span></code> option.  When this is done, everything defaults
+to <code class="docutils literal notranslate"><span class="pre">n</span></code> unless it is <code class="docutils literal notranslate"><span class="pre">select``ed</span> <span class="pre">or</span> <span class="pre">explicitly</span> <span class="pre">switched</span> <span class="pre">on</span> <span class="pre">in</span> <span class="pre">the</span>
+<span class="pre">``.mak</span></code> files.  In other words, <code class="docutils literal notranslate"><span class="pre">default</span></code> and <code class="docutils literal notranslate"><span class="pre">imply</span></code> directives
+are disabled.  When QEMU is built with this option, the user will probably
+want to change some lines in the first group, for example like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONFIG_PCI_DEVICES</span><span class="o">=</span><span class="n">y</span>
+<span class="c1">#CONFIG_TEST_DEVICES=n</span>
+</pre></div>
+</div>
+<p>and/or pick a subset of the devices in those device groups.  Right now
+there is no single place that lists all the optional devices for
+<code class="docutils literal notranslate"><span class="pre">CONFIG_PCI_DEVICES</span></code> and <code class="docutils literal notranslate"><span class="pre">CONFIG_TEST_DEVICES</span></code>.  In the future,
+we expect that <code class="docutils literal notranslate"><span class="pre">.mak</span></code> files will be automatically generated, so that
+they will include all these symbols and some help text on what they do.</p>
+</section>
+<section id="kconfig-host">
+<h2><code class="docutils literal notranslate"><span class="pre">Kconfig.host</span></code><a class="headerlink" href="#kconfig-host" title="Permalink to this heading"></a></h2>
+<p>In some special cases, a configurable element depends on host features
+that are detected by QEMU’s configure or <code class="docutils literal notranslate"><span class="pre">meson.build</span></code> scripts; for
+example some devices depend on the availability of KVM or on the presence
+of a library on the host.</p>
+<p>These symbols should be listed in <code class="docutils literal notranslate"><span class="pre">Kconfig.host</span></code> like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="n">TPM</span>
+  <span class="nb">bool</span>
+</pre></div>
+</div>
+<p>and also listed as follows in the top-level meson.build’s host_kconfig
+variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>host_kconfig = \
+  (have_tpm ? [&#39;CONFIG_TPM=y&#39;] : []) + \
+  (&#39;CONFIG_SPICE&#39; in config_host ? [&#39;CONFIG_SPICE=y&#39;] : []) + \
+  (have_ivshmem ? [&#39;CONFIG_IVSHMEM=y&#39;] : []) + \
+  ...
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="build-system.html" class="btn btn-neutral float-left" title="The QEMU build system architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="testing.html" class="btn btn-neutral float-right" title="Testing in QEMU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

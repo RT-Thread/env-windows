@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU Firmware Configuration (fw_cfg) Device &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Information" href="../devel/index.html" />
+    <link rel="prev" title="QEMU/Guest Firmware Interface for AMD SEV and SEV-ES" href="sev-guest-firmware.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU Firmware Configuration (fw_cfg) Device</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#guest-side-hardware-interface">Guest-side Hardware Interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#selector-control-register">Selector (Control) Register</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-register">Data Register</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#register-locations">Register Locations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#acpi-interface">ACPI Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#firmware-configuration-items">Firmware Configuration Items</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#guest-side-dma-interface">Guest-side DMA Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#externally-provided-items">Externally Provided Items</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Guest Hardware Specifications</a></li>
+      <li class="breadcrumb-item active">QEMU Firmware Configuration (fw_cfg) Device</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/fw_cfg.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-firmware-configuration-fw-cfg-device">
+<h1>QEMU Firmware Configuration (fw_cfg) Device<a class="headerlink" href="#qemu-firmware-configuration-fw-cfg-device" title="Permalink to this heading"></a></h1>
+<section id="guest-side-hardware-interface">
+<h2>Guest-side Hardware Interface<a class="headerlink" href="#guest-side-hardware-interface" title="Permalink to this heading"></a></h2>
+<p>This hardware interface allows the guest to retrieve various data items
+(blobs) that can influence how the firmware configures itself, or may
+contain tables to be installed for the guest OS. Examples include device
+boot order, ACPI and SMBIOS tables, virtual machine UUID, SMP and NUMA
+information, kernel/initrd images for direct (Linux) kernel booting, etc.</p>
+<section id="selector-control-register">
+<h3>Selector (Control) Register<a class="headerlink" href="#selector-control-register" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Write only</p></li>
+<li><p>Location: platform dependent (IOport or MMIO)</p></li>
+<li><p>Width: 16-bit</p></li>
+<li><p>Endianness: little-endian (if IOport), or big-endian (if MMIO)</p></li>
+</ul>
+<p>A write to this register sets the index of a firmware configuration
+item which can subsequently be accessed via the data register.</p>
+<p>Setting the selector register will cause the data offset to be set
+to zero. The data offset impacts which data is accessed via the data
+register, and is explained below.</p>
+<p>Bit14 of the selector register indicates whether the configuration
+setting is being written. A value of 0 means the item is only being
+read, and all write access to the data port will be ignored. A value
+of 1 means the item’s data can be overwritten by writes to the data
+register. In other words, configuration write mode is enabled when
+the selector value is between 0x4000-0x7fff or 0xc000-0xffff.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of QEMU v2.4, writes to the fw_cfg data register are no
+longer supported, and will be ignored (treated as no-ops)!</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of QEMU v2.9, writes are reinstated, but only through the DMA
+interface (see below). Furthermore, writeability of any specific item is
+governed independently of Bit14 in the selector key value.</p>
+</div>
+<p>Bit15 of the selector register indicates whether the configuration
+setting is architecture specific. A value of 0 means the item is a
+generic configuration item. A value of 1 means the item is specific
+to a particular architecture. In other words, generic configuration
+items are accessed with a selector value between 0x0000-0x7fff, and
+architecture specific configuration items are accessed with a selector
+value between 0x8000-0xffff.</p>
+</section>
+<section id="data-register">
+<h3>Data Register<a class="headerlink" href="#data-register" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Read/Write (writes ignored as of QEMU v2.4, but see the DMA interface)</p></li>
+<li><p>Location: platform dependent (IOport <a class="footnote-reference brackets" href="#id2" id="id1">1</a> or MMIO)</p></li>
+<li><p>Width: 8-bit (if IOport), 8/16/32/64-bit (if MMIO)</p></li>
+<li><p>Endianness: string-preserving</p></li>
+</ul>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>On platforms where the data register is exposed as an IOport, its
+port number will always be one greater than the port number of the
+selector register. In other words, the two ports overlap, and can not
+be mapped separately.</p>
+</dd>
+</dl>
+<p>The data register allows access to an array of bytes for each firmware
+configuration data item. The specific item is selected by writing to
+the selector register, as described above.</p>
+<p>Initially following a write to the selector register, the data offset
+will be set to zero. Each successful access to the data register will
+increment the data offset by the appropriate access width.</p>
+<p>Each firmware configuration item has a maximum length of data
+associated with the item. After the data offset has passed the
+end of this maximum data length, then any reads will return a data
+value of 0x00, and all writes will be ignored.</p>
+<p>An N-byte wide read of the data register will return the next available
+N bytes of the selected firmware configuration item, as a substring, in
+increasing address order, similar to memcpy().</p>
+</section>
+<section id="register-locations">
+<h3>Register Locations<a class="headerlink" href="#register-locations" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x86, x86_64</dt><dd><ul class="simple">
+<li><p>Selector Register IOport: 0x510</p></li>
+<li><p>Data Register IOport:     0x511</p></li>
+<li><p>DMA Address IOport:       0x514</p></li>
+</ul>
+</dd>
+<dt>Arm</dt><dd><ul class="simple">
+<li><p>Selector Register address: Base + 8 (2 bytes)</p></li>
+<li><p>Data Register address:     Base + 0 (8 bytes)</p></li>
+<li><p>DMA Address address:       Base + 16 (8 bytes)</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="acpi-interface">
+<h3>ACPI Interface<a class="headerlink" href="#acpi-interface" title="Permalink to this heading"></a></h3>
+<p>The fw_cfg device is defined with ACPI ID <code class="docutils literal notranslate"><span class="pre">QEMU0002</span></code>. Since we expect
+ACPI tables to be passed into the guest through the fw_cfg device itself,
+the guest-side firmware can not use ACPI to find fw_cfg. However, once the
+firmware is finished setting up ACPI tables and hands control over to the
+guest kernel, the latter can use the fw_cfg ACPI node for a more accurate
+inventory of in-use IOport or MMIO regions.</p>
+</section>
+<section id="firmware-configuration-items">
+<h3>Firmware Configuration Items<a class="headerlink" href="#firmware-configuration-items" title="Permalink to this heading"></a></h3>
+<section id="signature-key-0x0000-fw-cfg-signature">
+<h4>Signature (Key 0x0000, <code class="docutils literal notranslate"><span class="pre">FW_CFG_SIGNATURE</span></code>)<a class="headerlink" href="#signature-key-0x0000-fw-cfg-signature" title="Permalink to this heading"></a></h4>
+<p>The presence of the fw_cfg selector and data registers can be verified
+by selecting the “signature” item using key 0x0000 (<code class="docutils literal notranslate"><span class="pre">FW_CFG_SIGNATURE</span></code>),
+and reading four bytes from the data register. If the fw_cfg device is
+present, the four bytes read will contain the characters <code class="docutils literal notranslate"><span class="pre">QEMU</span></code>.</p>
+<p>If the DMA interface is available, then reading the DMA Address
+Register returns 0x51454d5520434647 (<code class="docutils literal notranslate"><span class="pre">QEMU</span> <span class="pre">CFG</span></code> in big-endian format).</p>
+</section>
+<section id="revision-feature-bitmap-key-0x0001-fw-cfg-id">
+<h4>Revision / feature bitmap (Key 0x0001, <code class="docutils literal notranslate"><span class="pre">FW_CFG_ID</span></code>)<a class="headerlink" href="#revision-feature-bitmap-key-0x0001-fw-cfg-id" title="Permalink to this heading"></a></h4>
+<p>A 32-bit little-endian unsigned int, this item is used to check for enabled
+features.</p>
+<ul class="simple">
+<li><p>Bit 0: traditional interface. Always set.</p></li>
+<li><p>Bit 1: DMA interface.</p></li>
+</ul>
+</section>
+<section id="file-directory-key-0x0019-fw-cfg-file-dir">
+<h4>File Directory (Key 0x0019, <code class="docutils literal notranslate"><span class="pre">FW_CFG_FILE_DIR</span></code>)<a class="headerlink" href="#file-directory-key-0x0019-fw-cfg-file-dir" title="Permalink to this heading"></a></h4>
+<p>Firmware configuration items stored at selector keys 0x0020 or higher
+(<code class="docutils literal notranslate"><span class="pre">FW_CFG_FILE_FIRST</span></code> or higher) have an associated entry in a directory
+structure, which makes it easier for guest-side firmware to identify
+and retrieve them. The format of this file directory (from <code class="docutils literal notranslate"><span class="pre">fw_cfg.h</span></code> in
+the QEMU source tree) is shown here, slightly annotated for clarity:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">FWCfgFiles</span><span class="w"> </span><span class="p">{</span><span class="w">         </span><span class="cm">/* the entire file directory fw_cfg item */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w">         </span><span class="cm">/* number of entries, in big-endian format */</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">FWCfgFile</span><span class="w"> </span><span class="n">f</span><span class="p">[];</span><span class="w">   </span><span class="cm">/* array of file entries, see below */</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">FWCfgFile</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="cm">/* an individual file entry, 64 bytes total */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w">          </span><span class="cm">/* size of referenced fw_cfg item, big-endian */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">select</span><span class="p">;</span><span class="w">        </span><span class="cm">/* selector key of fw_cfg item, big-endian */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">reserved</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">name</span><span class="p">[</span><span class="mi">56</span><span class="p">];</span><span class="w">          </span><span class="cm">/* fw_cfg item name, NUL-terminated ascii */</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="all-other-data-items">
+<h4>All Other Data Items<a class="headerlink" href="#all-other-data-items" title="Permalink to this heading"></a></h4>
+<p>Please consult the QEMU source for the most up-to-date and authoritative list
+of selector keys and their respective items’ purpose, format and writeability.</p>
+</section>
+<section id="ranges">
+<h4>Ranges<a class="headerlink" href="#ranges" title="Permalink to this heading"></a></h4>
+<p>Theoretically, there may be up to 0x4000 generic firmware configuration
+items, and up to 0x4000 architecturally specific ones.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Selector Reg.</p></th>
+<th class="head"><p>Range Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x0000 - 0x3fff</p></td>
+<td><p>Generic (0x0000 - 0x3fff, generally RO, possibly RW through
+the DMA interface in QEMU v2.9+)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x4000 - 0x7fff</p></td>
+<td><p>Generic (0x0000 - 0x3fff, RW, ignored in QEMU v2.4+)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x8000 - 0xbfff</p></td>
+<td><p>Arch. Specific (0x0000 - 0x3fff, generally RO, possibly RW
+through the DMA interface in QEMU v2.9+)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xc000 - 0xffff</p></td>
+<td><p>Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)</p></td>
+</tr>
+</tbody>
+</table>
+<p>In practice, the number of allowed firmware configuration items depends on the
+machine type/version.</p>
+</section>
+</section>
+</section>
+<section id="guest-side-dma-interface">
+<h2>Guest-side DMA Interface<a class="headerlink" href="#guest-side-dma-interface" title="Permalink to this heading"></a></h2>
+<p>If bit 1 of the feature bitmap is set, the DMA interface is present. This does
+not replace the existing fw_cfg interface, it is an add-on. This interface
+can be used through the 64-bit wide address register.</p>
+<p>The address register is in big-endian format. The value for the register is 0
+at startup and after an operation. A write to the least significant half (at
+offset 4) triggers an operation. This means that operations with 32-bit
+addresses can be triggered with just one write, whereas operations with
+64-bit addresses can be triggered with one 64-bit write or two 32-bit writes,
+starting with the most significant half (at offset 0).</p>
+<p>In this register, the physical address of a <code class="docutils literal notranslate"><span class="pre">FWCfgDmaAccess</span></code> structure in RAM
+should be written. This is the format of the <code class="docutils literal notranslate"><span class="pre">FWCfgDmaAccess</span></code> structure:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">FWCfgDmaAccess</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">control</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">length</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">address</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">FWCfgDmaAccess</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The fields of the structure are in big endian mode, and the field at the lowest
+address is the <code class="docutils literal notranslate"><span class="pre">control</span></code> field.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">control</span></code> field has the following bits:</p>
+<ul class="simple">
+<li><p>Bit 0: Error</p></li>
+<li><p>Bit 1: Read</p></li>
+<li><p>Bit 2: Skip</p></li>
+<li><p>Bit 3: Select. The upper 16 bits are the selected index.</p></li>
+<li><p>Bit 4: Write</p></li>
+</ul>
+<p>When an operation is triggered, if the <code class="docutils literal notranslate"><span class="pre">control</span></code> field has bit 3 set, the
+upper 16 bits are interpreted as an index of a firmware configuration item.
+This has the same effect as writing the selector register.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">control</span></code> field has bit 1 set, a read operation will be performed.
+<code class="docutils literal notranslate"><span class="pre">length</span></code> bytes for the current selector and offset will be copied into the
+physical RAM address specified by the <code class="docutils literal notranslate"><span class="pre">address</span></code> field.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">control</span></code> field has bit 4 set (and not bit 1), a write operation will be
+performed. <code class="docutils literal notranslate"><span class="pre">length</span></code> bytes will be copied from the physical RAM address
+specified by the <code class="docutils literal notranslate"><span class="pre">address</span></code> field to the current selector and offset. QEMU
+prevents starting or finishing the write beyond the end of the item associated
+with the current selector (i.e., the item cannot be resized). Truncated writes
+are dropped entirely. Writes to read-only items are also rejected. All of these
+write errors set bit 0 (the error bit) in the <code class="docutils literal notranslate"><span class="pre">control</span></code> field.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">control</span></code> field has bit 2 set (and neither bit 1 nor bit 4), a skip
+operation will be performed. The offset for the current selector will be
+advanced <code class="docutils literal notranslate"><span class="pre">length</span></code> bytes.</p>
+<p>To check the result, read the <code class="docutils literal notranslate"><span class="pre">control</span></code> field:</p>
+<dl class="simple">
+<dt>Error bit set</dt><dd><p>Something went wrong.</p>
+</dd>
+<dt>All bits cleared</dt><dd><p>Transfer finished successfully.</p>
+</dd>
+<dt>Otherwise</dt><dd><p>Transfer still in progress
+(doesn’t happen today due to implementation not being async,
+but may in the future).</p>
+</dd>
+</dl>
+</section>
+<section id="externally-provided-items">
+<h2>Externally Provided Items<a class="headerlink" href="#externally-provided-items" title="Permalink to this heading"></a></h2>
+<p>Since v2.4, “file” fw_cfg items (i.e., items with selector keys above
+<code class="docutils literal notranslate"><span class="pre">FW_CFG_FILE_FIRST</span></code>, and with a corresponding entry in the fw_cfg file
+directory structure) may be inserted via the QEMU command line, using
+the following syntax:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">fw_cfg</span><span class="w"> </span><span class="p">[</span><span class="n">name</span><span class="o">=</span><span class="p">]</span><span class="o">&lt;</span><span class="n">item_name</span><span class="o">&gt;</span><span class="p">,</span><span class="n">file</span><span class="o">=&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">fw_cfg</span><span class="w"> </span><span class="p">[</span><span class="n">name</span><span class="o">=</span><span class="p">]</span><span class="o">&lt;</span><span class="n">item_name</span><span class="o">&gt;</span><span class="p">,</span><span class="n">string</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Since v5.1, QEMU allows some objects to generate fw_cfg-specific content,
+the content is then associated with a “file” item using the ‘gen_id’ option
+in the command line, using the following syntax:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">object</span><span class="w"> </span><span class="o">&lt;</span><span class="n">generator</span><span class="o">-</span><span class="n">type</span><span class="o">&gt;</span><span class="p">,</span><span class="n">id</span><span class="o">=&lt;</span><span class="n">generated_id</span><span class="o">&gt;</span><span class="p">,[</span><span class="n">generator</span><span class="o">-</span><span class="n">specific</span><span class="o">-</span><span class="n">options</span><span class="p">]</span><span class="w"> </span>\
+<span class="o">-</span><span class="n">fw_cfg</span><span class="w"> </span><span class="p">[</span><span class="n">name</span><span class="o">=</span><span class="p">]</span><span class="o">&lt;</span><span class="n">item_name</span><span class="o">&gt;</span><span class="p">,</span><span class="n">gen_id</span><span class="o">=&lt;</span><span class="n">generated_id</span><span class="o">&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See QEMU man page for more documentation.</p>
+<p>Using item_name with plain ASCII characters only is recommended.</p>
+<p>Item names beginning with <code class="docutils literal notranslate"><span class="pre">opt/</span></code> are reserved for users.  QEMU will
+never create entries with such names unless explicitly ordered by the
+user.</p>
+<p>To avoid clashes among different users, it is strongly recommended
+that you use names beginning with <code class="docutils literal notranslate"><span class="pre">opt/RFQDN/</span></code>, where RFQDN is a reverse
+fully qualified domain name you control.  For instance, if SeaBIOS
+wanted to define additional names, the prefix <code class="docutils literal notranslate"><span class="pre">opt/org.seabios/</span></code> would
+be appropriate.</p>
+<p>For historical reasons, <code class="docutils literal notranslate"><span class="pre">opt/ovmf/</span></code> is reserved for OVMF firmware.</p>
+<p>Prefix <code class="docutils literal notranslate"><span class="pre">opt/org.qemu/</span></code> is reserved for QEMU itself.</p>
+<p>Use of names not beginning with <code class="docutils literal notranslate"><span class="pre">opt/</span></code> is potentially dangerous and
+entirely unsupported.  QEMU will warn if you try.</p>
+<p>Use of names not beginning with <code class="docutils literal notranslate"><span class="pre">opt/</span></code> is tolerated with ‘gen_id’ (that
+is, the warning is suppressed), but you must know exactly what you’re
+doing.</p>
+<p>All externally provided fw_cfg items are read-only to the guest.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sev-guest-firmware.html" class="btn btn-neutral float-left" title="QEMU/Guest Firmware Interface for AMD SEV and SEV-ES" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../devel/index.html" class="btn btn-neutral float-right" title="Developer Information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

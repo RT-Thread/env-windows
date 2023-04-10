@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dirty Bitmaps and Incremental Backup &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="D-Bus" href="dbus.html" />
+    <link rel="prev" title="Barrier client protocol" href="barrier.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dirty Bitmaps and Incremental Backup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supported-image-formats">Supported Image Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dirty-bitmap-names">Dirty Bitmap Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmap-status">Bitmap Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-qmp-usage">Basic QMP Usage</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-commands">Supported Commands</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creation-block-dirty-bitmap-add">Creation: block-dirty-bitmap-add</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deletion-block-dirty-bitmap-remove">Deletion: block-dirty-bitmap-remove</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resetting-block-dirty-bitmap-clear">Resetting: block-dirty-bitmap-clear</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enabling-block-dirty-bitmap-enable">Enabling: block-dirty-bitmap-enable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enabling-block-dirty-bitmap-disable">Enabling: block-dirty-bitmap-disable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#merging-copying-block-dirty-bitmap-merge">Merging, Copying: block-dirty-bitmap-merge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#querying-query-block">Querying: query-block</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmap-persistence">Bitmap Persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transactions">Transactions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#justification">Justification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-bitmap-transactions">Supported Bitmap Transactions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#incremental-backups-push-model">Incremental Backups - Push Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-new-incremental-backup-anchor-point">Example: New Incremental Backup Anchor Point</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-resetting-an-incremental-backup-anchor-point">Example: Resetting an Incremental Backup Anchor Point</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-first-incremental-backup">Example: First Incremental Backup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-second-incremental-backup">Example: Second Incremental Backup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-incremental-push-backups-without-backing-files">Example: Incremental Push Backups without Backing Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-multi-drive-incremental-backup">Example: Multi-drive Incremental Backup</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#push-backup-errors-recovery">Push Backup Errors &amp; Recovery</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-individual-failures">Example: Individual Failures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-partial-transactional-failures">Example: Partial Transactional Failures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-grouped-completion-mode">Example: Grouped Completion Mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">Dirty Bitmaps and Incremental Backup</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/bitmaps.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dirty-bitmaps-and-incremental-backup">
+<h1><a class="toc-backref" href="#id3">Dirty Bitmaps and Incremental Backup</a><a class="headerlink" href="#dirty-bitmaps-and-incremental-backup" title="Permalink to this heading"></a></h1>
+<p>Dirty Bitmaps are in-memory objects that track writes to block devices. They
+can be used in conjunction with various block job operations to perform
+incremental or differential backup regimens.</p>
+<p>This document explains the conceptual mechanisms, as well as up-to-date,
+complete and comprehensive documentation on the API to manipulate them.
+(Hopefully, the “why”, “what”, and “how”.)</p>
+<p>The intended audience for this document is developers who are adding QEMU
+backup features to management applications, or power users who run and
+administer QEMU directly via QMP.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#dirty-bitmaps-and-incremental-backup" id="id3">Dirty Bitmaps and Incremental Backup</a></p>
+<ul>
+<li><p><a class="reference internal" href="#overview" id="id4">Overview</a></p></li>
+<li><p><a class="reference internal" href="#supported-image-formats" id="id5">Supported Image Formats</a></p></li>
+<li><p><a class="reference internal" href="#dirty-bitmap-names" id="id6">Dirty Bitmap Names</a></p></li>
+<li><p><a class="reference internal" href="#bitmap-status" id="id7">Bitmap Status</a></p></li>
+<li><p><a class="reference internal" href="#basic-qmp-usage" id="id8">Basic QMP Usage</a></p>
+<ul>
+<li><p><a class="reference internal" href="#supported-commands" id="id9">Supported Commands</a></p></li>
+<li><p><a class="reference internal" href="#creation-block-dirty-bitmap-add" id="id10">Creation: block-dirty-bitmap-add</a></p></li>
+<li><p><a class="reference internal" href="#deletion-block-dirty-bitmap-remove" id="id11">Deletion: block-dirty-bitmap-remove</a></p></li>
+<li><p><a class="reference internal" href="#resetting-block-dirty-bitmap-clear" id="id12">Resetting: block-dirty-bitmap-clear</a></p></li>
+<li><p><a class="reference internal" href="#enabling-block-dirty-bitmap-enable" id="id13">Enabling: block-dirty-bitmap-enable</a></p></li>
+<li><p><a class="reference internal" href="#enabling-block-dirty-bitmap-disable" id="id14">Enabling: block-dirty-bitmap-disable</a></p></li>
+<li><p><a class="reference internal" href="#merging-copying-block-dirty-bitmap-merge" id="id15">Merging, Copying: block-dirty-bitmap-merge</a></p></li>
+<li><p><a class="reference internal" href="#querying-query-block" id="id16">Querying: query-block</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#bitmap-persistence" id="id17">Bitmap Persistence</a></p></li>
+<li><p><a class="reference internal" href="#transactions" id="id18">Transactions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#justification" id="id19">Justification</a></p></li>
+<li><p><a class="reference internal" href="#supported-bitmap-transactions" id="id20">Supported Bitmap Transactions</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#incremental-backups-push-model" id="id21">Incremental Backups - Push Model</a></p>
+<ul>
+<li><p><a class="reference internal" href="#example-new-incremental-backup-anchor-point" id="id22">Example: New Incremental Backup Anchor Point</a></p></li>
+<li><p><a class="reference internal" href="#example-resetting-an-incremental-backup-anchor-point" id="id23">Example: Resetting an Incremental Backup Anchor Point</a></p></li>
+<li><p><a class="reference internal" href="#example-first-incremental-backup" id="id24">Example: First Incremental Backup</a></p></li>
+<li><p><a class="reference internal" href="#example-second-incremental-backup" id="id25">Example: Second Incremental Backup</a></p></li>
+<li><p><a class="reference internal" href="#example-incremental-push-backups-without-backing-files" id="id26">Example: Incremental Push Backups without Backing Files</a></p></li>
+<li><p><a class="reference internal" href="#example-multi-drive-incremental-backup" id="id27">Example: Multi-drive Incremental Backup</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#push-backup-errors-recovery" id="id28">Push Backup Errors &amp; Recovery</a></p>
+<ul>
+<li><p><a class="reference internal" href="#example-individual-failures" id="id29">Example: Individual Failures</a></p></li>
+<li><p><a class="reference internal" href="#example-partial-transactional-failures" id="id30">Example: Partial Transactional Failures</a></p></li>
+<li><p><a class="reference internal" href="#example-grouped-completion-mode" id="id31">Example: Grouped Completion Mode</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="overview">
+<h2><a class="toc-backref" href="#id4">Overview</a><a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>Bitmaps are bit vectors where each ‘1’ bit in the vector indicates a modified
+(“dirty”) segment of the corresponding block device. The size of the segment
+that is tracked is the granularity of the bitmap. If the granularity of a
+bitmap is 64K, each ‘1’ bit means that a 64K region as a whole may have
+changed in some way, possibly by as little as one byte.</p>
+<p>Smaller granularities mean more accurate tracking of modified disk data, but
+requires more computational overhead and larger bitmap sizes. Larger
+granularities mean smaller bitmap sizes, but less targeted backups.</p>
+<dl class="simple">
+<dt>The size of a bitmap (in bytes) can be computed as such:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">size</span></code> = ceil(ceil(<code class="docutils literal notranslate"><span class="pre">image_size</span></code> / <code class="docutils literal notranslate"><span class="pre">granularity</span></code>) / 8)</p>
+</dd>
+<dt>e.g. the size of a 64KiB granularity bitmap on a 2TiB image is:</dt><dd><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">size</span></code> = ((2147483648K / 64K) / 8)</dt><dd><p>= 4194304B = 4MiB.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>QEMU uses these bitmaps when making incremental backups to know which sections
+of the file to copy out. They are not enabled by default and must be
+explicitly added in order to begin tracking writes.</p>
+<p>Bitmaps can be created at any time and can be attached to any arbitrary block
+node in the storage graph, but are most useful conceptually when attached to
+the root node attached to the guest’s storage device model.</p>
+<p>That is to say: It’s likely most useful to track the guest’s writes to disk,
+but you could theoretically track things like qcow2 metadata changes by
+attaching the bitmap elsewhere in the storage graph. This is beyond the scope
+of this document.</p>
+<p>QEMU supports persisting these bitmaps to disk via the qcow2 image format.
+Bitmaps which are stored or loaded in this way are called “persistent”,
+whereas bitmaps that are not are called “transient”.</p>
+<p>QEMU also supports the migration of both transient bitmaps (tracking any
+arbitrary image format) or persistent bitmaps (qcow2) via live migration.</p>
+</section>
+<section id="supported-image-formats">
+<h2><a class="toc-backref" href="#id5">Supported Image Formats</a><a class="headerlink" href="#supported-image-formats" title="Permalink to this heading"></a></h2>
+<p>QEMU supports all documented features below on the qcow2 image format.</p>
+<p>However, qcow2 is only strictly necessary for the persistence feature, which
+writes bitmap data to disk upon close. If persistence is not required for a
+specific use case, all bitmap features excepting persistence are available for
+any arbitrary image format.</p>
+<p>For example, Dirty Bitmaps can be combined with the ‘raw’ image format, but
+any changes to the bitmap will be discarded upon exit.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Transient bitmaps will not be saved on QEMU exit! Persistent
+bitmaps are available only on qcow2 images.</p>
+</div>
+</section>
+<section id="dirty-bitmap-names">
+<h2><a class="toc-backref" href="#id6">Dirty Bitmap Names</a><a class="headerlink" href="#dirty-bitmap-names" title="Permalink to this heading"></a></h2>
+<p>Bitmap objects need a method to reference them in the API. All API-created and
+managed bitmaps have a human-readable name chosen by the user at creation
+time.</p>
+<ul>
+<li><p>A bitmap’s name is unique to the node, but bitmaps attached to different
+nodes can share the same name. Therefore, all bitmaps are addressed via
+their (node, name) pair.</p></li>
+<li><p>The name of a user-created bitmap cannot be empty (“”).</p></li>
+<li><p>Transient bitmaps can have JSON unicode names that are effectively not
+length limited. (QMP protocol may restrict messages to less than 64MiB.)</p></li>
+<li><p>Persistent storage formats may impose their own requirements on bitmap names
+and namespaces. Presently, only qcow2 supports persistent bitmaps. See
+docs/interop/qcow2.txt for more details on restrictions. Notably:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>qcow2 bitmap names are limited to between 1 and 1023 bytes long.</p></li>
+<li><p>No two bitmaps saved to the same qcow2 file may share the same name.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>QEMU occasionally uses bitmaps for internal use which have no name. They are
+hidden from API query calls, cannot be manipulated by the external API, are
+never persistent, nor ever migrated.</p></li>
+</ul>
+</section>
+<section id="bitmap-status">
+<h2><a class="toc-backref" href="#id7">Bitmap Status</a><a class="headerlink" href="#bitmap-status" title="Permalink to this heading"></a></h2>
+<p>Dirty Bitmap objects can be queried with the QMP command <a class="reference external" href="qemu-qmp-ref.html#index-query_002dblock">query-block</a>, and are visible via the
+<a class="reference external" href="qemu-qmp-ref.html#index-BlockDirtyInfo">BlockDirtyInfo</a> QAPI structure.</p>
+<p>This struct shows the name, granularity, and dirty byte count for each bitmap.
+Additionally, it shows several boolean status indicators:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">recording</span></code>: This bitmap is recording writes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">busy</span></code>: This bitmap is in-use by an operation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persistent</span></code>: This bitmap is a persistent type.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inconsistent</span></code>: This bitmap is corrupted and cannot be used.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">+busy</span></code> status prohibits you from deleting, clearing, or otherwise
+modifying a bitmap, and happens when the bitmap is being used for a backup
+operation or is in the process of being loaded from a migration. Many of the
+commands documented below will refuse to work on such bitmaps.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">+inconsistent</span></code> status similarly prohibits almost all operations,
+notably allowing only the <code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-remove</span></code> operation.</p>
+<p>There is also a deprecated <code class="docutils literal notranslate"><span class="pre">status</span></code> field of type <a class="reference external" href="qemu-qmp-ref.html#index-DirtyBitmapStatus">DirtyBitmapStatus</a>. A bitmap historically had
+five visible states:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">Frozen</span></code>: This bitmap is currently in-use by an operation and is
+immutable. It can’t be deleted, renamed, reset, etc.</p>
+<p>(This is now <code class="docutils literal notranslate"><span class="pre">+busy</span></code>.)</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Disabled</span></code>: This bitmap is not recording new writes.</p>
+<p>(This is now <code class="docutils literal notranslate"><span class="pre">-recording</span> <span class="pre">-busy</span></code>.)</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Active</span></code>: This bitmap is recording new writes.</p>
+<p>(This is now <code class="docutils literal notranslate"><span class="pre">+recording</span> <span class="pre">-busy</span></code>.)</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Locked</span></code>: This bitmap is in-use by an operation, and is immutable.
+The difference from “Frozen” was primarily implementation details.</p>
+<p>(This is now <code class="docutils literal notranslate"><span class="pre">+busy</span></code>.)</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Inconsistent</span></code>: This persistent bitmap was not saved to disk
+correctly, and can no longer be used. It remains in memory to serve as
+an indicator of failure.</p>
+<p>(This is now <code class="docutils literal notranslate"><span class="pre">+inconsistent</span></code>.)</p>
+</li>
+</ol>
+</div></blockquote>
+<p>These states are directly replaced by the status indicators and should not be
+used. The difference between <code class="docutils literal notranslate"><span class="pre">Frozen</span></code> and <code class="docutils literal notranslate"><span class="pre">Locked</span></code> is an implementation
+detail and should not be relevant to external users.</p>
+</section>
+<section id="basic-qmp-usage">
+<h2><a class="toc-backref" href="#id8">Basic QMP Usage</a><a class="headerlink" href="#basic-qmp-usage" title="Permalink to this heading"></a></h2>
+<p>The primary interface to manipulating bitmap objects is via the QMP
+interface. If you are not familiar, see docs/interop/qmp-intro.txt for a broad
+overview, and <a class="reference external" href="qemu-qmp-ref.html">qemu-qmp-ref</a> for a full reference of all
+QMP commands.</p>
+<section id="supported-commands">
+<h3><a class="toc-backref" href="#id9">Supported Commands</a><a class="headerlink" href="#supported-commands" title="Permalink to this heading"></a></h3>
+<p>There are six primary bitmap-management API commands:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-add</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-remove</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-clear</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-disable</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-enable</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-merge</span></code></p></li>
+</ul>
+<p>And one related query command:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">query-block</span></code></p></li>
+</ul>
+</section>
+<section id="creation-block-dirty-bitmap-add">
+<h3><a class="toc-backref" href="#id10">Creation: block-dirty-bitmap-add</a><a class="headerlink" href="#creation-block-dirty-bitmap-add" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002dadd">block-dirty-bitmap-add</a>:</p>
+<p>Creates a new bitmap that tracks writes to the specified node. granularity,
+persistence, and recording state can be adjusted at creation time.</p>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>to create a new, actively recording persistent bitmap:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;persistent&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<ul class="simple">
+<li><p>This bitmap will have a default granularity that matches the cluster size of
+its associated drive, if available, clamped to between [4KiB, 64KiB]. The
+current default for qcow2 is 64KiB.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>To create a new, disabled (<code class="docutils literal notranslate"><span class="pre">-recording</span></code>), transient bitmap that tracks
+changes in 32KiB segments:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;granularity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">32768</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;disabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="deletion-block-dirty-bitmap-remove">
+<h3><a class="toc-backref" href="#id11">Deletion: block-dirty-bitmap-remove</a><a class="headerlink" href="#deletion-block-dirty-bitmap-remove" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002dremove">block-dirty-bitmap-remove</a>:</p>
+<p>Deletes a bitmap. Bitmaps that are <code class="docutils literal notranslate"><span class="pre">+busy</span></code> cannot be removed.</p>
+<ul class="simple">
+<li><p>Deleting a bitmap does not impact any other bitmaps attached to the same
+node, nor does it affect any backups already created from this bitmap or
+node.</p></li>
+<li><p>Because bitmaps are only unique to the node to which they are attached, you
+must specify the node/drive name here, too.</p></li>
+<li><p>Deleting a persistent bitmap will remove it from the qcow2 file.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Remove a bitmap named <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> from node <code class="docutils literal notranslate"><span class="pre">drive0</span></code>:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-remove&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="resetting-block-dirty-bitmap-clear">
+<h3><a class="toc-backref" href="#id12">Resetting: block-dirty-bitmap-clear</a><a class="headerlink" href="#resetting-block-dirty-bitmap-clear" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002dclear">block-dirty-bitmap-clear</a>:</p>
+<p>Clears all dirty bits from a bitmap. <code class="docutils literal notranslate"><span class="pre">+busy</span></code> bitmaps cannot be cleared.</p>
+<ul class="simple">
+<li><p>An incremental backup created from an empty bitmap will copy no data, as if
+nothing has changed.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Clear all dirty bits from bitmap <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> on node <code class="docutils literal notranslate"><span class="pre">drive0</span></code>:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-clear&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="enabling-block-dirty-bitmap-enable">
+<h3><a class="toc-backref" href="#id13">Enabling: block-dirty-bitmap-enable</a><a class="headerlink" href="#enabling-block-dirty-bitmap-enable" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002denable">block-dirty-bitmap-enable</a>:</p>
+<p>“Enables” a bitmap, setting the <code class="docutils literal notranslate"><span class="pre">recording</span></code> bit to true, causing writes to
+begin being recorded. <code class="docutils literal notranslate"><span class="pre">+busy</span></code> bitmaps cannot be enabled.</p>
+<ul class="simple">
+<li><p>Bitmaps default to being enabled when created, unless configured otherwise.</p></li>
+<li><p>Persistent enabled bitmaps will remember their <code class="docutils literal notranslate"><span class="pre">+recording</span></code> status on
+load.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>To set <code class="docutils literal notranslate"><span class="pre">+recording</span></code> on bitmap <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> on node <code class="docutils literal notranslate"><span class="pre">drive0</span></code>:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-enable&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="enabling-block-dirty-bitmap-disable">
+<h3><a class="toc-backref" href="#id14">Enabling: block-dirty-bitmap-disable</a><a class="headerlink" href="#enabling-block-dirty-bitmap-disable" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002ddisable">block-dirty-bitmap-disable</a>:</p>
+<p>“Disables” a bitmap, setting the <code class="docutils literal notranslate"><span class="pre">recording</span></code> bit to false, causing further
+writes to begin being ignored. <code class="docutils literal notranslate"><span class="pre">+busy</span></code> bitmaps cannot be disabled.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is potentially dangerous: QEMU makes no effort to stop any writes if
+there are disabled bitmaps on a node, and will not mark any disabled bitmaps
+as <code class="docutils literal notranslate"><span class="pre">+inconsistent</span></code> if any such writes do happen. Backups made from such
+bitmaps will not be able to be used to reconstruct a coherent image.</p>
+</div>
+<ul class="simple">
+<li><p>Disabling a bitmap may be useful for examining which sectors of a disk
+changed during a specific time period, or for explicit management of
+differential backup windows.</p></li>
+<li><p>Persistent disabled bitmaps will remember their <code class="docutils literal notranslate"><span class="pre">-recording</span></code> status on
+load.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>To set <code class="docutils literal notranslate"><span class="pre">-recording</span></code> on bitmap <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> on node <code class="docutils literal notranslate"><span class="pre">drive0</span></code>:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-disable&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="merging-copying-block-dirty-bitmap-merge">
+<h3><a class="toc-backref" href="#id15">Merging, Copying: block-dirty-bitmap-merge</a><a class="headerlink" href="#merging-copying-block-dirty-bitmap-merge" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-block_002ddirty_002dbitmap_002dmerge">block-dirty-bitmap-merge</a>:</p>
+<p>Merges one or more bitmaps into a target bitmap. For any segment that is dirty
+in any one source bitmap, the target bitmap will mark that segment dirty.</p>
+<ul class="simple">
+<li><p>Merge takes one or more bitmaps as a source and merges them together into a
+single destination, such that any segment marked as dirty in any source
+bitmap(s) will be marked dirty in the destination bitmap.</p></li>
+<li><p>Merge does not create the destination bitmap if it does not exist. A blank
+bitmap can be created beforehand to achieve the same effect.</p></li>
+<li><p>The destination is not cleared prior to merge, so subsequent merge
+operations will continue to cumulatively mark more segments as dirty.</p></li>
+<li><p>If the merge operation should fail, the destination bitmap is guaranteed to
+be unmodified. The operation may fail if the source or destination bitmaps
+are busy, or have different granularities.</p></li>
+<li><p>Bitmaps can only be merged on the same node. There is only one “node”
+argument, so all bitmaps must be attached to that same node.</p></li>
+<li><p>Copy can be achieved by merging from a single source to an empty
+destination.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Merge the data from <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> into the bitmap <code class="docutils literal notranslate"><span class="pre">new_bitmap</span></code> on node
+<code class="docutils literal notranslate"><span class="pre">drive0</span></code>. If <code class="docutils literal notranslate"><span class="pre">new_bitmap</span></code> was empty prior to this command, this achieves
+a copy.</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-merge&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;new_bitmap&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmaps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="w"> </span><span class="p">]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="querying-query-block">
+<h3><a class="toc-backref" href="#id16">Querying: query-block</a><a class="headerlink" href="#querying-query-block" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="qemu-qmp-ref.html#index-query_002dblock">query-block</a>:</p>
+<p>Not strictly a bitmaps command, but will return information about any bitmaps
+attached to nodes serving as the root for guest devices.</p>
+<ul class="simple">
+<li><p>The “inconsistent” bit will not appear when it is false, appearing only when
+the value is true to indicate there is a problem.</p></li>
+</ul>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Query the block sub-system of QEMU. The following json has trimmed irrelevant
+keys from the response to highlight only the bitmap-relevant portions of the
+API. This result highlights a bitmap <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> attached to the root node of
+device <code class="docutils literal notranslate"><span class="pre">drive0</span></code>.</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;query-block&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;dirty-bitmaps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;busy&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;persistent&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;recording&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;granularity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">65536</span>
+<span class="w">       </span><span class="p">}</span><span class="w"> </span><span class="p">],</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="p">}</span><span class="w"> </span><span class="p">]</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="bitmap-persistence">
+<h2><a class="toc-backref" href="#id17">Bitmap Persistence</a><a class="headerlink" href="#bitmap-persistence" title="Permalink to this heading"></a></h2>
+<p>As outlined in <a class="reference internal" href="#supported-image-formats">Supported Image Formats</a>, QEMU can persist bitmaps to qcow2
+files. Demonstrated in <a class="reference internal" href="#creation-block-dirty-bitmap-add">Creation: block-dirty-bitmap-add</a>, passing
+<code class="docutils literal notranslate"><span class="pre">persistent:</span> <span class="pre">true</span></code> to <code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-add</span></code> will persist that bitmap to
+disk.</p>
+<p>Persistent bitmaps will be automatically loaded into memory upon load, and
+will be written back to disk upon close. Their usage should be mostly
+transparent.</p>
+<p>However, if QEMU does not get a chance to close the file cleanly, the bitmap
+will be marked as <code class="docutils literal notranslate"><span class="pre">+inconsistent</span></code> at next load and considered unsafe to use
+for any operation. At this point, the only valid operation on such bitmaps is
+<code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-remove</span></code>.</p>
+<p>Losing a bitmap in this way does not invalidate any existing backups that have
+been made from this bitmap, but no further backups will be able to be issued
+for this chain.</p>
+</section>
+<section id="transactions">
+<h2><a class="toc-backref" href="#id18">Transactions</a><a class="headerlink" href="#transactions" title="Permalink to this heading"></a></h2>
+<p>Transactions are a QMP feature that allows you to submit multiple QMP commands
+at once, being guaranteed that they will all succeed or fail atomically,
+together. The interaction of bitmaps and transactions are demonstrated below.</p>
+<p>See <a class="reference external" href="qemu-qmp.ref.html#index-transaction">transaction</a> in the QMP reference
+for more details.</p>
+<section id="justification">
+<h3><a class="toc-backref" href="#id19">Justification</a><a class="headerlink" href="#justification" title="Permalink to this heading"></a></h3>
+<p>Bitmaps can generally be modified at any time, but certain operations often
+only make sense when paired directly with other commands. When a VM is paused,
+it’s easy to ensure that no guest writes occur between individual QMP
+commands. When a VM is running, this is difficult to accomplish with
+individual QMP commands that may allow guest writes to occur between each
+command.</p>
+<p>For example, using only individual QMP commands, we could:</p>
+<ol class="arabic simple">
+<li><p>Boot the VM in a paused state.</p></li>
+<li><p>Create a full drive backup of drive0.</p></li>
+<li><p>Create a new bitmap attached to drive0, confident that nothing has been
+written to drive0 in the meantime.</p></li>
+<li><p>Resume execution of the VM.</p></li>
+<li><p>At a later point, issue incremental backups from <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code>.</p></li>
+</ol>
+<p>At this point, the bitmap and drive backup would be correctly in sync, and
+incremental backups made from this point forward would be correctly aligned to
+the full drive backup.</p>
+<p>This is not particularly useful if we decide we want to start incremental
+backups after the VM has been running for a while, for which we would want to
+perform actions such as the following:</p>
+<ol class="arabic simple">
+<li><p>Boot the VM and begin execution.</p></li>
+<li><p>Using a single transaction, perform the following operations:</p>
+<ul class="simple">
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code>.</p></li>
+<li><p>Create a full drive backup of <code class="docutils literal notranslate"><span class="pre">drive0</span></code>.</p></li>
+</ul>
+</li>
+<li><p>At a later point, issue incremental backups from <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code>.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As a consideration, if <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> is created prior to the full
+drive backup, incremental backups can still be authored from this
+bitmap, but they will copy extra segments reflecting writes that
+occurred prior to the backup operation. Transactions allow us to
+narrow critical points in time to reduce waste, or, in the other
+direction, to ensure that no segments are omitted.</p>
+</div>
+</section>
+<section id="supported-bitmap-transactions">
+<h3><a class="toc-backref" href="#id20">Supported Bitmap Transactions</a><a class="headerlink" href="#supported-bitmap-transactions" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-add</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-clear</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-enable</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-disable</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-merge</span></code></p></li>
+</ul>
+<p>The usages for these commands are identical to their respective QMP commands,
+but see the sections below for concrete examples.</p>
+</section>
+</section>
+<section id="incremental-backups-push-model">
+<h2><a class="toc-backref" href="#id21">Incremental Backups - Push Model</a><a class="headerlink" href="#incremental-backups-push-model" title="Permalink to this heading"></a></h2>
+<p>Incremental backups are simply partial disk images that can be combined with
+other partial disk images on top of a base image to reconstruct a full backup
+from the point in time at which the incremental backup was issued.</p>
+<p>The “Push Model” here references the fact that QEMU is “pushing” the modified
+blocks out to a destination. We will be using the  <a class="reference external" href="qemu-qmp-ref.html#index-blockdev_002dbackup">blockdev-backup</a> QMP command to create both
+full and incremental backups.</p>
+<p>The command is a background job, which has its own QMP API for querying and
+management documented in <a class="reference external" href="qemu-qmp-ref.html#Background-jobs">Background jobs</a>.</p>
+<section id="example-new-incremental-backup-anchor-point">
+<h3><a class="toc-backref" href="#id22">Example: New Incremental Backup Anchor Point</a><a class="headerlink" href="#example-new-incremental-backup-anchor-point" title="Permalink to this heading"></a></h3>
+<p>As outlined in the Transactions - <a class="reference internal" href="#justification">Justification</a> section, perhaps we want to
+create a new incremental backup chain attached to a drive.</p>
+<p>This example creates a new, full backup of “drive0” and accompanies it with a
+new, empty bitmap that records writes from this point in time forward.</p>
+<p>The target can be created with the help of <a class="reference external" href="qemu-qmp-ref.html#index-blockdev_002dadd">blockdev-add</a> or <a class="reference external" href="qemu-qmp-ref.html#index-blockdev_002dcreate">blockdev-create</a> command.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any new writes that happen after this command is issued, even while
+the backup job runs, will be written locally and not to the backup
+destination. These writes will be recorded in the bitmap
+accordingly.</p>
+</div>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-add&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;full&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1555436945</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;microseconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">179620</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;created&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JOB_STATUS_CHANGE&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;concluded&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JOB_STATUS_CHANGE&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JOB_STATUS_CHANGE&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>A full explanation of the job transition semantics and the JOB_STATUS_CHANGE
+event are beyond the scope of this document and will be omitted in all
+subsequent examples; above, several more events have been omitted for brevity.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Subsequent examples will omit all events except BLOCK_JOB_COMPLETED
+except where necessary to illustrate workflow differences.</p>
+<p>Omitted events and json objects will be represented by ellipses:
+<code class="docutils literal notranslate"><span class="pre">...</span></code></p>
+</div>
+</section>
+<section id="example-resetting-an-incremental-backup-anchor-point">
+<h3><a class="toc-backref" href="#id23">Example: Resetting an Incremental Backup Anchor Point</a><a class="headerlink" href="#example-resetting-an-incremental-backup-anchor-point" title="Permalink to this heading"></a></h3>
+<p>If we want to start a new backup chain with an existing bitmap, we can also
+use a transaction to reset the bitmap while making a new full backup:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-clear&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">},</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;full&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">]</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>The result of this example is identical to the first, but we clear an existing
+bitmap instead of adding a new one.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In both of these examples, “bitmap0” is tied conceptually to the
+creation of new, full backups. This relationship is not saved or
+remembered by QEMU; it is up to the operator or management layer to
+remember which bitmaps are associated with which backups.</p>
+</div>
+</section>
+<section id="example-first-incremental-backup">
+<h3><a class="toc-backref" href="#id24">Example: First Incremental Backup</a><a class="headerlink" href="#example-first-incremental-backup" title="Permalink to this heading"></a></h3>
+<ol class="arabic">
+<li><p>Create a full backup and sync it to a dirty bitmap using any method:</p>
+<ul class="simple">
+<li><p>Either of the two live backup method demonstrated above,</p></li>
+<li><p>Using QMP commands with the VM paused as in the <a class="reference internal" href="#justification">Justification</a> section,
+or</p></li>
+<li><p>With the VM offline, manually copy the image and start the VM in a paused
+state, careful to add a new bitmap before the VM begins execution.</p></li>
+</ul>
+<p>Whichever method is chosen, let’s assume that at the end of this step:</p>
+<ul class="simple">
+<li><p>The full backup is named <code class="docutils literal notranslate"><span class="pre">drive0.full.qcow2</span></code>.</p></li>
+<li><p>The bitmap we created is named <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code>, attached to <code class="docutils literal notranslate"><span class="pre">drive0</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Create a destination image for the incremental backup that utilizes the
+full backup as a backing image.</p>
+<ul class="simple">
+<li><p>Let’s assume the new incremental image is named <code class="docutils literal notranslate"><span class="pre">drive0.inc0.qcow2</span></code>:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.inc0.qcow2 <span class="se">\</span>
+  -b drive0.full.qcow2 -F qcow2
+</pre></div>
+</div>
+</li>
+<li><p>Add target block node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc0.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Issue an incremental backup command:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>This copies any blocks modified since the full backup was created into the
+<code class="docutils literal notranslate"><span class="pre">drive0.inc0.qcow2</span></code> file. During the operation, <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> is marked
+<code class="docutils literal notranslate"><span class="pre">+busy</span></code>. If the operation is successful, <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> will be cleared to
+reflect the “incremental” backup regimen, which only copies out new changes
+from each incremental backup.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any new writes that occur after the backup operation starts do not
+get copied to the destination. The backup’s “point in time” is when
+the backup starts, not when it ends. These writes are recorded in a
+special bitmap that gets re-added to bitmap0 when the backup ends so
+that the next incremental backup can copy them out.</p>
+</div>
+</section>
+<section id="example-second-incremental-backup">
+<h3><a class="toc-backref" href="#id25">Example: Second Incremental Backup</a><a class="headerlink" href="#example-second-incremental-backup" title="Permalink to this heading"></a></h3>
+<ol class="arabic">
+<li><p>Create a new destination image for the incremental backup that points to
+the previous one, e.g.: <code class="docutils literal notranslate"><span class="pre">drive0.inc1.qcow2</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.inc1.qcow2 <span class="se">\</span>
+  -b drive0.inc0.qcow2 -F qcow2
+</pre></div>
+</div>
+</li>
+<li><p>Add target block node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc1.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Issue a new incremental backup command. The only difference here is that we
+have changed the target image below.</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Because the first incremental backup from the previous example completed
+successfully, <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> was synchronized with <code class="docutils literal notranslate"><span class="pre">drive0.inc0.qcow2</span></code>. Here,
+we use <code class="docutils literal notranslate"><span class="pre">bitmap0</span></code> again to create a new incremental backup that targets the
+previous one, creating a chain of three images:</p>
+<div class="admonition-diagram admonition">
+<p class="admonition-title">Diagram</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-------------------+   +-------------------+   +-------------------+
+| drive0.full.qcow2 |&lt;--| drive0.inc0.qcow2 |&lt;--| drive0.inc1.qcow2 |
++-------------------+   +-------------------+   +-------------------+
+</pre></div>
+</div>
+</div>
+<p>Each new incremental backup re-synchronizes the bitmap to the latest backup
+authored, allowing a user to continue to “consume” it to create new backups on
+top of an existing chain.</p>
+<p>In the above diagram, neither drive0.inc1.qcow2 nor drive0.inc0.qcow2 are
+complete images by themselves, but rely on their backing chain to reconstruct
+a full image. The dependency terminates with each full backup.</p>
+<p>Each backup in this chain remains independent, and is unchanged by new entries
+made later in the chain. For instance, drive0.inc0.qcow2 remains a perfectly
+valid backup of the disk as it was when that backup was issued.</p>
+</section>
+<section id="example-incremental-push-backups-without-backing-files">
+<h3><a class="toc-backref" href="#id26">Example: Incremental Push Backups without Backing Files</a><a class="headerlink" href="#example-incremental-push-backups-without-backing-files" title="Permalink to this heading"></a></h3>
+<p>Backup images are best kept off-site, so we often will not have the preceding
+backups in a chain available to link against. This is not a problem at backup
+time; we simply do not set the backing image when creating the destination
+image:</p>
+<ol class="arabic">
+<li><p>Create a new destination image with no backing file set. We will need to
+specify the size of the base image, because the backing file isn’t
+available for QEMU to use to determine it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.inc2.qcow2 64G
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Alternatively, you can omit <code class="docutils literal notranslate"><span class="pre">mode:</span> <span class="pre">&quot;existing&quot;</span></code> from the push
+backup commands to have QEMU create an image without a backing
+file for you, but you lose control over format options like
+compatibility and preallocation presets.</p>
+</div>
+</li>
+<li><p>Add target block node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc2.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Issue a new incremental backup command. Apart from the new destination
+image, there is no difference from the last two examples.</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The only difference from the perspective of the user is that you will need to
+set the backing image when attempting to restore the backup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img rebase drive0.inc2.qcow2 <span class="se">\</span>
+  -u -b drive0.inc1.qcow2
+</pre></div>
+</div>
+<p>This uses the “unsafe” rebase mode to simply set the backing file to a file
+that isn’t present.</p>
+<p>It is also possible to use <code class="docutils literal notranslate"><span class="pre">--image-opts</span></code> to specify the entire backing
+chain by hand as an ephemeral property at runtime, but that is beyond the
+scope of this document.</p>
+</section>
+<section id="example-multi-drive-incremental-backup">
+<h3><a class="toc-backref" href="#id27">Example: Multi-drive Incremental Backup</a><a class="headerlink" href="#example-multi-drive-incremental-backup" title="Permalink to this heading"></a></h3>
+<p>Assume we have a VM with two drives, “drive0” and “drive1” and we wish to back
+both of them up such that the two backups represent the same crash-consistent
+point in time.</p>
+<ol class="arabic">
+<li><p>For each drive, create an empty image:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.full.qcow2 64G
+$ qemu-img create -f qcow2 drive1.full.qcow2 64G
+</pre></div>
+</div>
+</li>
+<li><p>Add target block nodes:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.full.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1.full.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a full (anchor) backup for each drive, with accompanying bitmaps:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-add&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;block-dirty-bitmap-add&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;full&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;full&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+</li>
+<li><p>Later, create new destination images for each of the incremental backups
+that point to their respective full backups:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.inc0.qcow2 <span class="se">\</span>
+  -b drive0.full.qcow2 -F qcow2
+$ qemu-img create -f qcow2 drive1.inc0.qcow2 <span class="se">\</span>
+  -b drive1.full.qcow2 -F qcow2
+</pre></div>
+</div>
+</li>
+<li><p>Add target block nodes:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc0.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1.inc0.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Issue a multi-drive incremental push backup transaction:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockev-backup&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">         </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">             </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span>
+<span class="w">           </span><span class="p">}</span>
+<span class="w">         </span><span class="p">},</span>
+<span class="w">       </span><span class="p">]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">68719476736</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="push-backup-errors-recovery">
+<h2><a class="toc-backref" href="#id28">Push Backup Errors &amp; Recovery</a><a class="headerlink" href="#push-backup-errors-recovery" title="Permalink to this heading"></a></h2>
+<p>In the event of an error that occurs after a push backup job is successfully
+launched, either by an individual QMP command or a QMP transaction, the user
+will receive a <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_COMPLETE</span></code> event with a failure message,
+accompanied by a <code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_ERROR</span></code> event.</p>
+<p>In the case of a job being cancelled, the user will receive a
+<code class="docutils literal notranslate"><span class="pre">BLOCK_JOB_CANCELLED</span></code> event instead of a pair of COMPLETE and ERROR
+events.</p>
+<p>In either failure case, the bitmap used for the failed operation is not
+cleared. It will contain all of the dirty bits it did at the start of the
+operation, plus any new bits that got marked during the operation.</p>
+<p>Effectively, the “point in time” that a bitmap is recording differences
+against is kept at the issuance of the last successful incremental backup,
+instead of being moved forward to the start of this now-failed backup.</p>
+<p>Once the underlying problem is addressed (e.g. more storage space is allocated
+on the destination), the incremental backup command can be retried with the
+same bitmap.</p>
+<section id="example-individual-failures">
+<h3><a class="toc-backref" href="#id29">Example: Individual Failures</a><a class="headerlink" href="#example-individual-failures" title="Permalink to this heading"></a></h3>
+<p>Incremental Push Backup jobs that fail individually behave simply as
+described above. This example demonstrates the single-job failure case:</p>
+<ol class="arabic">
+<li><p>Create a target image:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img create -f qcow2 drive0.inc0.qcow2 <span class="se">\</span>
+  -b drive0.full.qcow2 -F qcow2
+</pre></div>
+</div>
+</li>
+<li><p>Add target block node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc0.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Attempt to create an incremental backup via QMP:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive a pair of events indicating failure:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;report&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;operation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;write&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_ERROR&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;No space left on device&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Remove target node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-del&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Delete the failed image, and re-create it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ rm drive0.inc0.qcow2
+$ qemu-img create -f qcow2 drive0.inc0.qcow2 <span class="se">\</span>
+  -b drive0.full.qcow2 -F qcow2
+</pre></div>
+</div>
+</li>
+<li><p>Add target block node:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-add&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;node-name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0.inc0.qcow2&quot;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Retry the command after fixing the underlying problem, such as
+freeing up space on the backup volume:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive confirmation that the job completed successfully:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="example-partial-transactional-failures">
+<h3><a class="toc-backref" href="#id30">Example: Partial Transactional Failures</a><a class="headerlink" href="#example-partial-transactional-failures" title="Permalink to this heading"></a></h3>
+<p>QMP commands like <a class="reference external" href="qemu-qmp-ref.html#index-blockdev_002dbackup">blockdev-backup</a>
+conceptually only start a job, and so transactions containing these commands
+may succeed even if the job it created later fails. This might have surprising
+interactions with notions of how a “transaction” ought to behave.</p>
+<p>This distinction means that on occasion, a transaction containing such job
+launching commands may appear to succeed and return success, but later
+individual jobs associated with the transaction may fail. It is possible that
+a management application may have to deal with a partial backup failure after
+a “successful” transaction.</p>
+<p>If multiple backup jobs are specified in a single transaction, if one of those
+jobs fails, it will not interact with the other backup jobs in any way by
+default. The job(s) that succeeded will clear the dirty bitmap associated with
+the operation, but the job(s) that failed will not. It is therefore not safe
+to delete any incremental backups that were created successfully in this
+scenario, even though others failed.</p>
+<p>This example illustrates a transaction with two backup jobs, where one fails
+and one succeeds:</p>
+<ol class="arabic">
+<li><p>Issue the transaction to start a backup of both drives.</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">},</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">}]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notice that the Transaction was accepted, and jobs were
+launched:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notice that the first job has completed:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notice that the second job has failed:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;report&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;operation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;read&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_ERROR&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">...</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Input/output error&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>At the conclusion of the above example, <code class="docutils literal notranslate"><span class="pre">drive0.inc0.qcow2</span></code> is valid and
+must be kept, but <code class="docutils literal notranslate"><span class="pre">drive1.inc0.qcow2</span></code> is incomplete and should be
+deleted. If a VM-wide incremental backup of all drives at a point-in-time is
+to be made, new backups for both drives will need to be made, taking into
+account that a new incremental backup for drive0 needs to be based on top of
+<code class="docutils literal notranslate"><span class="pre">drive0.inc0.qcow2</span></code>.</p>
+<p>For this example, an incremental backup for <code class="docutils literal notranslate"><span class="pre">drive0</span></code> was created, but not
+for <code class="docutils literal notranslate"><span class="pre">drive1</span></code>. The last VM-wide crash-consistent backup that is available in
+this case is the full backup:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[drive0.full.qcow2] &lt;-- [drive0.inc0.qcow2]
+[drive1.full.qcow2]
+</pre></div>
+</div>
+<p>To repair this, issue a new incremental backup across both drives. The result
+will be backup chains that resemble the following:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[drive0.full.qcow2] &lt;-- [drive0.inc0.qcow2] &lt;-- [drive0.inc1.qcow2]
+[drive1.full.qcow2] &lt;-------------------------- [drive1.inc1.qcow2]
+</pre></div>
+</div>
+</section>
+<section id="example-grouped-completion-mode">
+<h3><a class="toc-backref" href="#id31">Example: Grouped Completion Mode</a><a class="headerlink" href="#example-grouped-completion-mode" title="Permalink to this heading"></a></h3>
+<p>While jobs launched by transactions normally complete or fail individually,
+it’s possible to instruct them to complete or fail together as a group. QMP
+transactions take an optional properties structure that can affect the
+behavior of the transaction.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">completion-mode</span></code> transaction property can be either <code class="docutils literal notranslate"><span class="pre">individual</span></code>
+which is the default legacy behavior described above, or <code class="docutils literal notranslate"><span class="pre">grouped</span></code>, detailed
+below.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">grouped</span></code> completion mode, no jobs will report success until all jobs are
+ready to report success. If any job fails, all other jobs will be cancelled.</p>
+<p>Regardless of if a participating incremental backup job failed or was
+cancelled, their associated bitmaps will all be held at their existing
+points-in-time, as in individual failure cases.</p>
+<p>Here’s the same multi-drive backup scenario from <a class="reference internal" href="#example-partial-transactional-failures">Example: Partial
+Transactional Failures</a>, but with the <code class="docutils literal notranslate"><span class="pre">grouped</span></code> completion-mode property
+applied:</p>
+<ol class="arabic">
+<li><p>Issue the multi-drive incremental backup transaction:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;completion-mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;grouped&quot;</span>
+<span class="w">       </span><span class="p">},</span>
+<span class="w">       </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target0&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">},</span>
+<span class="w">       </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blockdev-backup&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;bitmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;sync&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target1&quot;</span>
+<span class="w">         </span><span class="p">}</span>
+<span class="w">       </span><span class="p">}]</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notice that the Transaction was accepted, and jobs were launched:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notification that the backup job for <code class="docutils literal notranslate"><span class="pre">drive1</span></code> has failed:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;report&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;operation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;read&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_ERROR&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+
+<span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Input/output error&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive1&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_COMPLETED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Receive notification that the job for <code class="docutils literal notranslate"><span class="pre">drive0</span></code> has been cancelled:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="gp">...</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;backup&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">67108864</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16777216</span>
+<span class="w">     </span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BLOCK_JOB_CANCELLED&quot;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>At the conclusion of <em>this</em> example, both jobs have been aborted due to a
+failure. Both destination images should be deleted and are no longer of use.</p>
+<p>The transaction as a whole can simply be re-issued at a later time.</p>
+<!--
+The FreeBSD Documentation License
+
+Redistribution and use in source (ReST) and 'compiled' forms (SGML, HTML,
+PDF, PostScript, RTF and so forth) with or without modification, are
+permitted provided that the following conditions are met:
+
+Redistributions of source code (ReST) must retain the above copyright notice,
+this list of conditions and the following disclaimer of this file unmodified.
+
+Redistributions in compiled form (transformed to other DTDs, converted to
+PDF, PostScript, RTF and other formats) must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS DOCUMENTATION, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+--></section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="barrier.html" class="btn btn-neutral float-left" title="Barrier client protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dbus.html" class="btn btn-neutral float-right" title="D-Bus" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

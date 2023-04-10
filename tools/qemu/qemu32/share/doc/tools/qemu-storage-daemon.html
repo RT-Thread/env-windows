@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU Storage Daemon &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU Disk Network Block Device Server" href="qemu-nbd.html" />
+    <link rel="prev" title="QEMU disk image utility" href="qemu-img.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qemu-img.html">QEMU disk image utility</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU Storage Daemon</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-nbd.html">QEMU Disk Network Block Device Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-pr-helper.html">QEMU persistent reservation helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-trace-stap.html">QEMU SystemTap trace tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtfs-proxy-helper.html">QEMU 9p virtfs proxy filesystem helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtiofsd.html">QEMU virtio-fs shared file system daemon</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tools</a></li>
+      <li class="breadcrumb-item active">QEMU Storage Daemon</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/tools/qemu-storage-daemon.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-storage-daemon">
+<h1>QEMU Storage Daemon<a class="headerlink" href="#qemu-storage-daemon" title="Permalink to this heading"></a></h1>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<p><strong>qemu-storage-daemon</strong> [options]</p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">qemu-storage-daemon</span></code> provides disk image functionality from QEMU,
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>, and <code class="docutils literal notranslate"><span class="pre">qemu-nbd</span></code> in a long-running process controlled via QMP
+commands without running a virtual machine.
+It can export disk images, run block job operations, and
+perform other disk-related operations. The daemon is controlled via a QMP
+monitor and initial configuration from the command-line.</p>
+<p>The daemon offers the following subset of QEMU features:</p>
+<ul class="simple">
+<li><p>Block nodes</p></li>
+<li><p>Block jobs</p></li>
+<li><p>Block exports</p></li>
+<li><p>Throttle groups</p></li>
+<li><p>Character devices</p></li>
+<li><p>Crypto and secrets</p></li>
+<li><p>QMP</p></li>
+<li><p>IOThreads</p></li>
+</ul>
+<p>Commands can be sent over a QEMU Monitor Protocol (QMP) connection. See the
+<em class="manpage">qemu-storage-daemon-qmp-ref(7)</em> manual page for a description of the
+commands.</p>
+<p>The daemon runs until it is stopped using the <code class="docutils literal notranslate"><span class="pre">quit</span></code> QMP command or
+SIGINT/SIGHUP/SIGTERM.</p>
+<p><strong>Warning:</strong> Never modify images in use by a running virtual machine or any
+other process; this may destroy the image. Also, be aware that querying an
+image that is being modified by another process may encounter inconsistent
+state.</p>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h2>
+<p>Standard options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-h">
+<span id="cmdoption-qemu-storage-daemon-help"></span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-h" title="Permalink to this definition"></a></dt>
+<dd><p>Display help and exit</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-V">
+<span id="cmdoption-qemu-storage-daemon-v"></span><span id="cmdoption-qemu-storage-daemon-version"></span><span class="sig-name descname"><span class="pre">-V</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-V" title="Permalink to this definition"></a></dt>
+<dd><p>Display version information and exit</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-T">
+<span id="cmdoption-qemu-storage-daemon-t"></span><span id="cmdoption-qemu-storage-daemon-trace"></span><span class="sig-name descname"><span class="pre">-T</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--trace</span></span><span class="sig-prename descclassname"> <span class="pre">[[enable=]PATTERN][,events=FILE][,file=FILE]</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-T" title="Permalink to this definition"></a></dt>
+<dd><p>Specify tracing options.</p>
+<p><code class="docutils literal notranslate"><span class="pre">[enable=]PATTERN</span></code></p>
+<blockquote>
+<div><p>Immediately enable events matching <em>PATTERN</em>
+(either event name or a globbing pattern).  This option is only
+available if QEMU has been compiled with the <code class="docutils literal notranslate"><span class="pre">simple</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code>
+or <code class="docutils literal notranslate"><span class="pre">ftrace</span></code> tracing backend.  To specify multiple events or patterns,
+specify the <code class="xref std std-option docutils literal notranslate"><span class="pre">-trace</span></code> option multiple times.</p>
+<p>Use <code class="xref std std-option docutils literal notranslate"><span class="pre">-trace</span> <span class="pre">help</span></code> to print a list of names of trace points.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">events=FILE</span></code></p>
+<blockquote>
+<div><p>Immediately enable events listed in <em>FILE</em>.
+The file must contain one event name (as listed in the <code class="docutils literal notranslate"><span class="pre">trace-events-all</span></code>
+file) per line; globbing patterns are accepted too.  This option is only
+available if QEMU has been compiled with the <code class="docutils literal notranslate"><span class="pre">simple</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ftrace</span></code> tracing backend.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">file=FILE</span></code></p>
+<blockquote>
+<div><p>Log output traces to <em>FILE</em>.
+This option is only available if QEMU has been compiled with
+the <code class="docutils literal notranslate"><span class="pre">simple</span></code> tracing backend.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-blockdev">
+<span class="sig-name descname"><span class="pre">--blockdev</span></span><span class="sig-prename descclassname"> <span class="pre">BLOCKDEVDEF</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-blockdev" title="Permalink to this definition"></a></dt>
+<dd><p>is a block node definition. See the <em class="manpage">qemu(1)</em> manual page for a
+description of block node properties and the <em class="manpage">qemu-block-drivers(7)</em>
+manual page for a description of driver-specific parameters.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-chardev">
+<span class="sig-name descname"><span class="pre">--chardev</span></span><span class="sig-prename descclassname"> <span class="pre">CHARDEVDEF</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-chardev" title="Permalink to this definition"></a></dt>
+<dd><p>is a character device definition. See the <em class="manpage">qemu(1)</em> manual page for
+a description of character device properties. A common character device
+definition configures a UNIX domain socket:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">chardev</span> <span class="n">socket</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">char1</span><span class="p">,</span><span class="n">path</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">qsd</span><span class="o">-</span><span class="n">qmp</span><span class="o">.</span><span class="n">sock</span><span class="p">,</span><span class="n">server</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">wait</span><span class="o">=</span><span class="n">off</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-export">
+<span class="sig-name descname"><span class="pre">--export</span></span><span class="sig-prename descclassname"> <span class="pre">[type=]nbd,id=&lt;id&gt;,node-name=&lt;node-name&gt;[,name=&lt;export-name&gt;][,writable=on|off][,bitmap=&lt;name&gt;]</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-export" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--export</span></span><span class="sig-prename descclassname"> <span class="pre">[type=]vhost-user-blk,id=&lt;id&gt;,node-name=&lt;node-name&gt;,addr.type=unix,addr.path=&lt;socket-path&gt;[,writable=on|off][,logical-block-size=&lt;block-size&gt;][,num-queues=&lt;num-queues&gt;]</span></span></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--export</span></span><span class="sig-prename descclassname"> <span class="pre">[type=]vhost-user-blk,id=&lt;id&gt;,node-name=&lt;node-name&gt;,addr.type=fd,addr.str=&lt;fd&gt;[,writable=on|off][,logical-block-size=&lt;block-size&gt;][,num-queues=&lt;num-queues&gt;]</span></span></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--export</span></span><span class="sig-prename descclassname"> <span class="pre">[type=]fuse,id=&lt;id&gt;,node-name=&lt;node-name&gt;,mountpoint=&lt;file&gt;[,growable=on|off][,writable=on|off][,allow-other=on|off|auto]</span></span></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--export</span></span><span class="sig-prename descclassname"> <span class="pre">[type=]vduse-blk,id=&lt;id&gt;,node-name=&lt;node-name&gt;,name=&lt;vduse-name&gt;[,writable=on|off][,num-queues=&lt;num-queues&gt;][,queue-size=&lt;queue-size&gt;][,logical-block-size=&lt;block-size&gt;][,serial=&lt;serial-number&gt;]</span></span></dt>
+<dd><p>is a block export definition. <code class="docutils literal notranslate"><span class="pre">node-name</span></code> is the block node that should be
+exported. <code class="docutils literal notranslate"><span class="pre">writable</span></code> determines whether or not the export allows write
+requests for modifying data (the default is off).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">nbd</span></code> export type requires <code class="docutils literal notranslate"><span class="pre">--nbd-server</span></code> (see below). <code class="docutils literal notranslate"><span class="pre">name</span></code> is
+the NBD export name (if not specified, it defaults to the given
+<code class="docutils literal notranslate"><span class="pre">node-name</span></code>). <code class="docutils literal notranslate"><span class="pre">bitmap</span></code> is the name of a dirty bitmap reachable from the
+block node, so the NBD client can use NBD_OPT_SET_META_CONTEXT with the
+metadata context name “qemu:dirty-bitmap:BITMAP” to inspect the bitmap.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">vhost-user-blk</span></code> export type takes a vhost-user socket address on which
+it accept incoming connections. Both
+<code class="docutils literal notranslate"><span class="pre">addr.type=unix,addr.path=&lt;socket-path&gt;</span></code> for UNIX domain sockets and
+<code class="docutils literal notranslate"><span class="pre">addr.type=fd,addr.str=&lt;fd&gt;</span></code> for file descriptor passing are supported.
+<code class="docutils literal notranslate"><span class="pre">logical-block-size</span></code> sets the logical block size in bytes (the default is
+512). <code class="docutils literal notranslate"><span class="pre">num-queues</span></code> sets the number of virtqueues (the default is 1).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fuse</span></code> export type takes a mount point, which must be a regular file,
+on which to export the given block node. That file will not be changed, it
+will just appear to have the block node’s content while the export is active
+(very much like mounting a filesystem on a directory does not change what the
+directory contains, it only shows a different content while the filesystem is
+mounted). Consequently, applications that have opened the given file before
+the export became active will continue to see its original content. If
+<code class="docutils literal notranslate"><span class="pre">growable</span></code> is set, writes after the end of the exported file will grow the
+block node to fit.  The <code class="docutils literal notranslate"><span class="pre">allow-other</span></code> option controls whether users other
+than the user running the process will be allowed to access the export.  Note
+that enabling this option as a non-root user requires enabling the
+user_allow_other option in the global fuse.conf configuration file.  Setting
+<code class="docutils literal notranslate"><span class="pre">allow-other</span></code> to auto (the default) will try enabling this option, and on
+error fall back to disabling it.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">vduse-blk</span></code> export type takes a <code class="docutils literal notranslate"><span class="pre">name</span></code> (must be unique across the host)
+to create the VDUSE device.
+<code class="docutils literal notranslate"><span class="pre">num-queues</span></code> sets the number of virtqueues (the default is 1).
+<code class="docutils literal notranslate"><span class="pre">queue-size</span></code> sets the virtqueue descriptor table size (the default is 256).</p>
+<p>The instantiated VDUSE device must then be added to the vDPA bus using the
+vdpa(8) command from the iproute2 project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># vdpa dev add name &lt;id&gt; mgmtdev vduse</span>
+</pre></div>
+</div>
+<p>The device can be removed from the vDPA bus later as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># vdpa dev del &lt;id&gt;</span>
+</pre></div>
+</div>
+<p>For more information about attaching vDPA devices to the host with
+virtio_vdpa.ko or attaching them to guests with vhost_vdpa.ko, see
+<a class="reference external" href="https://vdpa-dev.gitlab.io/">https://vdpa-dev.gitlab.io/</a>.</p>
+<p>For more information about VDUSE, see
+<a class="reference external" href="https://docs.kernel.org/userspace-api/vduse.html">https://docs.kernel.org/userspace-api/vduse.html</a>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-monitor">
+<span class="sig-name descname"><span class="pre">--monitor</span></span><span class="sig-prename descclassname"> <span class="pre">MONITORDEF</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-monitor" title="Permalink to this definition"></a></dt>
+<dd><p>is a QMP monitor definition. See the <em class="manpage">qemu(1)</em> manual page for
+a description of QMP monitor properties. A common QMP monitor definition
+configures a monitor on character device <code class="docutils literal notranslate"><span class="pre">char1</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">monitor</span> <span class="n">chardev</span><span class="o">=</span><span class="n">char1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-nbd-server">
+<span class="sig-name descname"><span class="pre">--nbd-server</span></span><span class="sig-prename descclassname"> <span class="pre">addr.type=inet,addr.host=&lt;host&gt;,addr.port=&lt;port&gt;[,tls-creds=&lt;id&gt;][,tls-authz=&lt;id&gt;][,max-connections=&lt;n&gt;]</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-nbd-server" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--nbd-server</span></span><span class="sig-prename descclassname"> <span class="pre">addr.type=unix,addr.path=&lt;path&gt;[,tls-creds=&lt;id&gt;][,tls-authz=&lt;id&gt;][,max-connections=&lt;n&gt;]</span></span></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--nbd-server</span></span><span class="sig-prename descclassname"> <span class="pre">addr.type=fd,addr.str=&lt;fd&gt;[,tls-creds=&lt;id&gt;][,tls-authz=&lt;id&gt;][,max-connections=&lt;n&gt;]</span></span></dt>
+<dd><p>is a server for NBD exports. Both TCP and UNIX domain sockets are supported.
+A listen socket can be provided via file descriptor passing (see Examples
+below). TLS encryption can be configured using <code class="docutils literal notranslate"><span class="pre">--object</span></code> tls-creds-* and
+authz-* secrets (see below).</p>
+<p>To configure an NBD server on UNIX domain socket path
+<code class="docutils literal notranslate"><span class="pre">/var/run/qsd-nbd.sock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">nbd</span><span class="o">-</span><span class="n">server</span> <span class="n">addr</span><span class="o">.</span><span class="n">type</span><span class="o">=</span><span class="n">unix</span><span class="p">,</span><span class="n">addr</span><span class="o">.</span><span class="n">path</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">qsd</span><span class="o">-</span><span class="n">nbd</span><span class="o">.</span><span class="n">sock</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-object">
+<span class="sig-name descname"><span class="pre">--object</span></span><span class="sig-prename descclassname"> <span class="pre">help</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-object" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--object</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;type&gt;,help</span></span></dt>
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">--object</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;type&gt;[,&lt;property&gt;=&lt;value&gt;...]</span></span></dt>
+<dd><p>is a QEMU user creatable object definition. List object types with <code class="docutils literal notranslate"><span class="pre">help</span></code>.
+List object properties with <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;,help</span></code>. See the <em class="manpage">qemu(1)</em>
+manual page for a description of the object properties.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-pidfile">
+<span class="sig-name descname"><span class="pre">--pidfile</span></span><span class="sig-prename descclassname"> <span class="pre">PATH</span></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-pidfile" title="Permalink to this definition"></a></dt>
+<dd><p>is the path to a file where the daemon writes its pid. This allows scripts to
+stop the daemon by sending a signal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ kill -SIGTERM $(&lt;path/to/qsd.pid)
+</pre></div>
+</div>
+<p>A file lock is applied to the file so only one instance of the daemon can run
+with a given pid file path. The daemon unlinks its pid file when terminating.</p>
+<p>The pid file is written after chardevs, exports, and NBD servers have been
+created but before accepting connections. The daemon has started successfully
+when the pid file is written and clients may begin connecting.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qemu-storage-daemon-daemonize">
+<span class="sig-name descname"><span class="pre">--daemonize</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qemu-storage-daemon-daemonize" title="Permalink to this definition"></a></dt>
+<dd><p>Daemonize the process. The parent process will exit once startup is complete
+(i.e., after the pid file has been or would have been written) or failure
+occurs. Its exit code reflects whether the child has started up successfully
+or failed to do so.</p>
+</dd></dl>
+
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<p>Launch the daemon with QMP monitor socket <code class="docutils literal notranslate"><span class="pre">qmp.sock</span></code> so clients can execute
+QMP commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-storage-daemon \
+    --chardev socket,path=qmp.sock,server=on,wait=off,id=char1 \
+    --monitor chardev=char1
+</pre></div>
+</div>
+<p>Launch the daemon from Python with a QMP monitor socket using file descriptor
+passing so there is no need to busy wait for the QMP monitor to become
+available:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+<span class="n">sock_path</span> <span class="o">=</span> <span class="s1">&#39;/var/run/qmp.sock&#39;</span>
+
+<span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_UNIX</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">listen_sock</span><span class="p">:</span>
+    <span class="n">listen_sock</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">sock_path</span><span class="p">)</span>
+    <span class="n">listen_sock</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
+
+    <span class="n">fd</span> <span class="o">=</span> <span class="n">listen_sock</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;qemu-storage-daemon&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;--chardev&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;socket,fd=</span><span class="si">{</span><span class="n">fd</span><span class="si">}</span><span class="s1">,server=on,id=char1&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;--monitor&#39;</span><span class="p">,</span> <span class="s1">&#39;chardev=char1&#39;</span><span class="p">],</span>
+        <span class="n">pass_fds</span><span class="o">=</span><span class="p">[</span><span class="n">fd</span><span class="p">],</span>
+    <span class="p">)</span>
+
+<span class="c1"># listen_sock was automatically closed when leaving the &#39;with&#39; statement</span>
+<span class="c1"># body. If the daemon process terminated early then the following connect()</span>
+<span class="c1"># will fail with &quot;Connection refused&quot; because no process has the listen</span>
+<span class="c1"># socket open anymore. Launch errors can be detected this way.</span>
+
+<span class="n">qmp_sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_UNIX</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="n">qmp_sock</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">sock_path</span><span class="p">)</span>
+<span class="o">...</span><span class="n">QMP</span> <span class="n">interaction</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>The same socket spawning approach also works with the <code class="docutils literal notranslate"><span class="pre">--nbd-server</span>
+<span class="pre">addr.type=fd,addr.str=&lt;fd&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">--export</span>
+<span class="pre">type=vhost-user-blk,addr.type=fd,addr.str=&lt;fd&gt;</span></code> options.</p>
+<p>Export raw image file <code class="docutils literal notranslate"><span class="pre">disk.img</span></code> over NBD UNIX domain socket <code class="docutils literal notranslate"><span class="pre">nbd.sock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-storage-daemon \
+    --blockdev driver=file,node-name=disk,filename=disk.img \
+    --nbd-server addr.type=unix,addr.path=nbd.sock \
+    --export type=nbd,id=export,node-name=disk,writable=on
+</pre></div>
+</div>
+<p>Export a qcow2 image file <code class="docutils literal notranslate"><span class="pre">disk.qcow2</span></code> as a vhost-user-blk device over UNIX
+domain socket <code class="docutils literal notranslate"><span class="pre">vhost-user-blk.sock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-storage-daemon \
+    --blockdev driver=file,node-name=file,filename=disk.qcow2 \
+    --blockdev driver=qcow2,node-name=qcow2,file=file \
+    --export type=vhost-user-blk,id=export,addr.type=unix,addr.path=vhost-user-blk.sock,node-name=qcow2
+</pre></div>
+</div>
+<p>Export a qcow2 image file <code class="docutils literal notranslate"><span class="pre">disk.qcow2</span></code> via FUSE on itself, so the disk image
+file will then appear as a raw image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-storage-daemon \
+    --blockdev driver=file,node-name=file,filename=disk.qcow2 \
+    --blockdev driver=qcow2,node-name=qcow2,file=file \
+    --export type=fuse,id=export,node-name=qcow2,mountpoint=disk.qcow2,writable=on
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<p><em class="manpage">qemu(1)</em>, <em class="manpage">qemu-block-drivers(7)</em>, <em class="manpage">qemu-storage-daemon-qmp-ref(7)</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qemu-img.html" class="btn btn-neutral float-left" title="QEMU disk image utility" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qemu-nbd.html" class="btn btn-neutral float-right" title="QEMU Disk Network Block Device Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

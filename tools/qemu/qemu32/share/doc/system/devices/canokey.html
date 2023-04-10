@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CanoKey QEMU &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Keys in the graphical frontends" href="../keys.html" />
+    <link rel="prev" title="QEMU vhost-user-rng - RNG emulation" href="vhost-user-rng.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usb.html">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">CanoKey QEMU</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/canokey.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="canokey-qemu">
+<span id="canokey"></span><h1>CanoKey QEMU<a class="headerlink" href="#canokey-qemu" title="Permalink to this heading"></a></h1>
+<p>CanoKey <a class="footnote-reference brackets" href="#id8" id="id1">1</a> is an open-source secure key with supports of</p>
+<ul class="simple">
+<li><p>U2F / FIDO2 with Ed25519 and HMAC-secret</p></li>
+<li><p>OpenPGP Card V3.4 with RSA4096, Ed25519 and more <a class="footnote-reference brackets" href="#id9" id="id2">2</a></p></li>
+<li><p>PIV (NIST SP 800-73-4)</p></li>
+<li><p>HOTP / TOTP</p></li>
+<li><p>NDEF</p></li>
+</ul>
+<p>All these platform-independent features are in canokey-core <a class="footnote-reference brackets" href="#id10" id="id3">3</a>.</p>
+<p>For different platforms, CanoKey has different implementations,
+including both hardware implementions and virtual cards:</p>
+<ul class="simple">
+<li><p>CanoKey STM32 <a class="footnote-reference brackets" href="#id11" id="id4">4</a></p></li>
+<li><p>CanoKey Pigeon <a class="footnote-reference brackets" href="#id12" id="id5">5</a></p></li>
+<li><p>(virt-card) CanoKey USB/IP</p></li>
+<li><p>(virt-card) CanoKey FunctionFS</p></li>
+</ul>
+<p>In QEMU, yet another CanoKey virt-card is implemented.
+CanoKey QEMU exposes itself as a USB device to the guest OS.</p>
+<p>With the same software configuration as a hardware key,
+the guest OS can use all the functionalities of a secure key as if
+there was actually an hardware key plugged in.</p>
+<p>CanoKey QEMU provides much convenience for debugging:</p>
+<ul class="simple">
+<li><p>libcanokey-qemu supports debugging output thus developers can
+inspect what happens inside a secure key</p></li>
+<li><p>CanoKey QEMU supports trace event thus event</p></li>
+<li><p>QEMU USB stack supports pcap thus USB packet between the guest
+and key can be captured and analysed</p></li>
+</ul>
+<p>Then for developers:</p>
+<ul class="simple">
+<li><p>For developers on software with secure key support (e.g. FIDO2, OpenPGP),
+they can see what happens inside the secure key</p></li>
+<li><p>For secure key developers, USB packets between guest OS and CanoKey
+can be easily captured and analysed</p></li>
+</ul>
+<p>Also since this is a virtual card, it can be easily used in CI for testing
+on code coping with secure key.</p>
+<section id="building">
+<h2>Building<a class="headerlink" href="#building" title="Permalink to this heading"></a></h2>
+<p>libcanokey-qemu is required to use CanoKey QEMU.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/canokeys/canokey-qemu
+mkdir canokey-qemu/build
+<span class="nb">pushd</span> canokey-qemu/build
+</pre></div>
+</div>
+<p>If you want to install libcanokey-qemu in a different place,
+add <code class="docutils literal notranslate"><span class="pre">-DCMAKE_INSTALL_PREFIX=/path/to/your/place</span></code> to cmake below.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cmake ..
+make
+make install <span class="c1"># may need sudo</span>
+<span class="nb">popd</span>
+</pre></div>
+</div>
+<p>Then configuring and building:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># depending on your env, lib/pkgconfig can be lib64/pkgconfig</span>
+<span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span>/path/to/your/place/lib/pkgconfig:<span class="nv">$PKG_CONFIG_PATH</span>
+./configure --enable-canokey <span class="o">&amp;&amp;</span> make
+</pre></div>
+</div>
+</section>
+<section id="using-canokey-qemu">
+<h2>Using CanoKey QEMU<a class="headerlink" href="#using-canokey-qemu" title="Permalink to this heading"></a></h2>
+<p>CanoKey QEMU stores all its data on a file of the host specified by the argument
+when invoking qemu.</p>
+<pre class="literal-block">qemu-system-x86_64 -usb -device canokey,file=$HOME/.canokey-file</pre>
+<p>Note: you should keep this file carefully as it may contain your private key!</p>
+<p>The first time when the file is used, it is created and initialized by CanoKey,
+afterwards CanoKey QEMU would just read this file.</p>
+<p>After the guest OS boots, you can check that there is a USB device.</p>
+<p>For example, If the guest OS is an Linux machine. You may invoke lsusb
+and find CanoKey QEMU there:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ lsusb
+Bus <span class="m">001</span> Device <span class="m">002</span>: ID 20a0:42d4 Clay Logic CanoKey QEMU
+</pre></div>
+</div>
+<p>You may setup the key as guided in <a class="footnote-reference brackets" href="#id13" id="id6">6</a>. The console for the key is at <a class="footnote-reference brackets" href="#id14" id="id7">7</a>.</p>
+</section>
+<section id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this heading"></a></h2>
+<p>CanoKey QEMU consists of two parts, <code class="docutils literal notranslate"><span class="pre">libcanokey-qemu.so</span></code> and <code class="docutils literal notranslate"><span class="pre">canokey.c</span></code>,
+the latter of which resides in QEMU. The former provides core functionality
+of a secure key while the latter provides platform-dependent functions:
+USB packet handling.</p>
+<p>If you want to trace what happens inside the secure key, when compiling
+libcanokey-qemu, you should add <code class="docutils literal notranslate"><span class="pre">-DQEMU_DEBUG_OUTPUT=ON</span></code> in cmake command
+line:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cmake .. -DQEMU_DEBUG_OUTPUT<span class="o">=</span>ON
+</pre></div>
+</div>
+<p>If you want to trace events happened in canokey.c, use</p>
+<pre class="literal-block">qemu-system-x86_64 --trace &quot;canokey_*&quot; \
+    -usb -device canokey,file=$HOME/.canokey-file</pre>
+<p>If you want to capture USB packets between the guest and the host, you can:</p>
+<pre class="literal-block">qemu-system-x86_64 -usb -device canokey,file=$HOME/.canokey-file,pcap=key.pcap</pre>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this heading"></a></h2>
+<p>Currently libcanokey-qemu.so has dozens of global variables as it was originally
+designed for embedded systems. Thus one qemu instance can not have
+multiple CanoKey QEMU running, namely you can not</p>
+<pre class="literal-block">qemu-system-x86_64 -usb -device canokey,file=$HOME/.canokey-file \
+     -device canokey,file=$HOME/.canokey-file2</pre>
+<p>Also, there is no lock on canokey-file, thus two CanoKey QEMU instance
+can not read one canokey-file at the same time.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://canokeys.org">https://canokeys.org</a></p>
+</dd>
+<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://docs.canokeys.org/userguide/openpgp/#supported-algorithm">https://docs.canokeys.org/userguide/openpgp/#supported-algorithm</a></p>
+</dd>
+<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/canokeys/canokey-core">https://github.com/canokeys/canokey-core</a></p>
+</dd>
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/canokeys/canokey-stm32">https://github.com/canokeys/canokey-stm32</a></p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/canokeys/canokey-pigeon">https://github.com/canokeys/canokey-pigeon</a></p>
+</dd>
+<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id6">6</a></span></dt>
+<dd><p><a class="reference external" href="https://docs.canokeys.org/">https://docs.canokeys.org/</a></p>
+</dd>
+<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id7">7</a></span></dt>
+<dd><p><a class="reference external" href="https://console.canokeys.org/">https://console.canokeys.org/</a></p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vhost-user-rng.html" class="btn btn-neutral float-left" title="QEMU vhost-user-rng - RNG emulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../keys.html" class="btn btn-neutral float-right" title="Keys in the graphical frontends" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

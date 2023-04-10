@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qtest Driver Framework &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CI" href="ci.html" />
+    <link rel="prev" title="QTest Device Emulation Testing Framework" href="qtest.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Qtest Driver Framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qtest.html#qtest-protocol">QTest Protocol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qtest.html#libqtest-api-reference">libqtest API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+          <li class="breadcrumb-item"><a href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+      <li class="breadcrumb-item active">Qtest Driver Framework</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/qgraph.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qtest-driver-framework">
+<span id="qgraph"></span><h1>Qtest Driver Framework<a class="headerlink" href="#qtest-driver-framework" title="Permalink to this heading"></a></h1>
+<p>In order to test a specific driver, plain libqos tests need to
+take care of booting QEMU with the right machine and devices.
+This makes each test “hardcoded” for a specific configuration, reducing
+the possible coverage that it can reach.</p>
+<p>For example, the sdhci device is supported on both x86_64 and ARM boards,
+therefore a generic sdhci test should test all machines and drivers that
+support that device.
+Using only libqos APIs, the test has to manually take care of
+covering all the setups, and build the correct command line.</p>
+<p>This also introduces backward compatibility issues: if a device/driver command
+line name is changed, all tests that use that will not work
+properly anymore and need to be adjusted.</p>
+<p>The aim of qgraph is to create a graph of drivers, machines and tests such that
+a test aimed to a certain driver does not have to care of
+booting the right QEMU machine, pick the right device, build the command line
+and so on. Instead, it only defines what type of device it is testing
+(interface in qgraph terms) and the framework takes care of
+covering all supported types of devices and machine architectures.</p>
+<p>Following the above example, an interface would be <code class="docutils literal notranslate"><span class="pre">sdhci</span></code>,
+so the sdhci-test should only care of linking its qgraph node with
+that interface. In this way, if the command line of a sdhci driver
+is changed, only the respective qgraph driver node has to be adjusted.</p>
+<section id="qgraph-concepts">
+<h2>QGraph concepts<a class="headerlink" href="#qgraph-concepts" title="Permalink to this heading"></a></h2>
+<p>The graph is composed by nodes that represent machines, drivers, tests
+and edges that define the relationships between them (<code class="docutils literal notranslate"><span class="pre">CONSUMES</span></code>, <code class="docutils literal notranslate"><span class="pre">PRODUCES</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">CONTAINS</span></code>).</p>
+<section id="nodes">
+<h3>Nodes<a class="headerlink" href="#nodes" title="Permalink to this heading"></a></h3>
+<p>A node can be of four types:</p>
+<ul class="simple">
+<li><p><strong>QNODE_MACHINE</strong>:   for example <code class="docutils literal notranslate"><span class="pre">arm/raspi2b</span></code></p></li>
+<li><p><strong>QNODE_DRIVER</strong>:    for example <code class="docutils literal notranslate"><span class="pre">generic-sdhci</span></code></p></li>
+<li><p><strong>QNODE_INTERFACE</strong>: for example <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> (interface for all <code class="docutils literal notranslate"><span class="pre">-sdhci</span></code>
+drivers).
+An interface is not explicitly created, it will be automatically
+instantiated when a node consumes or produces it.
+An interface is simply a struct that abstracts the various drivers
+for the same type of device, and offers an API to the nodes that
+use it (“consume” relation in qgraph terms) that is implemented/backed up by the drivers that implement it (“produce” relation in qgraph terms).</p></li>
+<li><p><strong>QNODE_TEST</strong>:      for example <code class="docutils literal notranslate"><span class="pre">sdhci-test</span></code>. A test consumes an interface
+and tests the functions provided by it.</p></li>
+</ul>
+<p>Notes for the nodes:</p>
+<ul class="simple">
+<li><p>QNODE_MACHINE: each machine struct must have a <code class="docutils literal notranslate"><span class="pre">QGuestAllocator</span></code> and
+implement <code class="docutils literal notranslate"><span class="pre">get_driver()</span></code> to return the allocator mapped to the interface
+“memory”. The function can also return <code class="docutils literal notranslate"><span class="pre">NULL</span></code> if the allocator
+is not set.</p></li>
+<li><p>QNODE_DRIVER:  driver names must be unique, and machines and nodes
+planned to be “consumed” by other nodes must match QEMU
+drivers name, otherwise they won’t be discovered</p></li>
+</ul>
+</section>
+<section id="edges">
+<h3>Edges<a class="headerlink" href="#edges" title="Permalink to this heading"></a></h3>
+<p>An edge relation between two nodes (drivers or machines) <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> can be:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">CONSUMES</span> <span class="pre">Y</span></code>: <code class="docutils literal notranslate"><span class="pre">Y</span></code> can be plugged into <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">PRODUCES</span> <span class="pre">Y</span></code>: <code class="docutils literal notranslate"><span class="pre">X</span></code> provides the interface <code class="docutils literal notranslate"><span class="pre">Y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">CONTAINS</span> <span class="pre">Y</span></code>: <code class="docutils literal notranslate"><span class="pre">Y</span></code> is part of <code class="docutils literal notranslate"><span class="pre">X</span></code> component</p></li>
+</ul>
+</section>
+<section id="execution-steps">
+<h3>Execution steps<a class="headerlink" href="#execution-steps" title="Permalink to this heading"></a></h3>
+<p>The basic framework steps are the following:</p>
+<ul class="simple">
+<li><p>All nodes and edges are created in their respective
+machine/driver/test files</p></li>
+<li><p>The framework starts QEMU and asks for a list of available devices
+and machines (note that only machines and “consumed” nodes are mapped
+1:1 with QEMU devices)</p></li>
+<li><p>The framework walks the graph starting from the available machines and
+performs a Depth First Search for tests</p></li>
+<li><p>Once a test is found, the path is walked again and all drivers are
+allocated accordingly and the final interface is passed to the test</p></li>
+<li><p>The test is executed</p></li>
+<li><p>Unused objects are cleaned and the path discovery is continued</p></li>
+</ul>
+<p>Depending on the QEMU binary used, only some drivers/machines will be
+available and only test that are reached by them will be executed.</p>
+</section>
+<section id="command-line">
+<h3>Command line<a class="headerlink" href="#command-line" title="Permalink to this heading"></a></h3>
+<p>Command line is built by using node names and optional arguments
+passed by the user when building the edges.</p>
+<p>There are three types of command line arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">in</span> <span class="pre">node</span></code>      : created from the node name. For example, machines will
+have <code class="docutils literal notranslate"><span class="pre">-M</span> <span class="pre">&lt;machine&gt;</span></code> to its command line, while devices
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">&lt;device&gt;</span></code>. It is automatically done by the framework.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">after</span> <span class="pre">node</span></code>   : added as additional argument to the node name.
+This argument is added optionally when creating edges,
+by setting the parameter <code class="docutils literal notranslate"><span class="pre">after_cmd_line</span></code> and
+<code class="docutils literal notranslate"><span class="pre">extra_edge_opts</span></code> in <code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code>.
+The framework automatically adds
+a comma before <code class="docutils literal notranslate"><span class="pre">extra_edge_opts</span></code>,
+because it is going to add attributes
+after the destination node pointed by
+the edge containing these options, and automatically
+adds a space before <code class="docutils literal notranslate"><span class="pre">after_cmd_line</span></code>, because it
+adds an additional device, not an attribute.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">before</span> <span class="pre">node</span></code>  : added as additional argument to the node name.
+This argument is added optionally when creating edges,
+by setting the parameter <code class="docutils literal notranslate"><span class="pre">before_cmd_line</span></code> in
+<code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code>. This attribute
+is going to add attributes before the destination node
+pointed by the edge containing these options. It is
+helpful to commands that are not node-representable,
+such as <code class="docutils literal notranslate"><span class="pre">-fdsev</span></code> or <code class="docutils literal notranslate"><span class="pre">-netdev</span></code>.</p></li>
+</ul>
+<p>While adding command line in edges is always used, not all nodes names are
+used in every path walk: this is because the contained or produced ones
+are already added by QEMU, so only nodes that “consumes” will be used to
+build the command line. Also, nodes that will have <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;abstract&quot;</span> <span class="pre">:</span> <span class="pre">true</span> <span class="pre">}</span></code>
+as QMP attribute will loose their command line, since they are not proper
+devices to be added in QEMU.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QOSGraphEdgeOptions</span> <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">before_cmd_line</span> <span class="o">=</span> <span class="s2">&quot;-drive id=drv0,if=none,file=null-co://,&quot;</span>
+                       <span class="s2">&quot;file.read-zeroes=on,format=raw&quot;</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">after_cmd_line</span> <span class="o">=</span> <span class="s2">&quot;-device scsi-hd,bus=vs0.0,drive=drv0&quot;</span><span class="p">,</span>
+
+    <span class="n">opts</span><span class="o">.</span><span class="n">extra_device_opts</span> <span class="o">=</span> <span class="s2">&quot;id=vs0&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">qos_node_create_driver</span><span class="p">(</span><span class="s2">&quot;virtio-scsi-device&quot;</span><span class="p">,</span>
+                        <span class="n">virtio_scsi_device_create</span><span class="p">);</span>
+<span class="n">qos_node_consumes</span><span class="p">(</span><span class="s2">&quot;virtio-scsi-device&quot;</span><span class="p">,</span> <span class="s2">&quot;virtio-bus&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">opts</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Will produce the following command line:
+<code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">id=drv0,if=none,file=null-co://,</span> <span class="pre">-device</span> <span class="pre">virtio-scsi-device,id=vs0</span> <span class="pre">-device</span> <span class="pre">scsi-hd,bus=vs0.0,drive=drv0</span></code></p>
+</section>
+<section id="troubleshooting-unavailable-tests">
+<h3>Troubleshooting unavailable tests<a class="headerlink" href="#troubleshooting-unavailable-tests" title="Permalink to this heading"></a></h3>
+<p>If there is no path from an available machine to a test then that test will be
+unavailable and won’t execute. This can happen if a test or driver did not set
+up its qgraph node correctly. It can also happen if the necessary machine type
+or device is missing from the QEMU binary because it was compiled out or
+otherwise.</p>
+<p>It is possible to troubleshoot unavailable tests by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ QTEST_QEMU_BINARY=build/qemu-system-x86_64 build/tests/qtest/qos-test --verbose
+# ALL QGRAPH EDGES: {
+#   src=&#39;virtio-net&#39;
+#      |-&gt; dest=&#39;virtio-net-tests/vhost-user/multiqueue&#39; type=2 (node=0x559142109e30)
+#      |-&gt; dest=&#39;virtio-net-tests/vhost-user/migrate&#39; type=2 (node=0x559142109d00)
+#   src=&#39;virtio-net-pci&#39;
+#      |-&gt; dest=&#39;virtio-net&#39; type=1 (node=0x55914210d740)
+#   src=&#39;pci-bus&#39;
+#      |-&gt; dest=&#39;virtio-net-pci&#39; type=2 (node=0x55914210d880)
+#   src=&#39;pci-bus-pc&#39;
+#      |-&gt; dest=&#39;pci-bus&#39; type=1 (node=0x559142103f40)
+#   src=&#39;i440FX-pcihost&#39;
+#      |-&gt; dest=&#39;pci-bus-pc&#39; type=0 (node=0x55914210ac70)
+#   src=&#39;x86_64/pc&#39;
+#      |-&gt; dest=&#39;i440FX-pcihost&#39; type=0 (node=0x5591421117f0)
+#   src=&#39;&#39;
+#      |-&gt; dest=&#39;x86_64/pc&#39; type=0 (node=0x559142111600)
+#      |-&gt; dest=&#39;arm/raspi2b&#39; type=0 (node=0x559142110740)
+...
+# }
+# ALL QGRAPH NODES: {
+#   name=&#39;virtio-net-tests/announce-self&#39; type=3 cmd_line=&#39;(null)&#39; [available]
+#   name=&#39;arm/raspi2b&#39; type=0 cmd_line=&#39;-M raspi2b &#39; [UNAVAILABLE]
+...
+# }
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">virtio-net-tests/announce-self</span></code> test is listed as “available” in the
+“ALL QGRAPH NODES” output. This means the test will execute. We can follow the
+qgraph path in the “ALL QGRAPH EDGES” output as follows: ‘’ -&gt; ‘x86_64/pc’ -&gt;
+‘i440FX-pcihost’ -&gt; ‘pci-bus-pc’ -&gt; ‘pci-bus’ -&gt; ‘virtio-net-pci’ -&gt;
+‘virtio-net’. The root of the qgraph is ‘’ and the depth first search begins
+there.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">arm/raspi2b</span></code> machine node is listed as “UNAVAILABLE”. Although it is
+reachable from the root via ‘’ -&gt; ‘arm/raspi2b’ the node is unavailable because
+the QEMU binary did not list it when queried by the framework. This is expected
+because we used the <code class="docutils literal notranslate"><span class="pre">qemu-system-x86_64</span></code> binary which does not support ARM
+machine types.</p>
+<p>If a test is unexpectedly listed as “UNAVAILABLE”, first check that the “ALL
+QGRAPH EDGES” output reports edge connectivity from the root (‘’) to the test.
+If there is no connectivity then the qgraph nodes were not set up correctly and
+the driver or test code is incorrect. If there is connectivity, check the
+availability of each node in the path in the “ALL QGRAPH NODES” output. The
+first unavailable node in the path is the reason why the test is unavailable.
+Typically this is because the QEMU binary lacks support for the necessary
+machine type or device.</p>
+</section>
+</section>
+<section id="creating-a-new-driver-and-its-interface">
+<h2>Creating a new driver and its interface<a class="headerlink" href="#creating-a-new-driver-and-its-interface" title="Permalink to this heading"></a></h2>
+<p>Here we continue the <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> use case, with the following scenario:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sdhci-test</span></code> aims to test the <code class="docutils literal notranslate"><span class="pre">read[q,w],</span> <span class="pre">writeq</span></code> functions
+offered by the <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> drivers.</p></li>
+<li><p>The current <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> device is supported by both <code class="docutils literal notranslate"><span class="pre">x86_64/pc</span></code> and <code class="docutils literal notranslate"><span class="pre">ARM</span></code>
+(in this example we focus on the <code class="docutils literal notranslate"><span class="pre">arm-raspi2b</span></code>) machines.</p></li>
+<li><p>QEMU offers 2 types of drivers: <code class="docutils literal notranslate"><span class="pre">QSDHCI_MemoryMapped</span></code> for <code class="docutils literal notranslate"><span class="pre">ARM</span></code> and
+<code class="docutils literal notranslate"><span class="pre">QSDHCI_PCI</span></code> for <code class="docutils literal notranslate"><span class="pre">x86_64/pc</span></code>. Both implement the
+<code class="docutils literal notranslate"><span class="pre">read[q,w],</span> <span class="pre">writeq</span></code> functions.</p></li>
+</ul>
+<p>In order to implement such scenario in qgraph, the test developer needs to:</p>
+<ul>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">x86_64/pc</span></code> machine node. This machine uses the
+<code class="docutils literal notranslate"><span class="pre">pci-bus</span></code> architecture so it <code class="docutils literal notranslate"><span class="pre">contains</span></code> a PCI driver,
+<code class="docutils literal notranslate"><span class="pre">pci-bus-pc</span></code>. The actual path is</p>
+<p><code class="docutils literal notranslate"><span class="pre">x86_64/pc</span> <span class="pre">--contains--&gt;</span> <span class="pre">1440FX-pcihost</span> <span class="pre">--contains--&gt;</span>
+<span class="pre">pci-bus-pc</span> <span class="pre">--produces--&gt;</span> <span class="pre">pci-bus</span></code>.</p>
+<p>For the sake of this example,
+we do not focus on the PCI interface implementation.</p>
+</li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">sdhci-pci</span></code> driver node, representing <code class="docutils literal notranslate"><span class="pre">QSDHCI_PCI</span></code>.
+The driver uses the PCI bus (and its API),
+so it must <code class="docutils literal notranslate"><span class="pre">consume</span></code> the <code class="docutils literal notranslate"><span class="pre">pci-bus</span></code> generic interface (which abstracts
+all the pci drivers available)</p>
+<p><code class="docutils literal notranslate"><span class="pre">sdhci-pci</span> <span class="pre">--consumes--&gt;</span> <span class="pre">pci-bus</span></code></p>
+</li>
+<li><p>Create an <code class="docutils literal notranslate"><span class="pre">arm/raspi2b</span></code> machine node. This machine <code class="docutils literal notranslate"><span class="pre">contains</span></code>
+a <code class="docutils literal notranslate"><span class="pre">generic-sdhci</span></code> memory mapped <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> driver node, representing
+<code class="docutils literal notranslate"><span class="pre">QSDHCI_MemoryMapped</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">arm/raspi2b</span> <span class="pre">--contains--&gt;</span> <span class="pre">generic-sdhci</span></code></p>
+</li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> interface node. This interface offers the
+functions that are shared by all <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> devices.
+The interface is produced by <code class="docutils literal notranslate"><span class="pre">sdhci-pci</span></code> and <code class="docutils literal notranslate"><span class="pre">generic-sdhci</span></code>,
+the available architecture-specific drivers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sdhci-pci</span> <span class="pre">--produces--&gt;</span> <span class="pre">sdhci</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">generic-sdhci</span> <span class="pre">--produces--&gt;</span> <span class="pre">sdhci</span></code></p>
+</li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">sdhci-test</span></code> test node. The test <code class="docutils literal notranslate"><span class="pre">consumes</span></code> the
+<code class="docutils literal notranslate"><span class="pre">sdhci</span></code> interface, using its API. It doesn’t need to look at
+the supported machines or drivers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sdhci-test</span> <span class="pre">--consumes--&gt;</span> <span class="pre">sdhci</span></code></p>
+</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">arm-raspi2b</span></code> machine, simplified from
+<code class="docutils literal notranslate"><span class="pre">tests/qtest/libqos/arm-raspi2-machine.c</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#include &quot;qgraph.h&quot;
+
+struct QRaspi2Machine {
+    QOSGraphObject obj;
+    QGuestAllocator alloc;
+    QSDHCI_MemoryMapped sdhci;
+};
+
+static void *raspi2_get_driver(void *object, const char *interface)
+{
+    QRaspi2Machine *machine = object;
+    if (!g_strcmp0(interface, &quot;memory&quot;)) {
+        return &amp;machine-&gt;alloc;
+    }
+
+    fprintf(stderr, &quot;%s not present in arm/raspi2b\n&quot;, interface);
+    g_assert_not_reached();
+}
+
+static QOSGraphObject *raspi2_get_device(void *obj,
+                                            const char *device)
+{
+    QRaspi2Machine *machine = obj;
+    if (!g_strcmp0(device, &quot;generic-sdhci&quot;)) {
+        return &amp;machine-&gt;sdhci.obj;
+    }
+
+    fprintf(stderr, &quot;%s not present in arm/raspi2b\n&quot;, device);
+    g_assert_not_reached();
+}
+
+static void *qos_create_machine_arm_raspi2(QTestState *qts)
+{
+    QRaspi2Machine *machine = g_new0(QRaspi2Machine, 1);
+
+    alloc_init(&amp;machine-&gt;alloc, ...);
+
+    /* Get node(s) contained inside (CONTAINS) */
+    machine-&gt;obj.get_device = raspi2_get_device;
+
+    /* Get node(s) produced (PRODUCES) */
+    machine-&gt;obj.get_driver = raspi2_get_driver;
+
+    /* free the object */
+    machine-&gt;obj.destructor = raspi2_destructor;
+    qos_init_sdhci_mm(&amp;machine-&gt;sdhci, ...);
+    return &amp;machine-&gt;obj;
+}
+
+static void raspi2_register_nodes(void)
+{
+    /* arm/raspi2b --contains--&gt; generic-sdhci */
+    qos_node_create_machine(&quot;arm/raspi2b&quot;,
+                             qos_create_machine_arm_raspi2);
+    qos_node_contains(&quot;arm/raspi2b&quot;, &quot;generic-sdhci&quot;, NULL);
+}
+
+libqos_init(raspi2_register_nodes);
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">x86_64/pc</span></code> machine, simplified from
+<code class="docutils literal notranslate"><span class="pre">tests/qtest/libqos/x86_64_pc-machine.c</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#include &quot;qgraph.h&quot;
+
+struct i440FX_pcihost {
+    QOSGraphObject obj;
+    QPCIBusPC pci;
+};
+
+struct QX86PCMachine {
+    QOSGraphObject obj;
+    QGuestAllocator alloc;
+    i440FX_pcihost bridge;
+};
+
+/* i440FX_pcihost */
+
+static QOSGraphObject *i440FX_host_get_device(void *obj,
+                                            const char *device)
+{
+    i440FX_pcihost *host = obj;
+    if (!g_strcmp0(device, &quot;pci-bus-pc&quot;)) {
+        return &amp;host-&gt;pci.obj;
+    }
+    fprintf(stderr, &quot;%s not present in i440FX-pcihost\n&quot;, device);
+    g_assert_not_reached();
+}
+
+/* x86_64/pc machine */
+
+static void *pc_get_driver(void *object, const char *interface)
+{
+    QX86PCMachine *machine = object;
+    if (!g_strcmp0(interface, &quot;memory&quot;)) {
+        return &amp;machine-&gt;alloc;
+    }
+
+    fprintf(stderr, &quot;%s not present in x86_64/pc\n&quot;, interface);
+    g_assert_not_reached();
+}
+
+static QOSGraphObject *pc_get_device(void *obj, const char *device)
+{
+    QX86PCMachine *machine = obj;
+    if (!g_strcmp0(device, &quot;i440FX-pcihost&quot;)) {
+        return &amp;machine-&gt;bridge.obj;
+    }
+
+    fprintf(stderr, &quot;%s not present in x86_64/pc\n&quot;, device);
+    g_assert_not_reached();
+}
+
+static void *qos_create_machine_pc(QTestState *qts)
+{
+    QX86PCMachine *machine = g_new0(QX86PCMachine, 1);
+
+    /* Get node(s) contained inside (CONTAINS) */
+    machine-&gt;obj.get_device = pc_get_device;
+
+    /* Get node(s) produced (PRODUCES) */
+    machine-&gt;obj.get_driver = pc_get_driver;
+
+    /* free the object */
+    machine-&gt;obj.destructor = pc_destructor;
+    pc_alloc_init(&amp;machine-&gt;alloc, qts, ALLOC_NO_FLAGS);
+
+    /* Get node(s) contained inside (CONTAINS) */
+    machine-&gt;bridge.obj.get_device = i440FX_host_get_device;
+
+    return &amp;machine-&gt;obj;
+}
+
+static void pc_machine_register_nodes(void)
+{
+    /* x86_64/pc --contains--&gt; 1440FX-pcihost --contains--&gt;
+     * pci-bus-pc [--produces--&gt; pci-bus (in pci.h)] */
+    qos_node_create_machine(&quot;x86_64/pc&quot;, qos_create_machine_pc);
+    qos_node_contains(&quot;x86_64/pc&quot;, &quot;i440FX-pcihost&quot;, NULL);
+
+    /* contained drivers don&#39;t need a constructor,
+     * they will be init by the parent */
+    qos_node_create_driver(&quot;i440FX-pcihost&quot;, NULL);
+    qos_node_contains(&quot;i440FX-pcihost&quot;, &quot;pci-bus-pc&quot;, NULL);
+}
+
+libqos_init(pc_machine_register_nodes);
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">sdhci</span></code> taken from <code class="docutils literal notranslate"><span class="pre">tests/qtest/libqos/sdhci.c</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/* Interface node, offers the sdhci API */
+struct QSDHCI {
+    uint16_t (*readw)(QSDHCI *s, uint32_t reg);
+    uint64_t (*readq)(QSDHCI *s, uint32_t reg);
+    void (*writeq)(QSDHCI *s, uint32_t reg, uint64_t val);
+    /* other fields */
+};
+
+/* Memory Mapped implementation of QSDHCI */
+struct QSDHCI_MemoryMapped {
+    QOSGraphObject obj;
+    QSDHCI sdhci;
+    /* other driver-specific fields */
+};
+
+/* PCI implementation of QSDHCI */
+struct QSDHCI_PCI {
+    QOSGraphObject obj;
+    QSDHCI sdhci;
+    /* other driver-specific fields */
+};
+
+/* Memory mapped implementation of QSDHCI */
+
+static void *sdhci_mm_get_driver(void *obj, const char *interface)
+{
+    QSDHCI_MemoryMapped *smm = obj;
+    if (!g_strcmp0(interface, &quot;sdhci&quot;)) {
+        return &amp;smm-&gt;sdhci;
+    }
+    fprintf(stderr, &quot;%s not present in generic-sdhci\n&quot;, interface);
+    g_assert_not_reached();
+}
+
+void qos_init_sdhci_mm(QSDHCI_MemoryMapped *sdhci, QTestState *qts,
+                    uint32_t addr, QSDHCIProperties *common)
+{
+    /* Get node contained inside (CONTAINS) */
+    sdhci-&gt;obj.get_driver = sdhci_mm_get_driver;
+
+    /* SDHCI interface API */
+    sdhci-&gt;sdhci.readw = sdhci_mm_readw;
+    sdhci-&gt;sdhci.readq = sdhci_mm_readq;
+    sdhci-&gt;sdhci.writeq = sdhci_mm_writeq;
+    sdhci-&gt;qts = qts;
+}
+
+/* PCI implementation of QSDHCI */
+
+static void *sdhci_pci_get_driver(void *object,
+                                  const char *interface)
+{
+    QSDHCI_PCI *spci = object;
+    if (!g_strcmp0(interface, &quot;sdhci&quot;)) {
+        return &amp;spci-&gt;sdhci;
+    }
+
+    fprintf(stderr, &quot;%s not present in sdhci-pci\n&quot;, interface);
+    g_assert_not_reached();
+}
+
+static void *sdhci_pci_create(void *pci_bus,
+                              QGuestAllocator *alloc,
+                              void *addr)
+{
+    QSDHCI_PCI *spci = g_new0(QSDHCI_PCI, 1);
+    QPCIBus *bus = pci_bus;
+    uint64_t barsize;
+
+    qpci_device_init(&amp;spci-&gt;dev, bus, addr);
+
+    /* SDHCI interface API */
+    spci-&gt;sdhci.readw = sdhci_pci_readw;
+    spci-&gt;sdhci.readq = sdhci_pci_readq;
+    spci-&gt;sdhci.writeq = sdhci_pci_writeq;
+
+    /* Get node(s) produced (PRODUCES) */
+    spci-&gt;obj.get_driver = sdhci_pci_get_driver;
+
+    spci-&gt;obj.start_hw = sdhci_pci_start_hw;
+    spci-&gt;obj.destructor = sdhci_destructor;
+    return &amp;spci-&gt;obj;
+}
+
+static void qsdhci_register_nodes(void)
+{
+    QOSGraphEdgeOptions opts = {
+        .extra_device_opts = &quot;addr=04.0&quot;,
+    };
+
+    /* generic-sdhci */
+    /* generic-sdhci --produces--&gt; sdhci */
+    qos_node_create_driver(&quot;generic-sdhci&quot;, NULL);
+    qos_node_produces(&quot;generic-sdhci&quot;, &quot;sdhci&quot;);
+
+    /* sdhci-pci */
+    /* sdhci-pci --produces--&gt; sdhci
+     * sdhci-pci --consumes--&gt; pci-bus */
+    qos_node_create_driver(&quot;sdhci-pci&quot;, sdhci_pci_create);
+    qos_node_produces(&quot;sdhci-pci&quot;, &quot;sdhci&quot;);
+    qos_node_consumes(&quot;sdhci-pci&quot;, &quot;pci-bus&quot;, &amp;opts);
+}
+
+libqos_init(qsdhci_register_nodes);
+</pre></div>
+</div>
+<p>In the above example, all possible types of relations are created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x86_64</span><span class="o">/</span><span class="n">pc</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="mi">1440</span><span class="n">FX</span><span class="o">-</span><span class="n">pcihost</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span><span class="o">-</span><span class="n">pc</span>
+                                                          <span class="o">|</span>
+             <span class="n">sdhci</span><span class="o">-</span><span class="n">pci</span> <span class="o">--</span><span class="n">consumes</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span> <span class="o">&lt;--</span><span class="n">produces</span><span class="o">--+</span>
+                <span class="o">|</span>
+                <span class="o">+--</span><span class="n">produces</span><span class="o">--+</span>
+                             <span class="o">|</span>
+                             <span class="n">v</span>
+                           <span class="n">sdhci</span>
+                             <span class="o">^</span>
+                             <span class="o">|</span>
+                             <span class="o">+--</span><span class="n">produces</span><span class="o">--</span> <span class="o">+</span>
+                                           <span class="o">|</span>
+             <span class="n">arm</span><span class="o">/</span><span class="n">raspi2b</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">generic</span><span class="o">-</span><span class="n">sdhci</span>
+</pre></div>
+</div>
+<p>or inverting the consumes edge in consumed_by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x86_64</span><span class="o">/</span><span class="n">pc</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="mi">1440</span><span class="n">FX</span><span class="o">-</span><span class="n">pcihost</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span><span class="o">-</span><span class="n">pc</span>
+                                                          <span class="o">|</span>
+          <span class="n">sdhci</span><span class="o">-</span><span class="n">pci</span> <span class="o">&lt;--</span><span class="n">consumed</span> <span class="n">by</span><span class="o">--</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span> <span class="o">&lt;--</span><span class="n">produces</span><span class="o">--+</span>
+              <span class="o">|</span>
+              <span class="o">+--</span><span class="n">produces</span><span class="o">--+</span>
+                           <span class="o">|</span>
+                           <span class="n">v</span>
+                          <span class="n">sdhci</span>
+                           <span class="o">^</span>
+                           <span class="o">|</span>
+                           <span class="o">+--</span><span class="n">produces</span><span class="o">--</span> <span class="o">+</span>
+                                         <span class="o">|</span>
+          <span class="n">arm</span><span class="o">/</span><span class="n">raspi2b</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">generic</span><span class="o">-</span><span class="n">sdhci</span>
+</pre></div>
+</div>
+</section>
+<section id="adding-a-new-test">
+<h2>Adding a new test<a class="headerlink" href="#adding-a-new-test" title="Permalink to this heading"></a></h2>
+<p>Given the above setup, adding a new test is very simple.
+<code class="docutils literal notranslate"><span class="pre">sdhci-test</span></code>, taken from <code class="docutils literal notranslate"><span class="pre">tests/qtest/sdhci-test.c</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">void</span> <span class="n">check_capab_sdma</span><span class="p">(</span><span class="n">QSDHCI</span> <span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">supported</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">uint64_t</span> <span class="n">capab</span><span class="p">,</span> <span class="n">capab_sdma</span><span class="p">;</span>
+
+    <span class="n">capab</span> <span class="o">=</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">readq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">SDHC_CAPAB</span><span class="p">);</span>
+    <span class="n">capab_sdma</span> <span class="o">=</span> <span class="n">FIELD_EX64</span><span class="p">(</span><span class="n">capab</span><span class="p">,</span> <span class="n">SDHC_CAPAB</span><span class="p">,</span> <span class="n">SDMA</span><span class="p">);</span>
+    <span class="n">g_assert_cmpuint</span><span class="p">(</span><span class="n">capab_sdma</span><span class="p">,</span> <span class="o">==</span><span class="p">,</span> <span class="n">supported</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">static</span> <span class="n">void</span> <span class="n">test_registers</span><span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span> <span class="n">void</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span>
+                            <span class="n">QGuestAllocator</span> <span class="o">*</span><span class="n">alloc</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">QSDHCI</span> <span class="o">*</span><span class="n">s</span> <span class="o">=</span> <span class="n">obj</span><span class="p">;</span>
+
+    <span class="o">/*</span> <span class="n">example</span> <span class="n">test</span> <span class="o">*/</span>
+    <span class="n">check_capab_sdma</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">props</span><span class="o">.</span><span class="n">capab</span><span class="o">.</span><span class="n">sdma</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">static</span> <span class="n">void</span> <span class="n">register_sdhci_test</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">/*</span> <span class="n">sdhci</span><span class="o">-</span><span class="n">test</span> <span class="o">--</span><span class="n">consumes</span><span class="o">--&gt;</span> <span class="n">sdhci</span> <span class="o">*/</span>
+    <span class="n">qos_add_test</span><span class="p">(</span><span class="s2">&quot;registers&quot;</span><span class="p">,</span> <span class="s2">&quot;sdhci&quot;</span><span class="p">,</span> <span class="n">test_registers</span><span class="p">,</span> <span class="n">NULL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">libqos_init</span><span class="p">(</span><span class="n">register_sdhci_test</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here a new test is created, consuming <code class="docutils literal notranslate"><span class="pre">sdhci</span></code> interface node
+and creating a valid path from both machines to a test.
+Final graph will be like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x86_64</span><span class="o">/</span><span class="n">pc</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="mi">1440</span><span class="n">FX</span><span class="o">-</span><span class="n">pcihost</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span><span class="o">-</span><span class="n">pc</span>
+                                                          <span class="o">|</span>
+             <span class="n">sdhci</span><span class="o">-</span><span class="n">pci</span> <span class="o">--</span><span class="n">consumes</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span> <span class="o">&lt;--</span><span class="n">produces</span><span class="o">--+</span>
+                <span class="o">|</span>
+                <span class="o">+--</span><span class="n">produces</span><span class="o">--+</span>
+                             <span class="o">|</span>
+                             <span class="n">v</span>
+                           <span class="n">sdhci</span> <span class="o">&lt;--</span><span class="n">consumes</span><span class="o">--</span> <span class="n">sdhci</span><span class="o">-</span><span class="n">test</span>
+                             <span class="o">^</span>
+                             <span class="o">|</span>
+                             <span class="o">+--</span><span class="n">produces</span><span class="o">--</span> <span class="o">+</span>
+                                           <span class="o">|</span>
+             <span class="n">arm</span><span class="o">/</span><span class="n">raspi2b</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">generic</span><span class="o">-</span><span class="n">sdhci</span>
+</pre></div>
+</div>
+<p>or inverting the consumes edge in consumed_by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x86_64</span><span class="o">/</span><span class="n">pc</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="mi">1440</span><span class="n">FX</span><span class="o">-</span><span class="n">pcihost</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span><span class="o">-</span><span class="n">pc</span>
+                                                          <span class="o">|</span>
+          <span class="n">sdhci</span><span class="o">-</span><span class="n">pci</span> <span class="o">&lt;--</span><span class="n">consumed</span> <span class="n">by</span><span class="o">--</span> <span class="n">pci</span><span class="o">-</span><span class="n">bus</span> <span class="o">&lt;--</span><span class="n">produces</span><span class="o">--+</span>
+              <span class="o">|</span>
+              <span class="o">+--</span><span class="n">produces</span><span class="o">--+</span>
+                           <span class="o">|</span>
+                           <span class="n">v</span>
+                          <span class="n">sdhci</span> <span class="o">--</span><span class="n">consumed</span> <span class="n">by</span><span class="o">--&gt;</span> <span class="n">sdhci</span><span class="o">-</span><span class="n">test</span>
+                           <span class="o">^</span>
+                           <span class="o">|</span>
+                           <span class="o">+--</span><span class="n">produces</span><span class="o">--</span> <span class="o">+</span>
+                                         <span class="o">|</span>
+          <span class="n">arm</span><span class="o">/</span><span class="n">raspi2b</span> <span class="o">--</span><span class="n">contains</span><span class="o">--&gt;</span> <span class="n">generic</span><span class="o">-</span><span class="n">sdhci</span>
+</pre></div>
+</div>
+<p>Assuming there the binary is
+<code class="docutils literal notranslate"><span class="pre">QTEST_QEMU_BINARY=./qemu-system-x86_64</span></code>
+a valid test path will be:
+<code class="docutils literal notranslate"><span class="pre">/x86_64/pc/1440FX-pcihost/pci-bus-pc/pci-bus/sdhci-pc/sdhci/sdhci-test</span></code></p>
+<p>and for the binary <code class="docutils literal notranslate"><span class="pre">QTEST_QEMU_BINARY=./qemu-system-arm</span></code>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">/arm/raspi2b/generic-sdhci/sdhci/sdhci-test</span></code></p>
+<p>Additional examples are also in <code class="docutils literal notranslate"><span class="pre">test-qgraph.c</span></code></p>
+</section>
+<section id="qgraph-api-reference">
+<h2>Qgraph API reference<a class="headerlink" href="#qgraph-api-reference" title="Permalink to this heading"></a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QOSGraphEdgeOptions">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QOSGraphEdgeOptions</span></span></span><a class="headerlink" href="#c.QOSGraphEdgeOptions" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Edge options to be passed to the contains/consumes *_args function.</p>
+</dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QOSGraphEdgeOptions</span> <span class="p">{</span>
+  <span class="n">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">;</span>
+  <span class="n">uint32_t</span> <span class="n">size_arg</span><span class="p">;</span>
+  <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">extra_device_opts</span><span class="p">;</span>
+  <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">before_cmd_line</span><span class="p">;</span>
+  <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">after_cmd_line</span><span class="p">;</span>
+  <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">edge_name</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">arg</span></code></dt><dd><p>optional arg that will be used by dest edge</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">size_arg</span></code></dt><dd><p><strong>arg</strong> size that will be used by dest edge</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extra_device_opts</span></code></dt><dd><p>optional additional command line for dest
+edge, used to add additional attributes
+<em>after</em> the node command line, the
+framework automatically prepends “,”
+to this argument.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">before_cmd_line</span></code></dt><dd><p>optional additional command line for dest
+edge, used to add additional attributes
+<em>before</em> the node command line, usually
+other non-node represented commands,
+like “-fdsev synt”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">after_cmd_line</span></code></dt><dd><p>optional extra command line to be added
+after the device command. This option
+is used to add other devices
+command line that depend on current node.
+Automatically prepends ” ” to this argument</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">edge_name</span></code></dt><dd><p>optional edge to differentiate multiple
+devices with same node name</p>
+</dd>
+</dl>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QOSGraphTestOptions">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QOSGraphTestOptions</span></span></span><a class="headerlink" href="#c.QOSGraphTestOptions" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Test options to be passed to the test functions.</p>
+</dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QOSGraphTestOptions</span> <span class="p">{</span>
+  <span class="n">QOSGraphEdgeOptions</span> <span class="n">edge</span><span class="p">;</span>
+  <span class="n">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">;</span>
+  <span class="n">QOSBeforeTest</span> <span class="n">before</span><span class="p">;</span>
+  <span class="nb">bool</span> <span class="n">subprocess</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">edge</span></code></dt><dd><p>edge arguments that will be used by test.
+Note that test <em>does not</em> use edge_name,
+and uses instead arg and size_arg as
+data arg for its test function.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">arg</span></code></dt><dd><p>if <strong>before</strong> is non-NULL, pass <strong>arg</strong> there.
+Otherwise pass it to the test function.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">before</span></code></dt><dd><p>executed before the test. Used to add
+additional parameters to the command line
+and modify the argument to the test function.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">subprocess</span></code></dt><dd><p>run the test in a subprocess.</p>
+</dd>
+</dl>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.QOSGraphObject">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QOSGraphObject</span></span></span><a class="headerlink" href="#c.QOSGraphObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Each driver, test or machine of this framework will have a QOSGraphObject as first field.</p>
+</dd></dl>
+
+<p><strong>Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">QOSGraphObject</span> <span class="p">{</span>
+  <span class="n">QOSGetDriver</span> <span class="n">get_driver</span><span class="p">;</span>
+  <span class="n">QOSGetDevice</span> <span class="n">get_device</span><span class="p">;</span>
+  <span class="n">QOSStartFunct</span> <span class="n">start_hw</span><span class="p">;</span>
+  <span class="n">QOSDestructorFunc</span> <span class="n">destructor</span><span class="p">;</span>
+  <span class="n">GDestroyNotify</span> <span class="n">free</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Members</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">get_driver</span></code></dt><dd><p>see <strong>get_device</strong></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">get_device</span></code></dt><dd><p>Once a machine-to-test path has been
+found, the framework traverses it again and allocates all the
+nodes, using the provided constructor. To satisfy their
+relations, i.e. for produces or contains, where a struct
+constructor needs an external parameter represented by the
+previous node, the framework will call
+<strong>get_device</strong> (for contains) or <strong>get_driver</strong> (for produces),
+depending on the edge type, passing them the name of the next
+node to be taken and getting from them the corresponding
+pointer to the actual structure of the next node to
+be used in the path.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">start_hw</span></code></dt><dd><p>This function is executed after all the path objects
+have been allocated, but before the test is run. It starts the
+hw, setting the initial configurations (*_device_enable) and
+making it ready for the test.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">destructor</span></code></dt><dd><p>Opposite to the node constructor, destroys the object.
+This function is called after the test has been executed, and
+performs a complete cleanup of each node allocated field.
+In case no constructor is provided, no destructor will be
+called.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">free</span></code></dt><dd><p>free the memory associated to the QOSGraphObject and its contained
+children</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This set of functions offered by QOSGraphObject are executed
+in different stages of the framework:</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_graph_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_graph_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_graph_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>initialize the framework, creates two hash tables: one for the nodes and another for the edges.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_graph_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_graph_destroy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_graph_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>deallocates all the hash tables, freeing all nodes and edges.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_destroy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>removes and frees a node from the nodes hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*key</span></code></dt><dd><p>Name of the node</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_edge_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_edge_destroy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_edge_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>removes and frees an edge from the edges hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*key</span></code></dt><dd><p>Name of the node</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_add_test">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_add_test</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">interface</span></span>, <span class="n"><span class="pre">QOSTestFunc</span></span><span class="w"> </span><span class="n"><span class="pre">test_func</span></span>, <a class="reference internal" href="#c.QOSGraphTestOptions" title="QOSGraphTestOptions"><span class="n"><span class="pre">QOSGraphTestOptions</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_add_test" title="Permalink to this definition"></a><br /></dt>
+<dd><p>adds a test node <strong>name</strong> to the nodes hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*name</span></code></dt><dd><p>Name of the test</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*interface</span></code></dt><dd><p>Name of the interface node it consumes</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSTestFunc</span> <span class="pre">test_func</span></code></dt><dd><p>Actual test to perform</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphTestOptions</span> <span class="pre">*opts</span></code></dt><dd><p>Facultative options (see <code class="docutils literal notranslate"><span class="pre">QOSGraphTestOptions</span></code>)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>The test will consume a <strong>interface</strong> node, and once the
+graph walking algorithm has found it, the <strong>test_func</strong> will be
+executed. It also has the possibility to
+add an optional <strong>opts</strong> (see <code class="docutils literal notranslate"><span class="pre">QOSGraphTestOptions</span></code>).</p>
+<p>For tests, opts-&gt;edge.arg and size_arg represent the arg to pass
+to <strong>test_func</strong></p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_create_machine">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_create_machine</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="n"><span class="pre">QOSCreateMachineFunc</span></span><span class="w"> </span><span class="n"><span class="pre">function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_create_machine" title="Permalink to this definition"></a><br /></dt>
+<dd><p>creates the machine <strong>name</strong> and adds it to the node hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*name</span></code></dt><dd><p>Name of the machine</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSCreateMachineFunc</span> <span class="pre">function</span></code></dt><dd><p>Machine constructor</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This node will be of type QNODE_MACHINE and have <strong>function</strong>
+as constructor</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_create_machine_args">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_create_machine_args</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="n"><span class="pre">QOSCreateMachineFunc</span></span><span class="w"> </span><span class="n"><span class="pre">function</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_create_machine_args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>same as qos_node_create_machine, but with the possibility to add an optional “, <strong>opts</strong>” after -M machine command line.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*name</span></code></dt><dd><p>Name of the machine</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSCreateMachineFunc</span> <span class="pre">function</span></code></dt><dd><p>Machine constructor</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*opts</span></code></dt><dd><p>Optional additional command line</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_create_driver">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_create_driver</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="n"><span class="pre">QOSCreateDriverFunc</span></span><span class="w"> </span><span class="n"><span class="pre">function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_create_driver" title="Permalink to this definition"></a><br /></dt>
+<dd><p>creates the driver <strong>name</strong> and adds it to the node hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*name</span></code></dt><dd><p>Name of the driver</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSCreateDriverFunc</span> <span class="pre">function</span></code></dt><dd><p>Driver constructor</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This node will be of type QNODE_DRIVER and have <strong>function</strong>
+as constructor</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_create_driver_named">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_create_driver_named</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">qemu_name</span></span>, <span class="n"><span class="pre">QOSCreateDriverFunc</span></span><span class="w"> </span><span class="n"><span class="pre">function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_create_driver_named" title="Permalink to this definition"></a><br /></dt>
+<dd><p>behaves as qos_node_create_driver() with the extension of allowing to specify a different node name vs. associated QEMU device name.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*name</span></code></dt><dd><p>Custom, unique name of the node to be created</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*qemu_name</span></code></dt><dd><p>Actual (official) QEMU driver name the node shall be
+associated with</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSCreateDriverFunc</span> <span class="pre">function</span></code></dt><dd><p>Driver constructor</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Use this function instead of qos_node_create_driver() if you need to create
+several instances of the same QEMU device. You are free to choose a custom
+node name, however the chosen node name must always be unique.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_contains">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">container</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">contained</span></span>, <a class="reference internal" href="#c.QOSGraphEdgeOptions" title="QOSGraphEdgeOptions"><span class="n"><span class="pre">QOSGraphEdgeOptions</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opts</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_contains" title="Permalink to this definition"></a><br /></dt>
+<dd><p>creates one or more edges of type QEDGE_CONTAINS and adds them to the edge list mapped to <strong>container</strong> in the edge hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*container</span></code></dt><dd><p>Source node that “contains”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*contained</span></code></dt><dd><p>Destination node that “is contained”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span> <span class="pre">*opts</span></code></dt><dd><p>Facultative options (see <code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">...</span></code></dt><dd><p>variable arguments</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>The edges will have <strong>container</strong> as source and <strong>contained</strong> as destination.</p>
+<p>If <strong>opts</strong> is NULL, a single edge will be added with no options.
+If <strong>opts</strong> is non-NULL, the arguments after <strong>contained</strong> represent a
+NULL-terminated list of <code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code> structs, and an
+edge will be added for each of them.</p>
+<p>This function can be useful when there are multiple devices
+with the same node name contained in a machine/other node</p>
+<p>For example, if <code class="docutils literal notranslate"><span class="pre">arm/raspi2b</span></code> contains 2 <code class="docutils literal notranslate"><span class="pre">generic-sdhci</span></code>
+devices, the right commands will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qos_node_create_machine</span><span class="p">(</span><span class="s2">&quot;arm/raspi2b&quot;</span><span class="p">);</span>
+<span class="n">qos_node_create_driver</span><span class="p">(</span><span class="s2">&quot;generic-sdhci&quot;</span><span class="p">,</span> <span class="n">constructor</span><span class="p">);</span>
+<span class="o">//</span> <span class="n">assume</span> <span class="n">rest</span> <span class="n">of</span> <span class="n">the</span> <span class="n">fields</span> <span class="n">are</span> <span class="nb">set</span> <span class="n">NULL</span>
+<span class="n">QOSGraphEdgeOptions</span> <span class="n">op1</span> <span class="o">=</span> <span class="p">{</span> <span class="o">.</span><span class="n">edge_name</span> <span class="o">=</span> <span class="s2">&quot;emmc&quot;</span> <span class="p">};</span>
+<span class="n">QOSGraphEdgeOptions</span> <span class="n">op2</span> <span class="o">=</span> <span class="p">{</span> <span class="o">.</span><span class="n">edge_name</span> <span class="o">=</span> <span class="s2">&quot;sdcard&quot;</span> <span class="p">};</span>
+<span class="n">qos_node_contains</span><span class="p">(</span><span class="s2">&quot;arm/raspi2b&quot;</span><span class="p">,</span> <span class="s2">&quot;generic-sdhci&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">op1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">op2</span><span class="p">,</span> <span class="n">NULL</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Of course this also requires that the <strong>container</strong>’s get_device function
+should implement a case for “emmc” and “sdcard”.</p>
+<p>For contains, op1.arg and op1.size_arg represent the arg to pass
+to <strong>contained</strong> constructor to properly initialize it.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_produces">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_produces</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">producer</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">interface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_produces" title="Permalink to this definition"></a><br /></dt>
+<dd><p>creates an edge of type QEDGE_PRODUCES and adds it to the edge list mapped to <strong>producer</strong> in the edge hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*producer</span></code></dt><dd><p>Source node that “produces”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*interface</span></code></dt><dd><p>Interface node that “is produced”</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This edge will have <strong>producer</strong> as source and <strong>interface</strong> as destination.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_node_consumes">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_node_consumes</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">consumer</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">interface</span></span>, <a class="reference internal" href="#c.QOSGraphEdgeOptions" title="QOSGraphEdgeOptions"><span class="n"><span class="pre">QOSGraphEdgeOptions</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_node_consumes" title="Permalink to this definition"></a><br /></dt>
+<dd><p>creates an edge of type QEDGE_CONSUMED_BY and adds it to the edge list mapped to <strong>interface</strong> in the edge hash table.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*consumer</span></code></dt><dd><p>Node that “consumes”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*interface</span></code></dt><dd><p>Interface node that “is consumed by”</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span> <span class="pre">*opts</span></code></dt><dd><p>Facultative options (see <code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code>)</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This edge will have <strong>interface</strong> as source and <strong>consumer</strong> as destination.
+It also has the possibility to add an optional <strong>opts</strong>
+(see <code class="docutils literal notranslate"><span class="pre">QOSGraphEdgeOptions</span></code>)</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_invalidate_command_line">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_invalidate_command_line</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_invalidate_command_line" title="Permalink to this definition"></a><br /></dt>
+<dd><p>invalidates current command line, so that qgraph framework cannot try to cache the current command line and forces QEMU to restart.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_get_current_command_line">
+<span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qos_get_current_command_line</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_get_current_command_line" title="Permalink to this definition"></a><br /></dt>
+<dd><p>return the command line required by the machine and driver objects. This is the same string that was passed to the test’s “before” callback, if any.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_allocate_objects">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qos_allocate_objects</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QTestState</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">qts</span></span>, <span class="n"><span class="pre">QGuestAllocator</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p_alloc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_allocate_objects" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QTestState</span> <span class="pre">*qts</span></code></dt><dd><p>The <code class="xref c c-type docutils literal notranslate"><span class="pre">QTestState</span></code> that will be referred to by the machine object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QGuestAllocator</span> <span class="pre">**p_alloc</span></code></dt><dd><p>Where to store the allocator for the machine object, or <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Allocate driver objects for the current test
+path, but relative to the QTestState <strong>qts</strong>.</p>
+<p>Returns a test object just like the one that was passed to
+the test function, but relative to <strong>qts</strong>.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_object_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_object_destroy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_object_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>calls the destructor for <strong>obj</strong></p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphObject</span> <span class="pre">*obj</span></code></dt><dd><p>A <a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">QOSGraphObject</span></code></a> to destroy</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_object_queue_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_object_queue_destroy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_object_queue_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>queue the destructor for <strong>obj</strong> so that it is called at the end of the test</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphObject</span> <span class="pre">*obj</span></code></dt><dd><p>A <a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">QOSGraphObject</span></code></a> to destroy</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_object_start_hw">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_object_start_hw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_object_start_hw" title="Permalink to this definition"></a><br /></dt>
+<dd><p>calls the start_hw function for <strong>obj</strong></p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphObject</span> <span class="pre">*obj</span></code></dt><dd><p>A <a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">QOSGraphObject</span></code></a> containing the start_hw function</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_machine_new">
+<a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qos_machine_new</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QOSGraphNode</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span>, <span class="n"><span class="pre">QTestState</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">qts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_machine_new" title="Permalink to this definition"></a><br /></dt>
+<dd><p>instantiate a new machine node</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphNode</span> <span class="pre">*node</span></code></dt><dd><p>Machine node to be instantiated</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QTestState</span> <span class="pre">*qts</span></code></dt><dd><p>A <code class="xref c c-type docutils literal notranslate"><span class="pre">QTestState</span></code> that will be referred to by the machine object.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Returns a machine object.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_driver_new">
+<a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">qos_driver_new</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QOSGraphNode</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span>, <a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><span class="n"><span class="pre">QOSGraphObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">parent</span></span>, <span class="n"><span class="pre">QGuestAllocator</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">alloc</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_driver_new" title="Permalink to this definition"></a><br /></dt>
+<dd><p>instantiate a new driver node</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphNode</span> <span class="pre">*node</span></code></dt><dd><p>A driver node to be instantiated</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QOSGraphObject</span> <span class="pre">*parent</span></code></dt><dd><p>A <a class="reference internal" href="#c.QOSGraphObject" title="QOSGraphObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">QOSGraphObject</span></code></a> to be consumed by the new driver node</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">QGuestAllocator</span> <span class="pre">*alloc</span></code></dt><dd><p>An allocator to be used by the new driver node.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*arg</span></code></dt><dd><p>The argument for the consumed-by edge to <strong>node</strong>.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Calls the constructor for the driver object.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qos_dump_graph">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qos_dump_graph</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qos_dump_graph" title="Permalink to this definition"></a><br /></dt>
+<dd><p>prints all currently existing nodes and edges to stdout. Just for debugging purposes.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span></code></dt><dd><p>no arguments</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>All qtests add themselves to the overall qos graph by calling qgraph
+functions that add device nodes and edges between the individual graph
+nodes for tests. As the actual graph is assmbled at runtime by the qos
+subsystem, it is sometimes not obvious how the overall graph looks like.
+E.g. when writing new tests it may happen that those new tests are simply
+ignored by the qtest framework.</p>
+<p>This function allows to identify problems in the created qgraph. Keep in
+mind: only tests with a path down from the actual test case node (leaf) up
+to the graph’s root node are actually executed by the qtest framework. And
+the qtest framework uses QMP to automatically check which QEMU drivers are
+actually currently available, and accordingly qos marks certain paths as
+‘unavailable’ in such cases (e.g. when QEMU was compiled without support for
+a certain feature).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qtest.html" class="btn btn-neutral float-left" title="QTest Device Emulation Testing Framework" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ci.html" class="btn btn-neutral float-right" title="CI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

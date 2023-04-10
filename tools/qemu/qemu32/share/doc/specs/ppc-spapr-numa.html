@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NUMA mechanics for sPAPR (pseries machines) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Hypervisor calls and the Ultravisor" href="ppc-spapr-uv-hcalls.html" />
+    <link rel="prev" title="sPAPR hypervisor calls" href="ppc-spapr-hcalls.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../system/index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../system/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../system/targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../system/target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../system/target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../system/target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../system/target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../system/security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../system/confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../system/index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../system/targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../system/target-ppc.html">PowerPC System emulator</a></li>
+          <li class="breadcrumb-item"><a href="../system/ppc/pseries.html">pSeries family boards (<code class="docutils literal notranslate"><span class="pre">pseries</span></code>)</a></li>
+      <li class="breadcrumb-item active">NUMA mechanics for sPAPR (pseries machines)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/ppc-spapr-numa.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="numa-mechanics-for-spapr-pseries-machines">
+<h1>NUMA mechanics for sPAPR (pseries machines)<a class="headerlink" href="#numa-mechanics-for-spapr-pseries-machines" title="Permalink to this heading"></a></h1>
+<p>NUMA in sPAPR works different than the System Locality Distance
+Information Table (SLIT) in ACPI. The logic is explained in the LOPAPR
+1.1 chapter 15, “Non Uniform Memory Access (NUMA) Option”. This
+document aims to complement this specification, providing details
+of the elements that impacts how QEMU views NUMA in pseries.</p>
+<section id="associativity-and-ibm-associativity-property">
+<h2>Associativity and ibm,associativity property<a class="headerlink" href="#associativity-and-ibm-associativity-property" title="Permalink to this heading"></a></h2>
+<p>Associativity is defined as a group of platform resources that has
+similar mean performance (or in our context here, distance) relative to
+everyone else outside of the group.</p>
+<p>The format of the ibm,associativity property varies with the value of
+bit 0 of byte 5 of the ibm,architecture-vec-5 property. The format with
+bit 0 equal to zero is deprecated. The current format, with the bit 0
+with the value of one, makes ibm,associativity property represent the
+physical hierarchy of the platform, as one or more lists that starts
+with the highest level grouping up to the smallest. Considering the
+following topology:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Mem</span> <span class="n">M1</span> <span class="o">----</span> <span class="n">Proc</span> <span class="n">P1</span>    <span class="o">|</span>
+<span class="o">-----------------</span>      <span class="o">|</span> <span class="n">Socket</span> <span class="n">S1</span>  <span class="o">---|</span>
+      <span class="n">chip</span> <span class="n">C1</span>          <span class="o">|</span>               <span class="o">|</span>
+                                       <span class="o">|</span> <span class="n">HW</span> <span class="n">module</span> <span class="mi">1</span> <span class="p">(</span><span class="n">MOD1</span><span class="p">)</span>
+<span class="n">Mem</span> <span class="n">M2</span> <span class="o">----</span> <span class="n">Proc</span> <span class="n">P2</span>    <span class="o">|</span>               <span class="o">|</span>
+<span class="o">-----------------</span>      <span class="o">|</span> <span class="n">Socket</span> <span class="n">S2</span>  <span class="o">---|</span>
+      <span class="n">chip</span> <span class="n">C2</span>          <span class="o">|</span>
+</pre></div>
+</div>
+<p>The ibm,associativity property for the processors would be:</p>
+<ul class="simple">
+<li><p>P1: {MOD1, S1, C1, P1}</p></li>
+<li><p>P2: {MOD1, S2, C2, P2}</p></li>
+</ul>
+<p>Each allocable resource has an ibm,associativity property. The LOPAPR
+specification allows multiple lists to be present in this property,
+considering that the same resource can have multiple connections to the
+platform.</p>
+</section>
+<section id="relative-performance-distance-and-ibm-associativity-reference-points">
+<h2>Relative Performance Distance and ibm,associativity-reference-points<a class="headerlink" href="#relative-performance-distance-and-ibm-associativity-reference-points" title="Permalink to this heading"></a></h2>
+<p>The ibm,associativity-reference-points property is an array that is used
+to define the relevant performance/distance  related boundaries, defining
+the NUMA levels for the platform.</p>
+<p>The definition of its elements also varies with the value of bit 0 of byte 5
+of the ibm,architecture-vec-5 property. The format with bit 0 equal to zero
+is also deprecated. With the current format, each integer of the
+ibm,associativity-reference-points represents an 1 based ordinal index (i.e.
+the first element is 1) of the ibm,associativity array. The first
+boundary is the most significant to application performance, followed by
+less significant boundaries. Allocated resources that belongs to the
+same performance boundaries are expected to have relative NUMA distance
+that matches the relevancy of the boundary itself. Resources that belongs
+to the same first boundary will have the shortest distance from each
+other. Subsequent boundaries represents greater distances and degraded
+performance.</p>
+<p>Using the previous example, the following setting reference points defines
+three NUMA levels:</p>
+<ul class="simple">
+<li><p>ibm,associativity-reference-points = {0x3, 0x2, 0x1}</p></li>
+</ul>
+<p>The first NUMA level (0x3) is interpreted as the third element of each
+ibm,associativity array, the second level is the second element and
+the third level is the first element. Let’s also consider that elements
+belonging to the first NUMA level have distance equal to 10 from each
+other, and each NUMA level doubles the distance from the previous. This
+means that the second would be 20 and the third level 40. For the P1 and
+P2 processors, we would have the following NUMA levels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">ibm</span><span class="p">,</span><span class="n">associativity</span><span class="o">-</span><span class="n">reference</span><span class="o">-</span><span class="n">points</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x3</span><span class="p">,</span> <span class="mh">0x2</span><span class="p">,</span> <span class="mh">0x1</span><span class="p">}</span>
+
+<span class="o">*</span> <span class="n">P1</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">C1</span><span class="p">,</span> <span class="n">P1</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x3</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">C1</span>
+<span class="n">Second</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x2</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S1</span>
+<span class="n">Third</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOD1</span>
+
+<span class="o">*</span> <span class="n">P2</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">C2</span><span class="p">,</span> <span class="n">P2</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x3</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">C2</span>
+<span class="n">Second</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x2</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S2</span>
+<span class="n">Third</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOD1</span>
+
+<span class="n">P1</span> <span class="ow">and</span> <span class="n">P2</span> <span class="n">have</span> <span class="n">the</span> <span class="n">same</span> <span class="n">third</span> <span class="n">NUMA</span> <span class="n">level</span><span class="p">,</span> <span class="n">MOD1</span><span class="p">:</span> <span class="n">Distance</span> <span class="n">between</span> <span class="n">them</span> <span class="o">=</span> <span class="mi">40</span>
+</pre></div>
+</div>
+<p>Changing the ibm,associativity-reference-points array changes the performance
+distance attributes for the same associativity arrays, as the following
+example illustrates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">ibm</span><span class="p">,</span><span class="n">associativity</span><span class="o">-</span><span class="n">reference</span><span class="o">-</span><span class="n">points</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x2</span><span class="p">}</span>
+
+<span class="o">*</span> <span class="n">P1</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">C1</span><span class="p">,</span> <span class="n">P1</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x2</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S1</span>
+
+<span class="o">*</span> <span class="n">P2</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">C2</span><span class="p">,</span> <span class="n">P2</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x2</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S2</span>
+
+<span class="n">P1</span> <span class="ow">and</span> <span class="n">P2</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">a</span> <span class="n">common</span> <span class="n">performance</span> <span class="n">boundary</span><span class="o">.</span> <span class="n">Since</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">one</span> <span class="n">level</span>
+<span class="n">NUMA</span> <span class="n">configuration</span><span class="p">,</span> <span class="n">distance</span> <span class="n">between</span> <span class="n">them</span> <span class="ow">is</span> <span class="n">one</span> <span class="n">boundary</span> <span class="n">above</span> <span class="n">the</span> <span class="n">first</span>
+<span class="n">level</span><span class="p">,</span> <span class="mf">20.</span>
+</pre></div>
+</div>
+<p>In a hypothetical platform where all resources inside the same hardware module
+is considered to be on the same performance boundary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">ibm</span><span class="p">,</span><span class="n">associativity</span><span class="o">-</span><span class="n">reference</span><span class="o">-</span><span class="n">points</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x1</span><span class="p">}</span>
+
+<span class="o">*</span> <span class="n">P1</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">C1</span><span class="p">,</span> <span class="n">P1</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOD0</span>
+
+<span class="o">*</span> <span class="n">P2</span><span class="p">:</span> <span class="n">associativity</span><span class="p">{</span><span class="n">MOD1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">C2</span><span class="p">,</span> <span class="n">P2</span><span class="p">}</span>
+
+<span class="n">First</span> <span class="n">NUMA</span> <span class="n">level</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">associativity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">MOD0</span>
+
+<span class="n">P1</span> <span class="ow">and</span> <span class="n">P2</span> <span class="n">belongs</span> <span class="n">to</span> <span class="n">the</span> <span class="n">same</span> <span class="n">first</span> <span class="n">order</span> <span class="n">boundary</span><span class="o">.</span> <span class="n">The</span> <span class="n">distance</span> <span class="n">between</span> <span class="n">then</span>
+<span class="ow">is</span> <span class="mf">10.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="how-the-pseries-linux-guest-calculates-numa-distances">
+<h1>How the pseries Linux guest calculates NUMA distances<a class="headerlink" href="#how-the-pseries-linux-guest-calculates-numa-distances" title="Permalink to this heading"></a></h1>
+<p>Another key difference between ACPI SLIT and the LOPAPR regarding NUMA is
+how the distances are expressed. The SLIT table provides the NUMA distance
+value between the relevant resources. LOPAPR does not provide a standard
+way to calculate it. We have the ibm,associativity for each resource, which
+provides a common-performance hierarchy,  and the ibm,associativity-reference-points
+array that tells which level of associativity is considered to be relevant
+or not.</p>
+<p>The result is that each OS is free to implement and to interpret the distance
+as it sees fit. For the pseries Linux guest, each level of NUMA duplicates
+the distance of the previous level, and the maximum amount of levels is
+limited to MAX_DISTANCE_REF_POINTS = 4 (from arch/powerpc/mm/numa.c in the
+kernel tree). This results in the following distances:</p>
+<ul class="simple">
+<li><p>both resources in the first NUMA level: 10</p></li>
+<li><p>resources one NUMA level apart: 20</p></li>
+<li><p>resources two NUMA levels apart: 40</p></li>
+<li><p>resources three NUMA levels apart: 80</p></li>
+<li><p>resources four NUMA levels apart: 160</p></li>
+</ul>
+</section>
+<section id="pseries-numa-mechanics">
+<h1>pseries NUMA mechanics<a class="headerlink" href="#pseries-numa-mechanics" title="Permalink to this heading"></a></h1>
+<p>Starting in QEMU 5.2, the pseries machine considers user input when setting NUMA
+topology of the guest. The overall design is:</p>
+<ul class="simple">
+<li><p>ibm,associativity-reference-points is set to {0x4, 0x3, 0x2, 0x1}, allowing
+for 4 distinct NUMA distance values based on the NUMA levels</p></li>
+<li><p>ibm,max-associativity-domains supports multiple associativity domains in all
+NUMA levels, granting user flexibility</p></li>
+<li><p>ibm,associativity for all resources varies with user input</p></li>
+</ul>
+<p>These changes are only effective for pseries-5.2 and newer machines that are
+created with more than one NUMA node (disconsidering NUMA nodes created by
+the machine itself, e.g. NVLink 2 GPUs). The now legacy support has been
+around for such a long time, with users seeing NUMA distances 10 and 40
+(and 80 if using NVLink2 GPUs), and there is no need to disrupt the
+existing experience of those guests.</p>
+<p>To bring the user experience x86 users have when tuning up NUMA, we had
+to operate under the current pseries Linux kernel logic described in
+<a class="reference internal" href="#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a>. The result
+is that we needed to translate NUMA distance user input to pseries
+Linux kernel input.</p>
+<section id="translating-user-distance-to-kernel-distance">
+<h2>Translating user distance to kernel distance<a class="headerlink" href="#translating-user-distance-to-kernel-distance" title="Permalink to this heading"></a></h2>
+<p>User input for NUMA distance can vary from 10 to 254. We need to translate
+that to the values that the Linux kernel operates on (10, 20, 40, 80, 160).
+This is how it is being done:</p>
+<ul class="simple">
+<li><p>user distance 11 to 30 will be interpreted as 20</p></li>
+<li><p>user distance 31 to 60 will be interpreted as 40</p></li>
+<li><p>user distance 61 to 120 will be interpreted as 80</p></li>
+<li><p>user distance 121 and beyond will be interpreted as 160</p></li>
+<li><p>user distance 10 stays 10</p></li>
+</ul>
+<p>The reasoning behind this approximation is to avoid any round up to the local
+distance (10), keeping it exclusive to the 4th NUMA level (which is still
+exclusive to the node_id). All other ranges were chosen under the developer
+discretion of what would be (somewhat) sensible considering the user input.
+Any other strategy can be used here, but in the end the reality is that we’ll
+have to accept that a large array of values will be translated to the same
+NUMA topology in the guest, e.g. this user input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">31</span> <span class="mi">120</span>
+<span class="mi">1</span>  <span class="mi">31</span>  <span class="mi">10</span>  <span class="mi">30</span>
+<span class="mi">2</span> <span class="mi">120</span>  <span class="mi">30</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>And this other user input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">60</span>  <span class="mi">61</span>
+<span class="mi">1</span>  <span class="mi">60</span>  <span class="mi">10</span>  <span class="mi">11</span>
+<span class="mi">2</span>  <span class="mi">61</span>  <span class="mi">11</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Will both be translated to the same values internally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">40</span>  <span class="mi">80</span>
+<span class="mi">1</span>  <span class="mi">40</span>  <span class="mi">10</span>  <span class="mi">20</span>
+<span class="mi">2</span>  <span class="mi">80</span>  <span class="mi">20</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Users are encouraged to use only the kernel values in the NUMA definition to
+avoid being taken by surprise with that the guest is actually seeing in the
+topology. There are enough potential surprises that are inherent to the
+associativity domain assignment process, discussed below.</p>
+</section>
+<section id="how-associativity-domains-are-assigned">
+<h2>How associativity domains are assigned<a class="headerlink" href="#how-associativity-domains-are-assigned" title="Permalink to this heading"></a></h2>
+<p>LOPAPR allows more than one associativity array (or ‘string’) per allocated
+resource. This would be used to represent that the resource has multiple
+connections with the board, and then the operational system, when deciding
+NUMA distancing, should consider the associativity information that provides
+the shortest distance.</p>
+<p>The spapr implementation does not support multiple associativity arrays per
+resource, neither does the pseries Linux kernel. We’ll have to represent the
+NUMA topology using one associativity per resource, which means that choices
+and compromises are going to be made.</p>
+<p>Consider the following NUMA topology entered by user input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>   <span class="mi">3</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">40</span>  <span class="mi">20</span>  <span class="mi">40</span>
+<span class="mi">1</span>  <span class="mi">40</span>  <span class="mi">10</span>  <span class="mi">80</span>  <span class="mi">40</span>
+<span class="mi">2</span>  <span class="mi">20</span>  <span class="mi">80</span>  <span class="mi">10</span>  <span class="mi">20</span>
+<span class="mi">3</span>  <span class="mi">40</span>  <span class="mi">40</span>  <span class="mi">20</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>All the associativity arrays are initialized with NUMA id in all associativity
+domains:</p>
+<ul class="simple">
+<li><p>node 0: 0 0 0 0</p></li>
+<li><p>node 1: 1 1 1 1</p></li>
+<li><p>node 2: 2 2 2 2</p></li>
+<li><p>node 3: 3 3 3 3</p></li>
+</ul>
+<p>Honoring just the relative distances of node 0 to every other node, we find the
+NUMA level matches (considering the reference points {0x4, 0x3, 0x2, 0x1}) for
+each distance:</p>
+<ul class="simple">
+<li><p>distance from 0 to 1 is 40 (no match at 0x4 and 0x3, will match
+at 0x2)</p></li>
+<li><p>distance from 0 to 2 is 20 (no match at 0x4, will match at 0x3)</p></li>
+<li><p>distance from 0 to 3 is 40 (no match at 0x4 and 0x3, will match
+at 0x2)</p></li>
+</ul>
+<p>We’ll copy the associativity domains of node 0 to all other nodes, based on
+the NUMA level matches. Between 0 and 1, a match in 0x2, we’ll also copy
+the domains 0x2 and 0x1 from 0 to 1 as well. This will give us:</p>
+<ul class="simple">
+<li><p>node 0: 0 0 0 0</p></li>
+<li><p>node 1: 0 0 1 1</p></li>
+</ul>
+<p>Doing the same to node 2 and node 3, these are the associativity arrays
+after considering all matches with node 0:</p>
+<ul class="simple">
+<li><p>node 0: 0 0 0 0</p></li>
+<li><p>node 1: 0 0 1 1</p></li>
+<li><p>node 2: 0 0 0 2</p></li>
+<li><p>node 3: 0 0 3 3</p></li>
+</ul>
+<p>The distances related to node 0 are accounted for. For node 1, and keeping
+in mind that we don’t need to revisit node 0 again, the distance from
+node 1 to 2 is 80, matching at 0x1, and distance from 1 to 3 is 40,
+match in 0x2. Repeating the same logic of copying all domains up to
+the NUMA level match:</p>
+<ul class="simple">
+<li><p>node 0: 0 0 0 0</p></li>
+<li><p>node 1: 1 0 1 1</p></li>
+<li><p>node 2: 1 0 0 2</p></li>
+<li><p>node 3: 1 0 3 3</p></li>
+</ul>
+<p>In the last step we will analyze just nodes 2 and 3. The desired distance
+between 2 and 3 is 20, i.e. a match in 0x3:</p>
+<ul class="simple">
+<li><p>node 0: 0 0 0 0</p></li>
+<li><p>node 1: 1 0 1 1</p></li>
+<li><p>node 2: 1 0 0 2</p></li>
+<li><p>node 3: 1 0 0 3</p></li>
+</ul>
+<p>The kernel will read these arrays and will calculate the following NUMA topology for
+the guest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>   <span class="mi">3</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">40</span>  <span class="mi">20</span>  <span class="mi">20</span>
+<span class="mi">1</span>  <span class="mi">40</span>  <span class="mi">10</span>  <span class="mi">40</span>  <span class="mi">40</span>
+<span class="mi">2</span>  <span class="mi">20</span>  <span class="mi">40</span>  <span class="mi">10</span>  <span class="mi">20</span>
+<span class="mi">3</span>  <span class="mi">20</span>  <span class="mi">40</span>  <span class="mi">20</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Note that this is not what the user wanted - the desired distance between
+0 and 3 is 40, we calculated it as 20. This is what the current logic and
+implementation constraints of the kernel and QEMU will provide inside the
+LOPAPR specification.</p>
+<p>Users are welcome to use this knowledge and experiment with the input to get
+the NUMA topology they want, or as closer as they want. The important thing
+is to keep expectations up to par with what we are capable of provide at this
+moment: an approximation.</p>
+</section>
+<section id="limitations-of-the-implementation">
+<h2>Limitations of the implementation<a class="headerlink" href="#limitations-of-the-implementation" title="Permalink to this heading"></a></h2>
+<p>As mentioned above, the pSeries NUMA distance logic is, in fact, a way to approximate
+user choice. The Linux kernel, and PAPR itself, does not provide QEMU with the ways
+to fully map user input to actual NUMA distance the guest will use. These limitations
+creates two notable limitations in our support:</p>
+<ul class="simple">
+<li><p>Asymmetrical topologies aren’t supported. We only support NUMA topologies where
+the distance from node A to B is always the same as B to A. We do not support
+any A-B pair where the distance back and forth is asymmetric. For example, the
+following topology isn’t supported and the pSeries guest will not boot with this
+user input:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">40</span>
+<span class="mi">1</span>  <span class="mi">20</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>‘non-transitive’ topologies will be poorly translated to the guest. This is the
+kind of topology where the distance from a node A to B is X, B to C is X, but
+the distance A to C is not X. E.g.:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">2</span>   <span class="mi">3</span>
+<span class="mi">0</span>  <span class="mi">10</span>  <span class="mi">20</span>  <span class="mi">20</span>  <span class="mi">40</span>
+<span class="mi">1</span>  <span class="mi">20</span>  <span class="mi">10</span>  <span class="mi">80</span>  <span class="mi">40</span>
+<span class="mi">2</span>  <span class="mi">20</span>  <span class="mi">80</span>  <span class="mi">10</span>  <span class="mi">20</span>
+<span class="mi">3</span>  <span class="mi">40</span>  <span class="mi">40</span>  <span class="mi">20</span>  <span class="mi">10</span>
+
+<span class="n">In</span> <span class="n">the</span> <span class="n">example</span> <span class="n">above</span><span class="p">,</span> <span class="n">distance</span> <span class="mi">0</span> <span class="n">to</span> <span class="mi">2</span> <span class="ow">is</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span> <span class="n">to</span> <span class="mi">3</span> <span class="ow">is</span> <span class="mi">20</span><span class="p">,</span> <span class="n">but</span> <span class="mi">0</span> <span class="n">to</span> <span class="mi">3</span> <span class="ow">is</span> <span class="mf">40.</span>
+<span class="n">The</span> <span class="n">kernel</span> <span class="n">will</span> <span class="n">always</span> <span class="n">match</span> <span class="k">with</span> <span class="n">the</span> <span class="n">shortest</span> <span class="n">associativity</span> <span class="n">domain</span> <span class="n">possible</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">we</span><span class="s1">&#39;re attempting to retain the previous established relations between the</span>
+<span class="n">nodes</span><span class="o">.</span> <span class="n">This</span> <span class="n">means</span> <span class="n">that</span> <span class="n">a</span> <span class="n">distance</span> <span class="n">equal</span> <span class="n">to</span> <span class="mi">20</span> <span class="n">between</span> <span class="n">nodes</span> <span class="mi">0</span> <span class="ow">and</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">the</span>
+<span class="n">same</span> <span class="n">distance</span> <span class="mi">20</span> <span class="n">between</span> <span class="n">nodes</span> <span class="mi">2</span> <span class="ow">and</span> <span class="mi">3</span> <span class="n">will</span> <span class="n">cause</span> <span class="n">the</span> <span class="n">distance</span> <span class="n">between</span> <span class="mi">0</span> <span class="ow">and</span> <span class="mi">3</span>
+<span class="n">to</span> <span class="n">also</span> <span class="n">be</span> <span class="mf">20.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="legacy-5-1-and-older-pseries-numa-mechanics">
+<h1>Legacy (5.1 and older) pseries NUMA mechanics<a class="headerlink" href="#legacy-5-1-and-older-pseries-numa-mechanics" title="Permalink to this heading"></a></h1>
+<p>In short, we can summarize the NUMA distances seem in pseries Linux guests, using
+QEMU up to 5.1, as follows:</p>
+<ul class="simple">
+<li><p>local distance, i.e. the distance of the resource to its own NUMA node: 10</p></li>
+<li><p>if it’s a NVLink GPU device, distance: 80</p></li>
+<li><p>every other resource, distance: 40</p></li>
+</ul>
+<p>The way the pseries Linux guest calculates NUMA distances has a direct effect
+on what QEMU users can expect when doing NUMA tuning. As of QEMU 5.1, this is
+the default ibm,associativity-reference-points being used in the pseries
+machine:</p>
+<p>ibm,associativity-reference-points = {0x4, 0x4, 0x2}</p>
+<p>The first and second level are equal, 0x4, and a third one was added in
+commit a6030d7e0b35 exclusively for NVLink GPUs support. This means that
+regardless of how the ibm,associativity properties are being created in
+the device tree, the pseries Linux guest will only recognize three scenarios
+as far as NUMA distance goes:</p>
+<ul class="simple">
+<li><p>if the resources belongs to the same first NUMA level = 10</p></li>
+<li><p>second level is skipped since it’s equal to the first</p></li>
+<li><p>all resources that aren’t a NVLink GPU, it is guaranteed that they will belong
+to the same third NUMA level, having distance = 40</p></li>
+<li><p>for NVLink GPUs, distance = 80 from everything else</p></li>
+</ul>
+<p>This also means that user input in QEMU command line does not change the
+NUMA distancing inside the guest for the pseries machine.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ppc-spapr-hcalls.html" class="btn btn-neutral float-left" title="sPAPR hypervisor calls" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ppc-spapr-uv-hcalls.html" class="btn btn-neutral float-right" title="Hypervisor calls and the Ultravisor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

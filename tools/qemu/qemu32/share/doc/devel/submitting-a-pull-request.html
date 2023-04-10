@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submitting a Pull Request &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Secure Coding Practices" href="secure-coding-practices.html" />
+    <link rel="prev" title="QEMU and the stable process" href="stable-process.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index-process.html">QEMU Community Processes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="code-of-conduct.html">Code of Conduct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="conflict-resolution.html">Conflict Resolution Policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maintainers.html">The Role of Maintainers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="style.html">QEMU Coding Style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="submitting-a-patch.html">Submitting a Patch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trivial-patches.html">Trivial Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stable-process.html">QEMU and the stable process</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Submitting a Pull Request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secure-coding-practices.html">Secure Coding Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-process.html">QEMU Community Processes</a></li>
+      <li class="breadcrumb-item active">Submitting a Pull Request</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/submitting-a-pull-request.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="submitting-a-pull-request">
+<span id="id1"></span><h1>Submitting a Pull Request<a class="headerlink" href="#submitting-a-pull-request" title="Permalink to this heading"></a></h1>
+<p>QEMU welcomes contributions of code, but we generally expect these to be
+sent as simple patch emails to the mailing list (see our page on
+<a class="reference internal" href="submitting-a-patch.html#submitting-a-patch"><span class="std std-ref">Submitting a Patch</span></a>
+for more details).  Generally only existing submaintainers of a tree
+will need to submit pull requests, although occasionally for a large
+patch series we might ask a submitter to send a pull request. This page
+documents our recommendations on pull requests for those people.</p>
+<p>A good rule of thumb is not to send a pull request unless somebody asks
+you to.</p>
+<p><strong>Resend the patches with the pull request</strong> as emails which are
+threaded as follow-ups to the pull request itself. The simplest way to
+do this is to use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span> <span class="pre">--cover-letter</span></code> to create the
+emails, and then edit the cover letter to include the pull request
+details that <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">request-pull</span></code> outputs.</p>
+<p><strong>Use PULL as the subject line tag</strong> in both the cover letter and the
+retransmitted patch mails (for example, by using
+<code class="docutils literal notranslate"><span class="pre">--subject-prefix=PULL</span></code> in your <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span></code> command). This
+helps people to filter in or out the resulting emails (especially useful
+if they are only CC’d on one email out of the set).</p>
+<p><strong>Each patch must have your own Signed-off-by: line</strong> as well as that of
+the original author if the patch was not written by you. This is because
+with a pull request you’re now indicating that the patch has passed via
+you rather than directly from the original author.</p>
+<p><strong>Don’t forget to add Reviewed-by: and Acked-by: lines</strong>. When other
+people have reviewed the patches you’re putting in the pull request,
+make sure you’ve copied their signoffs across. (If you use the <a class="reference external" href="https://github.com/stefanha/patches">patches
+tool</a> to add patches from email
+directly to your git repo it will include the tags automatically; if
+you’re updating patches manually or in some other way you’ll need to
+edit the commit messages by hand.)</p>
+<p><strong>Don’t send pull requests for code that hasn’t passed review</strong>. A pull
+request says these patches are ready to go into QEMU now, so they must
+have passed the standard code review processes. In particular if you’ve
+corrected issues in one round of code review, you need to send your
+fixed patch series as normal to the list; you can’t put it in a pull
+request until it’s gone through. (Extremely trivial fixes may be OK to
+just fix in passing, but if in doubt err on the side of not.)</p>
+<p><strong>Test before sending</strong>. This is an obvious thing to say, but make sure
+everything builds (including that it compiles at each step of the patch
+series) and that “make check” passes before sending out the pull
+request. As a submaintainer you’re one of QEMU’s lines of defense
+against bad code, so double check the details.</p>
+<p><strong>All pull requests must be signed</strong>. By “signed” here we mean that
+the pullreq email should quote a tag which is a GPG-signed tag (as
+created with ‘gpg tag -s …’). See <a class="reference internal" href="maintainers.html#maintainer-keys"><span class="std std-ref">Maintainer GPG Keys</span></a> for
+details.</p>
+<p><strong>Pull requests not for master should say “not for master” and have
+“PULL SUBSYSTEM whatever” in the subject tag</strong>. If your pull request is
+targeting a stable branch or some submaintainer tree, please include the
+string “not for master” in the cover letter email, and make sure the
+subject tag is “PULL SUBSYSTEM s390/block/whatever” rather than just
+“PULL”. This allows it to be automatically filtered out of the set of
+pull requests that should be applied to master.</p>
+<p>You might be interested in the <a class="reference external" href="https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/make-pullreq">make-pullreq</a>
+script which automates some of this process for you and includes a few
+sanity checks. Note that you must edit it to configure it suitably for
+your local situation!</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stable-process.html" class="btn btn-neutral float-left" title="QEMU and the stable process" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="secure-coding-practices.html" class="btn btn-neutral float-right" title="Secure Coding Practices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAN Bus Emulation Support &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chip Card Interface Device (CCID)" href="ccid.html" />
+    <link rel="prev" title="Device Emulation" href="../device-emulation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usb.html">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">CAN Bus Emulation Support</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/can.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="can-bus-emulation-support">
+<h1>CAN Bus Emulation Support<a class="headerlink" href="#can-bus-emulation-support" title="Permalink to this heading"></a></h1>
+<p>The CAN bus emulation provides mechanism to connect multiple
+emulated CAN controller chips together by one or multiple CAN busses
+(the controller device “canbus”  parameter). The individual busses
+can be connected to host system CAN API (at this time only Linux
+SocketCAN is supported).</p>
+<p>The concept of busses is generic and different CAN controllers
+can be implemented.</p>
+<p>The initial submission implemented SJA1000 controller which
+is common and well supported by by drivers for the most operating
+systems.</p>
+<p>The PCI addon card hardware has been selected as the first CAN
+interface to implement because such device can be easily connected
+to systems with different CPU architectures (x86, PowerPC, Arm, etc.).</p>
+<p>In 2020, CTU CAN FD controller model has been added as part
+of the bachelor thesis of Jan Charvat. This controller is complete
+open-source/design/hardware solution. The core designer
+of the project is Ondrej Ille, the financial support has been
+provided by CTU, and more companies including Volkswagen subsidiaries.</p>
+<p>The project has been initially started in frame of RTEMS GSoC 2013
+slot by Jin Yang under our mentoring  The initial idea was to provide generic
+CAN subsystem for RTEMS. But lack of common environment for code and RTEMS
+testing lead to goal change to provide environment which provides complete
+emulated environment for testing and RTEMS GSoC slot has been donated
+to work on CAN hardware emulation on QEMU.</p>
+<section id="examples-how-to-use-can-emulation-for-sja1000-based-boards">
+<h2>Examples how to use CAN emulation for SJA1000 based boards<a class="headerlink" href="#examples-how-to-use-can-emulation-for-sja1000-based-boards" title="Permalink to this heading"></a></h2>
+<p>When QEMU with CAN PCI support is compiled then one of the next
+CAN boards can be selected</p>
+<ol class="arabic">
+<li><p>CAN bus Kvaser PCI CAN-S (single SJA1000 channel) board. QEMU startup options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">kvaser_pci</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Add “can-host-socketcan” object to connect device to host system CAN bus:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">host</span><span class="o">-</span><span class="n">socketcan</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canhost0</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">can0</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span>
+</pre></div>
+</div>
+<ol class="arabic" start="2">
+<li><p>CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">pcm3680_pci</span><span class="p">,</span><span class="n">canbus0</span><span class="o">=</span><span class="n">canbus0</span><span class="p">,</span><span class="n">canbus1</span><span class="o">=</span><span class="n">canbus0</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Another example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus1</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">pcm3680_pci</span><span class="p">,</span><span class="n">canbus0</span><span class="o">=</span><span class="n">canbus0</span><span class="p">,</span><span class="n">canbus1</span><span class="o">=</span><span class="n">canbus1</span>
+</pre></div>
+</div>
+<ol class="arabic" start="3">
+<li><p>CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">mioe3680_pci</span><span class="p">,</span><span class="n">canbus0</span><span class="o">=</span><span class="n">canbus0</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The ‘’kvaser_pci’’ board/device model is compatible with and has been tested with
+the ‘’kvaser_pci’’ driver included in mainline Linux kernel.
+The tested setup was Linux 4.9 kernel on the host and guest side.</p>
+<p>Example for qemu-system-x86_64:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">x86_64</span> <span class="o">-</span><span class="n">accel</span> <span class="n">kvm</span> <span class="o">-</span><span class="n">kernel</span> <span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">vmlinuz</span><span class="o">-</span><span class="mf">4.9.0</span><span class="o">-</span><span class="mi">4</span><span class="o">-</span><span class="n">amd64</span> \
+  <span class="o">-</span><span class="n">initrd</span> <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span> \
+  <span class="o">-</span><span class="n">virtfs</span> <span class="n">local</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">shareddir</span><span class="p">,</span><span class="n">security_model</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">mount_tag</span><span class="o">=</span><span class="n">shareddir</span> \
+  <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span> \
+  <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">host</span><span class="o">-</span><span class="n">socketcan</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canhost0</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">can0</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span> \
+  <span class="o">-</span><span class="n">device</span> <span class="n">kvaser_pci</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span> \
+  <span class="o">-</span><span class="n">nographic</span> <span class="o">-</span><span class="n">append</span> <span class="s2">&quot;console=ttyS0&quot;</span>
+</pre></div>
+</div>
+<p>Example for qemu-system-arm:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">arm</span> <span class="o">-</span><span class="n">cpu</span> <span class="n">arm1176</span> <span class="o">-</span><span class="n">m</span> <span class="mi">256</span> <span class="o">-</span><span class="n">M</span> <span class="n">versatilepb</span> \
+  <span class="o">-</span><span class="n">kernel</span> <span class="n">kernel</span><span class="o">-</span><span class="n">qemu</span><span class="o">-</span><span class="n">arm1176</span><span class="o">-</span><span class="n">versatilepb</span> \
+  <span class="o">-</span><span class="n">hda</span> <span class="n">rpi</span><span class="o">-</span><span class="n">wheezy</span><span class="o">-</span><span class="n">overlay</span> \
+  <span class="o">-</span><span class="n">append</span> <span class="s2">&quot;console=ttyAMA0 root=/dev/sda2 ro init=/sbin/init-overlay&quot;</span> \
+  <span class="o">-</span><span class="n">nographic</span> \
+  <span class="o">-</span><span class="n">virtfs</span> <span class="n">local</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">shareddir</span><span class="p">,</span><span class="n">security_model</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">mount_tag</span><span class="o">=</span><span class="n">shareddir</span> \
+  <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span> \
+  <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">host</span><span class="o">-</span><span class="n">socketcan</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canhost0</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">can0</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span> \
+  <span class="o">-</span><span class="n">device</span> <span class="n">kvaser_pci</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="n">can0</span> \
+</pre></div>
+</div>
+<p>The CAN interface of the host system has to be configured for proper
+bitrate and set up. Configuration is not propagated from emulated
+devices through bus to the physical host device. Example configuration
+for 1 Mbit/s:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip</span> <span class="n">link</span> <span class="nb">set</span> <span class="n">can0</span> <span class="nb">type</span> <span class="n">can</span> <span class="n">bitrate</span> <span class="mi">1000000</span>
+<span class="n">ip</span> <span class="n">link</span> <span class="nb">set</span> <span class="n">can0</span> <span class="n">up</span>
+</pre></div>
+</div>
+<p>Virtual (host local only) can interface can be used on the host
+side instead of physical interface:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip</span> <span class="n">link</span> <span class="n">add</span> <span class="n">dev</span> <span class="n">can0</span> <span class="nb">type</span> <span class="n">vcan</span>
+</pre></div>
+</div>
+<p>The CAN interface on the host side can be used to analyze CAN
+traffic with “candump” command which is included in “can-utils”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">candump</span> <span class="n">can0</span>
+</pre></div>
+</div>
+</section>
+<section id="ctu-can-fd-support-examples">
+<h2>CTU CAN FD support examples<a class="headerlink" href="#ctu-can-fd-support-examples" title="Permalink to this heading"></a></h2>
+<p>This open-source core provides CAN FD support. CAN FD drames are
+delivered even to the host systems when SocketCAN interface is found
+CAN FD capable.</p>
+<p>The PCIe board emulation is provided for now (the device identifier is
+ctucan_pci). The default build defines two CTU CAN FD cores
+on the board.</p>
+<p>Example how to connect the canbus0-bus (virtual wire) to the host
+Linux system (SocketCAN used) and to both CTU CAN FD cores emulated
+on the corresponding PCI card expects that host system CAN bus
+is setup according to the previous SJA1000 section:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">x86_64</span> <span class="o">-</span><span class="n">enable</span><span class="o">-</span><span class="n">kvm</span> <span class="o">-</span><span class="n">kernel</span> <span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">vmlinuz</span><span class="o">-</span><span class="mf">4.19.52</span><span class="o">+</span> \
+    <span class="o">-</span><span class="n">initrd</span> <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span> \
+    <span class="o">-</span><span class="n">virtfs</span> <span class="n">local</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">shareddir</span><span class="p">,</span><span class="n">security_model</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">mount_tag</span><span class="o">=</span><span class="n">shareddir</span> \
+    <span class="o">-</span><span class="n">vga</span> <span class="n">cirrus</span> \
+    <span class="o">-</span><span class="n">append</span> <span class="s2">&quot;console=ttyS0&quot;</span> \
+    <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span><span class="o">-</span><span class="n">bus</span> \
+    <span class="o">-</span><span class="nb">object</span> <span class="n">can</span><span class="o">-</span><span class="n">host</span><span class="o">-</span><span class="n">socketcan</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">can0</span><span class="p">,</span><span class="n">canbus</span><span class="o">=</span><span class="n">canbus0</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">canbus0</span><span class="o">-</span><span class="n">socketcan</span> \
+    <span class="o">-</span><span class="n">device</span> <span class="n">ctucan_pci</span><span class="p">,</span><span class="n">canbus0</span><span class="o">=</span><span class="n">canbus0</span><span class="o">-</span><span class="n">bus</span><span class="p">,</span><span class="n">canbus1</span><span class="o">=</span><span class="n">canbus0</span><span class="o">-</span><span class="n">bus</span> \
+    <span class="o">-</span><span class="n">nographic</span>
+</pre></div>
+</div>
+<p>Setup of CTU CAN FD controller in a guest Linux system:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>insmod ctucanfd.ko || modprobe ctucanfd
+insmod ctucanfd_pci.ko || modprobe ctucanfd_pci
+
+for ifc in /sys/class/net/can* ; do
+  if [ -e  $ifc/device/vendor ] ; then
+    if ! grep -q 0x1760 $ifc/device/vendor ; then
+      continue;
+    fi
+  else
+    continue;
+  fi
+  if [ -e  $ifc/device/device ] ; then
+     if ! grep -q 0xff00 $ifc/device/device ; then
+       continue;
+     fi
+  else
+    continue;
+  fi
+  ifc=$(basename $ifc)
+  /bin/ip link set $ifc type can bitrate 1000000 dbitrate 10000000 fd on
+  /bin/ip link set $ifc up
+done
+</pre></div>
+</div>
+<p>The test can run for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">candump</span> <span class="n">can1</span>
+</pre></div>
+</div>
+<p>in the guest system and next commands in the host system for basic CAN:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cangen</span> <span class="n">can0</span>
+</pre></div>
+</div>
+<p>for CAN FD without bitrate switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cangen</span> <span class="n">can0</span> <span class="o">-</span><span class="n">f</span>
+</pre></div>
+</div>
+<p>and with bitrate switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cangen</span> <span class="n">can0</span> <span class="o">-</span><span class="n">b</span>
+</pre></div>
+</div>
+<p>The test can also be run the other way around, generating messages in the
+guest system and capturing them in the host system. Other combinations are
+also possible.</p>
+</section>
+<section id="links-to-other-resources">
+<h2>Links to other resources<a class="headerlink" href="#links-to-other-resources" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><a class="reference external" href="http://canbus.pages.fel.cvut.cz">CAN related projects at Czech Technical University, Faculty of Electrical Engineering</a></p></li>
+<li><p><a class="reference external" href="https://gitlab.fel.cvut.cz/canbus/qemu-canbus">Repository with development can-pci branch at Czech Technical University</a></p></li>
+<li><p><a class="reference external" href="https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation">RTEMS page describing project</a></p></li>
+<li><p><a class="reference external" href="http://cmp.felk.cvut.cz/~pisa/can/doc/rtlws-17-pisa-qemu-can.pdf">RTLWS 2015 article about the project and its use with CANopen emulation</a></p></li>
+<li><p><a class="reference external" href="https://www.linuxdays.cz/2017/video/Pavel_Pisa-CAN_canopen.pdf">GNU/Linux, CAN and CANopen in Real-time Control Applications Slides from LinuxDays 2017 (include updated RTLWS 2015 content)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/linux-can/can-utils">Linux SocketCAN utilities</a></p></li>
+<li><p><a class="reference external" href="https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core">CTU CAN FD project including core VHDL design, Linux driver, test utilities etc.</a></p></li>
+<li><p><a class="reference external" href="http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/doc/Datasheet.pdf">CTU CAN FD Core Datasheet Documentation</a></p></li>
+<li><p><a class="reference external" href="http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/doc/System_Architecture.pdf">CTU CAN FD Core System Architecture Documentation</a></p></li>
+<li><p><a class="reference external" href="https://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/doc/linux_driver/build/ctucanfd-driver.html">CTU CAN FD Driver Documentation</a></p></li>
+<li><p><a class="reference external" href="https://gitlab.fel.cvut.cz/canbus/pcie-ctu_can_fd">Integration with PCIe interfacing for Intel/Altera Cyclone IV based board</a></p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../device-emulation.html" class="btn btn-neutral float-left" title="Device Emulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ccid.html" class="btn btn-neutral float-right" title="Chip Card Interface Device (CCID)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

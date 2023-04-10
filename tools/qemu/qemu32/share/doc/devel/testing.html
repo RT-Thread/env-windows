@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing in QEMU &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ACPI/SMBIOS avocado tests using biosbits" href="acpi-bits.html" />
+    <link rel="prev" title="QEMU and Kconfig" href="kconfig.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Testing in QEMU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testing-with-make-check">Testing with “make check”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-iotests">QEMU iotests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#container-based-tests">Container based tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thread-sanitizer">Thread Sanitizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#docker-binfmt-image-debian-targets">docker-binfmt-image-debian-% targets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vm-testing">VM testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#image-fuzzer-testing">Image fuzzer testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integration-tests-using-the-avocado-framework">Integration tests using the Avocado Framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-with-make-check-tcg">Testing with “make check-tcg”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-tcg-tests">Other TCG Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gcc-gcov-support">GCC gcov support</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">Testing in QEMU</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/testing.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="testing-in-qemu">
+<span id="testing"></span><h1>Testing in QEMU<a class="headerlink" href="#testing-in-qemu" title="Permalink to this heading"></a></h1>
+<p>This document describes the testing infrastructure in QEMU.</p>
+<section id="testing-with-make-check">
+<h2>Testing with “make check”<a class="headerlink" href="#testing-with-make-check" title="Permalink to this heading"></a></h2>
+<p>The “make check” testing family includes most of the C based tests in QEMU. For
+a quick help, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-help</span></code> from the source tree.</p>
+<p>The usual way to run these tests is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span>
+</pre></div>
+</div>
+<p>which includes QAPI schema tests, unit tests, QTests and some iotests.
+Different sub-types of “make check” tests will be explained below.</p>
+<p>Before running tests, it is best to build QEMU programs first. Some tests
+expect the executables to exist and will fail with obscure messages if they
+cannot find them.</p>
+<section id="unit-tests">
+<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading"></a></h3>
+<p>Unit tests, which can be invoked with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-unit</span></code>, are simple C tests
+that typically link to individual QEMU object files and exercise them by
+calling exported functions.</p>
+<p>If you are writing new code in QEMU, consider adding a unit test, especially
+for utility modules that are relatively stateless or have few dependencies. To
+add a new unit test:</p>
+<ol class="arabic">
+<li><p>Create a new source file. For example, <code class="docutils literal notranslate"><span class="pre">tests/unit/foo-test.c</span></code>.</p></li>
+<li><p>Write the test. Normally you would include the header file which exports
+the module API, then verify the interface behaves as expected from your
+test. The test code should be organized with the glib testing framework.
+Copying and modifying an existing test is usually a good idea.</p></li>
+<li><p>Add the test to <code class="docutils literal notranslate"><span class="pre">tests/unit/meson.build</span></code>. The unit tests are listed in a
+dictionary called <code class="docutils literal notranslate"><span class="pre">tests</span></code>.  The values are any additional sources and
+dependencies to be linked with the test.  For a simple test whose source
+is in <code class="docutils literal notranslate"><span class="pre">tests/unit/foo-test.c</span></code>, it is enough to add an entry like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="o">...</span>
+  <span class="s1">&#39;foo-test&#39;</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Since unit tests don’t require environment variables, the simplest way to debug
+a unit test failure is often directly invoking it or even running it under
+<code class="docutils literal notranslate"><span class="pre">gdb</span></code>. However there can still be differences in behavior between <code class="docutils literal notranslate"><span class="pre">make</span></code>
+invocations and your manual run, due to <code class="docutils literal notranslate"><span class="pre">$MALLOC_PERTURB_</span></code> environment
+variable (which affects memory reclamation and catches invalid pointers better)
+and gtester options. If necessary, you can run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">unit</span> <span class="n">V</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>and copy the actual command line which executes the unit test, then run
+it from the command line.</p>
+</section>
+<section id="qtest">
+<h3>QTest<a class="headerlink" href="#qtest" title="Permalink to this heading"></a></h3>
+<p>QTest is a device emulation testing framework.  It can be very useful to test
+device models; it could also control certain aspects of QEMU (such as virtual
+clock stepping), with a special purpose “qtest” protocol.  Refer to
+<a class="reference internal" href="qtest.html"><span class="doc">QTest Device Emulation Testing Framework</span></a> for more details.</p>
+<p>QTest cases can be executed with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">qtest</span>
+</pre></div>
+</div>
+</section>
+<section id="writing-portable-test-cases">
+<h3>Writing portable test cases<a class="headerlink" href="#writing-portable-test-cases" title="Permalink to this heading"></a></h3>
+<p>Both unit tests and qtests can run on POSIX hosts as well as Windows hosts.
+Care must be taken when writing portable test cases that can be built and run
+successfully on various hosts. The following list shows some best practices:</p>
+<ul class="simple">
+<li><p>Use portable APIs from glib whenever necessary, e.g.: g_setenv(),
+g_mkdtemp(), g_mkdir().</p></li>
+<li><p>Avoid using hardcoded /tmp for temporary file directory.
+Use g_get_tmp_dir() instead.</p></li>
+<li><p>Bear in mind that Windows has different special string representation for
+stdin/stdout/stderr and null devices. For example if your test case uses
+“/dev/fd/2” and “/dev/null” on Linux, remember to use “2” and “nul” on
+Windows instead. Also IO redirection does not work on Windows, so avoid
+using “2&gt;nul” whenever necessary.</p></li>
+<li><p>If your test cases uses the blkdebug feature, use relative path to pass
+the config and image file paths in the command line as Windows absolute
+path contains the delimiter “:” which will confuse the blkdebug parser.</p></li>
+<li><p>Use double quotes in your extra QEMU command line in your test cases
+instead of single quotes, as Windows does not drop single quotes when
+passing the command line to QEMU.</p></li>
+<li><p>Windows opens a file in text mode by default, while a POSIX compliant
+implementation treats text files and binary files the same. So if your
+test cases opens a file to write some data and later wants to compare the
+written data with the original one, be sure to pass the letter ‘b’ as
+part of the mode string to fopen(), or O_BINARY flag for the open() call.</p></li>
+<li><p>If a certain test case can only run on POSIX or Linux hosts, use a proper
+#ifdef in the codes. If the whole test suite cannot run on Windows, disable
+the build in the meson.build file.</p></li>
+</ul>
+</section>
+<section id="qapi-schema-tests">
+<h3>QAPI schema tests<a class="headerlink" href="#qapi-schema-tests" title="Permalink to this heading"></a></h3>
+<p>The QAPI schema tests validate the QAPI parser used by QMP, by feeding
+predefined input to the parser and comparing the result with the reference
+output.</p>
+<p>The input/output data is managed under the <code class="docutils literal notranslate"><span class="pre">tests/qapi-schema</span></code> directory.
+Each test case includes four files that have a common base name:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">${casename}.json</span></code> - the file contains the JSON input for feeding the
+parser</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${casename}.out</span></code> - the file contains the expected stdout from the parser</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${casename}.err</span></code> - the file contains the expected stderr from the parser</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${casename}.exit</span></code> - the expected error code</p></li>
+</ul>
+</div></blockquote>
+<p>Consider adding a new QAPI schema test when you are making a change on the QAPI
+parser (either fixing a bug or extending/modifying the syntax). To do this:</p>
+<ol class="arabic simple">
+<li><p>Add four files for the new case as explained above. For example:</p></li>
+</ol>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$EDITOR</span> <span class="pre">tests/qapi-schema/foo.{json,out,err,exit}</span></code>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Add the new test in <code class="docutils literal notranslate"><span class="pre">tests/Makefile.include</span></code>. For example:</p></li>
+</ol>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">qapi-schema</span> <span class="pre">+=</span> <span class="pre">foo.json</span></code></p>
+</div></blockquote>
+</section>
+<section id="check-block">
+<h3>check-block<a class="headerlink" href="#check-block" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-block</span></code> runs a subset of the block layer iotests (the tests that
+are in the “auto” group).
+See the “QEMU iotests” section below for more information.</p>
+</section>
+</section>
+<section id="qemu-iotests">
+<h2>QEMU iotests<a class="headerlink" href="#qemu-iotests" title="Permalink to this heading"></a></h2>
+<p>QEMU iotests, under the directory <code class="docutils literal notranslate"><span class="pre">tests/qemu-iotests</span></code>, is the testing
+framework widely used to test block layer related features. It is higher level
+than “make check” tests and 99% of the code is written in bash or Python
+scripts.  The testing success criteria is golden output comparison, and the
+test files are named with numbers.</p>
+<p>To run iotests, make sure QEMU is built successfully, then switch to the
+<code class="docutils literal notranslate"><span class="pre">tests/qemu-iotests</span></code> directory under the build directory, and run <code class="docutils literal notranslate"><span class="pre">./check</span></code>
+with desired arguments from there.</p>
+<p>By default, “raw” format and “file” protocol is used; all tests will be
+executed, except the unsupported ones. You can override the format and protocol
+with arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># test with qcow2 format</span>
+<span class="o">./</span><span class="n">check</span> <span class="o">-</span><span class="n">qcow2</span>
+<span class="c1"># or test a different protocol</span>
+<span class="o">./</span><span class="n">check</span> <span class="o">-</span><span class="n">nbd</span>
+</pre></div>
+</div>
+<p>It’s also possible to list test numbers explicitly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># run selected cases with qcow2 format</span>
+<span class="o">./</span><span class="n">check</span> <span class="o">-</span><span class="n">qcow2</span> <span class="mi">001</span> <span class="mi">030</span> <span class="mi">153</span>
+</pre></div>
+</div>
+<p>Cache mode can be selected with the “-c” option, which may help reveal bugs
+that are specific to certain cache mode.</p>
+<p>More options are supported by the <code class="docutils literal notranslate"><span class="pre">./check</span></code> script, run <code class="docutils literal notranslate"><span class="pre">./check</span> <span class="pre">-h</span></code> for
+help.</p>
+<section id="writing-a-new-test-case">
+<h3>Writing a new test case<a class="headerlink" href="#writing-a-new-test-case" title="Permalink to this heading"></a></h3>
+<p>Consider writing a tests case when you are making any changes to the block
+layer. An iotest case is usually the choice for that. There are already many
+test cases, so it is possible that extending one of them may achieve the goal
+and save the boilerplate to create one.  (Unfortunately, there isn’t a 100%
+reliable way to find a related one out of hundreds of tests.  One approach is
+using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">grep</span></code>.)</p>
+<p>Usually an iotest case consists of two files. One is an executable that
+produces output to stdout and stderr, the other is the expected reference
+output. They are given the same number in file names. E.g. Test script <code class="docutils literal notranslate"><span class="pre">055</span></code>
+and reference output <code class="docutils literal notranslate"><span class="pre">055.out</span></code>.</p>
+<p>In rare cases, when outputs differ between cache mode <code class="docutils literal notranslate"><span class="pre">none</span></code> and others, a
+<code class="docutils literal notranslate"><span class="pre">.out.nocache</span></code> file is added. In other cases, when outputs differ between
+image formats, more than one <code class="docutils literal notranslate"><span class="pre">.out</span></code> files are created ending with the
+respective format names, e.g. <code class="docutils literal notranslate"><span class="pre">178.out.qcow2</span></code> and <code class="docutils literal notranslate"><span class="pre">178.out.raw</span></code>.</p>
+<p>There isn’t a hard rule about how to write a test script, but a new test is
+usually a (copy and) modification of an existing case.  There are a few
+commonly used ways to create a test:</p>
+<ul class="simple">
+<li><p>A Bash script. It will make use of several environmental variables related
+to the testing procedure, and could source a group of <code class="docutils literal notranslate"><span class="pre">common.*</span></code> libraries
+for some common helper routines.</p></li>
+<li><p>A Python unittest script. Import <code class="docutils literal notranslate"><span class="pre">iotests</span></code> and create a subclass of
+<code class="docutils literal notranslate"><span class="pre">iotests.QMPTestCase</span></code>, then call <code class="docutils literal notranslate"><span class="pre">iotests.main</span></code> method. The downside of
+this approach is that the output is too scarce, and the script is considered
+harder to debug.</p></li>
+<li><p>A simple Python script without using unittest module. This could also import
+<code class="docutils literal notranslate"><span class="pre">iotests</span></code> for launching QEMU and utilities etc, but it doesn’t inherit
+from <code class="docutils literal notranslate"><span class="pre">iotests.QMPTestCase</span></code> therefore doesn’t use the Python unittest
+execution. This is a combination of 1 and 2.</p></li>
+</ul>
+<p>Pick the language per your preference since both Bash and Python have
+comparable library support for invoking and interacting with QEMU programs. If
+you opt for Python, it is strongly recommended to write Python 3 compatible
+code.</p>
+<p>Both Python and Bash frameworks in iotests provide helpers to manage test
+images. They can be used to create and clean up images under the test
+directory. If no I/O or any protocol specific feature is needed, it is often
+more convenient to use the pseudo block driver, <code class="docutils literal notranslate"><span class="pre">null-co://</span></code>, as the test
+image, which doesn’t require image creation or cleaning up. Avoid system-wide
+devices or files whenever possible, such as <code class="docutils literal notranslate"><span class="pre">/dev/null</span></code> or <code class="docutils literal notranslate"><span class="pre">/dev/zero</span></code>.
+Otherwise, image locking implications have to be considered.  For example,
+another application on the host may have locked the file, possibly leading to a
+test failure.  If using such devices are explicitly desired, consider adding
+<code class="docutils literal notranslate"><span class="pre">locking=off</span></code> option to disable image locking.</p>
+</section>
+<section id="debugging-a-test-case">
+<h3>Debugging a test case<a class="headerlink" href="#debugging-a-test-case" title="Permalink to this heading"></a></h3>
+<p>The following options to the <code class="docutils literal notranslate"><span class="pre">check</span></code> script can be useful when debugging
+a failing test:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-gdb</span></code> wraps every QEMU invocation in a <code class="docutils literal notranslate"><span class="pre">gdbserver</span></code>, which waits for a
+connection from a gdb client.  The options given to <code class="docutils literal notranslate"><span class="pre">gdbserver</span></code> (e.g. the
+address on which to listen for connections) are taken from the <code class="docutils literal notranslate"><span class="pre">$GDB_OPTIONS</span></code>
+environment variable.  By default (if <code class="docutils literal notranslate"><span class="pre">$GDB_OPTIONS</span></code> is empty), it listens on
+<code class="docutils literal notranslate"><span class="pre">localhost:12345</span></code>.
+It is possible to connect to it for example with
+<code class="docutils literal notranslate"><span class="pre">gdb</span> <span class="pre">-iex</span> <span class="pre">&quot;target</span> <span class="pre">remote</span> <span class="pre">$addr&quot;</span></code>, where <code class="docutils literal notranslate"><span class="pre">$addr</span></code> is the address
+<code class="docutils literal notranslate"><span class="pre">gdbserver</span></code> listens on.
+If the <code class="docutils literal notranslate"><span class="pre">-gdb</span></code> option is not used, <code class="docutils literal notranslate"><span class="pre">$GDB_OPTIONS</span></code> is ignored,
+regardless of whether it is set or not.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-valgrind</span></code> attaches a valgrind instance to QEMU. If it detects
+warnings, it will print and save the log in
+<code class="docutils literal notranslate"><span class="pre">$TEST_DIR/&lt;valgrind_pid&gt;.valgrind</span></code>.
+The final command line will be <code class="docutils literal notranslate"><span class="pre">valgrind</span> <span class="pre">--log-file=$TEST_DIR/</span>
+<span class="pre">&lt;valgrind_pid&gt;.valgrind</span> <span class="pre">--error-exitcode=99</span> <span class="pre">$QEMU</span> <span class="pre">...</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-d</span></code> (debug) just increases the logging verbosity, showing
+for example the QMP commands and answers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-p</span></code> (print) redirects QEMU’s stdout and stderr to the test output,
+instead of saving it into a log file in
+<code class="docutils literal notranslate"><span class="pre">$TEST_DIR/qemu-machine-&lt;random_string&gt;</span></code>.</p></li>
+</ul>
+</section>
+<section id="test-case-groups">
+<h3>Test case groups<a class="headerlink" href="#test-case-groups" title="Permalink to this heading"></a></h3>
+<p>“Tests may belong to one or more test groups, which are defined in the form
+of a comment in the test source file. By convention, test groups are listed
+in the second line of the test file, after the “#!/…” line, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># group: auto quick</span>
+<span class="c1">#</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Another way of defining groups is creating the tests/qemu-iotests/group.local
+file. This should be used only for downstream (this file should never appear
+in upstream). This file may be used for defining some downstream test groups
+or for temporarily disabling tests, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># groups for some company downstream process</span>
+<span class="c1">#</span>
+<span class="c1"># ci - tests to run on build</span>
+<span class="c1"># down - our downstream tests, not for upstream</span>
+<span class="c1">#</span>
+<span class="c1"># Format of each line is:</span>
+<span class="c1"># TEST_NAME TEST_GROUP [TEST_GROUP ]...</span>
+
+<span class="mi">013</span> <span class="n">ci</span>
+<span class="mi">210</span> <span class="n">disabled</span>
+<span class="mi">215</span> <span class="n">disabled</span>
+<span class="n">our</span><span class="o">-</span><span class="n">ugly</span><span class="o">-</span><span class="n">workaround</span><span class="o">-</span><span class="n">test</span> <span class="n">down</span> <span class="n">ci</span>
+</pre></div>
+</div>
+<p>Note that the following group names have a special meaning:</p>
+<ul class="simple">
+<li><p>quick: Tests in this group should finish within a few seconds.</p></li>
+<li><p>auto: Tests in this group are used during “make check” and should be
+runnable in any case. That means they should run with every QEMU binary
+(also non-x86), with every QEMU configuration (i.e. must not fail if
+an optional feature is not compiled in - but reporting a “skip” is ok),
+work at least with the qcow2 file format, work with all kind of host
+filesystems and users (e.g. “nobody” or “root”) and must not take too
+much memory and disk space (since CI pipelines tend to fail otherwise).</p></li>
+<li><p>disabled: Tests in this group are disabled and ignored by check.</p></li>
+</ul>
+</section>
+</section>
+<section id="container-based-tests">
+<span id="container-ref"></span><h2>Container based tests<a class="headerlink" href="#container-based-tests" title="Permalink to this heading"></a></h2>
+<section id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h3>
+<p>The container testing framework in QEMU utilizes public images to
+build and test QEMU in predefined and widely accessible Linux
+environments. This makes it possible to expand the test coverage
+across distros, toolchain flavors and library versions. The support
+was originally written for Docker although we also support Podman as
+an alternative container runtime. Although many of the target
+names and scripts are prefixed with “docker” the system will
+automatically run on whichever is configured.</p>
+<p>The container images are also used to augment the generation of tests
+for testing TCG. See <a class="reference internal" href="#checktcg-ref"><span class="std std-ref">Testing with “make check-tcg”</span></a> for more details.</p>
+</section>
+<section id="docker-prerequisites">
+<h3>Docker Prerequisites<a class="headerlink" href="#docker-prerequisites" title="Permalink to this heading"></a></h3>
+<p>Install “docker” with the system package manager and start the Docker service
+on your development machine, then make sure you have the privilege to run
+Docker commands. Typically it means setting up passwordless <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">docker</span></code>
+command or login as root. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo yum install docker
+$ # or `apt-get install docker` for Ubuntu, etc.
+$ sudo systemctl start docker
+$ sudo docker ps
+</pre></div>
+</div>
+<p>The last command should print an empty table, to verify the system is ready.</p>
+<p>An alternative method to set up permissions is by adding the current user to
+“docker” group and making the docker daemon socket file (by default
+<code class="docutils literal notranslate"><span class="pre">/var/run/docker.sock</span></code>) accessible to the group:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo groupadd docker
+$ sudo usermod $USER -a -G docker
+$ sudo chown :docker /var/run/docker.sock
+</pre></div>
+</div>
+<p>Note that any one of above configurations makes it possible for the user to
+exploit the whole host with Docker bind mounting or other privileged
+operations.  So only do it on development machines.</p>
+</section>
+<section id="podman-prerequisites">
+<h3>Podman Prerequisites<a class="headerlink" href="#podman-prerequisites" title="Permalink to this heading"></a></h3>
+<p>Install “podman” with the system package manager.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo dnf install podman
+$ podman ps
+</pre></div>
+</div>
+<p>The last command should print an empty table, to verify the system is ready.</p>
+</section>
+<section id="quickstart">
+<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading"></a></h3>
+<p>From source tree, type <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docker-help</span></code> to see the help. Testing
+can be started without configuring or building QEMU (<code class="docutils literal notranslate"><span class="pre">configure</span></code> and
+<code class="docutils literal notranslate"><span class="pre">make</span></code> are done in the container, with parameters defined by the
+make target):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">docker</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">build</span><span class="nd">@centos8</span>
+</pre></div>
+</div>
+<p>This will create a container instance using the <code class="docutils literal notranslate"><span class="pre">centos8</span></code> image (the image
+is downloaded and initialized automatically), in which the <code class="docutils literal notranslate"><span class="pre">test-build</span></code> job
+is executed.</p>
+</section>
+<section id="registry">
+<h3>Registry<a class="headerlink" href="#registry" title="Permalink to this heading"></a></h3>
+<p>The QEMU project has a container registry hosted by GitLab at
+<code class="docutils literal notranslate"><span class="pre">registry.gitlab.com/qemu-project/qemu</span></code> which will automatically be
+used to pull in pre-built layers. This avoids unnecessary strain on
+the distro archives created by multiple developers running the same
+container build steps over and over again. This can be overridden
+locally by using the <code class="docutils literal notranslate"><span class="pre">NOCACHE</span></code> build option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">docker</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">debian</span><span class="o">-</span><span class="n">arm64</span><span class="o">-</span><span class="n">cross</span> <span class="n">NOCACHE</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="images">
+<h3>Images<a class="headerlink" href="#images" title="Permalink to this heading"></a></h3>
+<p>Along with many other images, the <code class="docutils literal notranslate"><span class="pre">centos8</span></code> image is defined in a Dockerfile
+in <code class="docutils literal notranslate"><span class="pre">tests/docker/dockerfiles/</span></code>, called <code class="docutils literal notranslate"><span class="pre">centos8.docker</span></code>. <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docker-help</span></code>
+command will list all the available images.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">.pre</span></code> script can be added beside the <code class="docutils literal notranslate"><span class="pre">.docker</span></code> file, which will be
+executed before building the image under the build context directory. This is
+mainly used to do necessary host side setup. One such setup is <code class="docutils literal notranslate"><span class="pre">binfmt_misc</span></code>,
+for example, to make qemu-user powered cross build containers work.</p>
+<p>Most of the existing Dockerfiles were written by hand, simply by creating a
+a new <code class="docutils literal notranslate"><span class="pre">.docker</span></code> file under the <code class="docutils literal notranslate"><span class="pre">tests/docker/dockerfiles/</span></code> directory.
+This has led to an inconsistent set of packages being present across the
+different containers.</p>
+<p>Thus going forward, QEMU is aiming to automatically generate the Dockerfiles
+using the <code class="docutils literal notranslate"><span class="pre">lcitool</span></code> program provided by the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> project:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://gitlab.com/libvirt/libvirt-ci">https://gitlab.com/libvirt/libvirt-ci</a></p>
+</div></blockquote>
+<p>In that project, there is a <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> file defining the distro native
+package names for a wide variety of third party projects. This is processed
+in combination with a project defined list of build pre-requisites to determine
+the list of native packages to install on each distribution. This can be used
+to generate dockerfiles, VM package lists and Cirrus CI variables needed to
+setup build environments across OS distributions with a consistent set of
+packages present.</p>
+<p>When preparing a patch series that adds a new build pre-requisite to QEMU,
+updates to various lcitool data files may be required.</p>
+<section id="adding-new-build-pre-requisites">
+<h4>Adding new build pre-requisites<a class="headerlink" href="#adding-new-build-pre-requisites" title="Permalink to this heading"></a></h4>
+<p>In the simple case where the pre-requisite is already known to <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code>
+the following steps are needed</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">tests/lcitool/projects/qemu.yml</span></code> and add the pre-requisite</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">lcitool-refresh</span></code> to re-generate all relevant build environment
+manifests</p></li>
+</ul>
+</div></blockquote>
+<p>In some cases <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> will not know about the build pre-requisite and
+thus some extra preparation steps will be required first</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Fork the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> project on gitlab</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> change to add an entry for the new build
+prerequisite, listing its native package name on as many OS distros
+as practical.</p></li>
+<li><p>Commit the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> change and submit a merge request to
+the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> project, noting in the description that this
+is a new build pre-requisite desired for use with QEMU</p></li>
+<li><p>CI pipeline will run to validate that the changes to <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code>
+are correct, by attempting to install the newly listed package on
+all OS distributions supported by <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code>.</p></li>
+<li><p>Once the merge request is accepted, go back to QEMU and update
+the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> submodule to point to a commit that contains
+the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> update.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="adding-new-os-distros">
+<h4>Adding new OS distros<a class="headerlink" href="#adding-new-os-distros" title="Permalink to this heading"></a></h4>
+<p>In some cases <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> will not know about the OS distro that is
+desired to be tested. Before adding a new OS distro, discuss the proposed
+addition:</p>
+<blockquote>
+<div><ul>
+<li><p>Send a mail to qemu-devel, copying people listed in the
+MAINTAINERS file for <code class="docutils literal notranslate"><span class="pre">Build</span> <span class="pre">and</span> <span class="pre">test</span> <span class="pre">automation</span></code>.</p>
+<p>There are limited CI compute resources available to QEMU, so the
+cost/benefit tradeoff of adding new OS distros needs to be considered.</p>
+</li>
+<li><p>File an issue at <a class="reference external" href="https://gitlab.com/libvirt/libvirt-ci/-/issues">https://gitlab.com/libvirt/libvirt-ci/-/issues</a>
+pointing to the qemu-devel mail thread in the archives.</p>
+<p>This alerts other people who might be interested in the work
+to avoid duplication, as well as to get feedback from libvirt-ci
+maintainers on any tips to ease the addition</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Assuming there is agreement to add a new OS distro then</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Fork the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> project on gitlab</p></li>
+<li><p>Add metadata under <code class="docutils literal notranslate"><span class="pre">guests/lcitool/lcitool/ansible/group_vars/</span></code>
+for the new OS distro. There might be code changes required if
+the OS distro uses a package format not currently known. The
+<code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> maintainers can advise on this when the issue
+is file.</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> change to update all the existing package
+entries, providing details of the new OS distro</p></li>
+<li><p>Commit the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> change and submit a merge request to
+the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> project, noting in the description that this
+is a new build pre-requisite desired for use with QEMU</p></li>
+<li><p>CI pipeline will run to validate that the changes to <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code>
+are correct, by attempting to install the newly listed package on
+all OS distributions supported by <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code>.</p></li>
+<li><p>Once the merge request is accepted, go back to QEMU and update
+the <code class="docutils literal notranslate"><span class="pre">libvirt-ci</span></code> submodule to point to a commit that contains
+the <code class="docutils literal notranslate"><span class="pre">mappings.yml</span></code> update.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="tests">
+<h3>Tests<a class="headerlink" href="#tests" title="Permalink to this heading"></a></h3>
+<p>Different tests are added to cover various configurations to build and test
+QEMU.  Docker tests are the executables under <code class="docutils literal notranslate"><span class="pre">tests/docker</span></code> named
+<code class="docutils literal notranslate"><span class="pre">test-*</span></code>. They are typically shell scripts and are built on top of a shell
+library, <code class="docutils literal notranslate"><span class="pre">tests/docker/common.rc</span></code>, which provides helpers to find the QEMU
+source and build it.</p>
+<p>The full list of tests is printed in the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docker-help</span></code> help.</p>
+</section>
+<section id="debugging-a-docker-test-failure">
+<h3>Debugging a Docker test failure<a class="headerlink" href="#debugging-a-docker-test-failure" title="Permalink to this heading"></a></h3>
+<p>When CI tasks, maintainers or yourself report a Docker test failure, follow the
+below steps to debug it:</p>
+<ol class="arabic simple">
+<li><p>Locally reproduce the failure with the reported command line. E.g. run
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docker-test-mingw&#64;fedora</span> <span class="pre">J=8</span></code>.</p></li>
+<li><p>Add “V=1” to the command line, try again, to see the verbose output.</p></li>
+<li><p>Further add “DEBUG=1” to the command line. This will pause in a shell prompt
+in the container right before testing starts. You could either manually
+build QEMU and run tests from there, or press Ctrl-D to let the Docker
+testing continue.</p></li>
+<li><p>If you press Ctrl-D, the same building and testing procedure will begin, and
+will hopefully run into the error again. After that, you will be dropped to
+the prompt for debug.</p></li>
+</ol>
+</section>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h3>
+<p>Various options can be used to affect how Docker tests are done. The full
+list is in the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docker</span></code> help text. The frequently used ones are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">V=1</span></code>: the same as in top level <code class="docutils literal notranslate"><span class="pre">make</span></code>. It will be propagated to the
+container and enable verbose output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">J=$N</span></code>: the number of parallel tasks in make commands in the container,
+similar to the <code class="docutils literal notranslate"><span class="pre">-j</span> <span class="pre">$N</span></code> option in top level <code class="docutils literal notranslate"><span class="pre">make</span></code>. (The <code class="docutils literal notranslate"><span class="pre">-j</span></code> option in
+top level <code class="docutils literal notranslate"><span class="pre">make</span></code> will not be propagated into the container.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEBUG=1</span></code>: enables debug. See the previous “Debugging a Docker test
+failure” section.</p></li>
+</ul>
+</section>
+</section>
+<section id="thread-sanitizer">
+<h2>Thread Sanitizer<a class="headerlink" href="#thread-sanitizer" title="Permalink to this heading"></a></h2>
+<p>Thread Sanitizer (TSan) is a tool which can detect data races.  QEMU supports
+building and testing with this tool.</p>
+<p>For more information on TSan:</p>
+<p><a class="reference external" href="https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual">https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual</a></p>
+<section id="thread-sanitizer-in-docker">
+<h3>Thread Sanitizer in Docker<a class="headerlink" href="#thread-sanitizer-in-docker" title="Permalink to this heading"></a></h3>
+<p>TSan is currently supported in the ubuntu2004 docker.</p>
+<p>The test-tsan test will build using TSan and then run make check.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">docker</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">tsan</span><span class="nd">@ubuntu2004</span>
+</pre></div>
+</div>
+<p>TSan warnings under docker are placed in files located at build/tsan/.</p>
+<p>We recommend using DEBUG=1 to allow launching the test from inside the docker,
+and to allow review of the warnings generated by TSan.</p>
+</section>
+<section id="building-and-testing-with-tsan">
+<h3>Building and Testing with TSan<a class="headerlink" href="#building-and-testing-with-tsan" title="Permalink to this heading"></a></h3>
+<p>It is possible to build and test with TSan, with a few additional steps.
+These steps are normally done automatically in the docker.</p>
+<p>There is a one time patch needed in clang-9 or clang-10 at this time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;s/^const/static const/g&#39;</span> \
+    <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">llvm</span><span class="o">-</span><span class="mi">10</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">clang</span><span class="o">/</span><span class="mf">10.0.0</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">sanitizer</span><span class="o">/</span><span class="n">tsan_interface</span><span class="o">.</span><span class="n">h</span>
+</pre></div>
+</div>
+<p>To configure the build for TSan:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">../</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">tsan</span> <span class="o">--</span><span class="n">cc</span><span class="o">=</span><span class="n">clang</span><span class="o">-</span><span class="mi">10</span> <span class="o">--</span><span class="n">cxx</span><span class="o">=</span><span class="n">clang</span><span class="o">++-</span><span class="mi">10</span> \
+             <span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">werror</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">cflags</span><span class="o">=</span><span class="s2">&quot;-O0&quot;</span>
+</pre></div>
+</div>
+<p>The runtime behavior of TSAN is controlled by the TSAN_OPTIONS environment
+variable.</p>
+<p>More information on the TSAN_OPTIONS can be found here:</p>
+<p><a class="reference external" href="https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags">https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags</a></p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">TSAN_OPTIONS</span><span class="o">=</span><span class="n">suppressions</span><span class="o">=&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">qemu</span><span class="o">&gt;/</span><span class="n">tests</span><span class="o">/</span><span class="n">tsan</span><span class="o">/</span><span class="n">suppressions</span><span class="o">.</span><span class="n">tsan</span> \
+                    <span class="n">detect_deadlocks</span><span class="o">=</span><span class="n">false</span> <span class="n">history_size</span><span class="o">=</span><span class="mi">7</span> <span class="n">exitcode</span><span class="o">=</span><span class="mi">0</span> \
+                    <span class="n">log_path</span><span class="o">=&lt;</span><span class="n">build</span> <span class="n">path</span><span class="o">&gt;/</span><span class="n">tsan</span><span class="o">/</span><span class="n">tsan_warning</span>
+</pre></div>
+</div>
+<p>The above exitcode=0 has TSan continue without error if any warnings are found.
+This allows for running the test and then checking the warnings afterwards.
+If you want TSan to stop and exit with error on warnings, use exitcode=66.</p>
+</section>
+<section id="tsan-suppressions">
+<h3>TSan Suppressions<a class="headerlink" href="#tsan-suppressions" title="Permalink to this heading"></a></h3>
+<p>Keep in mind that for any data race warning, although there might be a data race
+detected by TSan, there might be no actual bug here.  TSan provides several
+different mechanisms for suppressing warnings.  In general it is recommended
+to fix the code if possible to eliminate the data race rather than suppress
+the warning.</p>
+<p>A few important files for suppressing warnings are:</p>
+<p>tests/tsan/suppressions.tsan - Has TSan warnings we wish to suppress at runtime.
+The comment on each suppression will typically indicate why we are
+suppressing it.  More information on the file format can be found here:</p>
+<p><a class="reference external" href="https://github.com/google/sanitizers/wiki/ThreadSanitizerSuppressions">https://github.com/google/sanitizers/wiki/ThreadSanitizerSuppressions</a></p>
+<p>tests/tsan/blacklist.tsan - Has TSan warnings we wish to disable
+at compile time for test or debug.
+Add flags to configure to enable:</p>
+<p>“–extra-cflags=-fsanitize-blacklist=&lt;src path&gt;/tests/tsan/blacklist.tsan”</p>
+<p>More information on the file format can be found here under “Blacklist Format”:</p>
+<p><a class="reference external" href="https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags">https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags</a></p>
+</section>
+<section id="tsan-annotations">
+<h3>TSan Annotations<a class="headerlink" href="#tsan-annotations" title="Permalink to this heading"></a></h3>
+<p>include/qemu/tsan.h defines annotations.  See this file for more descriptions
+of the annotations themselves.  Annotations can be used to suppress
+TSan warnings or give TSan more information so that it can detect proper
+relationships between accesses of data.</p>
+<p>Annotation examples can be found here:</p>
+<p><a class="reference external" href="https://github.com/llvm/llvm-project/tree/master/compiler-rt/test/tsan/">https://github.com/llvm/llvm-project/tree/master/compiler-rt/test/tsan/</a></p>
+<p>Good files to start with are: annotate_happens_before.cpp and ignore_race.cpp</p>
+<p>The full set of annotations can be found here:</p>
+<p><a class="reference external" href="https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_interface_ann.cpp">https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_interface_ann.cpp</a></p>
+</section>
+</section>
+<section id="docker-binfmt-image-debian-targets">
+<h2>docker-binfmt-image-debian-% targets<a class="headerlink" href="#docker-binfmt-image-debian-targets" title="Permalink to this heading"></a></h2>
+<p>It is possible to combine Debian’s bootstrap scripts with a configured
+<code class="docutils literal notranslate"><span class="pre">binfmt_misc</span></code> to bootstrap a number of Debian’s distros including
+experimental ports not yet supported by a released OS. This can
+simplify setting up a rootfs by using docker to contain the foreign
+rootfs rather than manually invoking chroot.</p>
+<section id="setting-up-binfmt-misc">
+<h3>Setting up <code class="docutils literal notranslate"><span class="pre">binfmt_misc</span></code><a class="headerlink" href="#setting-up-binfmt-misc" title="Permalink to this heading"></a></h3>
+<p>You can use the script <code class="docutils literal notranslate"><span class="pre">qemu-binfmt-conf.sh</span></code> to configure a QEMU
+user binary to automatically run binaries for the foreign
+architecture. While the scripts will try their best to work with
+dynamically linked QEMU’s a statically linked one will present less
+potential complications when copying into the docker image. Modern
+kernels support the <code class="docutils literal notranslate"><span class="pre">F</span></code> (fix binary) flag which will open the QEMU
+executable on setup and avoids the need to find and re-open in the
+chroot environment. This is triggered with the <code class="docutils literal notranslate"><span class="pre">--persistent</span></code> flag.</p>
+</section>
+<section id="example-invocation">
+<h3>Example invocation<a class="headerlink" href="#example-invocation" title="Permalink to this heading"></a></h3>
+<p>For example to setup the HPPA ports builds of Debian:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">docker</span><span class="o">-</span><span class="n">binfmt</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">debian</span><span class="o">-</span><span class="n">sid</span><span class="o">-</span><span class="n">hppa</span> \
+  <span class="n">DEB_TYPE</span><span class="o">=</span><span class="n">sid</span> <span class="n">DEB_ARCH</span><span class="o">=</span><span class="n">hppa</span> \
+  <span class="n">DEB_URL</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">debian</span><span class="o">-</span><span class="n">ports</span><span class="o">/</span> \
+  <span class="n">DEB_KEYRING</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">keyrings</span><span class="o">/</span><span class="n">debian</span><span class="o">-</span><span class="n">ports</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">keyring</span><span class="o">.</span><span class="n">gpg</span> \
+  <span class="n">EXECUTABLE</span><span class="o">=</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span><span class="o">/</span><span class="n">qemu</span><span class="o">-</span><span class="n">hppa</span> <span class="n">V</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">DEB_</span></code> variables are substitutions used by
+<code class="docutils literal notranslate"><span class="pre">debian-boostrap.pre</span></code> which is called to do the initial debootstrap
+of the rootfs before it is copied into the container. The second stage
+is run as part of the build. The final image will be tagged as
+<code class="docutils literal notranslate"><span class="pre">qemu/debian-sid-hppa</span></code>.</p>
+</section>
+</section>
+<section id="vm-testing">
+<h2>VM testing<a class="headerlink" href="#vm-testing" title="Permalink to this heading"></a></h2>
+<p>This test suite contains scripts that bootstrap various guest images that have
+necessary packages to build QEMU. The basic usage is documented in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>
+help which is displayed with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">vm-help</span></code>.</p>
+<section id="id1">
+<h3>Quickstart<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">vm-help</span></code> to list available make targets. Invoke a specific make
+command to run build test in an image. For example, <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">vm-build-freebsd</span></code>
+will build the source tree in the FreeBSD image. The command can be executed
+from either the source tree or the build dir; if the former, <code class="docutils literal notranslate"><span class="pre">./configure</span></code> is
+not needed. The command will then generate the test image in <code class="docutils literal notranslate"><span class="pre">./tests/vm/</span></code>
+under the working directory.</p>
+<p>Note: images created by the scripts accept a well-known RSA key pair for SSH
+access, so they SHOULD NOT be exposed to external interfaces if you are
+concerned about attackers taking control of the guest and potentially
+exploiting a QEMU security bug to compromise the host.</p>
+</section>
+<section id="qemu-binaries">
+<h3>QEMU binaries<a class="headerlink" href="#qemu-binaries" title="Permalink to this heading"></a></h3>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">qemu-system-x86_64</span></code> is searched in $PATH to run the guest. If
+there isn’t one, or if it is older than 2.10, the test won’t work. In this case,
+provide the QEMU binary in env var: <code class="docutils literal notranslate"><span class="pre">QEMU=/path/to/qemu-2.10+</span></code>.</p>
+<p>Likewise the path to <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code> can be set in QEMU_IMG environment variable.</p>
+</section>
+<section id="make-jobs">
+<h3>Make jobs<a class="headerlink" href="#make-jobs" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-j$X</span></code> option in the make command line is not propagated into the VM,
+specify <code class="docutils literal notranslate"><span class="pre">J=$X</span></code> to control the make jobs in the guest.</p>
+</section>
+<section id="debugging">
+<h3>Debugging<a class="headerlink" href="#debugging" title="Permalink to this heading"></a></h3>
+<p>Add <code class="docutils literal notranslate"><span class="pre">DEBUG=1</span></code> and/or <code class="docutils literal notranslate"><span class="pre">V=1</span></code> to the make command to allow interactive
+debugging and verbose output. If this is not enough, see the next section.
+<code class="docutils literal notranslate"><span class="pre">V=1</span></code> will be propagated down into the make jobs in the guest.</p>
+</section>
+<section id="manual-invocation">
+<h3>Manual invocation<a class="headerlink" href="#manual-invocation" title="Permalink to this heading"></a></h3>
+<p>Each guest script is an executable script with the same command line options.
+For example to work with the netbsd guest, use <code class="docutils literal notranslate"><span class="pre">$QEMU_SRC/tests/vm/netbsd</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd $QEMU_SRC/tests/vm
+
+# To bootstrap the image
+$ ./netbsd --build-image --image /var/tmp/netbsd.img
+&lt;...&gt;
+
+# To run an arbitrary command in guest (the output will not be echoed unless
+# --debug is added)
+$ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
+
+# To build QEMU in guest
+$ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
+
+# To get to an interactive shell
+$ ./netbsd --interactive --image /var/tmp/netbsd.img sh
+</pre></div>
+</div>
+</section>
+<section id="adding-new-guests">
+<h3>Adding new guests<a class="headerlink" href="#adding-new-guests" title="Permalink to this heading"></a></h3>
+<p>Please look at existing guest scripts for how to add new guests.</p>
+<p>Most importantly, create a subclass of BaseVM and implement <code class="docutils literal notranslate"><span class="pre">build_image()</span></code>
+method and define <code class="docutils literal notranslate"><span class="pre">BUILD_SCRIPT</span></code>, then finally call <code class="docutils literal notranslate"><span class="pre">basevm.main()</span></code> from
+the script’s <code class="docutils literal notranslate"><span class="pre">main()</span></code>.</p>
+<ul class="simple">
+<li><p>Usually in <code class="docutils literal notranslate"><span class="pre">build_image()</span></code>, a template image is downloaded from a
+predefined URL. <code class="docutils literal notranslate"><span class="pre">BaseVM._download_with_cache()</span></code> takes care of the cache and
+the checksum, so consider using it.</p></li>
+<li><p>Once the image is downloaded, users, SSH server and QEMU build deps should
+be set up:</p>
+<ul>
+<li><p>Root password set to <code class="docutils literal notranslate"><span class="pre">BaseVM.ROOT_PASS</span></code></p></li>
+<li><p>User <code class="docutils literal notranslate"><span class="pre">BaseVM.GUEST_USER</span></code> is created, and password set to
+<code class="docutils literal notranslate"><span class="pre">BaseVM.GUEST_PASS</span></code></p></li>
+<li><p>SSH service is enabled and started on boot,
+<code class="docutils literal notranslate"><span class="pre">$QEMU_SRC/tests/keys/id_rsa.pub</span></code> is added to ssh’s <code class="docutils literal notranslate"><span class="pre">authorized_keys</span></code>
+file of both root and the normal user</p></li>
+<li><p>DHCP client service is enabled and started on boot, so that it can
+automatically configure the virtio-net-pci NIC and communicate with QEMU
+user net (10.0.2.2)</p></li>
+<li><p>Necessary packages are installed to untar the source tarball and build
+QEMU</p></li>
+</ul>
+</li>
+<li><p>Write a proper <code class="docutils literal notranslate"><span class="pre">BUILD_SCRIPT</span></code> template, which should be a shell script that
+untars a raw virtio-blk block device, which is the tarball data blob of the
+QEMU source tree, then configure/build it. Running “make check” is also
+recommended.</p></li>
+</ul>
+</section>
+</section>
+<section id="image-fuzzer-testing">
+<h2>Image fuzzer testing<a class="headerlink" href="#image-fuzzer-testing" title="Permalink to this heading"></a></h2>
+<p>An image fuzzer was added to exercise format drivers. Currently only qcow2 is
+supported. To start the fuzzer, run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tests</span><span class="o">/</span><span class="n">image</span><span class="o">-</span><span class="n">fuzzer</span><span class="o">/</span><span class="n">runner</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;[[&quot;qemu-img&quot;, &quot;info&quot;, &quot;$test_img&quot;]]&#39;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">test</span> <span class="n">qcow2</span>
+</pre></div>
+</div>
+<p>Alternatively, some command different from <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">info</span></code> can be tested, by
+changing the <code class="docutils literal notranslate"><span class="pre">-c</span></code> option.</p>
+</section>
+<section id="integration-tests-using-the-avocado-framework">
+<h2>Integration tests using the Avocado Framework<a class="headerlink" href="#integration-tests-using-the-avocado-framework" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">tests/avocado</span></code> directory hosts integration tests. They’re usually
+higher level tests, and may interact with external resources and with
+various guest operating systems.</p>
+<p>These tests are written using the Avocado Testing Framework (which must
+be installed separately) in conjunction with a the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code>
+class, implemented at <code class="docutils literal notranslate"><span class="pre">tests/avocado/avocado_qemu</span></code>.</p>
+<p>Tests based on <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> can easily:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Customize the command line arguments given to the convenience
+<code class="docutils literal notranslate"><span class="pre">self.vm</span></code> attribute (a QEMUMachine instance)</p></li>
+<li><p>Interact with the QEMU monitor, send QMP commands and check
+their results</p></li>
+<li><p>Interact with the guest OS, using the convenience console device
+(which may be useful to assert the effectiveness and correctness of
+command line arguments or QMP commands)</p></li>
+<li><p>Interact with external data files that accompany the test itself
+(see <code class="docutils literal notranslate"><span class="pre">self.get_data()</span></code>)</p></li>
+<li><p>Download (and cache) remote data files, such as firmware and kernel
+images</p></li>
+<li><p>Have access to a library of guest OS images (by means of the
+<code class="docutils literal notranslate"><span class="pre">avocado.utils.vmimage</span></code> library)</p></li>
+<li><p>Make use of various other test related utilities available at the
+test class itself and at the utility library:</p>
+<ul>
+<li><p><a class="reference external" href="http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test">http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test</a></p></li>
+<li><p><a class="reference external" href="http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html">http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html</a></p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<section id="running-tests">
+<h3>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this heading"></a></h3>
+<p>You can run the avocado tests simply by executing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">avocado</span>
+</pre></div>
+</div>
+<p>This involves the automatic creation of Python virtual environment
+within the build tree (at <code class="docutils literal notranslate"><span class="pre">tests/venv</span></code>) which will have all the
+right dependencies, and will save tests results also within the
+build tree (at <code class="docutils literal notranslate"><span class="pre">tests/results</span></code>).</p>
+<p>Note: the build environment must be using a Python 3 stack, and have
+the <code class="docutils literal notranslate"><span class="pre">venv</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> packages installed.  If necessary, make sure
+<code class="docutils literal notranslate"><span class="pre">configure</span></code> is called with <code class="docutils literal notranslate"><span class="pre">--python=</span></code> and that those modules are
+available.  On Debian and Ubuntu based systems, depending on the
+specific version, they may be on packages named <code class="docutils literal notranslate"><span class="pre">python3-venv</span></code> and
+<code class="docutils literal notranslate"><span class="pre">python3-pip</span></code>.</p>
+<p>It is also possible to run tests based on tags using the
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-avocado</span></code> command and the <code class="docutils literal notranslate"><span class="pre">AVOCADO_TAGS</span></code> environment
+variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">avocado</span> <span class="n">AVOCADO_TAGS</span><span class="o">=</span><span class="n">quick</span>
+</pre></div>
+</div>
+<p>Note that tags separated with commas have an AND behavior, while tags
+separated by spaces have an OR behavior. For more information on Avocado
+tags, see:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/user/chapters/tags.html">https://avocado-framework.readthedocs.io/en/latest/guides/user/chapters/tags.html</a></p>
+</div></blockquote>
+<p>To run a single test file, a couple of them, or a test within a file
+using the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-avocado</span></code> command, set the <code class="docutils literal notranslate"><span class="pre">AVOCADO_TESTS</span></code>
+environment variable with the test files or test names. To run all
+tests from a single file, use:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make check-avocado AVOCADO_TESTS=$FILEPATH
+</pre></div>
+</div>
+</div></blockquote>
+<p>The same is valid to run tests from multiple test files:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">avocado</span> <span class="n">AVOCADO_TESTS</span><span class="o">=</span><span class="s1">&#39;$FILEPATH1 $FILEPATH2&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>To run a single test within a file, use:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make check-avocado AVOCADO_TESTS=$FILEPATH:$TESTCLASS.$TESTNAME
+</pre></div>
+</div>
+</div></blockquote>
+<p>The same is valid to run single tests from multiple test files:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">avocado</span> <span class="n">AVOCADO_TESTS</span><span class="o">=</span><span class="s1">&#39;$FILEPATH1:$TESTCLASS1.$TESTNAME1 $FILEPATH2:$TESTCLASS2.$TESTNAME2&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The scripts installed inside the virtual environment may be used
+without an “activation”.  For instance, the Avocado test runner
+may be invoked by running:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/avocado/
+</pre></div>
+</div>
+</div></blockquote>
+<p>Note that if <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-avocado</span></code> was not executed before, it is
+possible to create the Python virtual environment with the dependencies
+needed running:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">venv</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>It is also possible to run tests from a single file or a single test within
+a test file. To run tests from a single file within the build tree, use:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>tests/venv/bin/avocado run tests/avocado/$TESTFILE
+</pre></div>
+</div>
+</div></blockquote>
+<p>To run a single test within a test file, use:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>tests/venv/bin/avocado run tests/avocado/$TESTFILE:$TESTCLASS.$TESTNAME
+</pre></div>
+</div>
+</div></blockquote>
+<p>Valid test names are visible in the output from any previous execution
+of Avocado or <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-avocado</span></code>, and can also be queried using:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tests</span><span class="o">/</span><span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">avocado</span> <span class="nb">list</span> <span class="n">tests</span><span class="o">/</span><span class="n">avocado</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="manual-installation">
+<h3>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this heading"></a></h3>
+<p>To manually install Avocado and its dependencies, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">avocado</span><span class="o">-</span><span class="n">framework</span>
+</pre></div>
+</div>
+<p>Alternatively, follow the instructions on this link:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/user/chapters/installing.html">https://avocado-framework.readthedocs.io/en/latest/guides/user/chapters/installing.html</a></p>
+</div></blockquote>
+</section>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">tests/avocado/avocado_qemu</span></code> directory provides the
+<code class="docutils literal notranslate"><span class="pre">avocado_qemu</span></code> Python module, containing the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code>
+class.  Here’s a simple usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">avocado_qemu</span> <span class="kn">import</span> <span class="n">QemuSystemTest</span>
+
+
+<span class="k">class</span> <span class="nc">Version</span><span class="p">(</span><span class="n">QemuSystemTest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :avocado: tags=quick</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">test_qmp_human_info_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+                              <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRegexpMatches</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;^(\d+\.\d+\.\d)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To execute your test, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">avocado</span> <span class="n">run</span> <span class="n">version</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Tests may be classified according to a convention by using docstring
+directives such as <code class="docutils literal notranslate"><span class="pre">:avocado:</span> <span class="pre">tags=TAG1,TAG2</span></code>.  To run all tests
+in the current directory, tagged as “quick”, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">avocado</span> <span class="n">run</span> <span class="o">-</span><span class="n">t</span> <span class="n">quick</span> <span class="o">.</span>
+</pre></div>
+</div>
+<section id="the-avocado-qemu-test-base-test-class">
+<h4>The <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> base test class<a class="headerlink" href="#the-avocado-qemu-test-base-test-class" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> class has a number of characteristics that
+are worth being mentioned right away.</p>
+<p>First of all, it attempts to give each test a ready to use QEMUMachine
+instance, available at <code class="docutils literal notranslate"><span class="pre">self.vm</span></code>.  Because many tests will tweak the
+QEMU command line, launching the QEMUMachine (by using <code class="docutils literal notranslate"><span class="pre">self.vm.launch()</span></code>)
+is left to the test writer.</p>
+<p>The base test class has also support for tests with more than one
+QEMUMachine. The way to get machines is through the <code class="docutils literal notranslate"><span class="pre">self.get_vm()</span></code>
+method which will return a QEMUMachine instance. The <code class="docutils literal notranslate"><span class="pre">self.get_vm()</span></code>
+method accepts arguments that will be passed to the QEMUMachine creation
+and also an optional <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute so you can identify a specific
+machine and get it more than once through the tests methods. A simple
+and hypothetical example follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">avocado_qemu</span> <span class="kn">import</span> <span class="n">QemuSystemTest</span>
+
+
+<span class="k">class</span> <span class="nc">MultipleMachines</span><span class="p">(</span><span class="n">QemuSystemTest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">test_multiple_machines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">first_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">()</span>
+        <span class="n">second_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;third_machine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+        <span class="n">first_machine</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+        <span class="n">second_machine</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+        <span class="n">first_res</span> <span class="o">=</span> <span class="n">first_machine</span><span class="o">.</span><span class="n">command</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="n">second_res</span> <span class="o">=</span> <span class="n">second_machine</span><span class="o">.</span><span class="n">command</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="n">third_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;third_machine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">first_res</span><span class="p">,</span> <span class="n">second_res</span><span class="p">,</span> <span class="n">third_res</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>At test “tear down”, <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> handles all the QEMUMachines
+shutdown.</p>
+</section>
+<section id="the-avocado-qemu-linuxtest-base-test-class">
+<h4>The <code class="docutils literal notranslate"><span class="pre">avocado_qemu.LinuxTest</span></code> base test class<a class="headerlink" href="#the-avocado-qemu-linuxtest-base-test-class" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">avocado_qemu.LinuxTest</span></code> is further specialization of the
+<code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> class, so it contains all the characteristics of
+the later plus some extra features.</p>
+<p>First of all, this base class is intended for tests that need to
+interact with a fully booted and operational Linux guest.  At this
+time, it uses a Fedora 31 guest image.  The most basic example looks
+like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">avocado_qemu</span> <span class="kn">import</span> <span class="n">LinuxTest</span>
+
+
+<span class="k">class</span> <span class="nc">SomeTest</span><span class="p">(</span><span class="n">LinuxTest</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">launch_and_wait</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssh_command</span><span class="p">(</span><span class="s1">&#39;some_command_to_be_run_in_the_guest&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Please refer to tests that use <code class="docutils literal notranslate"><span class="pre">avocado_qemu.LinuxTest</span></code> under
+<code class="docutils literal notranslate"><span class="pre">tests/avocado</span></code> for more examples.</p>
+</section>
+</section>
+<section id="qemumachine">
+<h3>QEMUMachine<a class="headerlink" href="#qemumachine" title="Permalink to this heading"></a></h3>
+<p>The QEMUMachine API is already widely used in the Python iotests,
+device-crash-test and other Python scripts.  It’s a wrapper around the
+execution of a QEMU binary, giving its users:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the ability to set command line arguments to be given to the QEMU
+binary</p></li>
+<li><p>a ready to use QMP connection and interface, which can be used to
+send commands and inspect its results, as well as asynchronous
+events</p></li>
+<li><p>convenience methods to set commonly used command line arguments in
+a more succinct and intuitive way</p></li>
+</ul>
+</div></blockquote>
+<section id="qemu-binary-selection">
+<h4>QEMU binary selection<a class="headerlink" href="#qemu-binary-selection" title="Permalink to this heading"></a></h4>
+<p>The QEMU binary used for the <code class="docutils literal notranslate"><span class="pre">self.vm</span></code> QEMUMachine instance will
+primarily depend on the value of the <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> parameter.  If it’s
+not explicitly set, its default value will be the result of a dynamic
+probe in the same source tree.  A suitable binary will be one that
+targets the architecture matching host machine.</p>
+<p>Based on this description, test writers will usually rely on one of
+the following approaches:</p>
+<ol class="arabic simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code>, and use the given binary</p></li>
+<li><p>Do not set <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code>, and use a QEMU binary named like
+“qemu-system-${arch}”, either in the current
+working directory, or in the current source tree.</p></li>
+</ol>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> value will be preserved in the
+<code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> as an attribute with the same name.</p>
+</section>
+</section>
+<section id="attribute-reference">
+<h3>Attribute reference<a class="headerlink" href="#attribute-reference" title="Permalink to this heading"></a></h3>
+<section id="test">
+<h4>Test<a class="headerlink" href="#test" title="Permalink to this heading"></a></h4>
+<p>Besides the attributes and methods that are part of the base
+<code class="docutils literal notranslate"><span class="pre">avocado.Test</span></code> class, the following attributes are available on any
+<code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> instance.</p>
+<section id="vm">
+<h5>vm<a class="headerlink" href="#vm" title="Permalink to this heading"></a></h5>
+<p>A QEMUMachine instance, initially configured according to the given
+<code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> parameter.</p>
+</section>
+<section id="arch">
+<h5>arch<a class="headerlink" href="#arch" title="Permalink to this heading"></a></h5>
+<p>The architecture can be used on different levels of the stack, e.g. by
+the framework or by the test itself.  At the framework level, it will
+currently influence the selection of a QEMU binary (when one is not
+explicitly given).</p>
+<p>Tests are also free to use this attribute value, for their own needs.
+A test may, for instance, use the same value when selecting the
+architecture of a kernel or disk image to boot a VM with.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">arch</span></code> attribute will be set to the test parameter of the same
+name.  If one is not given explicitly, it will either be set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, or, if the test is tagged with one (and only one)
+<code class="docutils literal notranslate"><span class="pre">:avocado:</span> <span class="pre">tags=arch:VALUE</span></code> tag, it will be set to <code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.</p>
+</section>
+<section id="cpu">
+<h5>cpu<a class="headerlink" href="#cpu" title="Permalink to this heading"></a></h5>
+<p>The cpu model that will be set to all QEMUMachine instances created
+by the test.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cpu</span></code> attribute will be set to the test parameter of the same
+name. If one is not given explicitly, it will either be set to
+<code class="docutils literal notranslate"><span class="pre">None</span> <span class="pre">``,</span> <span class="pre">or,</span> <span class="pre">if</span> <span class="pre">the</span> <span class="pre">test</span> <span class="pre">is</span> <span class="pre">tagged</span> <span class="pre">with</span> <span class="pre">one</span> <span class="pre">(and</span> <span class="pre">only</span> <span class="pre">one)</span>
+<span class="pre">``:avocado:</span> <span class="pre">tags=cpu:VALUE</span></code> tag, it will be set to <code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.</p>
+</section>
+<section id="machine">
+<h5>machine<a class="headerlink" href="#machine" title="Permalink to this heading"></a></h5>
+<p>The machine type that will be set to all QEMUMachine instances created
+by the test.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">machine</span></code> attribute will be set to the test parameter of the same
+name.  If one is not given explicitly, it will either be set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, or, if the test is tagged with one (and only one)
+<code class="docutils literal notranslate"><span class="pre">:avocado:</span> <span class="pre">tags=machine:VALUE</span></code> tag, it will be set to <code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.</p>
+</section>
+<section id="qemu-bin">
+<h5>qemu_bin<a class="headerlink" href="#qemu-bin" title="Permalink to this heading"></a></h5>
+<p>The preserved value of the <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> parameter or the result of the
+dynamic probe for a QEMU binary in the current working directory or
+source tree.</p>
+</section>
+</section>
+<section id="linuxtest">
+<h4>LinuxTest<a class="headerlink" href="#linuxtest" title="Permalink to this heading"></a></h4>
+<p>Besides the attributes present on the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> base
+class, the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.LinuxTest</span></code> adds the following attributes:</p>
+<section id="distro">
+<h5>distro<a class="headerlink" href="#distro" title="Permalink to this heading"></a></h5>
+<p>The name of the Linux distribution used as the guest image for the
+test.  The name should match the <strong>Provider</strong> column on the list
+of images supported by the avocado.utils.vmimage library:</p>
+<p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images">https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images</a></p>
+</section>
+<section id="distro-version">
+<h5>distro_version<a class="headerlink" href="#distro-version" title="Permalink to this heading"></a></h5>
+<p>The version of the Linux distribution as the guest image for the
+test.  The name should match the <strong>Version</strong> column on the list
+of images supported by the avocado.utils.vmimage library:</p>
+<p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images">https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images</a></p>
+</section>
+<section id="distro-checksum">
+<h5>distro_checksum<a class="headerlink" href="#distro-checksum" title="Permalink to this heading"></a></h5>
+<p>The sha256 hash of the guest image file used for the test.</p>
+<p>If this value is not set in the code or by a test parameter (with the
+same name), no validation on the integrity of the image will be
+performed.</p>
+</section>
+</section>
+</section>
+<section id="parameter-reference">
+<h3>Parameter reference<a class="headerlink" href="#parameter-reference" title="Permalink to this heading"></a></h3>
+<p>To understand how Avocado parameters are accessed by tests, and how
+they can be passed to tests, please refer to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">avocado</span><span class="o">-</span><span class="n">framework</span><span class="o">.</span><span class="n">readthedocs</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">en</span><span class="o">/</span><span class="n">latest</span><span class="o">/</span><span class="n">guides</span><span class="o">/</span><span class="n">writer</span><span class="o">/</span><span class="n">chapters</span><span class="o">/</span><span class="n">writing</span><span class="o">.</span><span class="n">html</span><span class="c1">#accessing-test-parameters</span>
+</pre></div>
+</div>
+<p>Parameter values can be easily seen in the log files, and will look
+like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PARAMS</span> <span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">qemu_bin</span><span class="p">,</span> <span class="n">path</span><span class="o">=*</span><span class="p">,</span> <span class="n">default</span><span class="o">=./</span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">x86_64</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s1">&#39;./qemu-system-x86_64</span>
+</pre></div>
+</div>
+<section id="id2">
+<h4>Test<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<section id="id3">
+<h5>arch<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h5>
+<p>The architecture that will influence the selection of a QEMU binary
+(when one is not explicitly given).</p>
+<p>Tests are also free to use this parameter value, for their own needs.
+A test may, for instance, use the same value when selecting the
+architecture of a kernel or disk image to boot a VM with.</p>
+<p>This parameter has a direct relation with the <code class="docutils literal notranslate"><span class="pre">arch</span></code> attribute.  If
+not given, it will default to None.</p>
+</section>
+<section id="id4">
+<h5>cpu<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h5>
+<p>The cpu model that will be set to all QEMUMachine instances created
+by the test.</p>
+</section>
+<section id="id5">
+<h5>machine<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h5>
+<p>The machine type that will be set to all QEMUMachine instances created
+by the test.</p>
+</section>
+<section id="id6">
+<h5>qemu_bin<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h5>
+<p>The exact QEMU binary to be used on QEMUMachine.</p>
+</section>
+</section>
+<section id="id7">
+<h4>LinuxTest<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h4>
+<p>Besides the parameters present on the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.Test</span></code> base
+class, the <code class="docutils literal notranslate"><span class="pre">avocado_qemu.LinuxTest</span></code> adds the following parameters:</p>
+<section id="id8">
+<h5>distro<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h5>
+<p>The name of the Linux distribution used as the guest image for the
+test.  The name should match the <strong>Provider</strong> column on the list
+of images supported by the avocado.utils.vmimage library:</p>
+<p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images">https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images</a></p>
+</section>
+<section id="id9">
+<h5>distro_version<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h5>
+<p>The version of the Linux distribution as the guest image for the
+test.  The name should match the <strong>Version</strong> column on the list
+of images supported by the avocado.utils.vmimage library:</p>
+<p><a class="reference external" href="https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images">https://avocado-framework.readthedocs.io/en/latest/guides/writer/libs/vmimage.html#supported-images</a></p>
+</section>
+<section id="id10">
+<h5>distro_checksum<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h5>
+<p>The sha256 hash of the guest image file used for the test.</p>
+<p>If this value is not set in the code or by this parameter no
+validation on the integrity of the image will be performed.</p>
+</section>
+</section>
+</section>
+<section id="skipping-tests">
+<h3>Skipping tests<a class="headerlink" href="#skipping-tests" title="Permalink to this heading"></a></h3>
+<p>The Avocado framework provides Python decorators which allow for easily skip
+tests running under certain conditions. For example, on the lack of a binary
+on the test system or when the running environment is a CI system. For further
+information about those decorators, please refer to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">avocado</span><span class="o">-</span><span class="n">framework</span><span class="o">.</span><span class="n">readthedocs</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">en</span><span class="o">/</span><span class="n">latest</span><span class="o">/</span><span class="n">guides</span><span class="o">/</span><span class="n">writer</span><span class="o">/</span><span class="n">chapters</span><span class="o">/</span><span class="n">writing</span><span class="o">.</span><span class="n">html</span><span class="c1">#skipping-tests</span>
+</pre></div>
+</div>
+<p>While the conditions for skipping tests are often specifics of each one, there
+are recurring scenarios identified by the QEMU developers and the use of
+environment variables became a kind of standard way to enable/disable tests.</p>
+<p>Here is a list of the most used variables:</p>
+<section id="avocado-allow-large-storage">
+<h4>AVOCADO_ALLOW_LARGE_STORAGE<a class="headerlink" href="#avocado-allow-large-storage" title="Permalink to this heading"></a></h4>
+<p>Tests which are going to fetch or produce assets considered <em>large</em> are not
+going to run unless that <code class="docutils literal notranslate"><span class="pre">AVOCADO_ALLOW_LARGE_STORAGE=1</span></code> is exported on
+the environment.</p>
+<p>The definition of <em>large</em> is a bit arbitrary here, but it usually means an
+asset which occupies at least 1GB of size on disk when uncompressed.</p>
+</section>
+<section id="avocado-allow-untrusted-code">
+<h4>AVOCADO_ALLOW_UNTRUSTED_CODE<a class="headerlink" href="#avocado-allow-untrusted-code" title="Permalink to this heading"></a></h4>
+<p>There are tests which will boot a kernel image or firmware that can be
+considered not safe to run on the developer’s workstation, thus they are
+skipped by default. The definition of <em>not safe</em> is also arbitrary but
+usually it means a blob which either its source or build process aren’t
+public available.</p>
+<p>You should export <code class="docutils literal notranslate"><span class="pre">AVOCADO_ALLOW_UNTRUSTED_CODE=1</span></code> on the environment in
+order to allow tests which make use of those kind of assets.</p>
+</section>
+<section id="avocado-timeout-expected">
+<h4>AVOCADO_TIMEOUT_EXPECTED<a class="headerlink" href="#avocado-timeout-expected" title="Permalink to this heading"></a></h4>
+<p>The Avocado framework has a timeout mechanism which interrupts tests to avoid the
+test suite of getting stuck. The timeout value can be set via test parameter or
+property defined in the test class, for further details:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">avocado</span><span class="o">-</span><span class="n">framework</span><span class="o">.</span><span class="n">readthedocs</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">en</span><span class="o">/</span><span class="n">latest</span><span class="o">/</span><span class="n">guides</span><span class="o">/</span><span class="n">writer</span><span class="o">/</span><span class="n">chapters</span><span class="o">/</span><span class="n">writing</span><span class="o">.</span><span class="n">html</span><span class="c1">#setting-a-test-timeout</span>
+</pre></div>
+</div>
+<p>Even though the timeout can be set by the test developer, there are some tests
+that may not have a well-defined limit of time to finish under certain
+conditions. For example, tests that take longer to execute when QEMU is
+compiled with debug flags. Therefore, the <code class="docutils literal notranslate"><span class="pre">AVOCADO_TIMEOUT_EXPECTED</span></code> variable
+has been used to determine whether those tests should run or not.</p>
+</section>
+<section id="gitlab-ci">
+<h4>GITLAB_CI<a class="headerlink" href="#gitlab-ci" title="Permalink to this heading"></a></h4>
+<p>A number of tests are flagged to not run on the GitLab CI. Usually because
+they proved to the flaky or there are constraints on the CI environment which
+would make them fail. If you encounter a similar situation then use that
+variable as shown on the code snippet below to skip the test:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@skipIf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;GITLAB_CI&#39;</span><span class="p">),</span> <span class="s1">&#39;Running on GitLab&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="uninstalling-avocado">
+<h3>Uninstalling Avocado<a class="headerlink" href="#uninstalling-avocado" title="Permalink to this heading"></a></h3>
+<p>If you’ve followed the manual installation instructions above, you can
+easily uninstall Avocado.  Start by listing the packages you have
+installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="nb">list</span> <span class="o">--</span><span class="n">user</span>
+</pre></div>
+</div>
+<p>And remove any package you want with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="o">&lt;</span><span class="n">package_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>If you’ve used <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-avocado</span></code>, the Python virtual environment where
+Avocado is installed will be cleaned up as part of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-clean</span></code>.</p>
+</section>
+</section>
+<section id="testing-with-make-check-tcg">
+<span id="checktcg-ref"></span><h2>Testing with “make check-tcg”<a class="headerlink" href="#testing-with-make-check-tcg" title="Permalink to this heading"></a></h2>
+<p>The check-tcg tests are intended for simple smoke tests of both
+linux-user and softmmu TCG functionality. However to build test
+programs for guest targets you need to have cross compilers available.
+If your distribution supports cross compilers you can do something as
+simple as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apt</span> <span class="n">install</span> <span class="n">gcc</span><span class="o">-</span><span class="n">aarch64</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span>
+</pre></div>
+</div>
+<p>The configure script will automatically pick up their presence.
+Sometimes compilers have slightly odd names so the availability of
+them can be prompted by passing in the appropriate configure option
+for the architecture in question, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$(configure) --cross-cc-aarch64=aarch64-cc
+</pre></div>
+</div>
+<p>There is also a <code class="docutils literal notranslate"><span class="pre">--cross-cc-cflags-ARCH</span></code> flag in case additional
+compiler flags are needed to build for a given target.</p>
+<p>If you have the ability to run containers as the user the build system
+will automatically use them where no system compiler is available. For
+architectures where we also support building QEMU we will generally
+use the same container to build tests. However there are a number of
+additional containers defined that have a minimal cross-build
+environment that is only suitable for building test cases. Sometimes
+we may use a bleeding edge distribution for compiler features needed
+for test cases that aren’t yet in the LTS distros we support for QEMU
+itself.</p>
+<p>See <a class="reference internal" href="#container-ref"><span class="std std-ref">Container based tests</span></a> for more details.</p>
+<section id="running-subset-of-tests">
+<h3>Running subset of tests<a class="headerlink" href="#running-subset-of-tests" title="Permalink to this heading"></a></h3>
+<p>You can build the tests for one architecture:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make build-tcg-tests-$TARGET
+</pre></div>
+</div>
+<p>And run with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make run-tcg-tests-$TARGET
+</pre></div>
+</div>
+<p>Adding <code class="docutils literal notranslate"><span class="pre">V=1</span></code> to the invocation will show the details of how to
+invoke QEMU for the test which is useful for debugging tests.</p>
+</section>
+<section id="tcg-test-dependencies">
+<h3>TCG test dependencies<a class="headerlink" href="#tcg-test-dependencies" title="Permalink to this heading"></a></h3>
+<p>The TCG tests are deliberately very light on dependencies and are
+either totally bare with minimal gcc lib support (for softmmu tests)
+or just glibc (for linux-user tests). This is because getting a cross
+compiler to work with additional libraries can be challenging.</p>
+</section>
+</section>
+<section id="other-tcg-tests">
+<h2>Other TCG Tests<a class="headerlink" href="#other-tcg-tests" title="Permalink to this heading"></a></h2>
+<p>There are a number of out-of-tree test suites that are used for more
+extensive testing of processor features.</p>
+<section id="kvm-unit-tests">
+<h3>KVM Unit Tests<a class="headerlink" href="#kvm-unit-tests" title="Permalink to this heading"></a></h3>
+<p>The KVM unit tests are designed to run as a Guest OS under KVM but
+there is no reason why they can’t exercise the TCG as well. It
+provides a minimal OS kernel with hooks for enabling the MMU as well
+as reporting test results via a special device:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">git</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">scm</span><span class="o">/</span><span class="n">virt</span><span class="o">/</span><span class="n">kvm</span><span class="o">/</span><span class="n">kvm</span><span class="o">-</span><span class="n">unit</span><span class="o">-</span><span class="n">tests</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</section>
+<section id="linux-test-project">
+<h3>Linux Test Project<a class="headerlink" href="#linux-test-project" title="Permalink to this heading"></a></h3>
+<p>The LTP is focused on exercising the syscall interface of a Linux
+kernel. It checks that syscalls behave as documented and strives to
+exercise as many corner cases as possible. It is a useful test suite
+to run to exercise QEMU’s linux-user code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">linux</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">project</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="gcc-gcov-support">
+<h2>GCC gcov support<a class="headerlink" href="#gcc-gcov-support" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">gcov</span></code> is a GCC tool to analyze the testing coverage by
+instrumenting the tested code. To use it, configure QEMU with
+<code class="docutils literal notranslate"><span class="pre">--enable-gcov</span></code> option and build. Then run the tests as usual.</p>
+<p>If you want to gather coverage information on a single test the <code class="docutils literal notranslate"><span class="pre">make</span>
+<span class="pre">clean-gcda</span></code> target can be used to delete any existing coverage
+information before running a single test.</p>
+<p>You can generate a HTML coverage report by executing <code class="docutils literal notranslate"><span class="pre">make</span>
+<span class="pre">coverage-html</span></code> which will create
+<code class="docutils literal notranslate"><span class="pre">meson-logs/coveragereport/index.html</span></code>.</p>
+<p>Further analysis can be conducted by running the <code class="docutils literal notranslate"><span class="pre">gcov</span></code> command
+directly on the various .gcda output files. Please read the <code class="docutils literal notranslate"><span class="pre">gcov</span></code>
+documentation for more information.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="kconfig.html" class="btn btn-neutral float-left" title="QEMU and Kconfig" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acpi-bits.html" class="btn btn-neutral float-right" title="ACPI/SMBIOS avocado tests using biosbits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

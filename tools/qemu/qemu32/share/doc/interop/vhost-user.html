@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vhost-user Protocol &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Vhost-user-gpu Protocol" href="vhost-user-gpu.html" />
+    <link rel="prev" title="QEMU Storage Daemon QMP Reference Manual" href="qemu-storage-daemon-qmp-ref.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Vhost-user Protocol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#support-for-platforms-other-than-linux">Support for platforms other than Linux</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#message-specification">Message Specification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#header">Header</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#payload">Payload</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c-structure">C structure</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#communication">Communication</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ring-states">Ring states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiple-queue-support">Multiple queue support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migration">Migration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-access">Memory access</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#iommu-support">IOMMU support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#back-end-communication">Back-end communication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inflight-i-o-tracking">Inflight I/O tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#in-band-notifications">In-band notifications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#protocol-features">Protocol features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#front-end-message-types">Front-end message types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#back-end-message-types">Back-end message types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vhost-user-protocol-f-reply-ack">VHOST_USER_PROTOCOL_F_REPLY_ACK</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#backend-program-conventions">Backend program conventions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#vhost-user-input">vhost-user-input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vhost-user-gpu">vhost-user-gpu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vhost-user-blk">vhost-user-blk</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">Vhost-user Protocol</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/vhost-user.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vhost-user-protocol">
+<span id="vhost-user-proto"></span><h1><a class="toc-backref" href="#id1">Vhost-user Protocol</a><a class="headerlink" href="#vhost-user-protocol" title="Permalink to this heading"></a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vhost-user-protocol" id="id1">Vhost-user Protocol</a></p>
+<ul>
+<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p>
+<ul>
+<li><p><a class="reference internal" href="#support-for-platforms-other-than-linux" id="id3">Support for platforms other than Linux</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#message-specification" id="id4">Message Specification</a></p>
+<ul>
+<li><p><a class="reference internal" href="#header" id="id5">Header</a></p></li>
+<li><p><a class="reference internal" href="#payload" id="id6">Payload</a></p>
+<ul>
+<li><p><a class="reference internal" href="#a-single-64-bit-integer" id="id7">A single 64-bit integer</a></p></li>
+<li><p><a class="reference internal" href="#a-vring-state-description" id="id8">A vring state description</a></p></li>
+<li><p><a class="reference internal" href="#a-vring-address-description" id="id9">A vring address description</a></p></li>
+<li><p><a class="reference internal" href="#memory-regions-description" id="id10">Memory regions description</a></p></li>
+<li><p><a class="reference internal" href="#single-memory-region-description" id="id11">Single memory region description</a></p></li>
+<li><p><a class="reference internal" href="#log-description" id="id12">Log description</a></p></li>
+<li><p><a class="reference internal" href="#an-iotlb-message" id="id13">An IOTLB message</a></p></li>
+<li><p><a class="reference internal" href="#virtio-device-config-space" id="id14">Virtio device config space</a></p></li>
+<li><p><a class="reference internal" href="#vring-area-description" id="id15">Vring area description</a></p></li>
+<li><p><a class="reference internal" href="#inflight-description" id="id16">Inflight description</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#c-structure" id="id17">C structure</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#communication" id="id18">Communication</a></p>
+<ul>
+<li><p><a class="reference internal" href="#ring-states" id="id19">Ring states</a></p></li>
+<li><p><a class="reference internal" href="#multiple-queue-support" id="id20">Multiple queue support</a></p></li>
+<li><p><a class="reference internal" href="#migration" id="id21">Migration</a></p></li>
+<li><p><a class="reference internal" href="#memory-access" id="id22">Memory access</a></p></li>
+<li><p><a class="reference internal" href="#iommu-support" id="id23">IOMMU support</a></p></li>
+<li><p><a class="reference internal" href="#back-end-communication" id="id24">Back-end communication</a></p></li>
+<li><p><a class="reference internal" href="#inflight-i-o-tracking" id="id25">Inflight I/O tracking</a></p></li>
+<li><p><a class="reference internal" href="#in-band-notifications" id="id26">In-band notifications</a></p></li>
+<li><p><a class="reference internal" href="#protocol-features" id="id27">Protocol features</a></p></li>
+<li><p><a class="reference internal" href="#front-end-message-types" id="id28">Front-end message types</a></p></li>
+<li><p><a class="reference internal" href="#back-end-message-types" id="id29">Back-end message types</a></p></li>
+<li><p><a class="reference internal" href="#vhost-user-protocol-f-reply-ack" id="id30">VHOST_USER_PROTOCOL_F_REPLY_ACK</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#backend-program-conventions" id="id31">Backend program conventions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#vhost-user-input" id="id32">vhost-user-input</a></p></li>
+<li><p><a class="reference internal" href="#vhost-user-gpu" id="id33">vhost-user-gpu</a></p></li>
+<li><p><a class="reference internal" href="#vhost-user-blk" id="id34">vhost-user-blk</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="introduction">
+<h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>This protocol is aiming to complement the <code class="docutils literal notranslate"><span class="pre">ioctl</span></code> interface used to
+control the vhost implementation in the Linux kernel. It implements
+the control plane needed to establish virtqueue sharing with a user
+space process on the same host. It uses communication over a Unix
+domain socket to share file descriptors in the ancillary data of the
+message.</p>
+<p>The protocol defines 2 sides of the communication, <em>front-end</em> and
+<em>back-end</em>. The <em>front-end</em> is the application that shares its virtqueues, in
+our case QEMU. The <em>back-end</em> is the consumer of the virtqueues.</p>
+<p>In the current implementation QEMU is the <em>front-end</em>, and the <em>back-end</em>
+is the external process consuming the virtio queues, for example a
+software Ethernet switch running in user space, such as Snabbswitch,
+or a block device back-end processing read &amp; write to a virtual
+disk. In order to facilitate interoperability between various back-end
+implementations, it is recommended to follow the <a class="reference internal" href="#backend-conventions"><span class="std std-ref">Backend program
+conventions</span></a>.</p>
+<p>The <em>front-end</em> and <em>back-end</em> can be either a client (i.e. connecting) or
+server (listening) in the socket communication.</p>
+<section id="support-for-platforms-other-than-linux">
+<h3><a class="toc-backref" href="#id3">Support for platforms other than Linux</a><a class="headerlink" href="#support-for-platforms-other-than-linux" title="Permalink to this heading"></a></h3>
+<p>While vhost-user was initially developed targeting Linux, nowadays it
+is supported on any platform that provides the following features:</p>
+<ul class="simple">
+<li><p>A way for requesting shared memory represented by a file descriptor
+so it can be passed over a UNIX domain socket and then mapped by the
+other process.</p></li>
+<li><p>AF_UNIX sockets with SCM_RIGHTS, so QEMU and the other process can
+exchange messages through it, including ancillary data when needed.</p></li>
+<li><p>Either eventfd or pipe/pipe2. On platforms where eventfd is not
+available, QEMU will automatically fall back to pipe2 or, as a last
+resort, pipe. Each file descriptor will be used for receiving or
+sending events by reading or writing (respectively) an 8-byte value
+to the corresponding it. The 8-value itself has no meaning and
+should not be interpreted.</p></li>
+</ul>
+</section>
+</section>
+<section id="message-specification">
+<h2><a class="toc-backref" href="#id4">Message Specification</a><a class="headerlink" href="#message-specification" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All numbers are in the machine native byte order.</p>
+</div>
+<p>A vhost-user message consists of 3 header fields and a payload.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 19%" />
+<col style="width: 29%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>request</p></td>
+<td><p>flags</p></td>
+<td><p>size</p></td>
+<td><p>payload</p></td>
+</tr>
+</tbody>
+</table>
+<section id="header">
+<h3><a class="toc-backref" href="#id5">Header</a><a class="headerlink" href="#header" title="Permalink to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">request</dt>
+<dd class="field-odd"><p>32-bit type of the request</p>
+</dd>
+<dt class="field-even">flags</dt>
+<dd class="field-even"><p>32-bit bit field</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Lower 2 bits are the version (currently 0x01)</p></li>
+<li><p>Bit 2 is the reply flag - needs to be sent on each reply from the back-end</p></li>
+<li><p>Bit 3 is the need_reply flag - see <a class="reference internal" href="#reply-ack"><span class="std std-ref">REPLY_ACK</span></a> for
+details.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">size</dt>
+<dd class="field-odd"><p>32-bit size of the payload</p>
+</dd>
+</dl>
+</section>
+<section id="payload">
+<h3><a class="toc-backref" href="#id6">Payload</a><a class="headerlink" href="#payload" title="Permalink to this heading"></a></h3>
+<p>Depending on the request type, <strong>payload</strong> can be:</p>
+<section id="a-single-64-bit-integer">
+<h4><a class="toc-backref" href="#id7">A single 64-bit integer</a><a class="headerlink" href="#a-single-64-bit-integer" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>u64</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">u64</dt>
+<dd class="field-odd"><p>a 64-bit unsigned integer</p>
+</dd>
+</dl>
+</section>
+<section id="a-vring-state-description">
+<h4><a class="toc-backref" href="#id8">A vring state description</a><a class="headerlink" href="#a-vring-state-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>index</p></td>
+<td><p>num</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">index</dt>
+<dd class="field-odd"><p>a 32-bit index</p>
+</dd>
+<dt class="field-even">num</dt>
+<dd class="field-even"><p>a 32-bit number</p>
+</dd>
+</dl>
+</section>
+<section id="a-vring-address-description">
+<h4><a class="toc-backref" href="#id9">A vring address description</a><a class="headerlink" href="#a-vring-address-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 11%" />
+<col style="width: 22%" />
+<col style="width: 11%" />
+<col style="width: 20%" />
+<col style="width: 9%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>index</p></td>
+<td><p>flags</p></td>
+<td><p>size</p></td>
+<td><p>descriptor</p></td>
+<td><p>used</p></td>
+<td><p>available</p></td>
+<td><p>log</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">index</dt>
+<dd class="field-odd"><p>a 32-bit vring index</p>
+</dd>
+<dt class="field-even">flags</dt>
+<dd class="field-even"><p>a 32-bit vring flags</p>
+</dd>
+<dt class="field-odd">descriptor</dt>
+<dd class="field-odd"><p>a 64-bit ring address of the vring descriptor table</p>
+</dd>
+<dt class="field-even">used</dt>
+<dd class="field-even"><p>a 64-bit ring address of the vring used ring</p>
+</dd>
+<dt class="field-odd">available</dt>
+<dd class="field-odd"><p>a 64-bit ring address of the vring available ring</p>
+</dd>
+<dt class="field-even">log</dt>
+<dd class="field-even"><p>a 64-bit guest address for logging</p>
+</dd>
+</dl>
+<p>Note that a ring address is an IOVA if <code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code> has
+been negotiated. Otherwise it is a user address.</p>
+</section>
+<section id="memory-regions-description">
+<h4><a class="toc-backref" href="#id10">Memory regions description</a><a class="headerlink" href="#memory-regions-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 11%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>num regions</p></td>
+<td><p>padding</p></td>
+<td><p>region0</p></td>
+<td><p>…</p></td>
+<td><p>region7</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">num regions</dt>
+<dd class="field-odd"><p>a 32-bit number of regions</p>
+</dd>
+<dt class="field-even">padding</dt>
+<dd class="field-even"><p>32-bit</p>
+</dd>
+</dl>
+<p>A region is:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 13%" />
+<col style="width: 29%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>guest address</p></td>
+<td><p>size</p></td>
+<td><p>user address</p></td>
+<td><p>mmap offset</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">guest address</dt>
+<dd class="field-odd"><p>a 64-bit guest address of the region</p>
+</dd>
+<dt class="field-even">size</dt>
+<dd class="field-even"><p>a 64-bit size</p>
+</dd>
+<dt class="field-odd">user address</dt>
+<dd class="field-odd"><p>a 64-bit user address</p>
+</dd>
+<dt class="field-even">mmap offset</dt>
+<dd class="field-even"><p>64-bit offset where region starts in the mapped memory</p>
+</dd>
+</dl>
+</section>
+<section id="single-memory-region-description">
+<h4><a class="toc-backref" href="#id11">Single memory region description</a><a class="headerlink" href="#single-memory-region-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 26%" />
+<col style="width: 11%" />
+<col style="width: 25%" />
+<col style="width: 23%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>padding</p></td>
+<td><p>guest address</p></td>
+<td><p>size</p></td>
+<td><p>user address</p></td>
+<td><p>mmap offset</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">padding</dt>
+<dd class="field-odd"><p>64-bit</p>
+</dd>
+<dt class="field-even">guest address</dt>
+<dd class="field-even"><p>a 64-bit guest address of the region</p>
+</dd>
+<dt class="field-odd">size</dt>
+<dd class="field-odd"><p>a 64-bit size</p>
+</dd>
+<dt class="field-even">user address</dt>
+<dd class="field-even"><p>a 64-bit user address</p>
+</dd>
+<dt class="field-odd">mmap offset</dt>
+<dd class="field-odd"><p>64-bit offset where region starts in the mapped memory</p>
+</dd>
+</dl>
+</section>
+<section id="log-description">
+<h4><a class="toc-backref" href="#id12">Log description</a><a class="headerlink" href="#log-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>log size</p></td>
+<td><p>log offset</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">log size</dt>
+<dd class="field-odd"><p>size of area used for logging</p>
+</dd>
+<dt class="field-even">log offset</dt>
+<dd class="field-even"><p>offset from start of supplied file descriptor where
+logging starts (i.e. where guest address 0 would be
+logged)</p>
+</dd>
+</dl>
+</section>
+<section id="an-iotlb-message">
+<h4><a class="toc-backref" href="#id13">An IOTLB message</a><a class="headerlink" href="#an-iotlb-message" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 27%" />
+<col style="width: 37%" />
+<col style="width: 12%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>iova</p></td>
+<td><p>size</p></td>
+<td><p>user address</p></td>
+<td><p>permissions flags</p></td>
+<td><p>type</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">iova</dt>
+<dd class="field-odd"><p>a 64-bit I/O virtual address programmed by the guest</p>
+</dd>
+<dt class="field-even">size</dt>
+<dd class="field-even"><p>a 64-bit size</p>
+</dd>
+<dt class="field-odd">user address</dt>
+<dd class="field-odd"><p>a 64-bit user address</p>
+</dd>
+<dt class="field-even">permissions flags</dt>
+<dd class="field-even"><p>an 8-bit value:
+- 0: No access
+- 1: Read access
+- 2: Write access
+- 3: Read/Write access</p>
+</dd>
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>an 8-bit IOTLB message type:
+- 1: IOTLB miss
+- 2: IOTLB update
+- 3: IOTLB invalidate
+- 4: IOTLB access fail</p>
+</dd>
+</dl>
+</section>
+<section id="virtio-device-config-space">
+<h4><a class="toc-backref" href="#id14">Virtio device config space</a><a class="headerlink" href="#virtio-device-config-space" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 20%" />
+<col style="width: 23%" />
+<col style="width: 30%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>offset</p></td>
+<td><p>size</p></td>
+<td><p>flags</p></td>
+<td><p>payload</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">offset</dt>
+<dd class="field-odd"><p>a 32-bit offset of virtio device’s configuration space</p>
+</dd>
+<dt class="field-even">size</dt>
+<dd class="field-even"><p>a 32-bit configuration space access size in bytes</p>
+</dd>
+<dt class="field-odd">flags</dt>
+<dd class="field-odd"><p>a 32-bit value:
+- 0: Vhost front-end messages used for writable fields
+- 1: Vhost front-end messages used for live migration</p>
+</dd>
+<dt class="field-even">payload</dt>
+<dd class="field-even"><p>Size bytes array holding the contents of the virtio
+device’s configuration space</p>
+</dd>
+</dl>
+</section>
+<section id="vring-area-description">
+<h4><a class="toc-backref" href="#id15">Vring area description</a><a class="headerlink" href="#vring-area-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 32%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>u64</p></td>
+<td><p>size</p></td>
+<td><p>offset</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">u64</dt>
+<dd class="field-odd"><p>a 64-bit integer contains vring index and flags</p>
+</dd>
+<dt class="field-even">size</dt>
+<dd class="field-even"><p>a 64-bit size of this area</p>
+</dd>
+<dt class="field-odd">offset</dt>
+<dd class="field-odd"><p>a 64-bit offset of this area from the start of the
+supplied file descriptor</p>
+</dd>
+</dl>
+</section>
+<section id="inflight-description">
+<h4><a class="toc-backref" href="#id16">Inflight description</a><a class="headerlink" href="#inflight-description" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 27%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>mmap size</p></td>
+<td><p>mmap offset</p></td>
+<td><p>num queues</p></td>
+<td><p>queue size</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">mmap size</dt>
+<dd class="field-odd"><p>a 64-bit size of area to track inflight I/O</p>
+</dd>
+<dt class="field-even">mmap offset</dt>
+<dd class="field-even"><p>a 64-bit offset of this area from the start
+of the supplied file descriptor</p>
+</dd>
+<dt class="field-odd">num queues</dt>
+<dd class="field-odd"><p>a 16-bit number of virtqueues</p>
+</dd>
+<dt class="field-even">queue size</dt>
+<dd class="field-even"><p>a 16-bit size of virtqueues</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="c-structure">
+<h3><a class="toc-backref" href="#id17">C structure</a><a class="headerlink" href="#c-structure" title="Permalink to this heading"></a></h3>
+<p>In QEMU the vhost-user message is implemented with the following struct:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">VhostUserMsg</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">VhostUserRequest</span><span class="w"> </span><span class="n">request</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">union</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">u64</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">vhost_vring_state</span><span class="w"> </span><span class="n">state</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">vhost_vring_addr</span><span class="w"> </span><span class="n">addr</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserMemory</span><span class="w"> </span><span class="n">memory</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserLog</span><span class="w"> </span><span class="n">log</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">vhost_iotlb_msg</span><span class="w"> </span><span class="n">iotlb</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserVringArea</span><span class="w"> </span><span class="n">area</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserInflight</span><span class="w"> </span><span class="n">inflight</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">QEMU_PACKED</span><span class="w"> </span><span class="n">VhostUserMsg</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="communication">
+<h2><a class="toc-backref" href="#id18">Communication</a><a class="headerlink" href="#communication" title="Permalink to this heading"></a></h2>
+<p>The protocol for vhost-user is based on the existing implementation of
+vhost for the Linux Kernel. Most messages that can be sent via the
+Unix domain socket implementing vhost-user have an equivalent ioctl to
+the kernel implementation.</p>
+<p>The communication consists of the <em>front-end</em> sending message requests and
+the <em>back-end</em> sending message replies. Most of the requests don’t require
+replies. Here is a list of the ones that do:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_VRING_BASE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_BASE</span></code> (if <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_LOG_SHMFD</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_INFLIGHT_FD</span></code> (if <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD</span></code>)</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#reply-ack"><span class="std std-ref">REPLY_ACK</span></a></dt><dd><p>The section on <code class="docutils literal notranslate"><span class="pre">REPLY_ACK</span></code> protocol extension.</p>
+</dd>
+</dl>
+</div>
+<p>There are several messages that the front-end sends with file descriptors passed
+in the ancillary data:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_ADD_MEM_REG</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_BASE</span></code> (if <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_LOG_SHMFD</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_FD</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_KICK</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_CALL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ERR</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_SLAVE_REQ_FD</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_INFLIGHT_FD</span></code> (if <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD</span></code>)</p></li>
+</ul>
+<p>If <em>front-end</em> is unable to send the full message or receives a wrong
+reply it will close the connection. An optional reconnection mechanism
+can be implemented.</p>
+<p>If <em>back-end</em> detects some error such as incompatible features, it may also
+close the connection. This should only happen in exceptional circumstances.</p>
+<p>Any protocol extensions are gated by protocol feature bits, which
+allows full backwards compatibility on both front-end and back-end.  As
+older back-ends don’t support negotiating protocol features, a feature
+bit was dedicated for this purpose:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define VHOST_USER_F_PROTOCOL_FEATURES 30</span>
+</pre></div>
+</div>
+<p>Note that VHOST_USER_F_PROTOCOL_FEATURES is the UNUSED (30) feature
+bit defined in <a class="reference external" href="https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-4130003">VIRTIO 1.1 6.3 Legacy Interface: Reserved Feature Bits</a>.
+VIRTIO devices do not advertise this feature bit and therefore VIRTIO
+drivers cannot negotiate it.</p>
+<p>This reserved feature bit was reused by the vhost-user protocol to add
+vhost-user protocol feature negotiation in a backwards compatible
+fashion. Old vhost-user front-end and back-end implementations continue to
+work even though they are not aware of vhost-user protocol feature
+negotiation.</p>
+<section id="ring-states">
+<h3><a class="toc-backref" href="#id19">Ring states</a><a class="headerlink" href="#ring-states" title="Permalink to this heading"></a></h3>
+<p>Rings can be in one of three states:</p>
+<ul class="simple">
+<li><p>stopped: the back-end must not process the ring at all.</p></li>
+<li><p>started but disabled: the back-end must process the ring without
+causing any side effects.  For example, for a networking device,
+in the disabled state the back-end must not supply any new RX packets,
+but must process and discard any TX packets.</p></li>
+<li><p>started and enabled.</p></li>
+</ul>
+<p>Each ring is initialized in a stopped state.  The back-end must start
+ring upon receiving a kick (that is, detecting that file descriptor is
+readable) on the descriptor specified by <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_KICK</span></code>
+or receiving the in-band message <code class="docutils literal notranslate"><span class="pre">VHOST_USER_VRING_KICK</span></code> if negotiated,
+and stop ring upon receiving <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_VRING_BASE</span></code>.</p>
+<p>Rings can be enabled or disabled by <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ENABLE</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> has not been negotiated, the
+ring starts directly in the enabled state.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> has been negotiated, the ring is
+initialized in a disabled state and is enabled by
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ENABLE</span></code> with parameter 1.</p>
+<p>While processing the rings (whether they are enabled or not), the back-end
+must support changing some configuration aspects on the fly.</p>
+</section>
+<section id="multiple-queue-support">
+<h3><a class="toc-backref" href="#id20">Multiple queue support</a><a class="headerlink" href="#multiple-queue-support" title="Permalink to this heading"></a></h3>
+<p>Many devices have a fixed number of virtqueues.  In this case the front-end
+already knows the number of available virtqueues without communicating with the
+back-end.</p>
+<p>Some devices do not have a fixed number of virtqueues.  Instead the maximum
+number of virtqueues is chosen by the back-end.  The number can depend on host
+resource availability or back-end implementation details.  Such devices are called
+multiple queue devices.</p>
+<p>Multiple queue support allows the back-end to advertise the maximum number of
+queues.  This is treated as a protocol extension, hence the back-end has to
+implement protocol features first. The multiple queues feature is supported
+only when the protocol feature <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_MQ</span></code> (bit 0) is set.</p>
+<p>The max number of queues the back-end supports can be queried with message
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_QUEUE_NUM</span></code>. Front-end should stop when the number of requested
+queues is bigger than that.</p>
+<p>As all queues share one connection, the front-end uses a unique index for each
+queue in the sent message to identify a specified queue.</p>
+<p>The front-end enables queues by sending message <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ENABLE</span></code>.
+vhost-user-net has historically automatically enabled the first queue pair.</p>
+<p>Back-ends should always implement the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_MQ</span></code> protocol
+feature, even for devices with a fixed number of virtqueues, since it is simple
+to implement and offers a degree of introspection.</p>
+<p>Front-ends must not rely on the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_MQ</span></code> protocol feature for
+devices with a fixed number of virtqueues.  Only true multiqueue devices
+require this protocol feature.</p>
+</section>
+<section id="migration">
+<h3><a class="toc-backref" href="#id21">Migration</a><a class="headerlink" href="#migration" title="Permalink to this heading"></a></h3>
+<p>During live migration, the front-end may need to track the modifications
+the back-end makes to the memory mapped regions. The front-end should mark
+the dirty pages in a log. Once it complies to this logging, it may
+declare the <code class="docutils literal notranslate"><span class="pre">VHOST_F_LOG_ALL</span></code> vhost feature.</p>
+<p>To start/stop logging of data/used ring writes, the front-end may send
+messages <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code> with <code class="docutils literal notranslate"><span class="pre">VHOST_F_LOG_ALL</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ADDR</span></code> with <code class="docutils literal notranslate"><span class="pre">VHOST_VRING_F_LOG</span></code> in ring’s
+flags set to 1/0, respectively.</p>
+<p>All the modifications to memory pointed by vring “descriptor” should
+be marked. Modifications to “used” vring should be marked if
+<code class="docutils literal notranslate"><span class="pre">VHOST_VRING_F_LOG</span></code> is part of ring’s flags.</p>
+<p>Dirty pages are of size:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define VHOST_LOG_PAGE 0x1000</span>
+</pre></div>
+</div>
+<p>The log memory fd is provided in the ancillary data of
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_BASE</span></code> message when the back-end has
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_LOG_SHMFD</span></code> protocol feature.</p>
+<p>The size of the log is supplied as part of <code class="docutils literal notranslate"><span class="pre">VhostUserMsg</span></code> which
+should be large enough to cover all known guest addresses. Log starts
+at the supplied offset in the supplied file descriptor.  The log
+covers from address 0 to the maximum of guest regions. In pseudo-code,
+to mark page at <code class="docutils literal notranslate"><span class="pre">addr</span></code> as dirty:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">/</span> <span class="n">VHOST_LOG_PAGE</span>
+<span class="n">log</span><span class="p">[</span><span class="n">page</span> <span class="o">/</span> <span class="mi">8</span><span class="p">]</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">page</span> <span class="o">%</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">addr</span></code> is the guest physical address.</p>
+<p>Use atomic operations, as the log may be concurrently manipulated.</p>
+<p>Note that when logging modifications to the used ring (when
+<code class="docutils literal notranslate"><span class="pre">VHOST_VRING_F_LOG</span></code> is set for this ring), <code class="docutils literal notranslate"><span class="pre">log_guest_addr</span></code> should
+be used to calculate the log offset: the write to first byte of the
+used ring is logged at this offset from log start. Also note that this
+value might be outside the legal guest physical address range
+(i.e. does not have to be covered by the <code class="docutils literal notranslate"><span class="pre">VhostUserMemory</span></code> table), but
+the bit offset of the last byte of the ring must fall within the size
+supplied by <code class="docutils literal notranslate"><span class="pre">VhostUserLog</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_FD</span></code> is an optional message with an eventfd in
+ancillary data, it may be used to inform the front-end that the log has
+been modified.</p>
+<p>Once the source has finished migration, rings will be stopped by the
+source. No further update must be done before rings are restarted.</p>
+<p>In postcopy migration the back-end is started before all the memory has
+been received from the source host, and care must be taken to avoid
+accessing pages that have yet to be received.  The back-end opens a
+‘userfault’-fd and registers the memory with it; this fd is then
+passed back over to the front-end.  The front-end services requests on the
+userfaultfd for pages that are accessed and when the page is available
+it performs WAKE ioctl’s on the userfaultfd to wake the stalled
+back-end.  The front-end indicates support for this via the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_PAGEFAULT</span></code> feature.</p>
+</section>
+<section id="memory-access">
+<h3><a class="toc-backref" href="#id22">Memory access</a><a class="headerlink" href="#memory-access" title="Permalink to this heading"></a></h3>
+<p>The front-end sends a list of vhost memory regions to the back-end using the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code> message.  Each region has two base
+addresses: a guest address and a user address.</p>
+<p>Messages contain guest addresses and/or user addresses to reference locations
+within the shared memory.  The mapping of these addresses works as follows.</p>
+<p>User addresses map to the vhost memory region containing that user address.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code> feature has not been negotiated:</p>
+<ul class="simple">
+<li><p>Guest addresses map to the vhost memory region containing that guest
+address.</p></li>
+</ul>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code> feature has been negotiated:</p>
+<ul class="simple">
+<li><p>Guest addresses are also called I/O virtual addresses (IOVAs).  They are
+translated to user addresses via the IOTLB.</p></li>
+<li><p>The vhost memory region guest address is not used.</p></li>
+</ul>
+</section>
+<section id="iommu-support">
+<h3><a class="toc-backref" href="#id23">IOMMU support</a><a class="headerlink" href="#iommu-support" title="Permalink to this heading"></a></h3>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code> feature has been negotiated, the
+front-end sends IOTLB entries update &amp; invalidation by sending
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_IOTLB_MSG</span></code> requests to the back-end with a <code class="docutils literal notranslate"><span class="pre">struct</span>
+<span class="pre">vhost_iotlb_msg</span></code> as payload. For update events, the <code class="docutils literal notranslate"><span class="pre">iotlb</span></code> payload
+has to be filled with the update message type (2), the I/O virtual
+address, the size, the user virtual address, and the permissions
+flags. Addresses and size must be within vhost memory regions set via
+the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code> request. For invalidation events, the
+<code class="docutils literal notranslate"><span class="pre">iotlb</span></code> payload has to be filled with the invalidation message type
+(3), the I/O virtual address and the size. On success, the back-end is
+expected to reply with a zero payload, non-zero otherwise.</p>
+<p>The back-end relies on the back-end communication channel (see <a class="reference internal" href="#backend-communication"><span class="std std-ref">Back-end
+communication</span></a> section below) to send IOTLB miss
+and access failure events, by sending <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_IOTLB_MSG</span></code>
+requests to the front-end with a <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_iotlb_msg</span></code> as
+payload. For miss events, the iotlb payload has to be filled with the
+miss message type (1), the I/O virtual address and the permissions
+flags. For access failure event, the iotlb payload has to be filled
+with the access failure message type (4), the I/O virtual address and
+the permissions flags.  For synchronization purpose, the back-end may
+rely on the reply-ack feature, so the front-end may send a reply when
+operation is completed if the reply-ack feature is negotiated and
+back-ends requests a reply. For miss events, completed operation means
+either front-end sent an update message containing the IOTLB entry
+containing requested address and permission, or front-end sent nothing if
+the IOTLB miss message is invalid (invalid IOVA or permission).</p>
+<p>The front-end isn’t expected to take the initiative to send IOTLB update
+messages, as the back-end sends IOTLB miss messages for the guest virtual
+memory areas it needs to access.</p>
+</section>
+<section id="back-end-communication">
+<span id="backend-communication"></span><h3><a class="toc-backref" href="#id24">Back-end communication</a><a class="headerlink" href="#back-end-communication" title="Permalink to this heading"></a></h3>
+<p>An optional communication channel is provided if the back-end declares
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_REQ</span></code> protocol feature, to allow the
+back-end to make requests to the front-end.</p>
+<p>The fd is provided via <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_SLAVE_REQ_FD</span></code> ancillary data.</p>
+<p>A back-end may then send <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_*</span></code> messages to the front-end
+using this fd communication channel.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD</span></code> protocol feature is
+negotiated, back-end can send file descriptors (at most 8 descriptors in
+each message) to front-end via ancillary data using this fd communication
+channel.</p>
+</section>
+<section id="inflight-i-o-tracking">
+<h3><a class="toc-backref" href="#id25">Inflight I/O tracking</a><a class="headerlink" href="#inflight-i-o-tracking" title="Permalink to this heading"></a></h3>
+<p>To support reconnecting after restart or crash, back-end may need to
+resubmit inflight I/Os. If virtqueue is processed in order, we can
+easily achieve that by getting the inflight descriptors from
+descriptor table (split virtqueue) or descriptor ring (packed
+virtqueue). However, it can’t work when we process descriptors
+out-of-order because some entries which store the information of
+inflight descriptors in available ring (split virtqueue) or descriptor
+ring (packed virtqueue) might be overridden by new entries. To solve
+this problem, the back-end need to allocate an extra buffer to store this
+information of inflight descriptors and share it with front-end for
+persistent. <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_INFLIGHT_FD</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_INFLIGHT_FD</span></code> are used to transfer this buffer
+between front-end and back-end. And the format of this buffer is described
+below:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 10%" />
+<col style="width: 30%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>queue0 region</p></td>
+<td><p>queue1 region</p></td>
+<td><p>…</p></td>
+<td><p>queueN region</p></td>
+</tr>
+</tbody>
+</table>
+<p>N is the number of available virtqueues. The back-end could get it from num
+queues field of <code class="docutils literal notranslate"><span class="pre">VhostUserInflight</span></code>.</p>
+<p>For split virtqueue, queue region can be implemented as:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">DescStateSplit</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Indicate whether this descriptor is inflight or not.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">inflight</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Padding */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">padding</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Maintain a list for the last batch of used descriptors.</span>
+<span class="cm">     * Only available when batching is used for submitting */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Used to preserve the order of fetching available descriptors.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">DescStateSplit</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">QueueRegionSplit</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* The feature flags of this region. Now it&#39;s initialized to 0. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">features</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The version of this region. It&#39;s 1 currently.</span>
+<span class="cm">     * Zero value indicates an uninitialized buffer */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">version</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The size of DescStateSplit array. It&#39;s equal to the virtqueue size.</span>
+<span class="cm">     * The back-end could get it from queue size field of VhostUserInflight. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">desc_num</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The head of list that track the last batch of used descriptors. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">last_batch_head</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Store the idx value of used ring */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">used_idx</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Used to track the state of each descriptor in descriptor table */</span><span class="w"></span>
+<span class="w">    </span><span class="n">DescStateSplit</span><span class="w"> </span><span class="n">desc</span><span class="p">[];</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">QueueRegionSplit</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To track inflight I/O, the queue region should be processed as follows:</p>
+<p>When receiving available buffers from the driver:</p>
+<ol class="arabic simple">
+<li><p>Get the next available head-descriptor index from available ring, <code class="docutils literal notranslate"><span class="pre">i</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[i].counter</span></code> to the value of global counter</p></li>
+<li><p>Increase global counter by 1</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[i].inflight</span></code> to 1</p></li>
+</ol>
+<p>When supplying used buffers to the driver:</p>
+<ol class="arabic simple">
+<li><p>Get corresponding used head-descriptor index, i</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[i].next</span></code> to <code class="docutils literal notranslate"><span class="pre">last_batch_head</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">last_batch_head</span></code> to <code class="docutils literal notranslate"><span class="pre">i</span></code></p></li>
+<li><p>Steps 1,2,3 may be performed repeatedly if batching is possible</p></li>
+<li><p>Increase the <code class="docutils literal notranslate"><span class="pre">idx</span></code> value of used ring by the size of the batch</p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">inflight</span></code> field of each <code class="docutils literal notranslate"><span class="pre">DescStateSplit</span></code> entry in the batch to 0</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> to the <code class="docutils literal notranslate"><span class="pre">idx</span></code> value of used ring</p></li>
+</ol>
+<p>When reconnecting:</p>
+<ol class="arabic simple">
+<li><p>If the value of <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> does not match the <code class="docutils literal notranslate"><span class="pre">idx</span></code> value of
+used ring (means the inflight field of <code class="docutils literal notranslate"><span class="pre">DescStateSplit</span></code> entries in
+last batch may be incorrect),</p>
+<ol class="loweralpha simple">
+<li><p>Subtract the value of <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> from the <code class="docutils literal notranslate"><span class="pre">idx</span></code> value of
+used ring to get last batch size of <code class="docutils literal notranslate"><span class="pre">DescStateSplit</span></code> entries</p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">inflight</span></code> field of each <code class="docutils literal notranslate"><span class="pre">DescStateSplit</span></code> entry to 0 in last batch
+list which starts from <code class="docutils literal notranslate"><span class="pre">last_batch_head</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> to the <code class="docutils literal notranslate"><span class="pre">idx</span></code> value of used ring</p></li>
+</ol>
+</li>
+<li><p>Resubmit inflight <code class="docutils literal notranslate"><span class="pre">DescStateSplit</span></code> entries in order of their
+counter value</p></li>
+</ol>
+<p>For packed virtqueue, queue region can be implemented as:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">DescStatePacked</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Indicate whether this descriptor is inflight or not.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">inflight</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Padding */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">padding</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Link to the next free entry */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Link to the last entry of descriptor list.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">last</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The length of descriptor list.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">num</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Used to preserve the order of fetching available descriptors.</span>
+<span class="cm">     * Only available for head-descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The buffer id */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The descriptor flags */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The buffer length */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">len</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The buffer address */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">addr</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">DescStatePacked</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">QueueRegionPacked</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* The feature flags of this region. Now it&#39;s initialized to 0. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">features</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The version of this region. It&#39;s 1 currently.</span>
+<span class="cm">     * Zero value indicates an uninitialized buffer */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">version</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The size of DescStatePacked array. It&#39;s equal to the virtqueue size.</span>
+<span class="cm">     * The back-end could get it from queue size field of VhostUserInflight. */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">desc_num</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The head of free DescStatePacked entry list */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">free_head</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The old head of free DescStatePacked entry list */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">old_free_head</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The used index of descriptor ring */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">used_idx</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The old used index of descriptor ring */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">old_used_idx</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Device ring wrap counter */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">used_wrap_counter</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The old device ring wrap counter */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">old_used_wrap_counter</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Padding */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">padding</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Used to track the state of each descriptor fetched from descriptor ring */</span><span class="w"></span>
+<span class="w">    </span><span class="n">DescStatePacked</span><span class="w"> </span><span class="n">desc</span><span class="p">[];</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">QueueRegionPacked</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To track inflight I/O, the queue region should be processed as follows:</p>
+<p>When receiving available buffers from the driver:</p>
+<ol class="arabic simple">
+<li><p>Get the next available descriptor entry from descriptor ring, <code class="docutils literal notranslate"><span class="pre">d</span></code></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">d</span></code> is head descriptor,</p>
+<ol class="loweralpha simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[old_free_head].num</span></code> to 0</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[old_free_head].counter</span></code> to the value of global counter</p></li>
+<li><p>Increase global counter by 1</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[old_free_head].inflight</span></code> to 1</p></li>
+</ol>
+</li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">d</span></code> is last descriptor, set <code class="docutils literal notranslate"><span class="pre">desc[old_free_head].last</span></code> to
+<code class="docutils literal notranslate"><span class="pre">free_head</span></code></p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">desc[old_free_head].num</span></code> by 1</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[free_head].addr</span></code>, <code class="docutils literal notranslate"><span class="pre">desc[free_head].len</span></code>,
+<code class="docutils literal notranslate"><span class="pre">desc[free_head].flags</span></code>, <code class="docutils literal notranslate"><span class="pre">desc[free_head].id</span></code> to <code class="docutils literal notranslate"><span class="pre">d.addr</span></code>,
+<code class="docutils literal notranslate"><span class="pre">d.len</span></code>, <code class="docutils literal notranslate"><span class="pre">d.flags</span></code>, <code class="docutils literal notranslate"><span class="pre">d.id</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">free_head</span></code> to <code class="docutils literal notranslate"><span class="pre">desc[free_head].next</span></code></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">d</span></code> is last descriptor, set <code class="docutils literal notranslate"><span class="pre">old_free_head</span></code> to <code class="docutils literal notranslate"><span class="pre">free_head</span></code></p></li>
+</ol>
+<p>When supplying used buffers to the driver:</p>
+<ol class="arabic simple">
+<li><p>Get corresponding used head-descriptor entry from descriptor ring,
+<code class="docutils literal notranslate"><span class="pre">d</span></code></p></li>
+<li><p>Get corresponding <code class="docutils literal notranslate"><span class="pre">DescStatePacked</span></code> entry, <code class="docutils literal notranslate"><span class="pre">e</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">desc[e.last].next</span></code> to <code class="docutils literal notranslate"><span class="pre">free_head</span></code></p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">free_head</span></code> to the index of <code class="docutils literal notranslate"><span class="pre">e</span></code></p></li>
+<li><p>Steps 1,2,3,4 may be performed repeatedly if batching is possible</p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> by the size of the batch and update
+<code class="docutils literal notranslate"><span class="pre">used_wrap_counter</span></code> if needed</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">d.flags</span></code></p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">inflight</span></code> field of each head <code class="docutils literal notranslate"><span class="pre">DescStatePacked</span></code> entry
+in the batch to 0</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">old_free_head</span></code>,  <code class="docutils literal notranslate"><span class="pre">old_used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">old_used_wrap_counter</span></code>
+to <code class="docutils literal notranslate"><span class="pre">free_head</span></code>, <code class="docutils literal notranslate"><span class="pre">used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">used_wrap_counter</span></code></p></li>
+</ol>
+<p>When reconnecting:</p>
+<ol class="arabic simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">used_idx</span></code> does not match <code class="docutils literal notranslate"><span class="pre">old_used_idx</span></code> (means the
+<code class="docutils literal notranslate"><span class="pre">inflight</span></code> field of <code class="docutils literal notranslate"><span class="pre">DescStatePacked</span></code> entries in last batch may
+be incorrect),</p>
+<ol class="loweralpha simple">
+<li><p>Get the next descriptor ring entry through <code class="docutils literal notranslate"><span class="pre">old_used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">old_used_wrap_counter</span></code> to calculate the available flags</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">d.flags</span></code> is not equal to the calculated flags value (means
+back-end has submitted the buffer to guest driver before crash, so
+it has to commit the in-progres update), set <code class="docutils literal notranslate"><span class="pre">old_free_head</span></code>,
+<code class="docutils literal notranslate"><span class="pre">old_used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">old_used_wrap_counter</span></code> to <code class="docutils literal notranslate"><span class="pre">free_head</span></code>,
+<code class="docutils literal notranslate"><span class="pre">used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">used_wrap_counter</span></code></p></li>
+</ol>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">free_head</span></code>, <code class="docutils literal notranslate"><span class="pre">used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">used_wrap_counter</span></code> to
+<code class="docutils literal notranslate"><span class="pre">old_free_head</span></code>, <code class="docutils literal notranslate"><span class="pre">old_used_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">old_used_wrap_counter</span></code>
+(roll back any in-progress update)</p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">inflight</span></code> field of each <code class="docutils literal notranslate"><span class="pre">DescStatePacked</span></code> entry in
+free list to 0</p></li>
+<li><p>Resubmit inflight <code class="docutils literal notranslate"><span class="pre">DescStatePacked</span></code> entries in order of their
+counter value</p></li>
+</ol>
+</section>
+<section id="in-band-notifications">
+<h3><a class="toc-backref" href="#id26">In-band notifications</a><a class="headerlink" href="#in-band-notifications" title="Permalink to this heading"></a></h3>
+<p>In some limited situations (e.g. for simulation) it is desirable to
+have the kick, call and error (if used) signals done via in-band
+messages instead of asynchronous eventfd notifications. This can be
+done by negotiating the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code>
+protocol feature.</p>
+<p>Note that due to the fact that too many messages on the sockets can
+cause the sending application(s) to block, it is not advised to use
+this feature unless absolutely necessary. It is also considered an
+error to negotiate this feature without also negotiating
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_REQ</span></code> and <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code>,
+the former is necessary for getting a message channel from the back-end
+to the front-end, while the latter needs to be used with the in-band
+notification messages to block until they are processed, both to avoid
+blocking later and for proper processing (at least in the simulation
+use case.) As it has no other way of signalling this error, the back-end
+should close the connection as a response to a
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_PROTOCOL_FEATURES</span></code> message that sets the in-band
+notifications feature flag without the other two.</p>
+</section>
+<section id="protocol-features">
+<h3><a class="toc-backref" href="#id27">Protocol features</a><a class="headerlink" href="#protocol-features" title="Permalink to this heading"></a></h3>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define VHOST_USER_PROTOCOL_F_MQ                    0</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_LOG_SHMFD             1</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_RARP                  2</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_REPLY_ACK             3</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_MTU                   4</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_SLAVE_REQ             5</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN          6</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION        7</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_PAGEFAULT             8</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_CONFIG                9</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD        10</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER        11</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD       12</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS  15</span>
+<span class="cp">#define VHOST_USER_PROTOCOL_F_STATUS               16</span>
+</pre></div>
+</div>
+</section>
+<section id="front-end-message-types">
+<h3><a class="toc-backref" href="#id28">Front-end message types</a><a class="headerlink" href="#front-end-message-types" title="Permalink to this heading"></a></h3>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>1</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_GET_FEATURES</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>Get from the underlying vhost implementation the features bitmask.
+Feature bit <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> signals back-end support
+for <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_PROTOCOL_FEATURES</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_FEATURES</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Enable features in the underlying vhost implementation using a
+bitmask.  Feature bit <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> signals
+back-end support for <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_PROTOCOL_FEATURES</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>15</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_GET_FEATURES</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>Get the protocol feature bitmask from the underlying vhost
+implementation.  Only legal if feature bit
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> is present in
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code>.  It does not need to be acknowledged by
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Back-ends that report <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> must
+support this message even before <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code> was
+called.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_PROTOCOL_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>16</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_FEATURES</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Enable protocol features in the underlying vhost implementation.</p>
+<p>Only legal if feature bit <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> is present in
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code>.  It does not need to be acknowledged by
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Back-ends that report <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> must support
+this message even before <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_FEATURES</span></code> was called.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_OWNER</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_OWNER</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Issued when a new connection is established. It marks the sender
+as the front-end that owns of the session. This can be used on the <em>back-end</em>
+as a “session start” flag.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_RESET_OWNER</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition-deprecated admonition">
+<p class="admonition-title">Deprecated</p>
+<p>This is no longer used. Used to be sent to request disabling all
+rings, but some back-ends interpreted it to also discard connection
+state (this interpretation would lead to bugs).  It is recommended
+that back-ends either ignore this message, or use it to disable all
+rings.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_MEM_TABLE</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>memory regions description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>(postcopy only) memory regions description</p>
+</dd>
+</dl>
+<p>Sets the memory map regions on the back-end so it can translate the
+vring addresses. In the ancillary data there is an array of file
+descriptors for each memory mapped region. The size and ordering of
+the fds matches the number and ordering of memory regions.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_LISTEN</span></code> has been received,
+<code class="docutils literal notranslate"><span class="pre">SET_MEM_TABLE</span></code> replies with the bases of the memory mapped
+regions to the front-end.  The back-end must have mmap’d the regions but
+not yet accessed them and should not yet generate a userfault
+event.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">NEED_REPLY_MASK</span></code> is not set in this case.  QEMU will then
+reply back to the list of mappings with an empty
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code> as an acknowledgement; only upon
+reception of this message may the guest start accessing the memory
+and generating faults.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_BASE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>6</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_LOG_BASE</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>u64</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets logging shared memory space.</p>
+<p>When the back-end has <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_LOG_SHMFD</span></code> protocol feature,
+the log memory fd is provided in the ancillary data of
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_BASE</span></code> message, the size and offset of shared
+memory area provided in the message.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_LOG_FD</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>7</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_LOG_FD</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets the logging file descriptor, which is passed as ancillary data.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_NUM</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>8</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_NUM</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the size of the queue.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ADDR</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>9</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_ADDR</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring address description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets the addresses of the different aspects of the vring.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_BASE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>10</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_BASE</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets the base offset in the available vring.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_VRING_BASE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>11</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_VRING_BASE</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>vring state description</p>
+</dd>
+</dl>
+<p>Get the available vring base offset.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_KICK</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>12</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_KICK</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the event file descriptor for adding buffers to the vring. It is
+passed in the ancillary data.</p>
+<p>Bits (0-7) of the payload contain the vring index. Bit 8 is the
+invalid FD flag. This flag is set when there is no file descriptor
+in the ancillary data. This signals that polling should be used
+instead of waiting for the kick. Note that if the protocol feature
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> has been negotiated
+this message isn’t necessary as the ring is also started on the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_VRING_KICK</span></code> message, it may however still be used to
+set an event file descriptor (which will be preferred over the
+message) or to enable polling.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_CALL</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>13</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_CALL</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the event file descriptor to signal when buffers are used. It is
+passed in the ancillary data.</p>
+<p>Bits (0-7) of the payload contain the vring index. Bit 8 is the
+invalid FD flag. This flag is set when there is no file descriptor
+in the ancillary data. This signals that polling will be used
+instead of waiting for the call. Note that if the protocol features
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_REQ</span></code> have been negotiated this message
+isn’t necessary as the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_VRING_CALL</span></code> message can be
+used, it may however still be used to set an event file descriptor
+or to enable polling.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ERR</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>14</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_ERR</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the event file descriptor to signal when error occurs. It is
+passed in the ancillary data.</p>
+<p>Bits (0-7) of the payload contain the vring index. Bit 8 is the
+invalid FD flag. This flag is set when there is no file descriptor
+in the ancillary data. Note that if the protocol features
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_REQ</span></code> have been negotiated this message
+isn’t necessary as the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_VRING_ERR</span></code> message can be
+used, it may however still be used to set an event file descriptor
+(which will be preferred over the message).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_QUEUE_NUM</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>17</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>u64</p>
+</dd>
+</dl>
+<p>Query how many queues the back-end supports.</p>
+<p>This request should be sent only when <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_MQ</span></code>
+is set in queried protocol features by
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ENABLE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>18</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Signal the back-end to enable or disable corresponding vring.</p>
+<p>This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> has been negotiated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SEND_RARP</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>19</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Ask vhost user back-end to broadcast a fake RARP to notify the migration
+is terminated for guest that does not support GUEST_ANNOUNCE.</p>
+<p>Only legal if feature bit <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> is
+present in <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code> and protocol feature bit
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_RARP</span></code> is present in
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code>.  The first 6 bytes of the
+payload contain the mac address of the guest to allow the vhost user
+back-end to construct and broadcast the fake RARP.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_NET_SET_MTU</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>20</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set host MTU value exposed to the guest.</p>
+<p>This request should be sent only when <code class="docutils literal notranslate"><span class="pre">VIRTIO_NET_F_MTU</span></code> feature
+has been successfully negotiated, <code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code>
+is present in <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_FEATURES</span></code> and protocol feature bit
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_NET_MTU</span></code> is present in
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code> is negotiated, the back-end must
+respond with zero in case the specified MTU is valid, or non-zero
+otherwise.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_SLAVE_REQ_FD</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>21</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the socket file descriptor for back-end initiated requests. It is passed
+in the ancillary data.</p>
+<p>This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_F_PROTOCOL_FEATURES</span></code> has been negotiated, and protocol
+feature bit <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_SLAVE_REQ</span></code> bit is present in
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_PROTOCOL_FEATURES</span></code>.  If
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code> is negotiated, the back-end must
+respond with zero for success, non-zero otherwise.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_IOTLB_MSG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>22</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A (equivalent to <code class="docutils literal notranslate"><span class="pre">VHOST_IOTLB_MSG</span></code> message type)</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_iotlb_msg</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>Send IOTLB messages with <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_iotlb_msg</span></code> as payload.</p>
+<p>The front-end sends such requests to update and invalidate entries in the
+device IOTLB. The back-end has to acknowledge the request with sending
+zero as <code class="docutils literal notranslate"><span class="pre">u64</span></code> payload for success, non-zero otherwise.</p>
+<p>This request should be send only when <code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code>
+feature has been successfully negotiated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ENDIAN</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>23</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VHOST_SET_VRING_ENDIAN</span></code></p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the endianness of a VQ for legacy devices. Little-endian is
+indicated with state.num set to 0 and big-endian is indicated with
+state.num set to 1. Other values are invalid.</p>
+<p>This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CROSS_ENDIAN</span></code> has been negotiated.
+Backends that negotiated this feature should handle both
+endiannesses and expect this message once (per VQ) during device
+configuration (ie. before the front-end starts the VQ).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_CONFIG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>24</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>virtio device config space</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>virtio device config space</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIG</span></code> is negotiated, this message is
+submitted by the vhost-user front-end to fetch the contents of the
+virtio device configuration space, vhost-user back-end’s payload size
+MUST match the front-end’s request, vhost-user back-end uses zero length of
+payload to indicate an error to the vhost-user front-end. The vhost-user
+front-end may cache the contents to avoid repeated
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_CONFIG</span></code> calls.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_CONFIG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>25</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>virtio device config space</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIG</span></code> is negotiated, this message is
+submitted by the vhost-user front-end when the Guest changes the virtio
+device configuration space and also can be used for live migration
+on the destination host. The vhost-user back-end must check the flags
+field, and back-ends MUST NOT accept SET_CONFIG for read-only
+configuration space fields unless the live migration bit is set.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_CREATE_CRYPTO_SESSION</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>26</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>crypto session description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>crypto session description</p>
+</dd>
+</dl>
+<p>Create a session for crypto operation. The back-end must return
+the session id, 0 or positive for success, negative for failure.
+This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CRYPTO_SESSION</span></code> feature has been
+successfully negotiated.  It’s a required feature for crypto
+devices.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_CLOSE_CRYPTO_SESSION</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>27</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Close a session for crypto operation which was previously
+created by <code class="docutils literal notranslate"><span class="pre">VHOST_USER_CREATE_CRYPTO_SESSION</span></code>.</p>
+<p>This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CRYPTO_SESSION</span></code> feature has been
+successfully negotiated.  It’s a required feature for crypto
+devices.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_ADVISE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>28</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>userfault fd</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_PAGEFAULT</span></code> is supported, the front-end
+advises back-end that a migration with postcopy enabled is underway,
+the back-end must open a userfaultfd for later use.  Note that at this
+stage the migration is still in precopy mode.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_LISTEN</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>29</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>The front-end advises back-end that a transition to postcopy mode has
+happened.  The back-end must ensure that shared memory is registered
+with userfaultfd to cause faulting of non-present pages.</p>
+<p>This is always sent sometime after a <code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_ADVISE</span></code>,
+and thus only when <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_PAGEFAULT</span></code> is supported.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_END</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>30</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>The front-end advises that postcopy migration has now completed.  The back-end
+must disable the userfaultfd. The reply is an acknowledgement
+only.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_PAGEFAULT</span></code> is supported, this message
+is sent at the end of the migration, after
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_LISTEN</span></code> was previously sent.</p>
+<p>The value returned is an error indication; 0 is success.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_INFLIGHT_FD</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>31</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>inflight description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD</span></code> protocol feature has
+been successfully negotiated, this message is submitted by the front-end to
+get a shared buffer from back-end. The shared buffer will be used to
+track inflight I/O by back-end. QEMU should retrieve a new one when vm
+reset.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_INFLIGHT_FD</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>32</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>inflight description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD</span></code> protocol feature has
+been successfully negotiated, this message is submitted by the front-end to
+send the shared inflight buffer back to the back-end so that the back-end
+could get inflight I/O after a crash or restart.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_SET_SOCKET</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>33</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets the GPU protocol socket file descriptor, which is passed as
+ancillary data. The GPU protocol is used to inform the front-end of
+rendering state and updates. See vhost-user-gpu.rst for details.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_RESET_DEVICE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>34</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Ask the vhost user back-end to disable all rings and reset all
+internal device state to the initial state, ready to be
+reinitialized. The back-end retains ownership of the device
+throughout the reset operation.</p>
+<p>Only valid if the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_RESET_DEVICE</span></code> protocol
+feature is set by the back-end.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_VRING_KICK</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>35</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> protocol
+feature has been successfully negotiated, this message may be
+submitted by the front-end to indicate that a buffer was added to
+the vring instead of signalling it using the vring’s kick file
+descriptor or having the back-end rely on polling.</p>
+<p>The state.num field is currently reserved and must be set to 0.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_MAX_MEM_SLOTS</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>36</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>u64</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS</span></code> protocol
+feature has been successfully negotiated, this message is submitted
+by the front-end to the back-end. The back-end should return the message with a
+u64 payload containing the maximum number of memory slots for
+QEMU to expose to the guest. The value returned by the back-end
+will be capped at the maximum number of ram slots which can be
+supported by the target platform.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_ADD_MEM_REG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>37</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>single memory region description</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS</span></code> protocol
+feature has been successfully negotiated, this message is submitted
+by the front-end to the back-end. The message payload contains a memory
+region descriptor struct, describing a region of guest memory which
+the back-end device must map in. When the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS</span></code> protocol feature has
+been successfully negotiated, along with the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_REM_MEM_REG</span></code> message, this message is used to set and
+update the memory tables of the back-end device.</p>
+<p>Exactly one file descriptor from which the memory is mapped is
+passed in the ancillary data.</p>
+<p>In postcopy mode (see <code class="docutils literal notranslate"><span class="pre">VHOST_USER_POSTCOPY_LISTEN</span></code>), the back-end
+replies with the bases of the memory mapped region to the front-end.
+For further details on postcopy, see <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_MEM_TABLE</span></code>.
+They apply to <code class="docutils literal notranslate"><span class="pre">VHOST_USER_ADD_MEM_REG</span></code> accordingly.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_REM_MEM_REG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>38</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>single memory region description</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS</span></code> protocol
+feature has been successfully negotiated, this message is submitted
+by the front-end to the back-end. The message payload contains a memory
+region descriptor struct, describing a region of guest memory which
+the back-end device must unmap. When the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS</span></code> protocol feature has
+been successfully negotiated, along with the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_ADD_MEM_REG</span></code> message, this message is used to set and
+update the memory tables of the back-end device.</p>
+<p>The memory region to be removed is identified by its guest address,
+user address and size. The mmap offset is ignored.</p>
+<p>No file descriptors SHOULD be passed in the ancillary data. For
+compatibility with existing incorrect implementations, the back-end MAY
+accept messages with one file descriptor. If a file descriptor is
+passed, the back-end MUST close it without using it otherwise.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_STATUS</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>39</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>VHOST_VDPA_SET_STATUS</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_STATUS</span></code> protocol feature has been
+successfully negotiated, this message is submitted by the front-end to
+notify the back-end with updated device status as defined in the Virtio
+specification.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_STATUS</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>40</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>VHOST_VDPA_GET_STATUS</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_STATUS</span></code> protocol feature has been
+successfully negotiated, this message is submitted by the front-end to
+query the back-end for its device status as defined in the Virtio
+specification.</p>
+</dd>
+</dl>
+</section>
+<section id="back-end-message-types">
+<h3><a class="toc-backref" href="#id29">Back-end message types</a><a class="headerlink" href="#back-end-message-types" title="Permalink to this heading"></a></h3>
+<p>For this type of message, the request is sent by the back-end and the reply
+is sent by the front-end.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_IOTLB_MSG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>1</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A (equivalent to <code class="docutils literal notranslate"><span class="pre">VHOST_IOTLB_MSG</span></code> message type)</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_iotlb_msg</span></code></p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Send IOTLB messages with <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">vhost_iotlb_msg</span></code> as payload.
+The back-end sends such requests to notify of an IOTLB miss, or an IOTLB
+access failure. If <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code> is
+negotiated, and back-end set the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_NEED_REPLY</span></code> flag, the front-end
+must respond with zero when operation is successfully completed, or
+non-zero otherwise.  This request should be send only when
+<code class="docutils literal notranslate"><span class="pre">VIRTIO_F_IOMMU_PLATFORM</span></code> feature has been successfully
+negotiated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_CONFIG_CHANGE_MSG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_CONFIG</span></code> is negotiated, vhost-user
+back-end sends such messages to notify that the virtio device’s
+configuration space has changed, for those host devices which can
+support such feature, host driver can send <code class="docutils literal notranslate"><span class="pre">VHOST_USER_GET_CONFIG</span></code>
+message to the back-end to get the latest content. If
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code> is negotiated, and the back-end sets the
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_NEED_REPLY</span></code> flag, the front-end must respond with zero when
+operation is successfully completed, or non-zero otherwise.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring area description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>Sets host notifier for a specified queue. The queue index is
+contained in the <code class="docutils literal notranslate"><span class="pre">u64</span></code> field of the vring area description. The
+host notifier is described by the file descriptor (typically it’s a
+VFIO device fd) which is passed as ancillary data and the size
+(which is mmap size and should be the same as host page size) and
+offset (which is mmap offset) carried in the vring area
+description. QEMU can mmap the file descriptor based on the size and
+offset to get a memory range. Registering a host notifier means
+mapping this memory range to the VM as the specified queue’s notify
+MMIO region. The back-end sends this request to tell QEMU to de-register
+the existing notifier if any and register the new notifier if the
+request is sent with a file descriptor.</p>
+<p>This request should be sent only when
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_HOST_NOTIFIER</span></code> protocol feature has been
+successfully negotiated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_VRING_CALL</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> protocol
+feature has been successfully negotiated, this message may be
+submitted by the back-end to indicate that a buffer was used from
+the vring instead of signalling this using the vring’s call file
+descriptor or having the front-end relying on polling.</p>
+<p>The state.num field is currently reserved and must be set to 0.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_SLAVE_VRING_ERR</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">equivalent ioctl</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">request payload</dt>
+<dd class="field-odd"><p>vring state description</p>
+</dd>
+<dt class="field-even">reply payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+</dl>
+<p>When the <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS</span></code> protocol
+feature has been successfully negotiated, this message may be
+submitted by the back-end to indicate that an error occurred on the
+specific vring, instead of signalling the error file descriptor
+set by the front-end via <code class="docutils literal notranslate"><span class="pre">VHOST_USER_SET_VRING_ERR</span></code>.</p>
+<p>The state.num field is currently reserved and must be set to 0.</p>
+</dd>
+</dl>
+</section>
+<section id="vhost-user-protocol-f-reply-ack">
+<span id="reply-ack"></span><h3><a class="toc-backref" href="#id30">VHOST_USER_PROTOCOL_F_REPLY_ACK</a><a class="headerlink" href="#vhost-user-protocol-f-reply-ack" title="Permalink to this heading"></a></h3>
+<p>The original vhost-user specification only demands replies for certain
+commands. This differs from the vhost protocol implementation where
+commands are sent over an <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> call and block until the back-end
+has completed.</p>
+<p>With this protocol extension negotiated, the sender (QEMU) can set the
+<code class="docutils literal notranslate"><span class="pre">need_reply</span></code> [Bit 3] flag to any command. This indicates that the
+back-end MUST respond with a Payload <code class="docutils literal notranslate"><span class="pre">VhostUserMsg</span></code> indicating success
+or failure. The payload should be set to zero on success or non-zero
+on failure, unless the message already has an explicit reply body.</p>
+<p>The reply payload gives QEMU a deterministic indication of the result
+of the command. Today, QEMU is expected to terminate the main vhost-user
+loop upon receiving such errors. In future, qemu could be taught to be more
+resilient for selective requests.</p>
+<p>For the message types that already solicit a reply from the back-end,
+the presence of <code class="docutils literal notranslate"><span class="pre">VHOST_USER_PROTOCOL_F_REPLY_ACK</span></code> or need_reply bit
+being set brings no behavioural change. (See the <a class="reference internal" href="#communication">Communication</a>
+section for details.)</p>
+</section>
+</section>
+<section id="backend-program-conventions">
+<span id="backend-conventions"></span><h2><a class="toc-backref" href="#id31">Backend program conventions</a><a class="headerlink" href="#backend-program-conventions" title="Permalink to this heading"></a></h2>
+<p>vhost-user back-ends can provide various devices &amp; services and may
+need to be configured manually depending on the use case. However, it
+is a good idea to follow the conventions listed here when
+possible. Users, QEMU or libvirt, can then rely on some common
+behaviour to avoid heterogeneous configuration and management of the
+back-end programs and facilitate interoperability.</p>
+<p>Each back-end installed on a host system should come with at least one
+JSON file that conforms to the vhost-user.json schema. Each file
+informs the management applications about the back-end type, and binary
+location. In addition, it defines rules for management apps for
+picking the highest priority back-end when multiple match the search
+criteria (see <code class="docutils literal notranslate"><span class="pre">&#64;VhostUserBackend</span></code> documentation in the schema file).</p>
+<p>If the back-end is not capable of enabling a requested feature on the
+host (such as 3D acceleration with virgl), or the initialization
+failed, the back-end should fail to start early and exit with a status
+!= 0. It may also print a message to stderr for further details.</p>
+<p>The back-end program must not daemonize itself, but it may be
+daemonized by the management layer. It may also have a restricted
+access to the system.</p>
+<p>File descriptors 0, 1 and 2 will exist, and have regular
+stdin/stdout/stderr usage (they may have been redirected to /dev/null
+by the management layer, or to a log handler).</p>
+<p>The back-end program must end (as quickly and cleanly as possible) when
+the SIGTERM signal is received. Eventually, it may receive SIGKILL by
+the management layer after a few seconds.</p>
+<p>The following command line options have an expected behaviour. They
+are mandatory, unless explicitly said differently:</p>
+<dl class="option-list">
+<dt><kbd><span class="option">--socket-path=<var>PATH</var></span></kbd></dt>
+<dd><p>This option specify the location of the vhost-user Unix domain socket.
+It is incompatible with –fd.</p>
+</dd>
+<dt><kbd><span class="option">--fd=<var>FDNUM</var></span></kbd></dt>
+<dd><p>When this argument is given, the back-end program is started with the
+vhost-user socket as file descriptor FDNUM. It is incompatible with
+–socket-path.</p>
+</dd>
+<dt><kbd><span class="option">--print-capabilities</span></kbd></dt>
+<dd><p>Output to stdout the back-end capabilities in JSON format, and then
+exit successfully. Other options and arguments should be ignored, and
+the back-end program should not perform its normal function.  The
+capabilities can be reported dynamically depending on the host
+capabilities.</p>
+</dd>
+</dl>
+<p>The JSON output is described in the <code class="docutils literal notranslate"><span class="pre">vhost-user.json</span></code> schema, by
+<code class="docutils literal notranslate"><span class="pre">`&#64;VHostUserBackendCapabilities</span></code>.  Example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;foo&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;features&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;feature-a&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;feature-b&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<section id="vhost-user-input">
+<h3><a class="toc-backref" href="#id32">vhost-user-input</a><a class="headerlink" href="#vhost-user-input" title="Permalink to this heading"></a></h3>
+<p>Command line options:</p>
+<dl class="option-list">
+<dt><kbd><span class="option">--evdev-path=<var>PATH</var></span></kbd></dt>
+<dd><p>Specify the linux input device.</p>
+<p>(optional)</p>
+</dd>
+<dt><kbd><span class="option">--no-grab</span></kbd></dt>
+<dd><p>Do no request exclusive access to the input device.</p>
+<p>(optional)</p>
+</dd>
+</dl>
+</section>
+<section id="vhost-user-gpu">
+<h3><a class="toc-backref" href="#id33">vhost-user-gpu</a><a class="headerlink" href="#vhost-user-gpu" title="Permalink to this heading"></a></h3>
+<p>Command line options:</p>
+<dl class="option-list">
+<dt><kbd><span class="option">--render-node=<var>PATH</var></span></kbd></dt>
+<dd><p>Specify the GPU DRM render node.</p>
+<p>(optional)</p>
+</dd>
+<dt><kbd><span class="option">--virgl</span></kbd></dt>
+<dd><p>Enable virgl rendering support.</p>
+<p>(optional)</p>
+</dd>
+</dl>
+</section>
+<section id="vhost-user-blk">
+<h3><a class="toc-backref" href="#id34">vhost-user-blk</a><a class="headerlink" href="#vhost-user-blk" title="Permalink to this heading"></a></h3>
+<p>Command line options:</p>
+<dl class="option-list">
+<dt><kbd><span class="option">--blk-file=<var>PATH</var></span></kbd></dt>
+<dd><p>Specify block device or file path.</p>
+<p>(optional)</p>
+</dd>
+<dt><kbd><span class="option">--read-only</span></kbd></dt>
+<dd><p>Enable read-only.</p>
+<p>(optional)</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qemu-storage-daemon-qmp-ref.html" class="btn btn-neutral float-left" title="QEMU Storage Daemon QMP Reference Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vhost-user-gpu.html" class="btn btn-neutral float-right" title="Vhost-user-gpu Protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vhost-user-gpu Protocol &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Vhost-vdpa Protocol" href="vhost-vdpa.html" />
+    <link rel="prev" title="Vhost-user Protocol" href="vhost-user.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Vhost-user-gpu Protocol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wire-format">Wire format</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#header">Header</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#payload-types">Payload types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c-structure">C structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#protocol-features">Protocol features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#communication">Communication</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#message-types">Message types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">Vhost-user-gpu Protocol</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/vhost-user-gpu.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vhost-user-gpu-protocol">
+<h1><a class="toc-backref" href="#id1">Vhost-user-gpu Protocol</a><a class="headerlink" href="#vhost-user-gpu-protocol" title="Permalink to this heading"></a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vhost-user-gpu-protocol" id="id1">Vhost-user-gpu Protocol</a></p>
+<ul>
+<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#wire-format" id="id3">Wire format</a></p>
+<ul>
+<li><p><a class="reference internal" href="#header" id="id4">Header</a></p></li>
+<li><p><a class="reference internal" href="#payload-types" id="id5">Payload types</a></p>
+<ul>
+<li><p><a class="reference internal" href="#vhostusergpucursorpos" id="id6">VhostUserGpuCursorPos</a></p></li>
+<li><p><a class="reference internal" href="#vhostusergpucursorupdate" id="id7">VhostUserGpuCursorUpdate</a></p></li>
+<li><p><a class="reference internal" href="#vhostusergpuscanout" id="id8">VhostUserGpuScanout</a></p></li>
+<li><p><a class="reference internal" href="#vhostusergpuupdate" id="id9">VhostUserGpuUpdate</a></p></li>
+<li><p><a class="reference internal" href="#vhostusergpudmabufscanout" id="id10">VhostUserGpuDMABUFScanout</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#c-structure" id="id11">C structure</a></p></li>
+<li><p><a class="reference internal" href="#protocol-features" id="id12">Protocol features</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#communication" id="id13">Communication</a></p>
+<ul>
+<li><p><a class="reference internal" href="#message-types" id="id14">Message types</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="introduction">
+<h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>The vhost-user-gpu protocol is aiming at sharing the rendering result
+of a virtio-gpu, done from a vhost-user back-end process to a vhost-user
+front-end process (such as QEMU). It bears a resemblance to a display
+server protocol, if you consider QEMU as the display server and the
+back-end as the client, but in a very limited way. Typically, it will
+work by setting a scanout/display configuration, before sending flush
+events for the display updates. It will also update the cursor shape
+and position.</p>
+<p>The protocol is sent over a UNIX domain stream socket, since it uses
+socket ancillary data to share opened file descriptors (DMABUF fds or
+shared memory). The socket is usually obtained via
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_SET_SOCKET</span></code>.</p>
+<p>Requests are sent by the <em>back-end</em>, and the optional replies by the
+<em>front-end</em>.</p>
+</section>
+<section id="wire-format">
+<h2><a class="toc-backref" href="#id3">Wire format</a><a class="headerlink" href="#wire-format" title="Permalink to this heading"></a></h2>
+<p>Unless specified differently, numbers are in the machine native byte
+order.</p>
+<p>A vhost-user-gpu message (request and reply) consists of 3 header
+fields and a payload.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 19%" />
+<col style="width: 29%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>request</p></td>
+<td><p>flags</p></td>
+<td><p>size</p></td>
+<td><p>payload</p></td>
+</tr>
+</tbody>
+</table>
+<section id="header">
+<h3><a class="toc-backref" href="#id4">Header</a><a class="headerlink" href="#header" title="Permalink to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">request</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, type of the request</p>
+</dd>
+<dt class="field-even">flags</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, 32-bit bit field:</p>
+<ul class="simple">
+<li><p>Bit 2 is the reply flag - needs to be set on each reply</p></li>
+</ul>
+</dd>
+<dt class="field-odd">size</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, size of the payload</p>
+</dd>
+</dl>
+</section>
+<section id="payload-types">
+<h3><a class="toc-backref" href="#id5">Payload types</a><a class="headerlink" href="#payload-types" title="Permalink to this heading"></a></h3>
+<p>Depending on the request type, <strong>payload</strong> can be:</p>
+<section id="vhostusergpucursorpos">
+<h4><a class="toc-backref" href="#id6">VhostUserGpuCursorPos</a><a class="headerlink" href="#vhostusergpucursorpos" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>scanout-id</p></td>
+<td><p>x</p></td>
+<td><p>y</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">scanout-id</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout where the cursor is located</p>
+</dd>
+<dt class="field-even">x/y</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the cursor position</p>
+</dd>
+</dl>
+</section>
+<section id="vhostusergpucursorupdate">
+<h4><a class="toc-backref" href="#id7">VhostUserGpuCursorUpdate</a><a class="headerlink" href="#vhostusergpucursorupdate" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 26%" />
+<col style="width: 26%" />
+<col style="width: 30%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>pos</p></td>
+<td><p>hot_x</p></td>
+<td><p>hot_y</p></td>
+<td><p>cursor</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">pos</dt>
+<dd class="field-odd"><p>a <code class="docutils literal notranslate"><span class="pre">VhostUserGpuCursorPos</span></code>, the cursor location</p>
+</dd>
+<dt class="field-even">hot_x/hot_y</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the cursor hot location</p>
+</dd>
+<dt class="field-odd">cursor</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[u32;</span> <span class="pre">64</span> <span class="pre">*</span> <span class="pre">64]</span></code>, 64x64 RGBA cursor data (PIXMAN_a8r8g8b8 format)</p>
+</dd>
+</dl>
+</section>
+<section id="vhostusergpuscanout">
+<h4><a class="toc-backref" href="#id8">VhostUserGpuScanout</a><a class="headerlink" href="#vhostusergpuscanout" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>scanout-id</p></td>
+<td><p>w</p></td>
+<td><p>h</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">scanout-id</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout configuration to set</p>
+</dd>
+<dt class="field-even">w/h</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout width/height size</p>
+</dd>
+</dl>
+</section>
+<section id="vhostusergpuupdate">
+<h4><a class="toc-backref" href="#id9">VhostUserGpuUpdate</a><a class="headerlink" href="#vhostusergpuupdate" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>scanout-id</p></td>
+<td><p>x</p></td>
+<td><p>y</p></td>
+<td><p>w</p></td>
+<td><p>h</p></td>
+<td><p>data</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">scanout-id</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout content to update</p>
+</dd>
+<dt class="field-even">x/y/w/h</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, region of the update</p>
+</dd>
+<dt class="field-odd">data</dt>
+<dd class="field-odd"><p>RGB data (PIXMAN_x8r8g8b8 format)</p>
+</dd>
+</dl>
+</section>
+<section id="vhostusergpudmabufscanout">
+<h4><a class="toc-backref" href="#id10">VhostUserGpuDMABUFScanout</a><a class="headerlink" href="#vhostusergpudmabufscanout" title="Permalink to this heading"></a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 14%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>scanout-id</p></td>
+<td><p>x</p></td>
+<td><p>y</p></td>
+<td><p>w</p></td>
+<td><p>h</p></td>
+<td><p>fdw</p></td>
+<td><p>fwh</p></td>
+<td><p>stride</p></td>
+<td><p>flags</p></td>
+<td><p>fourcc</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">scanout-id</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout configuration to set</p>
+</dd>
+<dt class="field-even">x/y</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the location of the scanout within the DMABUF</p>
+</dd>
+<dt class="field-odd">w/h</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the scanout width/height size</p>
+</dd>
+<dt class="field-even">fdw/fdh/stride/flags</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code>, the DMABUF width/height/stride/flags</p>
+</dd>
+<dt class="field-odd">fourcc</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">i32</span></code>, the DMABUF fourcc</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="c-structure">
+<h3><a class="toc-backref" href="#id11">C structure</a><a class="headerlink" href="#c-structure" title="Permalink to this heading"></a></h3>
+<p>In QEMU the vhost-user-gpu message is implemented with the following struct:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">VhostUserGpuMsg</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">request</span><span class="p">;</span><span class="w"> </span><span class="cm">/* VhostUserGpuRequest */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w"> </span><span class="cm">/* the following payload size */</span><span class="w"></span>
+<span class="w">    </span><span class="k">union</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserGpuCursorPos</span><span class="w"> </span><span class="n">cursor_pos</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserGpuCursorUpdate</span><span class="w"> </span><span class="n">cursor_update</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserGpuScanout</span><span class="w"> </span><span class="n">scanout</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserGpuUpdate</span><span class="w"> </span><span class="n">update</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">VhostUserGpuDMABUFScanout</span><span class="w"> </span><span class="n">dmabuf_scanout</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">virtio_gpu_resp_display_info</span><span class="w"> </span><span class="n">display_info</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">u64</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="n">payload</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">QEMU_PACKED</span><span class="w"> </span><span class="n">VhostUserGpuMsg</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="protocol-features">
+<h3><a class="toc-backref" href="#id12">Protocol features</a><a class="headerlink" href="#protocol-features" title="Permalink to this heading"></a></h3>
+<p>None yet.</p>
+<p>As the protocol may need to evolve, new messages and communication
+changes are negotiated thanks to preliminary
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_GET_PROTOCOL_FEATURES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_SET_PROTOCOL_FEATURES</span></code> requests.</p>
+</section>
+</section>
+<section id="communication">
+<h2><a class="toc-backref" href="#id13">Communication</a><a class="headerlink" href="#communication" title="Permalink to this heading"></a></h2>
+<section id="message-types">
+<h3><a class="toc-backref" href="#id14">Message types</a><a class="headerlink" href="#message-types" title="Permalink to this heading"></a></h3>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_GET_PROTOCOL_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>1</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+</dl>
+<p>Get the supported protocol features bitmask.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_SET_PROTOCOL_FEATURES</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">u64</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Enable protocol features using a bitmask.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_GET_DISPLAY_INFO</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p>N/A</p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">virtio_gpu_resp_display_info</span></code> (from virtio specification)</p>
+</dd>
+</dl>
+<p>Get the preferred display configuration.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_CURSOR_POS</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuCursorPos</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Set/show the cursor position.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_CURSOR_POS_HIDE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuCursorPos</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Set/hide the cursor.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_CURSOR_UPDATE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>6</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuCursorUpdate</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Update the cursor shape and location.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_SCANOUT</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>7</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuScanout</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the scanout resolution. To disable a scanout, the dimensions
+width/height are set to 0.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_UPDATE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>8</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuUpdate</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Update the scanout content. The data payload contains the graphical bits.
+The display should be flushed and presented.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_DMABUF_SCANOUT</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>9</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuDMABUFScanout</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>N/A</p>
+</dd>
+</dl>
+<p>Set the scanout resolution/configuration, and share a DMABUF file
+descriptor for the scanout content, which is passed as ancillary
+data. To disable a scanout, the dimensions width/height are set
+to 0, there is no file descriptor passed.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_DMABUF_UPDATE</span></code></dt><dd><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>10</p>
+</dd>
+<dt class="field-even">request payload</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">VhostUserGpuUpdate</span></code></p>
+</dd>
+<dt class="field-odd">reply payload</dt>
+<dd class="field-odd"><p>empty payload</p>
+</dd>
+</dl>
+<p>The display should be flushed and presented according to updated
+region from <code class="docutils literal notranslate"><span class="pre">VhostUserGpuUpdate</span></code>.</p>
+<p>Note: there is no data payload, since the scanout is shared thanks
+to DMABUF, that must have been set previously with
+<code class="docutils literal notranslate"><span class="pre">VHOST_USER_GPU_DMABUF_SCANOUT</span></code>.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vhost-user.html" class="btn btn-neutral float-left" title="Vhost-user Protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vhost-vdpa.html" class="btn btn-neutral float-right" title="Vhost-vdpa Protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

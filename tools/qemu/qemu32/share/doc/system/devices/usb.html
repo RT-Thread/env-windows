@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USB emulation &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="vhost-user back ends" href="vhost-user.html" />
+    <link rel="prev" title="NVMe Emulation" href="nvme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nvme.html">NVMe Emulation</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">USB emulation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/usb.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb-emulation">
+<span id="pcsys-005fusb"></span><h1>USB emulation<a class="headerlink" href="#usb-emulation" title="Permalink to this heading"></a></h1>
+<p>QEMU can emulate a PCI UHCI, OHCI, EHCI or XHCI USB controller. You can
+plug virtual USB devices or real host USB devices (only works with
+certain host operating systems). QEMU will automatically create and
+connect virtual USB hubs as necessary to connect multiple USB devices.</p>
+<section id="usb-controllers">
+<h2>USB controllers<a class="headerlink" href="#usb-controllers" title="Permalink to this heading"></a></h2>
+<section id="xhci-controller-support">
+<h3>XHCI controller support<a class="headerlink" href="#xhci-controller-support" title="Permalink to this heading"></a></h3>
+<p>QEMU has XHCI host adapter support.  The XHCI hardware design is much
+more virtualization-friendly when compared to EHCI and UHCI, thus XHCI
+emulation uses less resources (especially CPU).  So if your guest
+supports XHCI (which should be the case for any operating system
+released around 2010 or later) we recommend using it:</p>
+<blockquote>
+<div><p>qemu -device qemu-xhci</p>
+</div></blockquote>
+<p>XHCI supports USB 1.1, USB 2.0 and USB 3.0 devices, so this is the
+only controller you need.  With only a single USB controller (and
+therefore only a single USB bus) present in the system there is no
+need to use the bus= parameter when adding USB devices.</p>
+</section>
+<section id="ehci-controller-support">
+<h3>EHCI controller support<a class="headerlink" href="#ehci-controller-support" title="Permalink to this heading"></a></h3>
+<p>The QEMU EHCI Adapter supports USB 2.0 devices.  It can be used either
+standalone or with companion controllers (UHCI, OHCI) for USB 1.1
+devices.  The companion controller setup is more convenient to use
+because it provides a single USB bus supporting both USB 2.0 and USB
+1.1 devices.  See next section for details.</p>
+<p>When running EHCI in standalone mode you can add UHCI or OHCI
+controllers for USB 1.1 devices too.  Each controller creates its own
+bus though, so there are two completely separate USB buses: One USB
+1.1 bus driven by the UHCI controller and one USB 2.0 bus driven by
+the EHCI controller.  Devices must be attached to the correct
+controller manually.</p>
+<p>The easiest way to add a UHCI controller to a <code class="docutils literal notranslate"><span class="pre">pc</span></code> machine is the
+<code class="docutils literal notranslate"><span class="pre">-usb</span></code> switch.  QEMU will create the UHCI controller as function of
+the PIIX3 chipset.  The USB 1.1 bus will carry the name <code class="docutils literal notranslate"><span class="pre">usb-bus.0</span></code>.</p>
+<p>You can use the standard <code class="docutils literal notranslate"><span class="pre">-device</span></code> switch to add a EHCI controller to
+your virtual machine.  It is strongly recommended to specify an ID for
+the controller so the USB 2.0 bus gets an individual name, for example
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-ehci,id=ehci</span></code>.  This will give you a USB 2.0 bus named
+<code class="docutils literal notranslate"><span class="pre">ehci.0</span></code>.</p>
+<p>When adding USB devices using the <code class="docutils literal notranslate"><span class="pre">-device</span></code> switch you can specify the
+bus they should be attached to.  Here is a complete example:</p>
+<pre class="literal-block">qemu-system-x86_64 -M pc ${otheroptions}                        \
+    -drive if=none,id=usbstick,format=raw,file=/path/to/image   \
+    -usb                                                        \
+    -device usb-ehci,id=ehci                                    \
+    -device usb-tablet,bus=usb-bus.0                            \
+    -device usb-storage,bus=ehci.0,drive=usbstick</pre>
+<p>This attaches a USB tablet to the UHCI adapter and a USB mass storage
+device to the EHCI adapter.</p>
+</section>
+<section id="companion-controller-support">
+<h3>Companion controller support<a class="headerlink" href="#companion-controller-support" title="Permalink to this heading"></a></h3>
+<p>The UHCI and OHCI controllers can attach to a USB bus created by EHCI
+as companion controllers.  This is done by specifying the <code class="docutils literal notranslate"><span class="pre">masterbus</span></code>
+and <code class="docutils literal notranslate"><span class="pre">firstport</span></code> properties.  <code class="docutils literal notranslate"><span class="pre">masterbus</span></code> specifies the bus name the
+controller should attach to.  <code class="docutils literal notranslate"><span class="pre">firstport</span></code> specifies the first port the
+controller should attach to, which is needed as usually one EHCI
+controller with six ports has three UHCI companion controllers with
+two ports each.</p>
+<p>There is a config file in docs which will do all this for
+you, which you can use like this:</p>
+<pre class="literal-block">qemu-system-x86_64 -readconfig docs/config/ich9-ehci-uhci.cfg</pre>
+<p>Then use <code class="docutils literal notranslate"><span class="pre">bus=ehci.0</span></code> to assign your USB devices to that bus.</p>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">-usb</span></code> switch for <code class="docutils literal notranslate"><span class="pre">q35</span></code> machines will create a similar
+USB controller configuration.</p>
+</section>
+</section>
+<section id="connecting-usb-devices">
+<span id="id1"></span><h2>Connecting USB devices<a class="headerlink" href="#connecting-usb-devices" title="Permalink to this heading"></a></h2>
+<p>USB devices can be connected with the <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-...</span></code> command line
+option or the <code class="docutils literal notranslate"><span class="pre">device_add</span></code> monitor command. Available devices are:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-mouse</span></code></dt><dd><p>Virtual Mouse. This will override the PS/2 mouse emulation when
+activated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-tablet</span></code></dt><dd><p>Pointer device that uses absolute coordinates (like a touchscreen).
+This means QEMU is able to report the mouse position without having
+to grab the mouse. Also overrides the PS/2 mouse emulation when
+activated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-storage,drive=drive_id</span></code></dt><dd><p>Mass storage device backed by drive_id (see the <a class="reference internal" href="../images.html#disk-images"><span class="std std-ref">Disk Images</span></a>
+chapter in the System Emulation Users Guide). This is the classic
+bulk-only transport protocol used by 99% of USB sticks. This
+example shows it connected to an XHCI USB controller and with
+a drive backed by a raw format disk image:</p>
+<pre class="literal-block">qemu-system-x86_64 [...]                                   \
+ -drive if=none,id=stick,format=raw,file=/path/to/file.img \
+ -device nec-usb-xhci,id=xhci                              \
+ -device usb-storage,bus=xhci.0,drive=stick</pre>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-uas</span></code></dt><dd><p>USB attached SCSI device. This does not create a SCSI disk, so
+you need to explicitly create a <code class="docutils literal notranslate"><span class="pre">scsi-hd</span></code> or <code class="docutils literal notranslate"><span class="pre">scsi-cd</span></code> device
+on the command line, as well as using the <code class="docutils literal notranslate"><span class="pre">-drive</span></code> option to
+specify what those disks are backed by. One <code class="docutils literal notranslate"><span class="pre">usb-uas</span></code> device can
+handle multiple logical units (disks). This example creates three
+logical units: two disks and one cdrom drive:</p>
+<pre class="literal-block">qemu-system-x86_64 [...]                                         \
+ -drive if=none,id=uas-disk1,format=raw,file=/path/to/file1.img  \
+ -drive if=none,id=uas-disk2,format=raw,file=/path/to/file2.img  \
+ -drive if=none,id=uas-cdrom,media=cdrom,format=raw,file=/path/to/image.iso \
+ -device nec-usb-xhci,id=xhci                                    \
+ -device usb-uas,id=uas,bus=xhci.0                               \
+ -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=uas-disk1       \
+ -device scsi-hd,bus=uas.0,scsi-id=0,lun=1,drive=uas-disk2       \
+ -device scsi-cd,bus=uas.0,scsi-id=0,lun=5,drive=uas-cdrom</pre>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-bot</span></code></dt><dd><p>Bulk-only transport storage device. This presents the guest with the
+same USB bulk-only transport protocol interface as <code class="docutils literal notranslate"><span class="pre">usb-storage</span></code>, but
+the QEMU command line option works like <code class="docutils literal notranslate"><span class="pre">usb-uas</span></code> and does not
+automatically create SCSI disks for you. <code class="docutils literal notranslate"><span class="pre">usb-bot</span></code> supports up to
+16 LUNs. Unlike <code class="docutils literal notranslate"><span class="pre">usb-uas</span></code>, the LUN numbers must be continuous,
+i.e. for three devices you must use 0+1+2. The 0+1+5 numbering from the
+<code class="docutils literal notranslate"><span class="pre">usb-uas</span></code> example above won’t work with <code class="docutils literal notranslate"><span class="pre">usb-bot</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-mtp,rootdir=dir</span></code></dt><dd><p>Media transfer protocol device, using dir as root of the file tree
+that is presented to the guest.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-host,hostbus=bus,hostaddr=addr</span></code></dt><dd><p>Pass through the host device identified by bus and addr</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-host,vendorid=vendor,productid=product</span></code></dt><dd><p>Pass through the host device identified by vendor and product ID</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-wacom-tablet</span></code></dt><dd><p>Virtual Wacom PenPartner tablet. This device is similar to the
+<code class="docutils literal notranslate"><span class="pre">tablet</span></code> above but it can be used with the tslib library because in
+addition to touch coordinates it reports touch pressure.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-kbd</span></code></dt><dd><p>Standard USB keyboard. Will override the PS/2 keyboard (if present).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-serial,chardev=id</span></code></dt><dd><p>Serial converter. This emulates an FTDI FT232BM chip connected to
+host character device id.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-braille,chardev=id</span></code></dt><dd><p>Braille device. This emulates a Baum Braille device USB port. id has to
+specify a character device defined with <code class="docutils literal notranslate"><span class="pre">-chardev</span> <span class="pre">…,id=id</span></code>.  One will
+normally use BrlAPI to display the braille output on a BRLTTY-supported
+device with</p>
+<pre class="literal-block">qemu-system-x86_64 [...] -chardev braille,id=brl -device usb-braille,chardev=brl</pre>
+<p>or alternatively, use the following equivalent shortcut:</p>
+<pre class="literal-block">qemu-system-x86_64 [...] -usbdevice braille</pre>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-net[,netdev=id]</span></code></dt><dd><p>Network adapter that supports CDC ethernet and RNDIS protocols. id
+specifies a netdev defined with <code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">…,id=id</span></code>. For instance,
+user-mode networking can be used with</p>
+<pre class="literal-block">qemu-system-x86_64 [...] -netdev user,id=net0 -device usb-net,netdev=net0</pre>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-ccid</span></code></dt><dd><p>Smartcard reader device</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">usb-audio</span></code></dt><dd><p>USB audio device</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">u2f-{emulated,passthru}</span></code></dt><dd><p>Universal Second Factor device</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">canokey</span></code></dt><dd><p>An Open-source Secure Key implementing FIDO2, OpenPGP, PIV and more.
+For more information, see <a class="reference internal" href="canokey.html#canokey"><span class="std std-ref">CanoKey QEMU</span></a>.</p>
+</dd>
+</dl>
+<section id="physical-port-addressing">
+<h3>Physical port addressing<a class="headerlink" href="#physical-port-addressing" title="Permalink to this heading"></a></h3>
+<p>For all the above USB devices, by default QEMU will plug the device
+into the next available port on the specified USB bus, or onto
+some available USB bus if you didn’t specify one explicitly.
+If you need to, you can also specify the physical port where
+the device will show up in the guest.  This can be done using the
+<code class="docutils literal notranslate"><span class="pre">port</span></code> property.  UHCI has two root ports (1,2).  EHCI has six root
+ports (1-6), and the emulated (1.1) USB hub has eight ports.</p>
+<p>Plugging a tablet into UHCI port 1 works like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">tablet</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">usb</span><span class="o">-</span><span class="n">bus</span><span class="mf">.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Plugging a hub into UHCI port 2 works like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">hub</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">usb</span><span class="o">-</span><span class="n">bus</span><span class="mf">.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>Plugging a virtual USB stick into port 4 of the hub just plugged works
+this way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">usb</span><span class="o">-</span><span class="n">storage</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">usb</span><span class="o">-</span><span class="n">bus</span><span class="mf">.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>In the monitor, the <code class="docutils literal notranslate"><span class="pre">device_add`</span> <span class="pre">command</span> <span class="pre">also</span> <span class="pre">accepts</span> <span class="pre">a</span> <span class="pre">``port</span></code>
+property specification. If you want to unplug devices too you should
+specify some unique id which you can use to refer to the device.
+You can then use <code class="docutils literal notranslate"><span class="pre">device_del</span></code> to unplug the device later.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">device_add</span> <span class="n">usb</span><span class="o">-</span><span class="n">tablet</span><span class="p">,</span><span class="n">bus</span><span class="o">=</span><span class="n">usb</span><span class="o">-</span><span class="n">bus</span><span class="mf">.0</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">tablet</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">device_del</span> <span class="n">my</span><span class="o">-</span><span class="n">tablet</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="hotplugging-usb-storage">
+<h2>Hotplugging USB storage<a class="headerlink" href="#hotplugging-usb-storage" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">usb-bot</span></code> and <code class="docutils literal notranslate"><span class="pre">usb-uas</span></code> devices can be hotplugged.  In the hotplug
+case they are added with <code class="docutils literal notranslate"><span class="pre">attached</span> <span class="pre">=</span> <span class="pre">false</span></code> so the guest will not see
+the device until the <code class="docutils literal notranslate"><span class="pre">attached</span></code> property is explicitly set to true.
+That allows you to attach one or more scsi devices before making the
+device visible to the guest. The workflow looks like this:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">device-add</span> <span class="pre">usb-bot,id=foo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">device-add</span> <span class="pre">scsi-{hd,cd},bus=foo.0,lun=0</span></code></p></li>
+<li><p>optionally add more devices (luns 1 … 15)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scripts/qmp/qom-set</span> <span class="pre">foo.attached</span> <span class="pre">=</span> <span class="pre">true</span></code></p></li>
+</ol>
+</section>
+<section id="using-host-usb-devices-on-a-linux-host">
+<span id="host-005fusb-005fdevices"></span><h2>Using host USB devices on a Linux host<a class="headerlink" href="#using-host-usb-devices-on-a-linux-host" title="Permalink to this heading"></a></h2>
+<p>WARNING: this is an experimental feature. QEMU will slow down when using
+it. USB devices requiring real time streaming (i.e. USB Video Cameras)
+are not supported yet.</p>
+<ol class="arabic">
+<li><p>If you use an early Linux 2.4 kernel, verify that no Linux driver is
+actually using the USB device. A simple way to do that is simply to
+disable the corresponding kernel module by renaming it from
+<code class="docutils literal notranslate"><span class="pre">mydriver.o</span></code> to <code class="docutils literal notranslate"><span class="pre">mydriver.o.disabled</span></code>.</p></li>
+<li><p>Verify that <code class="docutils literal notranslate"><span class="pre">/proc/bus/usb</span></code> is working (most Linux distributions
+should enable it by default). You should see something like that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">usb</span>
+<span class="mi">001</span>  <span class="n">devices</span>  <span class="n">drivers</span>
+</pre></div>
+</div>
+</li>
+<li><p>Since only root can access to the USB devices directly, you can
+either launch QEMU as root or change the permissions of the USB
+devices you want to use. For testing, the following suffices:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chown</span> <span class="o">-</span><span class="n">R</span> <span class="n">myuid</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">usb</span>
+</pre></div>
+</div>
+</li>
+<li><p>Launch QEMU and do in the monitor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">info</span> <span class="n">usbhost</span>
+  <span class="n">Device</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">speed</span> <span class="mi">480</span> <span class="n">Mb</span><span class="o">/</span><span class="n">s</span>
+    <span class="n">Class</span> <span class="mi">00</span><span class="p">:</span> <span class="n">USB</span> <span class="n">device</span> <span class="mi">1234</span><span class="p">:</span><span class="mi">5678</span><span class="p">,</span> <span class="n">USB</span> <span class="n">DISK</span>
+</pre></div>
+</div>
+<p>You should see the list of the devices you can use (Never try to use
+hubs, it won’t work).</p>
+</li>
+<li><p>Add the device in QEMU by using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device_add</span> <span class="n">usb</span><span class="o">-</span><span class="n">host</span><span class="p">,</span><span class="n">vendorid</span><span class="o">=</span><span class="mh">0x1234</span><span class="p">,</span><span class="n">productid</span><span class="o">=</span><span class="mh">0x5678</span>
+</pre></div>
+</div>
+<p>Normally the guest OS should report that a new USB device is plugged.
+You can use the option <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-host,...</span></code> to do the same.</p>
+</li>
+<li><p>Now you can try to use the host USB device in QEMU.</p></li>
+</ol>
+<p>When relaunching QEMU, you may have to unplug and plug again the USB
+device to make it work again (this is a bug).</p>
+<section id="usb-host-properties-for-specifying-the-host-device">
+<h3><code class="docutils literal notranslate"><span class="pre">usb-host</span></code> properties for specifying the host device<a class="headerlink" href="#usb-host-properties-for-specifying-the-host-device" title="Permalink to this heading"></a></h3>
+<p>The example above uses the <code class="docutils literal notranslate"><span class="pre">vendorid</span></code> and <code class="docutils literal notranslate"><span class="pre">productid</span></code> to
+specify which host device to pass through, but this is not
+the only way to specify the host device. <code class="docutils literal notranslate"><span class="pre">usb-host</span></code> supports
+the following properties:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">hostbus=&lt;nr&gt;</span></code></dt><dd><p>Specifies the bus number the device must be attached to</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hostaddr=&lt;nr&gt;</span></code></dt><dd><p>Specifies the device address the device got assigned by the guest os</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hostport=&lt;str&gt;</span></code></dt><dd><p>Specifies the physical port the device is attached to</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">vendorid=&lt;hexnr&gt;</span></code></dt><dd><p>Specifies the vendor ID of the device</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">productid=&lt;hexnr&gt;</span></code></dt><dd><p>Specifies the product ID of the device.</p>
+</dd>
+</dl>
+<p>In theory you can combine all these properties as you like.  In
+practice only a few combinations are useful:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vendorid</span></code> and <code class="docutils literal notranslate"><span class="pre">productid</span></code> – match for a specific device, pass it to
+the guest when it shows up somewhere in the host.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hostbus</span></code> and <code class="docutils literal notranslate"><span class="pre">hostport</span></code> – match for a specific physical port in the
+host, any device which is plugged in there gets passed to the
+guest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hostbus</span></code> and <code class="docutils literal notranslate"><span class="pre">hostaddr</span></code> – most useful for ad-hoc pass through as the
+hostaddr isn’t stable. The next time you plug the device into the host it
+will get a new hostaddr.</p></li>
+</ul>
+<p>Note that on the host USB 1.1 devices are handled by UHCI/OHCI and USB
+2.0 by EHCI.  That means different USB devices plugged into the very
+same physical port on the host may show up on different host buses
+depending on the speed. Supposing that devices plugged into a given
+physical port appear as bus 1 + port 1 for 2.0 devices and bus 3 + port 1
+for 1.1 devices, you can pass through any device plugged into that port
+and also assign it to the correct USB bus in QEMU like this:</p>
+<pre class="literal-block">qemu-system-x86_64 -M pc [...]                            \
+     -usb                                                 \
+     -device usb-ehci,id=ehci                             \
+     -device usb-host,bus=usb-bus.0,hostbus=3,hostport=1  \
+     -device usb-host,bus=ehci.0,hostbus=1,hostport=1</pre>
+</section>
+<section id="usb-host-properties-for-reset-behavior">
+<h3><code class="docutils literal notranslate"><span class="pre">usb-host</span></code> properties for reset behavior<a class="headerlink" href="#usb-host-properties-for-reset-behavior" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">guest-reset</span></code> and <code class="docutils literal notranslate"><span class="pre">guest-reset-all</span></code> properties control
+whenever the guest is allowed to reset the physical usb device on the
+host.  There are three cases:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">guest-reset=false</span></code></dt><dd><p>The guest is not allowed to reset the (physical) usb device.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">guest-reset=true,guest-resets-all=false</span></code></dt><dd><p>The guest is allowed to reset the device when it is not yet
+initialized (aka no usb bus address assigned).  Usually this results
+in one guest reset being allowed.  This is the default behavior.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">guest-reset=true,guest-resets-all=true</span></code></dt><dd><p>The guest is allowed to reset the device as it pleases.</p>
+</dd>
+</dl>
+<p>The reason for this existing are broken usb devices.  In theory one
+should be able to reset (and re-initialize) usb devices at any time.
+In practice that may result in shitty usb device firmware crashing and
+the device not responding any more until you power-cycle (aka un-plug
+and re-plug) it.</p>
+<p>What works best pretty much depends on the behavior of the specific
+usb device at hand, so it’s a trial-and-error game.  If the default
+doesn’t work, try another option and see whenever the situation
+improves.</p>
+</section>
+<section id="record-usb-transfers">
+<h3>record usb transfers<a class="headerlink" href="#record-usb-transfers" title="Permalink to this heading"></a></h3>
+<p>All usb devices have support for recording the usb traffic.  This can
+be enabled using the <code class="docutils literal notranslate"><span class="pre">pcap=&lt;file&gt;</span></code> property, for example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-mouse,pcap=mouse.pcap</span></code></p>
+<p>The pcap files are compatible with the linux kernels usbmon.  Many
+tools, including <code class="docutils literal notranslate"><span class="pre">wireshark</span></code>, can decode and inspect these trace
+files.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nvme.html" class="btn btn-neutral float-left" title="NVMe Emulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vhost-user.html" class="btn btn-neutral float-right" title="vhost-user back ends" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

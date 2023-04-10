@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A-profile CPU architecture support &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Arm CPU Features" href="cpu-features.html" />
+    <link rel="prev" title="Xilinx Versal Virt (xlnx-versal-virt)" href="xlnx-versal-virt.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">A-profile CPU architecture support</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/emulation.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="a-profile-cpu-architecture-support">
+<h1>A-profile CPU architecture support<a class="headerlink" href="#a-profile-cpu-architecture-support" title="Permalink to this heading"></a></h1>
+<p>QEMU’s TCG emulation includes support for the Armv5, Armv6, Armv7 and
+Armv8 versions of the A-profile architecture. It also has support for
+the following architecture extensions:</p>
+<ul class="simple">
+<li><p>FEAT_AA32BF16 (AArch32 BFloat16 instructions)</p></li>
+<li><p>FEAT_AA32HPD (AArch32 hierarchical permission disables)</p></li>
+<li><p>FEAT_AA32I8MM (AArch32 Int8 matrix multiplication instructions)</p></li>
+<li><p>FEAT_AES (AESD and AESE instructions)</p></li>
+<li><p>FEAT_BBM at level 2 (Translation table break-before-make levels)</p></li>
+<li><p>FEAT_BF16 (AArch64 BFloat16 instructions)</p></li>
+<li><p>FEAT_BTI (Branch Target Identification)</p></li>
+<li><p>FEAT_CSV2 (Cache speculation variant 2)</p></li>
+<li><p>FEAT_CSV2_1p1 (Cache speculation variant 2, version 1.1)</p></li>
+<li><p>FEAT_CSV2_1p2 (Cache speculation variant 2, version 1.2)</p></li>
+<li><p>FEAT_CSV2_2 (Cache speculation variant 2, version 2)</p></li>
+<li><p>FEAT_CSV3 (Cache speculation variant 3)</p></li>
+<li><p>FEAT_DGH (Data gathering hint)</p></li>
+<li><p>FEAT_DIT (Data Independent Timing instructions)</p></li>
+<li><p>FEAT_DPB (DC CVAP instruction)</p></li>
+<li><p>FEAT_Debugv8p2 (Debug changes for v8.2)</p></li>
+<li><p>FEAT_Debugv8p4 (Debug changes for v8.4)</p></li>
+<li><p>FEAT_DotProd (Advanced SIMD dot product instructions)</p></li>
+<li><p>FEAT_DoubleFault (Double Fault Extension)</p></li>
+<li><p>FEAT_E0PD (Preventing EL0 access to halves of address maps)</p></li>
+<li><p>FEAT_ETS (Enhanced Translation Synchronization)</p></li>
+<li><p>FEAT_FCMA (Floating-point complex number instructions)</p></li>
+<li><p>FEAT_FHM (Floating-point half-precision multiplication instructions)</p></li>
+<li><p>FEAT_FP16 (Half-precision floating-point data processing)</p></li>
+<li><p>FEAT_FRINTTS (Floating-point to integer instructions)</p></li>
+<li><p>FEAT_FlagM (Flag manipulation instructions v2)</p></li>
+<li><p>FEAT_FlagM2 (Enhancements to flag manipulation instructions)</p></li>
+<li><p>FEAT_GTG (Guest translation granule size)</p></li>
+<li><p>FEAT_HAFDBS (Hardware management of the access flag and dirty bit state)</p></li>
+<li><p>FEAT_HCX (Support for the HCRX_EL2 register)</p></li>
+<li><p>FEAT_HPDS (Hierarchical permission disables)</p></li>
+<li><p>FEAT_I8MM (AArch64 Int8 matrix multiplication instructions)</p></li>
+<li><p>FEAT_IDST (ID space trap handling)</p></li>
+<li><p>FEAT_IESB (Implicit error synchronization event)</p></li>
+<li><p>FEAT_JSCVT (JavaScript conversion instructions)</p></li>
+<li><p>FEAT_LOR (Limited ordering regions)</p></li>
+<li><p>FEAT_LPA (Large Physical Address space)</p></li>
+<li><p>FEAT_LPA2 (Large Physical and virtual Address space v2)</p></li>
+<li><p>FEAT_LRCPC (Load-acquire RCpc instructions)</p></li>
+<li><p>FEAT_LRCPC2 (Load-acquire RCpc instructions v2)</p></li>
+<li><p>FEAT_LSE (Large System Extensions)</p></li>
+<li><p>FEAT_LVA (Large Virtual Address space)</p></li>
+<li><p>FEAT_MTE (Memory Tagging Extension)</p></li>
+<li><p>FEAT_MTE2 (Memory Tagging Extension)</p></li>
+<li><p>FEAT_MTE3 (MTE Asymmetric Fault Handling)</p></li>
+<li><p>FEAT_PAN (Privileged access never)</p></li>
+<li><p>FEAT_PAN2 (AT S1E1R and AT S1E1W instruction variants affected by PSTATE.PAN)</p></li>
+<li><p>FEAT_PAuth (Pointer authentication)</p></li>
+<li><p>FEAT_PMULL (PMULL, PMULL2 instructions)</p></li>
+<li><p>FEAT_PMUv3p1 (PMU Extensions v3.1)</p></li>
+<li><p>FEAT_PMUv3p4 (PMU Extensions v3.4)</p></li>
+<li><p>FEAT_PMUv3p5 (PMU Extensions v3.5)</p></li>
+<li><p>FEAT_RAS (Reliability, availability, and serviceability)</p></li>
+<li><p>FEAT_RASv1p1 (RAS Extension v1.1)</p></li>
+<li><p>FEAT_RDM (Advanced SIMD rounding double multiply accumulate instructions)</p></li>
+<li><p>FEAT_RNG (Random number generator)</p></li>
+<li><p>FEAT_S2FWB (Stage 2 forced Write-Back)</p></li>
+<li><p>FEAT_SB (Speculation Barrier)</p></li>
+<li><p>FEAT_SEL2 (Secure EL2)</p></li>
+<li><p>FEAT_SHA1 (SHA1 instructions)</p></li>
+<li><p>FEAT_SHA256 (SHA256 instructions)</p></li>
+<li><p>FEAT_SHA3 (Advanced SIMD SHA3 instructions)</p></li>
+<li><p>FEAT_SHA512 (Advanced SIMD SHA512 instructions)</p></li>
+<li><p>FEAT_SM3 (Advanced SIMD SM3 instructions)</p></li>
+<li><p>FEAT_SM4 (Advanced SIMD SM4 instructions)</p></li>
+<li><p>FEAT_SME (Scalable Matrix Extension)</p></li>
+<li><p>FEAT_SME_FA64 (Full A64 instruction set in Streaming SVE mode)</p></li>
+<li><p>FEAT_SME_F64F64 (Double-precision floating-point outer product instructions)</p></li>
+<li><p>FEAT_SME_I16I64 (16-bit to 64-bit integer widening outer product instructions)</p></li>
+<li><p>FEAT_SPECRES (Speculation restriction instructions)</p></li>
+<li><p>FEAT_SSBS (Speculative Store Bypass Safe)</p></li>
+<li><p>FEAT_TLBIOS (TLB invalidate instructions in Outer Shareable domain)</p></li>
+<li><p>FEAT_TLBIRANGE (TLB invalidate range instructions)</p></li>
+<li><p>FEAT_TTCNP (Translation table Common not private translations)</p></li>
+<li><p>FEAT_TTL (Translation Table Level)</p></li>
+<li><p>FEAT_TTST (Small translation tables)</p></li>
+<li><p>FEAT_UAO (Unprivileged Access Override control)</p></li>
+<li><p>FEAT_VHE (Virtualization Host Extensions)</p></li>
+<li><p>FEAT_VMID16 (16-bit VMID)</p></li>
+<li><p>FEAT_XNX (Translation table stage 2 Unprivileged Execute-never)</p></li>
+<li><p>SVE (The Scalable Vector Extension)</p></li>
+<li><p>SVE2 (The Scalable Vector Extension v2)</p></li>
+</ul>
+<p>For information on the specifics of these extensions, please refer
+to the <a class="reference external" href="https://developer.arm.com/documentation/ddi0487/latest">Armv8-A Arm Architecture Reference Manual</a>.</p>
+<p>When a specific named CPU is being emulated, only those features which
+are present in hardware for that CPU are emulated. (If a feature is
+not in the list above then it is not supported, even if the real
+hardware should have it.) The <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU enables all features.</p>
+</section>
+<section id="r-profile-cpu-architecture-support">
+<h1>R-profile CPU architecture support<a class="headerlink" href="#r-profile-cpu-architecture-support" title="Permalink to this heading"></a></h1>
+<p>QEMU’s TCG emulation support for R-profile CPUs is currently limited.
+We emulate only the Cortex-R5 and Cortex-R5F CPUs.</p>
+</section>
+<section id="m-profile-cpu-architecture-support">
+<h1>M-profile CPU architecture support<a class="headerlink" href="#m-profile-cpu-architecture-support" title="Permalink to this heading"></a></h1>
+<p>QEMU’s TCG emulation includes support for Armv6-M, Armv7-M, Armv8-M, and
+Armv8.1-M versions of the M-profile architucture.  It also has support
+for the following architecture extensions:</p>
+<ul class="simple">
+<li><p>FP (Floating-point Extension)</p></li>
+<li><p>FPCXT (FPCXT access instructions)</p></li>
+<li><p>HP (Half-precision floating-point instructions)</p></li>
+<li><p>LOB (Low Overhead loops and Branch future)</p></li>
+<li><p>M (Main Extension)</p></li>
+<li><p>MPU (Memory Protection Unit Extension)</p></li>
+<li><p>PXN (Privileged Execute Never)</p></li>
+<li><p>RAS (Reliability, Serviceability and Availability): “minimum RAS Extension” only</p></li>
+<li><p>S (Security Extension)</p></li>
+<li><p>ST (System Timer Extension)</p></li>
+</ul>
+<p>For information on the specifics of these extensions, please refer
+to the <a class="reference external" href="https://developer.arm.com/documentation/ddi0553/latest">Armv8-M Arm Architecture Reference Manual</a>.</p>
+<p>When a specific named CPU is being emulated, only those features which
+are present in hardware for that CPU are emulated. (If a feature is
+not in the list above then it is not supported, even if the real
+hardware should have it.) There is no equivalent of the <code class="docutils literal notranslate"><span class="pre">max</span></code> CPU for
+M-profile.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="xlnx-versal-virt.html" class="btn btn-neutral float-left" title="Xilinx Versal Virt (xlnx-versal-virt)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cpu-features.html" class="btn btn-neutral float-right" title="Arm CPU Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

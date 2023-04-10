@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pSeries family boards (pseries) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="sPAPR Dynamic Reconfiguration" href="../../specs/ppc-spapr-hotplug.html" />
+    <link rel="prev" title="Prep machine (40p)" href="prep.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-ppc.html">PowerPC System emulator</a></li>
+      <li class="breadcrumb-item active">pSeries family boards (<code class="docutils literal notranslate"><span class="pre">pseries</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/ppc/pseries.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pseries-family-boards-pseries">
+<h1>pSeries family boards (<code class="docutils literal notranslate"><span class="pre">pseries</span></code>)<a class="headerlink" href="#pseries-family-boards-pseries" title="Permalink to this heading"></a></h1>
+<p>The Power machine para-virtualized environment described by the Linux on Power
+Architecture Reference (<a class="reference internal" href="#lopar" id="id1"><span>[LoPAR]</span></a>) document is called pSeries. This environment
+is also known as sPAPR, System p guests, or simply Power Linux guests (although
+it is capable of running other operating systems, such as AIX).</p>
+<p>Even though pSeries is designed to behave as a guest environment, it is also
+capable of acting as a hypervisor OS, providing, on that role, nested
+virtualization capabilities.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Multi processor support for many Power processors generations: POWER7,
+POWER7+, POWER8, POWER8NVL, POWER9, and Power10. Support for POWER5+ exists,
+but its state is unknown.</p></li>
+<li><p>Interrupt Controller, XICS (POWER8) and XIVE (POWER9 and Power10)</p></li>
+<li><p>vPHB PCIe Host bridge.</p></li>
+<li><p>vscsi and vnet devices, compatible with the same devices available on a
+PowerVM hypervisor with VIOS managing LPARs.</p></li>
+<li><p>Virtio based devices.</p></li>
+<li><p>PCIe device pass through.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="missing-devices">
+<h2>Missing devices<a class="headerlink" href="#missing-devices" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>SPICE support.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="firmware">
+<h2>Firmware<a class="headerlink" href="#firmware" title="Permalink to this heading"></a></h2>
+<p>The pSeries platform in QEMU comes with 2 firmwares:</p>
+<p><a class="reference external" href="https://github.com/aik/SLOF">SLOF</a> (Slimline Open Firmware) is an
+implementation of the <a class="reference external" href="https://standards.ieee.org/standard/1275-1994.html">IEEE 1275-1994, Standard for Boot (Initialization
+Configuration) Firmware: Core Requirements and Practices</a>.</p>
+<p>SLOF performs bus scanning, PCI resource allocation, provides the client
+interface to boot from block devices and network.</p>
+<p>QEMU includes a prebuilt image of SLOF which is updated when a more recent
+version is required.</p>
+<p>VOF (Virtual Open Firmware) is a minimalistic firmware to work with
+<code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">pseries,x-vof=on</span></code>. When enabled, the firmware acts as a slim
+shim and QEMU implements parts of the IEEE 1275 Open Firmware interface.</p>
+<p>VOF does not have device drivers, does not do PCI resource allocation and
+relies on <code class="docutils literal notranslate"><span class="pre">-kernel</span></code> used with Linux kernels recent enough (v5.4+)
+to PCI resource assignment. It is ideal to use with petitboot.</p>
+<p>Booting via <code class="docutils literal notranslate"><span class="pre">-kernel</span></code> supports the following:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 34%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>kernel</p></th>
+<th class="head"><p>pseries,x-vof=off</p></th>
+<th class="head"><p>pseries,x-vof=on</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>vmlinux BE</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>vmlinux LE</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>zImage.pseries BE</p></td>
+<td><p>✓¹</p></td>
+<td><p>✓¹</p></td>
+</tr>
+<tr class="row-odd"><td><p>zImage.pseries LE</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+<p>¹ must set kernel-addr=0</p>
+</section>
+<section id="build-directions">
+<h2>Build directions<a class="headerlink" href="#build-directions" title="Permalink to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./configure --target-list<span class="o">=</span>ppc64-softmmu <span class="o">&amp;&amp;</span> make
+</pre></div>
+</div>
+</section>
+<section id="running-instructions">
+<h2>Running instructions<a class="headerlink" href="#running-instructions" title="Permalink to this heading"></a></h2>
+<p>Someone can select the pSeries machine type by running QEMU with the following
+options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qemu-system-ppc64 -M pseries &lt;other QEMU arguments&gt;
+</pre></div>
+</div>
+</section>
+<section id="spapr-devices">
+<h2>sPAPR devices<a class="headerlink" href="#spapr-devices" title="Permalink to this heading"></a></h2>
+<p>The sPAPR specification defines a set of para-virtualized devices, which are
+also supported by the pSeries machine in QEMU and can be instantiated with the
+<code class="docutils literal notranslate"><span class="pre">-device</span></code> option:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-vlan</span></code> : a virtual network interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-vscsi</span></code> : a virtual SCSI disk interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-rng</span></code> : a pseudo-device for passing random number generator data to the
+guest (see the <a class="reference external" href="https://wiki.qemu.org/Features/HRandomHypercall">H_RANDOM hypercall feature</a> for details).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-vty</span></code>: a virtual teletype.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-pci-host-bridge</span></code>: a PCI host bridge.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tpm-spapr</span></code>: a Trusted Platform Module (TPM).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spapr-tpm-proxy</span></code>: a TPM proxy.</p></li>
+</ul>
+<p>These are compatible with the devices historically available for use when
+running the IBM PowerVM hypervisor with LPARs.</p>
+<p>However, since these devices have originally been specified with another
+hypervisor and non-Linux guests in mind, you should use the virtio counterparts
+(virtio-net, virtio-blk/scsi and virtio-rng for instance) if possible instead,
+since they will most probably give you better performance with Linux guests in a
+QEMU environment.</p>
+<p>The pSeries machine in QEMU is always instantiated with the following devices:</p>
+<ul class="simple">
+<li><p>A NVRAM device (<code class="docutils literal notranslate"><span class="pre">spapr-nvram</span></code>).</p></li>
+<li><p>A virtual teletype (<code class="docutils literal notranslate"><span class="pre">spapr-vty</span></code>).</p></li>
+<li><p>A PCI host bridge (<code class="docutils literal notranslate"><span class="pre">spapr-pci-host-bridge</span></code>).</p></li>
+</ul>
+<p>Hence, it is not needed to add them manually, unless you use the <code class="docutils literal notranslate"><span class="pre">-nodefaults</span></code>
+command line option in QEMU.</p>
+<p>In the case of the default <code class="docutils literal notranslate"><span class="pre">spapr-nvram</span></code> device, if someone wants to make the
+contents of the NVRAM device persistent, they will need to specify a PFLASH
+device when starting QEMU, i.e. either use
+<code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=pflash,file=&lt;filename&gt;,format=raw</span></code> to set the default PFLASH
+device, or specify one with an ID
+(<code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=none,file=&lt;filename&gt;,format=raw,id=pfid</span></code>) and pass that ID to the
+NVRAM device with <code class="docutils literal notranslate"><span class="pre">-global</span> <span class="pre">spapr-nvram.drive=pfid</span></code>.</p>
+<section id="spapr-specification">
+<h3>sPAPR specification<a class="headerlink" href="#spapr-specification" title="Permalink to this heading"></a></h3>
+<p>The main source of documentation on the sPAPR standard is the <a class="reference internal" href="#lopar" id="id2"><span>[LoPAR]</span></a> document.
+However, documentation specific to QEMU’s implementation of the specification
+can  also be found in QEMU documentation:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-hotplug.html">sPAPR Dynamic Reconfiguration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-hcalls.html">sPAPR hypervisor calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-uv-hcalls.html">Hypervisor calls and the Ultravisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="switching-between-the-kvm-pr-and-kvm-hv-kernel-module">
+<h2>Switching between the KVM-PR and KVM-HV kernel module<a class="headerlink" href="#switching-between-the-kvm-pr-and-kvm-hv-kernel-module" title="Permalink to this heading"></a></h2>
+<p>Currently, there are two implementations of KVM on Power, <code class="docutils literal notranslate"><span class="pre">kvm_hv.ko</span></code> and
+<code class="docutils literal notranslate"><span class="pre">kvm_pr.ko</span></code>.</p>
+<p>If a host supports both KVM modes, and both KVM kernel modules are loaded, it is
+possible to switch between the two modes with the <code class="docutils literal notranslate"><span class="pre">kvm-type</span></code> parameter:</p>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc64</span> <span class="pre">-M</span> <span class="pre">pseries,accel=kvm,kvm-type=PR</span></code> to use the
+<code class="docutils literal notranslate"><span class="pre">kvm_pr.ko</span></code> kernel module.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">qemu-system-ppc64</span> <span class="pre">-M</span> <span class="pre">pseries,accel=kvm,kvm-type=HV</span></code> to use <code class="docutils literal notranslate"><span class="pre">kvm_hv.ko</span></code>
+instead.</p></li>
+</ul>
+<section id="kvm-pr">
+<h3>KVM-PR<a class="headerlink" href="#kvm-pr" title="Permalink to this heading"></a></h3>
+<p>KVM-PR uses the so-called <strong>PR</strong>oblem state of the PPC CPUs to run the guests,
+i.e. the virtual machine is run in user mode and all privileged instructions
+trap and have to be emulated by the host. That means you can run KVM-PR inside
+a pSeries guest (or a PowerVM LPAR for that matter), and that is where it has
+originated, as historically (prior to POWER7) it was not possible to run Linux
+on hypervisor mode on a Power processor (this function was restricted to
+PowerVM, the IBM proprietary hypervisor).</p>
+<p>Because all privileged instructions are trapped, guests that use a lot of
+privileged instructions run quite slow with KVM-PR. On the other hand, because
+of that, this kernel module can run on pretty much every PPC hardware, and is
+able to emulate a lot of guests CPUs. This module can even be used to run other
+PowerPC guests like an emulated PowerMac.</p>
+<p>As KVM-PR can be run inside a pSeries guest, it can also provide nested
+virtualization capabilities (i.e. running a guest from within a guest).</p>
+<p>It is important to notice that, as KVM-HV provides a much better execution
+performance, maintenance work has been much more focused on it in the past
+years. Maintenance for KVM-PR has been minimal.</p>
+<p>In order to run KVM-PR guests with POWER9 processors, someone will need to start
+QEMU with <code class="docutils literal notranslate"><span class="pre">kernel_irqchip=off</span></code> command line option.</p>
+</section>
+<section id="kvm-hv">
+<h3>KVM-HV<a class="headerlink" href="#kvm-hv" title="Permalink to this heading"></a></h3>
+<p>KVM-HV uses the hypervisor mode of more recent Power processors, that allow
+access to the bare metal hardware directly. Although POWER7 had this capability,
+it was only starting with POWER8 that this was officially supported by IBM.</p>
+<p>Originally, KVM-HV was only available when running on a PowerNV platform (a.k.a.
+Power bare metal). Although it runs on a PowerNV platform, it can only be used
+to start pSeries guests. As the pSeries guest doesn’t have access to the
+hypervisor mode of the Power CPU, it wasn’t possible to run KVM-HV on a guest.
+This limitation has been lifted, and now it is possible to run KVM-HV inside
+pSeries guests as well, making nested virtualization possible with KVM-HV.</p>
+<p>As KVM-HV has access to privileged instructions, guests that use a lot of these
+can run much faster than with KVM-PR. On the other hand, the guest CPU has to be
+of the same type as the host CPU this way, e.g. it is not possible to specify an
+embedded PPC CPU for the guest with KVM-HV. However, there is at least the
+possibility to run the guest in a backward-compatibility mode of the previous
+CPUs generations, e.g. you can run a POWER7 guest on a POWER8 host by using
+<code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">POWER8,compat=power7</span></code> as parameter to QEMU.</p>
+</section>
+</section>
+<section id="modules-support">
+<h2>Modules support<a class="headerlink" href="#modules-support" title="Permalink to this heading"></a></h2>
+<p>As noticed in the sections above, each module can run in a different
+environment. The following table shows with which environment each module can
+run. As long as you are in a supported environment, you can run KVM-PR or KVM-HV
+nested. Combinations not shown in the table are not available.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 17%" />
+<col style="width: 9%" />
+<col style="width: 28%" />
+<col style="width: 14%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Host type</p></th>
+<th class="head"><p>Bits</p></th>
+<th class="head"><p>Page table format</p></th>
+<th class="head"><p>KVM-HV</p></th>
+<th class="head"><p>KVM-PR</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="4"><p>PowerNV</p></td>
+<td rowspan="4"><p>bare metal</p></td>
+<td rowspan="2"><p>32</p></td>
+<td><p>hash</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>64</p></td>
+<td><p>hash</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td rowspan="8"><p>pSeries <a class="footnote-reference brackets" href="#id6" id="id3">1</a></p></td>
+<td rowspan="4"><p>PowerNV</p></td>
+<td rowspan="2"><p>32</p></td>
+<td><p>hash</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>64</p></td>
+<td><p>hash</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix</p></td>
+<td><p>yes <a class="footnote-reference brackets" href="#id7" id="id4">2</a></p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><p>PowerVM</p></td>
+<td rowspan="2"><p>32</p></td>
+<td><p>hash</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>64</p></td>
+<td><p>hash</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>radix <a class="footnote-reference brackets" href="#id8" id="id5">3</a></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dd><p>On POWER9 DD2.1 processors, the page table format on the host and guest
+must be the same.</p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
+<dd><p>KVM-HV cannot run nested on POWER8 machines.</p>
+</dd>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
+<dd><p>Introduced on Power10 machines.</p>
+</dd>
+</dl>
+<section id="power-papr-protected-execution-facility-pef">
+<span id="id9"></span><h3>POWER (PAPR) Protected Execution Facility (PEF)<a class="headerlink" href="#power-papr-protected-execution-facility-pef" title="Permalink to this heading"></a></h3>
+<p>Protected Execution Facility (PEF), also known as Secure Guest support
+is a feature found on IBM POWER9 and POWER10 processors.</p>
+<p>If a suitable firmware including an Ultravisor is installed, it adds
+an extra memory protection mode to the CPU.  The ultravisor manages a
+pool of secure memory which cannot be accessed by the hypervisor.</p>
+<p>When this feature is enabled in QEMU, a guest can use ultracalls to
+enter “secure mode”.  This transfers most of its memory to secure
+memory, where it cannot be eavesdropped by a compromised hypervisor.</p>
+<section id="launching">
+<h4>Launching<a class="headerlink" href="#launching" title="Permalink to this heading"></a></h4>
+<p>To launch a guest which will be permitted to enter PEF secure mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-ppc64 \
+    -object pef-guest,id=pef0 \
+    -machine confidential-guest-support=pef0 \
+    ...
+</pre></div>
+</div>
+</section>
+<section id="live-migration">
+<h4>Live Migration<a class="headerlink" href="#live-migration" title="Permalink to this heading"></a></h4>
+<p>Live migration is not yet implemented for PEF guests.  For
+consistency, QEMU currently prevents migration if the PEF feature is
+enabled, whether or not the guest has actually entered secure mode.</p>
+</section>
+</section>
+</section>
+<section id="maintainer-contact-information">
+<h2>Maintainer contact information<a class="headerlink" href="#maintainer-contact-information" title="Permalink to this heading"></a></h2>
+<p>Cédric Le Goater &lt;<a class="reference external" href="mailto:clg&#37;&#52;&#48;kaod&#46;org">clg<span>&#64;</span>kaod<span>&#46;</span>org</a>&gt;</p>
+<p>Daniel Henrique Barboza &lt;<a class="reference external" href="mailto:danielhb413&#37;&#52;&#48;gmail&#46;com">danielhb413<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+<dl class="citation">
+<dt class="label" id="lopar"><span class="brackets">LoPAR</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://openpowerfoundation.org/wp-content/uploads/2020/07/LoPAR-20200812.pdf">Linux on Power Architecture Reference document (LoPAR) revision
+2.9</a>.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="prep.html" class="btn btn-neutral float-left" title="Prep machine (40p)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../specs/ppc-spapr-hotplug.html" class="btn btn-neutral float-right" title="sPAPR Dynamic Reconfiguration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

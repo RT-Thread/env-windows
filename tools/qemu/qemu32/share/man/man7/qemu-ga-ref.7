@@ -1,0 +1,2077 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "QEMU-GA-REF" "7" "Dec 30, 2022" "7.2.0" "QEMU"
+.SH NAME
+qemu-ga-ref \- QEMU Guest Agent Protocol Reference
+.SS Contents
+.INDENT 0.0
+.IP \(bu 2
+\fI\%QEMU Guest Agent Protocol Reference\fP
+.INDENT 2.0
+.IP \(bu 2
+\fI\%General note concerning the use of guest agent interfaces\fP
+.INDENT 2.0
+.IP \(bu 2
+\fI\%"unsupported" is a higher\-level error than the errors that individual
+commands might document. The caller should always be prepared to receive
+QERR_UNSUPPORTED, even if the given command doesn\(aqt specify it, or doesn\(aqt
+document any failure mode at all.\fP
+.UNINDENT
+.IP \(bu 2
+\fI\%QEMU guest agent protocol commands and structs\fP
+.INDENT 2.0
+.IP \(bu 2
+\fI\%guest\-sync\-delimited (Command)\fP
+.IP \(bu 2
+\fI\%guest\-sync (Command)\fP
+.IP \(bu 2
+\fI\%guest\-ping (Command)\fP
+.IP \(bu 2
+\fI\%guest\-get\-time (Command)\fP
+.IP \(bu 2
+\fI\%guest\-set\-time (Command)\fP
+.IP \(bu 2
+\fI\%GuestAgentCommandInfo (Object)\fP
+.IP \(bu 2
+\fI\%GuestAgentInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-info (Command)\fP
+.IP \(bu 2
+\fI\%guest\-shutdown (Command)\fP
+.IP \(bu 2
+\fI\%guest\-file\-open (Command)\fP
+.IP \(bu 2
+\fI\%guest\-file\-close (Command)\fP
+.IP \(bu 2
+\fI\%GuestFileRead (Object)\fP
+.IP \(bu 2
+\fI\%guest\-file\-read (Command)\fP
+.IP \(bu 2
+\fI\%GuestFileWrite (Object)\fP
+.IP \(bu 2
+\fI\%guest\-file\-write (Command)\fP
+.IP \(bu 2
+\fI\%GuestFileSeek (Object)\fP
+.IP \(bu 2
+\fI\%QGASeek (Enum)\fP
+.IP \(bu 2
+\fI\%GuestFileWhence (Alternate)\fP
+.IP \(bu 2
+\fI\%guest\-file\-seek (Command)\fP
+.IP \(bu 2
+\fI\%guest\-file\-flush (Command)\fP
+.IP \(bu 2
+\fI\%GuestFsfreezeStatus (Enum)\fP
+.IP \(bu 2
+\fI\%guest\-fsfreeze\-status (Command)\fP
+.IP \(bu 2
+\fI\%guest\-fsfreeze\-freeze (Command)\fP
+.IP \(bu 2
+\fI\%guest\-fsfreeze\-freeze\-list (Command)\fP
+.IP \(bu 2
+\fI\%guest\-fsfreeze\-thaw (Command)\fP
+.IP \(bu 2
+\fI\%GuestFilesystemTrimResult (Object)\fP
+.IP \(bu 2
+\fI\%GuestFilesystemTrimResponse (Object)\fP
+.IP \(bu 2
+\fI\%guest\-fstrim (Command)\fP
+.IP \(bu 2
+\fI\%guest\-suspend\-disk (Command)\fP
+.IP \(bu 2
+\fI\%guest\-suspend\-ram (Command)\fP
+.IP \(bu 2
+\fI\%guest\-suspend\-hybrid (Command)\fP
+.IP \(bu 2
+\fI\%GuestIpAddressType (Enum)\fP
+.IP \(bu 2
+\fI\%GuestIpAddress (Object)\fP
+.IP \(bu 2
+\fI\%GuestNetworkInterfaceStat (Object)\fP
+.IP \(bu 2
+\fI\%GuestNetworkInterface (Object)\fP
+.IP \(bu 2
+\fI\%guest\-network\-get\-interfaces (Command)\fP
+.IP \(bu 2
+\fI\%GuestLogicalProcessor (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-vcpus (Command)\fP
+.IP \(bu 2
+\fI\%guest\-set\-vcpus (Command)\fP
+.IP \(bu 2
+\fI\%GuestDiskBusType (Enum)\fP
+.IP \(bu 2
+\fI\%GuestPCIAddress (Object)\fP
+.IP \(bu 2
+\fI\%GuestCCWAddress (Object)\fP
+.IP \(bu 2
+\fI\%GuestDiskAddress (Object)\fP
+.IP \(bu 2
+\fI\%GuestNVMeSmart (Object)\fP
+.IP \(bu 2
+\fI\%GuestDiskSmart (Object)\fP
+.IP \(bu 2
+\fI\%GuestDiskInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-disks (Command)\fP
+.IP \(bu 2
+\fI\%GuestFilesystemInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-fsinfo (Command)\fP
+.IP \(bu 2
+\fI\%guest\-set\-user\-password (Command)\fP
+.IP \(bu 2
+\fI\%GuestMemoryBlock (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-memory\-blocks (Command)\fP
+.IP \(bu 2
+\fI\%GuestMemoryBlockResponseType (Enum)\fP
+.IP \(bu 2
+\fI\%GuestMemoryBlockResponse (Object)\fP
+.IP \(bu 2
+\fI\%guest\-set\-memory\-blocks (Command)\fP
+.IP \(bu 2
+\fI\%GuestMemoryBlockInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-memory\-block\-info (Command)\fP
+.IP \(bu 2
+\fI\%GuestExecStatus (Object)\fP
+.IP \(bu 2
+\fI\%guest\-exec\-status (Command)\fP
+.IP \(bu 2
+\fI\%GuestExec (Object)\fP
+.IP \(bu 2
+\fI\%guest\-exec (Command)\fP
+.IP \(bu 2
+\fI\%GuestHostName (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-host\-name (Command)\fP
+.IP \(bu 2
+\fI\%GuestUser (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-users (Command)\fP
+.IP \(bu 2
+\fI\%GuestTimezone (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-timezone (Command)\fP
+.IP \(bu 2
+\fI\%GuestOSInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-osinfo (Command)\fP
+.IP \(bu 2
+\fI\%GuestDeviceType (Enum)\fP
+.IP \(bu 2
+\fI\%GuestDeviceIdPCI (Object)\fP
+.IP \(bu 2
+\fI\%GuestDeviceId (Object)\fP
+.IP \(bu 2
+\fI\%GuestDeviceInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-devices (Command)\fP
+.IP \(bu 2
+\fI\%GuestAuthorizedKeys (Object)\fP
+.IP \(bu 2
+\fI\%guest\-ssh\-get\-authorized\-keys (Command)\fP
+.IP \(bu 2
+\fI\%guest\-ssh\-add\-authorized\-keys (Command)\fP
+.IP \(bu 2
+\fI\%guest\-ssh\-remove\-authorized\-keys (Command)\fP
+.IP \(bu 2
+\fI\%GuestDiskStats (Object)\fP
+.IP \(bu 2
+\fI\%GuestDiskStatsInfo (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-diskstats (Command)\fP
+.IP \(bu 2
+\fI\%GuestCpuStatsType (Enum)\fP
+.IP \(bu 2
+\fI\%GuestLinuxCpuStats (Object)\fP
+.IP \(bu 2
+\fI\%GuestCpuStats (Object)\fP
+.IP \(bu 2
+\fI\%guest\-get\-cpustats (Command)\fP
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH GENERAL NOTE CONCERNING THE USE OF GUEST AGENT INTERFACES
+"unsupported" is a higher\-level error than the errors that individual
+commands might document. The caller should always be prepared to receive
+QERR_UNSUPPORTED, even if the given command doesn\(aqt specify it, or doesn\(aqt
+document any failure mode at all.
+.SH QEMU GUEST AGENT PROTOCOL COMMANDS AND STRUCTS
+.SS \fBguest\-sync\-delimited\fP (Command)
+.sp
+Echo back a unique integer value, and prepend to response a
+leading sentinel byte (0xFF) the client can check scan for.
+.sp
+This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn\(aqt contain stale
+data from previous client. It must be issued upon initial
+connection, and after any client\-side timeouts (including
+timeouts on receiving a response to this command).
+.sp
+After issuing this request, all guest agent responses should be
+ignored until the response containing the unique integer value
+the client passed in is returned. Receival of the 0xFF sentinel
+byte must be handled as an indication that the client\(aqs
+lexer/tokenizer/parser state should be flushed/reset in
+preparation for reliably receiving the subsequent response. As
+an optimization, clients may opt to ignore all data until a
+sentinel value is receiving to avoid unnecessary processing of
+stale data.
+.sp
+Similarly, clients should also precede this \fIrequest\fP
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous client connection.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBid\fP: \fBint\fP
+randomly generated 64\-bit integer
+.UNINDENT
+.SS Returns
+.sp
+The unique integer id passed in by the client
+.SS Since
+.sp
+1.1
+.SS \fBguest\-sync\fP (Command)
+.sp
+Echo back a unique integer value
+.sp
+This is used by clients talking to the guest agent over the
+wire to ensure the stream is in sync and doesn\(aqt contain stale
+data from previous client. All guest agent responses should be
+ignored until the provided unique integer value is returned,
+and it is up to the client to handle stale whole or
+partially\-delivered JSON text in such a way that this response
+can be obtained.
+.sp
+In cases where a partial stale response was previously
+received by the client, this cannot always be done reliably.
+One particular scenario being if qemu\-ga responses are fed
+character\-by\-character into a JSON parser. In these situations,
+using guest\-sync\-delimited may be optimal.
+.sp
+For clients that fetch responses line by line and convert them
+to JSON objects, guest\-sync should be sufficient, but note that
+in cases where the channel is dirty some attempts at parsing the
+response may result in a parser error.
+.sp
+Such clients should also precede this command
+with a 0xFF byte to make sure the guest agent flushes any
+partially read JSON data from a previous session.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBid\fP: \fBint\fP
+randomly generated 64\-bit integer
+.UNINDENT
+.SS Returns
+.sp
+The unique integer id passed in by the client
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-ping\fP (Command)
+.sp
+Ping the guest agent, a non\-error return implies success
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-get\-time\fP (Command)
+.sp
+Get the information about guest\(aqs System Time relative to
+the Epoch of 1970\-01\-01 in UTC.
+.SS Returns
+.sp
+Time in nanoseconds.
+.SS Since
+.sp
+1.5
+.SS \fBguest\-set\-time\fP (Command)
+.sp
+Set guest time.
+.sp
+When a guest is paused or migrated to a file then loaded
+from that file, the guest OS has no idea that there
+was a big gap in the time. Depending on how long the
+gap was, NTP might not be able to resynchronize the
+guest.
+.sp
+This command tries to set guest\(aqs System Time to the
+given value, then sets the Hardware Clock (RTC) to the
+current System Time. This will make it easier for a guest
+to resynchronize without waiting for NTP. If no \fBtime\fP is
+specified, then the time to set is read from RTC. However,
+this may not be supported on all platforms (i.e. Windows).
+If that\(aqs the case users are advised to always pass a
+value.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBtime\fP: \fBint\fP (optional)
+time of nanoseconds, relative to the Epoch
+of 1970\-01\-01 in UTC.
+.UNINDENT
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+1.5
+.SS \fBGuestAgentCommandInfo\fP (Object)
+.sp
+Information about guest agent commands.
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBname\fP: \fBstring\fP
+name of the command
+.TP
+.B \fBenabled\fP: \fBboolean\fP
+whether command is currently enabled by guest admin
+.TP
+.B \fBsuccess\-response\fP: \fBboolean\fP
+whether command returns a response on success
+(since 1.7)
+.UNINDENT
+.SS Since
+.sp
+1.1.0
+.SS \fBGuestAgentInfo\fP (Object)
+.sp
+Information about guest agent.
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBversion\fP: \fBstring\fP
+guest agent version
+.TP
+.B \fBsupported_commands\fP: \fBarray of GuestAgentCommandInfo\fP
+Information about guest agent commands
+.UNINDENT
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-info\fP (Command)
+.sp
+Get some information about the guest agent.
+.SS Returns
+.sp
+\fBGuestAgentInfo\fP
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-shutdown\fP (Command)
+.sp
+Initiate guest\-activated shutdown. Note: this is an asynchronous
+shutdown request, with no guarantee of successful shutdown.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBmode\fP: \fBstring\fP (optional)
+"halt", "powerdown" (default), or "reboot"
+.UNINDENT
+This command does NOT return a response on success. Success condition
+is indicated by the VM exiting with a zero exit status or, when
+running with \-\-no\-shutdown, by issuing the query\-status QMP command
+to confirm the VM status is "shutdown".
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-file\-open\fP (Command)
+.sp
+Open a file in the guest and retrieve a file handle for it
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBpath\fP: \fBstring\fP
+Full path to the file in the guest to open.
+.TP
+.B \fBmode\fP: \fBstring\fP (optional)
+open mode, as per fopen(), "r" is the default.
+.UNINDENT
+.SS Returns
+.sp
+Guest file handle on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-file\-close\fP (Command)
+.sp
+Close an open file in the guest
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBhandle\fP: \fBint\fP
+filehandle returned by guest\-file\-open
+.UNINDENT
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBGuestFileRead\fP (Object)
+.sp
+Result of guest agent file\-read operation
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBcount\fP: \fBint\fP
+number of bytes read (note: count is \fIbefore\fP
+base64\-encoding is applied)
+.TP
+.B \fBbuf\-b64\fP: \fBstring\fP
+base64\-encoded bytes read
+.TP
+.B \fBeof\fP: \fBboolean\fP
+whether EOF was encountered during read operation.
+.UNINDENT
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-file\-read\fP (Command)
+.sp
+Read from an open file in the guest. Data will be base64\-encoded.
+As this command is just for limited, ad\-hoc debugging, such as log
+file access, the number of bytes to read is limited to 48 MB.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBhandle\fP: \fBint\fP
+filehandle returned by guest\-file\-open
+.TP
+.B \fBcount\fP: \fBint\fP (optional)
+maximum number of bytes to read (default is 4KB, maximum is 48MB)
+.UNINDENT
+.SS Returns
+.sp
+\fBGuestFileRead\fP on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBGuestFileWrite\fP (Object)
+.sp
+Result of guest agent file\-write operation
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBcount\fP: \fBint\fP
+number of bytes written (note: count is actual bytes
+written, after base64\-decoding of provided buffer)
+.TP
+.B \fBeof\fP: \fBboolean\fP
+whether EOF was encountered during write operation.
+.UNINDENT
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-file\-write\fP (Command)
+.sp
+Write to an open file in the guest.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBhandle\fP: \fBint\fP
+filehandle returned by guest\-file\-open
+.TP
+.B \fBbuf\-b64\fP: \fBstring\fP
+base64\-encoded string representing data to be written
+.TP
+.B \fBcount\fP: \fBint\fP (optional)
+bytes to write (actual bytes, after base64\-decode),
+default is all content in buf\-b64 buffer after base64 decoding
+.UNINDENT
+.SS Returns
+.sp
+\fBGuestFileWrite\fP on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBGuestFileSeek\fP (Object)
+.sp
+Result of guest agent file\-seek operation
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBposition\fP: \fBint\fP
+current file position
+.TP
+.B \fBeof\fP: \fBboolean\fP
+whether EOF was encountered during file seek
+.UNINDENT
+.SS Since
+.sp
+0.15.0
+.SS \fBQGASeek\fP (Enum)
+.sp
+Symbolic names for use in \fBguest\-file\-seek\fP
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBset\fP
+Set to the specified offset (same effect as \(aqwhence\(aq:0)
+.TP
+.B \fBcur\fP
+Add offset to the current location (same effect as \(aqwhence\(aq:1)
+.TP
+.B \fBend\fP
+Add offset to the end of the file (same effect as \(aqwhence\(aq:2)
+.UNINDENT
+.SS Since
+.sp
+2.6
+.SS \fBGuestFileWhence\fP (Alternate)
+.sp
+Controls the meaning of offset to \fBguest\-file\-seek\fP\&.
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBvalue\fP: \fBint\fP
+Integral value (0 for set, 1 for cur, 2 for end), available
+for historical reasons, and might differ from the host\(aqs or
+guest\(aqs SEEK_* values (since: 0.15)
+.TP
+.B \fBname\fP: \fBQGASeek\fP
+Symbolic name, and preferred interface
+.UNINDENT
+.SS Since
+.sp
+2.6
+.SS \fBguest\-file\-seek\fP (Command)
+.sp
+Seek to a position in the file, as with fseek(), and return the
+current file position afterward. Also encapsulates ftell()\(aqs
+functionality, with offset=0 and whence=1.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBhandle\fP: \fBint\fP
+filehandle returned by guest\-file\-open
+.TP
+.B \fBoffset\fP: \fBint\fP
+bytes to skip over in the file stream
+.TP
+.B \fBwhence\fP: \fBGuestFileWhence\fP
+Symbolic or numeric code for interpreting offset
+.UNINDENT
+.SS Returns
+.sp
+\fBGuestFileSeek\fP on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-file\-flush\fP (Command)
+.sp
+Write file changes buffered in userspace to disk/kernel buffers
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBhandle\fP: \fBint\fP
+filehandle returned by guest\-file\-open
+.UNINDENT
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+0.15.0
+.SS \fBGuestFsfreezeStatus\fP (Enum)
+.sp
+An enumeration of filesystem freeze states
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBthawed\fP
+filesystems thawed/unfrozen
+.TP
+.B \fBfrozen\fP
+all non\-network guest filesystems frozen
+.UNINDENT
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-fsfreeze\-status\fP (Command)
+.sp
+Get guest fsfreeze state. error state indicates
+.SS Returns
+.sp
+GuestFsfreezeStatus ("thawed", "frozen", etc., as defined below)
+.SS Note
+.sp
+This may fail to properly report the current state as a result of
+some other guest processes having issued an fs freeze/thaw.
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-fsfreeze\-freeze\fP (Command)
+.sp
+Sync and freeze all freezable, local guest filesystems. If this
+command succeeded, you may call \fBguest\-fsfreeze\-thaw\fP later to
+unfreeze.
+.SS Note
+.sp
+On Windows, the command is implemented with the help of a
+Volume Shadow\-copy Service DLL helper. The frozen state is limited
+for up to 10 seconds by VSS.
+.SS Returns
+.sp
+Number of file systems currently frozen. On error, all filesystems
+will be thawed. If no filesystems are frozen as a result of this call,
+then \fBguest\-fsfreeze\-status\fP will remain "thawed" and calling
+\fBguest\-fsfreeze\-thaw\fP is not necessary.
+.SS Since
+.sp
+0.15.0
+.SS \fBguest\-fsfreeze\-freeze\-list\fP (Command)
+.sp
+Sync and freeze specified guest filesystems.
+See also \fBguest\-fsfreeze\-freeze\fP\&.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBmountpoints\fP: \fBarray of string\fP (optional)
+an array of mountpoints of filesystems to be frozen.
+If omitted, every mounted filesystem is frozen.
+Invalid mount points are ignored.
+.UNINDENT
+.SS Returns
+.sp
+Number of file systems currently frozen. On error, all filesystems
+will be thawed.
+.SS Since
+.sp
+2.2
+.SS \fBguest\-fsfreeze\-thaw\fP (Command)
+.sp
+Unfreeze all frozen guest filesystems
+.SS Returns
+.sp
+Number of file systems thawed by this call
+.SS Note
+.sp
+if return value does not match the previous call to
+guest\-fsfreeze\-freeze, this likely means some freezable
+filesystems were unfrozen before this call, and that the
+filesystem state may have changed before issuing this
+command.
+.SS Since
+.sp
+0.15.0
+.SS \fBGuestFilesystemTrimResult\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBpath\fP: \fBstring\fP
+path that was trimmed
+.TP
+.B \fBerror\fP: \fBstring\fP (optional)
+an error message when trim failed
+.TP
+.B \fBtrimmed\fP: \fBint\fP (optional)
+bytes trimmed for this path
+.TP
+.B \fBminimum\fP: \fBint\fP (optional)
+reported effective minimum for this path
+.UNINDENT
+.SS Since
+.sp
+2.4
+.SS \fBGuestFilesystemTrimResponse\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBpaths\fP: \fBarray of GuestFilesystemTrimResult\fP
+list of \fBGuestFilesystemTrimResult\fP per path that was trimmed
+.UNINDENT
+.SS Since
+.sp
+2.4
+.SS \fBguest\-fstrim\fP (Command)
+.sp
+Discard (or "trim") blocks which are not in use by the filesystem.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBminimum\fP: \fBint\fP (optional)
+Minimum contiguous free range to discard, in bytes. Free ranges
+smaller than this may be ignored (this is a hint and the guest
+may not respect it).  By increasing this value, the fstrim
+operation will complete more quickly for filesystems with badly
+fragmented free space, although not all blocks will be discarded.
+The default value is zero, meaning "discard every free block".
+.UNINDENT
+.SS Returns
+.sp
+A \fBGuestFilesystemTrimResponse\fP which contains the
+status of all trimmed paths. (since 2.4)
+.SS Since
+.sp
+1.2
+.SS \fBguest\-suspend\-disk\fP (Command)
+.sp
+Suspend guest to disk.
+.sp
+This command attempts to suspend the guest using three strategies, in this
+order:
+.INDENT 0.0
+.IP \(bu 2
+systemd hibernate
+.IP \(bu 2
+pm\-utils (via pm\-hibernate)
+.IP \(bu 2
+manual write into sysfs
+.UNINDENT
+.sp
+This command does NOT return a response on success. There is a high chance
+the command succeeded if the VM exits with a zero exit status or, when
+running with \-\-no\-shutdown, by issuing the query\-status QMP command to
+to confirm the VM status is "shutdown". However, the VM could also exit
+(or set its status to "shutdown") due to other reasons.
+.sp
+The following errors may be returned:
+.INDENT 0.0
+.IP \(bu 2
+If suspend to disk is not supported, Unsupported
+.UNINDENT
+.SS Notes
+.sp
+It\(aqs strongly recommended to issue the guest\-sync command before
+sending commands when the guest resumes
+.SS Since
+.sp
+1.1
+.SS \fBguest\-suspend\-ram\fP (Command)
+.sp
+Suspend guest to ram.
+.sp
+This command attempts to suspend the guest using three strategies, in this
+order:
+.INDENT 0.0
+.IP \(bu 2
+systemd suspend
+.IP \(bu 2
+pm\-utils (via pm\-suspend)
+.IP \(bu 2
+manual write into sysfs
+.UNINDENT
+.sp
+IMPORTANT: guest\-suspend\-ram requires working wakeup support in
+QEMU. You should check QMP command query\-current\-machine returns
+wakeup\-suspend\-support: true before issuing this command. Failure in
+doing so can result in a suspended guest that QEMU will not be able to
+awaken, forcing the user to power cycle the guest to bring it back.
+.sp
+This command does NOT return a response on success. There are two options
+to check for success:
+.INDENT 0.0
+.IP 1. 3
+Wait for the SUSPEND QMP event from QEMU
+.IP 2. 3
+Issue the query\-status QMP command to confirm the VM status is
+"suspended"
+.UNINDENT
+.sp
+The following errors may be returned:
+.INDENT 0.0
+.IP \(bu 2
+If suspend to ram is not supported, Unsupported
+.UNINDENT
+.SS Notes
+.sp
+It\(aqs strongly recommended to issue the guest\-sync command before
+sending commands when the guest resumes
+.SS Since
+.sp
+1.1
+.SS \fBguest\-suspend\-hybrid\fP (Command)
+.sp
+Save guest state to disk and suspend to ram.
+.sp
+This command attempts to suspend the guest by executing, in this order:
+.INDENT 0.0
+.IP \(bu 2
+systemd hybrid\-sleep
+.IP \(bu 2
+pm\-utils (via pm\-suspend\-hybrid)
+.UNINDENT
+.sp
+IMPORTANT: guest\-suspend\-hybrid requires working wakeup support in
+QEMU. You should check QMP command query\-current\-machine returns
+wakeup\-suspend\-support: true before issuing this command. Failure in
+doing so can result in a suspended guest that QEMU will not be able to
+awaken, forcing the user to power cycle the guest to bring it back.
+.sp
+This command does NOT return a response on success. There are two options
+to check for success:
+.INDENT 0.0
+.IP 1. 3
+Wait for the SUSPEND QMP event from QEMU
+.IP 2. 3
+Issue the query\-status QMP command to confirm the VM status is
+"suspended"
+.UNINDENT
+.sp
+The following errors may be returned:
+.INDENT 0.0
+.IP \(bu 2
+If hybrid suspend is not supported, Unsupported
+.UNINDENT
+.SS Notes
+.sp
+It\(aqs strongly recommended to issue the guest\-sync command before
+sending commands when the guest resumes
+.SS Since
+.sp
+1.1
+.SS \fBGuestIpAddressType\fP (Enum)
+.sp
+An enumeration of supported IP address types
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBipv4\fP
+IP version 4
+.TP
+.B \fBipv6\fP
+IP version 6
+.UNINDENT
+.SS Since
+.sp
+1.1
+.SS \fBGuestIpAddress\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBip\-address\fP: \fBstring\fP
+IP address
+.TP
+.B \fBip\-address\-type\fP: \fBGuestIpAddressType\fP
+Type of \fBip\-address\fP (e.g. ipv4, ipv6)
+.TP
+.B \fBprefix\fP: \fBint\fP
+Network prefix length of \fBip\-address\fP
+.UNINDENT
+.SS Since
+.sp
+1.1
+.SS \fBGuestNetworkInterfaceStat\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBrx\-bytes\fP: \fBint\fP
+total bytes received
+.TP
+.B \fBrx\-packets\fP: \fBint\fP
+total packets received
+.TP
+.B \fBrx\-errs\fP: \fBint\fP
+bad packets received
+.TP
+.B \fBrx\-dropped\fP: \fBint\fP
+receiver dropped packets
+.TP
+.B \fBtx\-bytes\fP: \fBint\fP
+total bytes transmitted
+.TP
+.B \fBtx\-packets\fP: \fBint\fP
+total packets transmitted
+.TP
+.B \fBtx\-errs\fP: \fBint\fP
+packet transmit problems
+.TP
+.B \fBtx\-dropped\fP: \fBint\fP
+dropped packets transmitted
+.UNINDENT
+.SS Since
+.sp
+2.11
+.SS \fBGuestNetworkInterface\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBname\fP: \fBstring\fP
+The name of interface for which info are being delivered
+.TP
+.B \fBhardware\-address\fP: \fBstring\fP (optional)
+Hardware address of \fBname\fP
+.TP
+.B \fBip\-addresses\fP: \fBarray of GuestIpAddress\fP (optional)
+List of addresses assigned to \fBname\fP
+.TP
+.B \fBstatistics\fP: \fBGuestNetworkInterfaceStat\fP (optional)
+various statistic counters related to \fBname\fP
+(since 2.11)
+.UNINDENT
+.SS Since
+.sp
+1.1
+.SS \fBguest\-network\-get\-interfaces\fP (Command)
+.sp
+Get list of guest IP addresses, MAC addresses
+and netmasks.
+.SS Returns
+.sp
+List of GuestNetworkInfo on success.
+.SS Since
+.sp
+1.1
+.SS \fBGuestLogicalProcessor\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBlogical\-id\fP: \fBint\fP
+Arbitrary guest\-specific unique identifier of the VCPU.
+.TP
+.B \fBonline\fP: \fBboolean\fP
+Whether the VCPU is enabled.
+.TP
+.B \fBcan\-offline\fP: \fBboolean\fP (optional)
+Whether offlining the VCPU is possible. This member
+is always filled in by the guest agent when the structure is
+returned, and always ignored on input (hence it can be omitted
+then).
+.UNINDENT
+.SS Since
+.sp
+1.5
+.SS \fBguest\-get\-vcpus\fP (Command)
+.sp
+Retrieve the list of the guest\(aqs logical processors.
+.sp
+This is a read\-only operation.
+.SS Returns
+.sp
+The list of all VCPUs the guest knows about. Each VCPU is put on the
+list exactly once, but their order is unspecified.
+.SS Since
+.sp
+1.5
+.SS \fBguest\-set\-vcpus\fP (Command)
+.sp
+Attempt to reconfigure (currently: enable/disable) logical processors inside
+the guest.
+.sp
+The input list is processed node by node in order. In each node \fBlogical\-id\fP
+is used to look up the guest VCPU, for which \fBonline\fP specifies the requested
+state. The set of distinct \fBlogical\-id\fP\(aqs is only required to be a subset of
+the guest\-supported identifiers. There\(aqs no restriction on list length or on
+repeating the same \fBlogical\-id\fP (with possibly different \fBonline\fP field).
+Preferably the input list should describe a modified subset of
+\fBguest\-get\-vcpus\fP\(aq return value.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBvcpus\fP: \fBarray of GuestLogicalProcessor\fP
+Not documented
+.UNINDENT
+.SS Returns
+.sp
+The length of the initial sublist that has been successfully
+processed. The guest agent maximizes this value. Possible cases:
+.INDENT 0.0
+.IP \(bu 2
+0:
+if the \fBvcpus\fP list was empty on input. Guest state
+has not been changed. Otherwise,
+.IP \(bu 2
+Error:
+processing the first node of \fBvcpus\fP failed for the
+reason returned. Guest state has not been changed.
+Otherwise,
+.IP \(bu 2
+< length(\fBvcpus\fP):
+more than zero initial nodes have been processed,
+but not the entire \fBvcpus\fP list. Guest state has
+changed accordingly. To retrieve the error
+(assuming it persists), repeat the call with the
+successfully processed initial sublist removed.
+Otherwise,
+.IP \(bu 2
+length(\fBvcpus\fP):
+call successful.
+.UNINDENT
+.SS Since
+.sp
+1.5
+.SS \fBGuestDiskBusType\fP (Enum)
+.sp
+An enumeration of bus type of disks
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBide\fP
+IDE disks
+.TP
+.B \fBfdc\fP
+floppy disks
+.TP
+.B \fBscsi\fP
+SCSI disks
+.TP
+.B \fBvirtio\fP
+virtio disks
+.TP
+.B \fBxen\fP
+Xen disks
+.TP
+.B \fBusb\fP
+USB disks
+.TP
+.B \fBuml\fP
+UML disks
+.TP
+.B \fBsata\fP
+SATA disks
+.TP
+.B \fBsd\fP
+SD cards
+.TP
+.B \fBunknown\fP
+Unknown bus type
+.TP
+.B \fBieee1394\fP
+Win IEEE 1394 bus type
+.TP
+.B \fBssa\fP
+Win SSA bus type
+.TP
+.B \fBfibre\fP
+Win fiber channel bus type
+.TP
+.B \fBraid\fP
+Win RAID bus type
+.TP
+.B \fBiscsi\fP
+Win iScsi bus type
+.TP
+.B \fBsas\fP
+Win serial\-attaches SCSI bus type
+.TP
+.B \fBmmc\fP
+Win multimedia card (MMC) bus type
+.TP
+.B \fBvirtual\fP
+Win virtual bus type
+.TP
+.B \fBfile\-backed\-virtual\fP
+Win file\-backed bus type
+.TP
+.B \fBnvme\fP
+NVMe disks (since 7.1)
+.UNINDENT
+.SS Since
+.sp
+2.2; \(aqUnknown\(aq and all entries below since 2.4
+.SS \fBGuestPCIAddress\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBdomain\fP: \fBint\fP
+domain id
+.TP
+.B \fBbus\fP: \fBint\fP
+bus id
+.TP
+.B \fBslot\fP: \fBint\fP
+slot id
+.TP
+.B \fBfunction\fP: \fBint\fP
+function id
+.UNINDENT
+.SS Since
+.sp
+2.2
+.SS \fBGuestCCWAddress\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBcssid\fP: \fBint\fP
+channel subsystem image id
+.TP
+.B \fBssid\fP: \fBint\fP
+subchannel set id
+.TP
+.B \fBsubchno\fP: \fBint\fP
+subchannel number
+.TP
+.B \fBdevno\fP: \fBint\fP
+device number
+.UNINDENT
+.SS Since
+.sp
+6.0
+.SS \fBGuestDiskAddress\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBpci\-controller\fP: \fBGuestPCIAddress\fP
+controller\(aqs PCI address (fields are set to \-1 if invalid)
+.TP
+.B \fBbus\-type\fP: \fBGuestDiskBusType\fP
+bus type
+.TP
+.B \fBbus\fP: \fBint\fP
+bus id
+.TP
+.B \fBtarget\fP: \fBint\fP
+target id
+.TP
+.B \fBunit\fP: \fBint\fP
+unit id
+.TP
+.B \fBserial\fP: \fBstring\fP (optional)
+serial number (since: 3.1)
+.TP
+.B \fBdev\fP: \fBstring\fP (optional)
+device node (POSIX) or device UNC (Windows) (since: 3.1)
+.TP
+.B \fBccw\-address\fP: \fBGuestCCWAddress\fP (optional)
+CCW address on s390x (since: 6.0)
+.UNINDENT
+.SS Since
+.sp
+2.2
+.SS \fBGuestNVMeSmart\fP (Object)
+.sp
+NVMe smart informations, based on NVMe specification,
+section <SMART / Health Information (Log Identifier 02h)>
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBcritical\-warning\fP: \fBint\fP
+Not documented
+.TP
+.B \fBtemperature\fP: \fBint\fP
+Not documented
+.TP
+.B \fBavailable\-spare\fP: \fBint\fP
+Not documented
+.TP
+.B \fBavailable\-spare\-threshold\fP: \fBint\fP
+Not documented
+.TP
+.B \fBpercentage\-used\fP: \fBint\fP
+Not documented
+.TP
+.B \fBdata\-units\-read\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBdata\-units\-read\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBdata\-units\-written\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBdata\-units\-written\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBhost\-read\-commands\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBhost\-read\-commands\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBhost\-write\-commands\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBhost\-write\-commands\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBcontroller\-busy\-time\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBcontroller\-busy\-time\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBpower\-cycles\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBpower\-cycles\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBpower\-on\-hours\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBpower\-on\-hours\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBunsafe\-shutdowns\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBunsafe\-shutdowns\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBmedia\-errors\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBmedia\-errors\-hi\fP: \fBint\fP
+Not documented
+.TP
+.B \fBnumber\-of\-error\-log\-entries\-lo\fP: \fBint\fP
+Not documented
+.TP
+.B \fBnumber\-of\-error\-log\-entries\-hi\fP: \fBint\fP
+Not documented
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBGuestDiskSmart\fP (Object)
+.sp
+Disk type related smart information.
+.INDENT 0.0
+.IP \(bu 2
+\fBnvme\fP: NVMe disk smart
+.UNINDENT
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBtype\fP: \fBGuestDiskBusType\fP
+Not documented
+.TP
+.B The members of \fBGuestNVMeSmart\fP when \fBtype\fP is \fB"nvme"\fP
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBGuestDiskInfo\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBname\fP: \fBstring\fP
+device node (Linux) or device UNC (Windows)
+.TP
+.B \fBpartition\fP: \fBboolean\fP
+whether this is a partition or disk
+.TP
+.B \fBdependencies\fP: \fBarray of string\fP (optional)
+list of device dependencies; e.g. for LVs of the LVM this will
+hold the list of PVs, for LUKS encrypted volume this will
+contain the disk where the volume is placed.     (Linux)
+.TP
+.B \fBaddress\fP: \fBGuestDiskAddress\fP (optional)
+disk address information (only for non\-virtual devices)
+.TP
+.B \fBalias\fP: \fBstring\fP (optional)
+optional alias assigned to the disk, on Linux this is a name assigned
+by device mapper
+.TP
+.B \fBsmart\fP: \fBGuestDiskSmart\fP (optional)
+disk smart information (Since 7.1)
+.UNINDENT
+.SS Since
+.sp
+5.2
+.SS \fBguest\-get\-disks\fP (Command)
+.SS Returns
+.sp
+The list of disks in the guest. For Windows these are only the
+physical disks. On Linux these are all root block devices of
+non\-zero size including e.g. removable devices, loop devices,
+NBD, etc.
+.SS Since
+.sp
+5.2
+.SS \fBGuestFilesystemInfo\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBname\fP: \fBstring\fP
+disk name
+.TP
+.B \fBmountpoint\fP: \fBstring\fP
+mount point path
+.TP
+.B \fBtype\fP: \fBstring\fP
+file system type string
+.TP
+.B \fBused\-bytes\fP: \fBint\fP (optional)
+file system used bytes (since 3.0)
+.TP
+.B \fBtotal\-bytes\fP: \fBint\fP (optional)
+non\-root file system total bytes (since 3.0)
+.TP
+.B \fBdisk\fP: \fBarray of GuestDiskAddress\fP
+an array of disk hardware information that the volume lies on,
+which may be empty if the disk type is not supported
+.UNINDENT
+.SS Since
+.sp
+2.2
+.SS \fBguest\-get\-fsinfo\fP (Command)
+.SS Returns
+.sp
+The list of filesystems information mounted in the guest.
+The returned mountpoints may be specified to
+\fBguest\-fsfreeze\-freeze\-list\fP\&.
+Network filesystems (such as CIFS and NFS) are not listed.
+.SS Since
+.sp
+2.2
+.SS \fBguest\-set\-user\-password\fP (Command)
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBusername\fP: \fBstring\fP
+the user account whose password to change
+.TP
+.B \fBpassword\fP: \fBstring\fP
+the new password entry string, base64 encoded
+.TP
+.B \fBcrypted\fP: \fBboolean\fP
+true if password is already crypt()d, false if raw
+.UNINDENT
+If the \fBcrypted\fP flag is true, it is the caller\(aqs responsibility
+to ensure the correct crypt() encryption scheme is used. This
+command does not attempt to interpret or report on the encryption
+scheme. Refer to the documentation of the guest operating system
+in question to determine what is supported.
+.sp
+Not all guest operating systems will support use of the
+\fBcrypted\fP flag, as they may require the clear\-text password
+.sp
+The \fBpassword\fP parameter must always be base64 encoded before
+transmission, even if already crypt()d, to ensure it is 8\-bit
+safe when passed as JSON.
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+2.3
+.SS \fBGuestMemoryBlock\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBphys\-index\fP: \fBint\fP
+Arbitrary guest\-specific unique identifier of the MEMORY BLOCK.
+.TP
+.B \fBonline\fP: \fBboolean\fP
+Whether the MEMORY BLOCK is enabled in guest.
+.TP
+.B \fBcan\-offline\fP: \fBboolean\fP (optional)
+Whether offlining the MEMORY BLOCK is possible.
+This member is always filled in by the guest agent when the
+structure is returned, and always ignored on input (hence it
+can be omitted then).
+.UNINDENT
+.SS Since
+.sp
+2.3
+.SS \fBguest\-get\-memory\-blocks\fP (Command)
+.sp
+Retrieve the list of the guest\(aqs memory blocks.
+.sp
+This is a read\-only operation.
+.SS Returns
+.sp
+The list of all memory blocks the guest knows about.
+Each memory block is put on the list exactly once, but their order
+is unspecified.
+.SS Since
+.sp
+2.3
+.SS \fBGuestMemoryBlockResponseType\fP (Enum)
+.sp
+An enumeration of memory block operation result.
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBsuccess\fP
+the operation of online/offline memory block is successful.
+.TP
+.B \fBnot\-found\fP
+can\(aqt find the corresponding memoryXXX directory in sysfs.
+.TP
+.B \fBoperation\-not\-supported\fP
+for some old kernels, it does not support
+online or offline memory block.
+.TP
+.B \fBoperation\-failed\fP
+the operation of online/offline memory block fails,
+because of some errors happen.
+.UNINDENT
+.SS Since
+.sp
+2.3
+.SS \fBGuestMemoryBlockResponse\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBphys\-index\fP: \fBint\fP
+same with the \(aqphys\-index\(aq member of \fBGuestMemoryBlock\fP\&.
+.TP
+.B \fBresponse\fP: \fBGuestMemoryBlockResponseType\fP
+the result of memory block operation.
+.TP
+.B \fBerror\-code\fP: \fBint\fP (optional)
+the error number.
+When memory block operation fails, we assign the value of
+\(aqerrno\(aq to this member, it indicates what goes wrong.
+When the operation succeeds, it will be omitted.
+.UNINDENT
+.SS Since
+.sp
+2.3
+.SS \fBguest\-set\-memory\-blocks\fP (Command)
+.sp
+Attempt to reconfigure (currently: enable/disable) state of memory blocks
+inside the guest.
+.sp
+The input list is processed node by node in order. In each node \fBphys\-index\fP
+is used to look up the guest MEMORY BLOCK, for which \fBonline\fP specifies the
+requested state. The set of distinct \fBphys\-index\fP\(aqs is only required to be a
+subset of the guest\-supported identifiers. There\(aqs no restriction on list
+length or on repeating the same \fBphys\-index\fP (with possibly different \fBonline\fP
+field).
+Preferably the input list should describe a modified subset of
+\fBguest\-get\-memory\-blocks\fP\(aq return value.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBmem\-blks\fP: \fBarray of GuestMemoryBlock\fP
+Not documented
+.UNINDENT
+.SS Returns
+.sp
+The operation results, it is a list of \fBGuestMemoryBlockResponse\fP,
+which is corresponding to the input list.
+.sp
+Note: it will return NULL if the \fBmem\-blks\fP list was empty on input,
+or there is an error, and in this case, guest state will not be
+changed.
+.SS Since
+.sp
+2.3
+.SS \fBGuestMemoryBlockInfo\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBsize\fP: \fBint\fP
+the size (in bytes) of the guest memory blocks,
+which are the minimal units of memory block online/offline
+operations (also called Logical Memory Hotplug).
+.UNINDENT
+.SS Since
+.sp
+2.3
+.SS \fBguest\-get\-memory\-block\-info\fP (Command)
+.sp
+Get information relating to guest memory blocks.
+.SS Returns
+.sp
+\fBGuestMemoryBlockInfo\fP
+.SS Since
+.sp
+2.3
+.SS \fBGuestExecStatus\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBexited\fP: \fBboolean\fP
+true if process has already terminated.
+.TP
+.B \fBexitcode\fP: \fBint\fP (optional)
+process exit code if it was normally terminated.
+.TP
+.B \fBsignal\fP: \fBint\fP (optional)
+signal number (linux) or unhandled exception code
+(windows) if the process was abnormally terminated.
+.TP
+.B \fBout\-data\fP: \fBstring\fP (optional)
+base64\-encoded stdout of the process
+.TP
+.B \fBerr\-data\fP: \fBstring\fP (optional)
+base64\-encoded stderr of the process
+Note: \fBout\-data\fP and \fBerr\-data\fP are present only
+if \(aqcapture\-output\(aq was specified for \(aqguest\-exec\(aq
+.TP
+.B \fBout\-truncated\fP: \fBboolean\fP (optional)
+true if stdout was not fully captured
+due to size limitation.
+.TP
+.B \fBerr\-truncated\fP: \fBboolean\fP (optional)
+true if stderr was not fully captured
+due to size limitation.
+.UNINDENT
+.SS Since
+.sp
+2.5
+.SS \fBguest\-exec\-status\fP (Command)
+.sp
+Check status of process associated with PID retrieved via guest\-exec.
+Reap the process and associated metadata if it has exited.
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBpid\fP: \fBint\fP
+pid returned from guest\-exec
+.UNINDENT
+.SS Returns
+.sp
+GuestExecStatus on success.
+.SS Since
+.sp
+2.5
+.SS \fBGuestExec\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBpid\fP: \fBint\fP
+pid of child process in guest OS
+.UNINDENT
+.SS Since
+.sp
+2.5
+.SS \fBguest\-exec\fP (Command)
+.sp
+Execute a command in the guest
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBpath\fP: \fBstring\fP
+path or executable name to execute
+.TP
+.B \fBarg\fP: \fBarray of string\fP (optional)
+argument list to pass to executable
+.TP
+.B \fBenv\fP: \fBarray of string\fP (optional)
+environment variables to pass to executable
+.TP
+.B \fBinput\-data\fP: \fBstring\fP (optional)
+data to be passed to process stdin (base64 encoded)
+.TP
+.B \fBcapture\-output\fP: \fBboolean\fP (optional)
+bool flag to enable capture of
+stdout/stderr of running process. defaults to false.
+.UNINDENT
+.SS Returns
+.sp
+PID on success.
+.SS Since
+.sp
+2.5
+.SS \fBGuestHostName\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBhost\-name\fP: \fBstring\fP
+Fully qualified domain name of the guest OS
+.UNINDENT
+.SS Since
+.sp
+2.10
+.SS \fBguest\-get\-host\-name\fP (Command)
+.sp
+Return a name for the machine.
+.sp
+The returned name is not necessarily a fully\-qualified domain name, or even
+present in DNS or some other name service at all. It need not even be unique
+on your local network or site, but usually it is.
+.SS Returns
+.sp
+the host name of the machine on success
+.SS Since
+.sp
+2.10
+.SS \fBGuestUser\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBuser\fP: \fBstring\fP
+Username
+.TP
+.B \fBdomain\fP: \fBstring\fP (optional)
+Logon domain (windows only)
+.TP
+.B \fBlogin\-time\fP: \fBnumber\fP
+Time of login of this user on the computer. If multiple
+instances of the user are logged in, the earliest login time is
+reported. The value is in fractional seconds since epoch time.
+.UNINDENT
+.SS Since
+.sp
+2.10
+.SS \fBguest\-get\-users\fP (Command)
+.sp
+Retrieves a list of currently active users on the VM.
+.SS Returns
+.sp
+A unique list of users.
+.SS Since
+.sp
+2.10
+.SS \fBGuestTimezone\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBzone\fP: \fBstring\fP (optional)
+Timezone name. These values may differ depending on guest/OS and
+should only be used for informational purposes.
+.TP
+.B \fBoffset\fP: \fBint\fP
+Offset to UTC in seconds, negative numbers for time zones west of
+GMT, positive numbers for east
+.UNINDENT
+.SS Since
+.sp
+2.10
+.SS \fBguest\-get\-timezone\fP (Command)
+.sp
+Retrieves the timezone information from the guest.
+.SS Returns
+.sp
+A GuestTimezone dictionary.
+.SS Since
+.sp
+2.10
+.SS \fBGuestOSInfo\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBkernel\-release\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: release field returned by uname(2)
+.IP \(bu 2
+Windows: build number of the OS
+.UNINDENT
+.TP
+.B \fBkernel\-version\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: version field returned by uname(2)
+.IP \(bu 2
+Windows: version number of the OS
+.UNINDENT
+.TP
+.B \fBmachine\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: machine field returned by uname(2)
+.IP \(bu 2
+Windows: one of x86, x86_64, arm, ia64
+.UNINDENT
+.TP
+.B \fBid\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: contains string "mswindows"
+.UNINDENT
+.TP
+.B \fBname\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: contains string "Microsoft Windows"
+.UNINDENT
+.TP
+.B \fBpretty\-name\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: product name, e.g. "Microsoft Windows 10 Enterprise"
+.UNINDENT
+.TP
+.B \fBversion\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: long version string, e.g. "Microsoft Windows Server 2008"
+.UNINDENT
+.TP
+.B \fBversion\-id\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: short version identifier, e.g. "7" or "20012r2"
+.UNINDENT
+.TP
+.B \fBvariant\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: contains string "server" or "client"
+.UNINDENT
+.TP
+.B \fBvariant\-id\fP: \fBstring\fP (optional)
+.INDENT 7.0
+.IP \(bu 2
+POSIX: as defined by os\-release(5)
+.IP \(bu 2
+Windows: contains string "server" or "client"
+.UNINDENT
+.UNINDENT
+.SS Notes
+.sp
+On POSIX systems the fields \fBid\fP, \fBname\fP, \fBpretty\-name\fP, \fBversion\fP, \fBversion\-id\fP,
+\fBvariant\fP and \fBvariant\-id\fP follow the definition specified in os\-release(5).
+Refer to the manual page for exact description of the fields. Their values
+are taken from the os\-release file. If the file is not present in the system,
+or the values are not present in the file, the fields are not included.
+.sp
+On Windows the values are filled from information gathered from the system.
+.SS Since
+.sp
+2.10
+.SS \fBguest\-get\-osinfo\fP (Command)
+.sp
+Retrieve guest operating system information
+.SS Returns
+.sp
+\fBGuestOSInfo\fP
+.SS Since
+.sp
+2.10
+.SS \fBGuestDeviceType\fP (Enum)
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBpci\fP
+Not documented
+.UNINDENT
+.SS \fBGuestDeviceIdPCI\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBvendor\-id\fP: \fBint\fP
+vendor ID
+.TP
+.B \fBdevice\-id\fP: \fBint\fP
+device ID
+.UNINDENT
+.SS Since
+.sp
+5.2
+.SS \fBGuestDeviceId\fP (Object)
+.sp
+Id of the device
+\- \fBpci\fP: PCI ID, since: 5.2
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBtype\fP: \fBGuestDeviceType\fP
+Not documented
+.TP
+.B The members of \fBGuestDeviceIdPCI\fP when \fBtype\fP is \fB"pci"\fP
+.UNINDENT
+.SS Since
+.sp
+5.2
+.SS \fBGuestDeviceInfo\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBdriver\-name\fP: \fBstring\fP
+name of the associated driver
+.TP
+.B \fBdriver\-date\fP: \fBint\fP (optional)
+driver release date, in nanoseconds since the epoch
+.TP
+.B \fBdriver\-version\fP: \fBstring\fP (optional)
+driver version
+.TP
+.B \fBid\fP: \fBGuestDeviceId\fP (optional)
+device ID
+.UNINDENT
+.SS Since
+.sp
+5.2
+.SS \fBguest\-get\-devices\fP (Command)
+.sp
+Retrieve information about device drivers in Windows guest
+.SS Returns
+.sp
+\fBGuestDeviceInfo\fP
+.SS Since
+.sp
+5.2
+.SS \fBGuestAuthorizedKeys\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBkeys\fP: \fBarray of string\fP
+public keys (in OpenSSH/sshd(8) authorized_keys format)
+.UNINDENT
+.SS Since
+.sp
+5.2
+.SS If
+.sp
+\fBCONFIG_POSIX\fP
+.SS \fBguest\-ssh\-get\-authorized\-keys\fP (Command)
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBusername\fP: \fBstring\fP
+the user account to add the authorized keys
+.UNINDENT
+Return the public keys from user .ssh/authorized_keys on Unix systems (not
+implemented for other systems).
+.SS Returns
+.sp
+\fBGuestAuthorizedKeys\fP
+.SS Since
+.sp
+5.2
+.SS If
+.sp
+\fBCONFIG_POSIX\fP
+.SS \fBguest\-ssh\-add\-authorized\-keys\fP (Command)
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBusername\fP: \fBstring\fP
+the user account to add the authorized keys
+.TP
+.B \fBkeys\fP: \fBarray of string\fP
+the public keys to add (in OpenSSH/sshd(8) authorized_keys format)
+.TP
+.B \fBreset\fP: \fBboolean\fP (optional)
+ignore the existing content, set it with the given keys only
+.UNINDENT
+Append public keys to user .ssh/authorized_keys on Unix systems (not
+implemented for other systems).
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+5.2
+.SS If
+.sp
+\fBCONFIG_POSIX\fP
+.SS \fBguest\-ssh\-remove\-authorized\-keys\fP (Command)
+.SS Arguments
+.INDENT 0.0
+.TP
+.B \fBusername\fP: \fBstring\fP
+the user account to remove the authorized keys
+.TP
+.B \fBkeys\fP: \fBarray of string\fP
+the public keys to remove (in OpenSSH/sshd(8) authorized_keys format)
+.UNINDENT
+Remove public keys from the user .ssh/authorized_keys on Unix systems (not
+implemented for other systems). It\(aqs not an error if the key is already
+missing.
+.SS Returns
+.sp
+Nothing on success.
+.SS Since
+.sp
+5.2
+.SS If
+.sp
+\fBCONFIG_POSIX\fP
+.SS \fBGuestDiskStats\fP (Object)
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBread\-sectors\fP: \fBint\fP (optional)
+sectors read
+.TP
+.B \fBread\-ios\fP: \fBint\fP (optional)
+reads completed successfully
+.TP
+.B \fBread\-merges\fP: \fBint\fP (optional)
+read requests merged
+.TP
+.B \fBwrite\-sectors\fP: \fBint\fP (optional)
+sectors written
+.TP
+.B \fBwrite\-ios\fP: \fBint\fP (optional)
+writes completed
+.TP
+.B \fBwrite\-merges\fP: \fBint\fP (optional)
+write requests merged
+.TP
+.B \fBdiscard\-sectors\fP: \fBint\fP (optional)
+sectors discarded
+.TP
+.B \fBdiscard\-ios\fP: \fBint\fP (optional)
+discards completed successfully
+.TP
+.B \fBdiscard\-merges\fP: \fBint\fP (optional)
+discard requests merged
+.TP
+.B \fBflush\-ios\fP: \fBint\fP (optional)
+flush requests completed successfully
+.TP
+.B \fBread\-ticks\fP: \fBint\fP (optional)
+time spent reading(ms)
+.TP
+.B \fBwrite\-ticks\fP: \fBint\fP (optional)
+time spent writing(ms)
+.TP
+.B \fBdiscard\-ticks\fP: \fBint\fP (optional)
+time spent discarding(ms)
+.TP
+.B \fBflush\-ticks\fP: \fBint\fP (optional)
+time spent flushing(ms)
+.TP
+.B \fBios\-pgr\fP: \fBint\fP (optional)
+number of I/Os currently in flight
+.TP
+.B \fBtotal\-ticks\fP: \fBint\fP (optional)
+time spent doing I/Os (ms)
+.TP
+.B \fBweight\-ticks\fP: \fBint\fP (optional)
+weighted time spent doing I/Os since the last update of this field(ms)
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBGuestDiskStatsInfo\fP (Object)
+.sp
+\fBname\fP disk name
+.sp
+\fBmajor\fP major device number of disk
+.sp
+\fBminor\fP minor device number of disk
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBname\fP: \fBstring\fP
+Not documented
+.TP
+.B \fBmajor\fP: \fBint\fP
+Not documented
+.TP
+.B \fBminor\fP: \fBint\fP
+Not documented
+.TP
+.B \fBstats\fP: \fBGuestDiskStats\fP
+Not documented
+.UNINDENT
+.SS \fBguest\-get\-diskstats\fP (Command)
+.sp
+Retrieve information about disk stats.
+.SS Returns
+.sp
+List of disk stats of guest.
+.SS Since
+.sp
+7.1
+.SS \fBGuestCpuStatsType\fP (Enum)
+.sp
+An enumeration of OS type
+.SS Values
+.INDENT 0.0
+.TP
+.B \fBlinux\fP
+Not documented
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBGuestLinuxCpuStats\fP (Object)
+.sp
+CPU statistics of Linux
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBcpu\fP: \fBint\fP
+CPU index in guest OS
+.TP
+.B \fBuser\fP: \fBint\fP
+Time spent in user mode
+.TP
+.B \fBnice\fP: \fBint\fP
+Time spent in user mode with low priority (nice)
+.TP
+.B \fBsystem\fP: \fBint\fP
+Time spent in system mode
+.TP
+.B \fBidle\fP: \fBint\fP
+Time spent in the idle task
+.TP
+.B \fBiowait\fP: \fBint\fP (optional)
+Time waiting for I/O to complete (since Linux 2.5.41)
+.TP
+.B \fBirq\fP: \fBint\fP (optional)
+Time servicing interrupts (since Linux 2.6.0\-test4)
+.TP
+.B \fBsoftirq\fP: \fBint\fP (optional)
+Time servicing softirqs (since Linux 2.6.0\-test4)
+.TP
+.B \fBsteal\fP: \fBint\fP (optional)
+Stolen time by host (since Linux 2.6.11)
+.TP
+.B \fBguest\fP: \fBint\fP (optional)
+ime spent running a virtual CPU for guest operating systems under
+the  control of the Linux kernel (since Linux 2.6.24)
+.TP
+.B \fBguestnice\fP: \fBint\fP (optional)
+Time spent running a niced guest (since Linux 2.6.33)
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBGuestCpuStats\fP (Object)
+.sp
+Get statistics of each CPU in millisecond.
+.INDENT 0.0
+.IP \(bu 2
+\fBlinux\fP: Linux style CPU statistics
+.UNINDENT
+.SS Members
+.INDENT 0.0
+.TP
+.B \fBtype\fP: \fBGuestCpuStatsType\fP
+Not documented
+.TP
+.B The members of \fBGuestLinuxCpuStats\fP when \fBtype\fP is \fB"linux"\fP
+.UNINDENT
+.SS Since
+.sp
+7.1
+.SS \fBguest\-get\-cpustats\fP (Command)
+.sp
+Retrieve information about CPU stats.
+.SS Returns
+.sp
+List of CPU stats of guest.
+.SS Since
+.sp
+7.1
+.SH COPYRIGHT
+2022, The QEMU Project Developers
+.\" Generated by docutils manpage writer.
+.

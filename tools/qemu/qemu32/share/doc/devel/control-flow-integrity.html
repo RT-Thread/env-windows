@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control-Flow Integrity (CFI) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Internal QEMU APIs" href="index-api.html" />
+    <link rel="prev" title="Fuzzing" href="fuzzing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Control-Flow Integrity (CFI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basics">Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#building-with-cfi">Building with CFI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-qemu-built-with-cfi">Using QEMU built with CFI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#incompatible-code-with-cfi">Incompatible code with CFI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#disabling-cfi-for-a-specific-function">Disabling CFI for a specific function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cfi-and-fuzzing">CFI and fuzzing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">Control-Flow Integrity (CFI)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/control-flow-integrity.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="control-flow-integrity-cfi">
+<h1>Control-Flow Integrity (CFI)<a class="headerlink" href="#control-flow-integrity-cfi" title="Permalink to this heading"></a></h1>
+<p>This document describes the current control-flow integrity (CFI) mechanism in
+QEMU. How it can be enabled, its benefits and deficiencies, and how it affects
+new and existing code in QEMU</p>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this heading"></a></h2>
+<p>CFI is a hardening technique that focusing on guaranteeing that indirect
+function calls have not been altered by an attacker.
+The type used in QEMU is a forward-edge control-flow integrity that ensures
+function calls performed through function pointers, always call a “compatible”
+function. A compatible function is a function with the same signature of the
+function pointer declared in the source code.</p>
+<p>This type of CFI is entirely compiler-based and relies on the compiler knowing
+the signature of every function and every function pointer used in the code.
+As of now, the only compiler that provides support for CFI is Clang.</p>
+<p>CFI is best used on production binaries, to protect against unknown attack
+vectors.</p>
+<p>In case of a CFI violation (i.e. call to a non-compatible function) QEMU will
+terminate abruptly, to stop the possible attack.</p>
+</section>
+<section id="building-with-cfi">
+<h2>Building with CFI<a class="headerlink" href="#building-with-cfi" title="Permalink to this heading"></a></h2>
+<p>NOTE: CFI requires the use of link-time optimization. Therefore, when CFI is
+selected, LTO will be automatically enabled.</p>
+<p>To build with CFI, the minimum requirement is Clang 6+. If you
+are planning to also enable fuzzing, then Clang 11+ is needed (more on this
+later).</p>
+<p>Given the use of LTO, a version of AR that supports LLVM IR is required.
+The easies way of doing this is by selecting the AR provided by LLVM:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AR</span><span class="o">=</span><span class="n">llvm</span><span class="o">-</span><span class="n">ar</span><span class="o">-</span><span class="mi">9</span> <span class="n">CC</span><span class="o">=</span><span class="n">clang</span><span class="o">-</span><span class="mi">9</span> <span class="n">CXX</span><span class="o">=</span><span class="n">clang</span><span class="o">++-</span><span class="mi">9</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">cfi</span>
+</pre></div>
+</div>
+<p>CFI is enabled on every binary produced.</p>
+<p>If desired, an additional flag to increase the verbosity of the output in case
+of a CFI violation is offered (<code class="docutils literal notranslate"><span class="pre">--enable-debug-cfi</span></code>).</p>
+</section>
+<section id="using-qemu-built-with-cfi">
+<h2>Using QEMU built with CFI<a class="headerlink" href="#using-qemu-built-with-cfi" title="Permalink to this heading"></a></h2>
+<p>A binary with CFI will work exactly like a standard binary. In case of a CFI
+violation, the binary will terminate with an illegal instruction signal.</p>
+</section>
+<section id="incompatible-code-with-cfi">
+<h2>Incompatible code with CFI<a class="headerlink" href="#incompatible-code-with-cfi" title="Permalink to this heading"></a></h2>
+<p>As mentioned above, CFI is entirely compiler-based and therefore relies on
+compile-time knowledge of the code. This means that, while generally supported
+for most code, some specific use pattern can break CFI compatibility, and
+create false-positives. The two main patterns that can cause issues are:</p>
+<ul class="simple">
+<li><p>Just-in-time compiled code: since such code is created at runtime, the jump
+to the buffer containing JIT code will fail.</p></li>
+<li><p>Libraries loaded dynamically, e.g. with dlopen/dlsym, since the library was
+not known at compile time.</p></li>
+</ul>
+<p>Current areas of QEMU that are not entirely compatible with CFI are:</p>
+<ol class="arabic simple">
+<li><p>TCG, since the idea of TCG is to pre-compile groups of instructions at
+runtime to speed-up interpretation, quite similarly to a JIT compiler</p></li>
+<li><p>TCI, where the interpreter has to interpret the generic <em>call</em> operation</p></li>
+<li><p>Plugins, since a plugin is implemented as an external library</p></li>
+<li><p>Modules, since they are implemented as an external library</p></li>
+<li><p>Directly calling signal handlers from the QEMU source code, since the
+signal handler may have been provided by an external library or even plugged
+at runtime.</p></li>
+</ol>
+</section>
+<section id="disabling-cfi-for-a-specific-function">
+<h2>Disabling CFI for a specific function<a class="headerlink" href="#disabling-cfi-for-a-specific-function" title="Permalink to this heading"></a></h2>
+<p>If you are working on function that is performing a call using an
+incompatible way, as described before, you can selectively disable CFI checks
+for such function by using the decorator <code class="docutils literal notranslate"><span class="pre">QEMU_DISABLE_CFI</span></code> at function
+definition, and add an explanation on why the function is not compatible
+with CFI. An example of the use of <code class="docutils literal notranslate"><span class="pre">QEMU_DISABLE_CFI</span></code> is provided here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
+ <span class="o">*</span> <span class="n">Disable</span> <span class="n">CFI</span> <span class="n">checks</span><span class="o">.</span>
+ <span class="o">*</span> <span class="n">TCG</span> <span class="n">creates</span> <span class="n">binary</span> <span class="n">blobs</span> <span class="n">at</span> <span class="n">runtime</span><span class="p">,</span> <span class="k">with</span> <span class="n">the</span> <span class="n">transformed</span> <span class="n">code</span><span class="o">.</span>
+ <span class="o">*</span> <span class="n">A</span> <span class="n">TB</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">blob</span> <span class="n">of</span> <span class="n">binary</span> <span class="n">code</span><span class="p">,</span> <span class="n">created</span> <span class="n">at</span> <span class="n">runtime</span> <span class="ow">and</span> <span class="n">called</span> <span class="k">with</span> <span class="n">an</span>
+ <span class="o">*</span> <span class="n">indirect</span> <span class="n">function</span> <span class="n">call</span><span class="o">.</span> <span class="n">Since</span> <span class="n">such</span> <span class="n">function</span> <span class="n">did</span> <span class="ow">not</span> <span class="n">exist</span> <span class="n">at</span> <span class="nb">compile</span> <span class="n">time</span><span class="p">,</span>
+ <span class="o">*</span> <span class="n">the</span> <span class="n">CFI</span> <span class="n">runtime</span> <span class="n">has</span> <span class="n">no</span> <span class="n">way</span> <span class="n">to</span> <span class="n">verify</span> <span class="n">its</span> <span class="n">signature</span> <span class="ow">and</span> <span class="n">would</span> <span class="n">fail</span><span class="o">.</span>
+ <span class="o">*</span> <span class="n">TCG</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">considered</span> <span class="n">a</span> <span class="n">security</span><span class="o">-</span><span class="n">sensitive</span> <span class="n">part</span> <span class="n">of</span> <span class="n">QEMU</span> <span class="n">so</span> <span class="n">this</span> <span class="n">does</span> <span class="ow">not</span>
+ <span class="o">*</span> <span class="n">affect</span> <span class="n">the</span> <span class="n">impact</span> <span class="n">of</span> <span class="n">CFI</span> <span class="ow">in</span> <span class="n">environment</span> <span class="k">with</span> <span class="n">high</span> <span class="n">security</span> <span class="n">requirements</span>
+ <span class="o">*/</span>
+<span class="n">QEMU_DISABLE_CFI</span>
+<span class="n">static</span> <span class="n">inline</span> <span class="n">tcg_target_ulong</span> <span class="n">cpu_tb_exec</span><span class="p">(</span><span class="n">CPUState</span> <span class="o">*</span><span class="n">cpu</span><span class="p">,</span> <span class="n">TranslationBlock</span> <span class="o">*</span><span class="n">itb</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>NOTE: CFI needs to be disabled at the <strong>caller</strong> function, (i.e. a compatible
+cfi function that calls a non-compatible one), since the check is performed
+when the function call is performed.</p>
+</section>
+<section id="cfi-and-fuzzing">
+<h2>CFI and fuzzing<a class="headerlink" href="#cfi-and-fuzzing" title="Permalink to this heading"></a></h2>
+<p>There is generally no advantage of using CFI and fuzzing together, because
+they target different environments (production for CFI, debug for fuzzing).</p>
+<p>CFI could be used in conjunction with fuzzing to identify a broader set of
+bugs that may not end immediately in a segmentation fault or triggering
+an assertion. However, other sanitizers such as address and ub sanitizers
+can identify such bugs in a more precise way than CFI.</p>
+<p>There is, however, an interesting use case in using CFI in conjunction with
+fuzzing, that is to make sure that CFI is not triggering any false positive
+in remote-but-possible parts of the code.</p>
+<p>CFI can be enabled with fuzzing, but with some caveats:
+1. Fuzzing relies on the linker performing function wrapping at link-time.
+The standard BFD linker does not support function wrapping when LTO is
+also enabled. The workaround is to use LLVM’s lld linker.
+2. Fuzzing also relies on a custom linker script, which is only supported by
+lld with version 11+.</p>
+<p>In other words, to compile with fuzzing and CFI, clang 11+ is required, and
+lld needs to be used as a linker:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AR</span><span class="o">=</span><span class="n">llvm</span><span class="o">-</span><span class="n">ar</span><span class="o">-</span><span class="mi">11</span> <span class="n">CC</span><span class="o">=</span><span class="n">clang</span><span class="o">-</span><span class="mi">11</span> <span class="n">CXX</span><span class="o">=</span><span class="n">clang</span><span class="o">++-</span><span class="mi">11</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">cfi</span> \
+                          <span class="o">-</span><span class="n">enable</span><span class="o">-</span><span class="n">fuzzing</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">ldflags</span><span class="o">=</span><span class="s2">&quot;-fuse-ld=lld&quot;</span>
+</pre></div>
+</div>
+<p>and then, compile the fuzzers as usual.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fuzzing.html" class="btn btn-neutral float-left" title="Fuzzing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index-api.html" class="btn btn-neutral float-right" title="Internal QEMU APIs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

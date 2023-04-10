@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D-Bus display &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Live Block Device Operations" href="live-block-operations.html" />
+    <link rel="prev" title="D-Bus VMState" href="dbus-vmstate.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">D-Bus display</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.VM-section">org.qemu.Display1.VM interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Console-section">org.qemu.Display1.Console interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Keyboard-section">org.qemu.Display1.Keyboard interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Mouse-section">org.qemu.Display1.Mouse interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Listener-section">org.qemu.Display1.Listener interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Clipboard-section">org.qemu.Display1.Clipboard interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Audio-section">org.qemu.Display1.Audio interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.AudioOutListener-section">org.qemu.Display1.AudioOutListener interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.AudioInListener-section">org.qemu.Display1.AudioInListener interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org.qemu.Display1.Chardev-section">org.qemu.Display1.Chardev interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Management and Interoperability</a></li>
+      <li class="breadcrumb-item active">D-Bus display</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/interop/dbus-display.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="d-bus-display">
+<h1>D-Bus display<a class="headerlink" href="#d-bus-display" title="Permalink to this heading"></a></h1>
+<p>QEMU can export the VM display through D-Bus (when started with <code class="docutils literal notranslate"><span class="pre">-display</span>
+<span class="pre">dbus</span></code>), to allow out-of-process UIs, remote protocol servers or other
+interactive display usages.</p>
+<p>Various specialized D-Bus interfaces are available on different object paths
+under <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/</span></code>, depending on the VM configuration.</p>
+<p>QEMU also implements the standard interfaces, such as
+<a class="reference external" href="https://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces">org.freedesktop.DBus.Introspectable</a>.</p>
+<section id="org.qemu.Display1.VM-section">
+<h2>org.qemu.Display1.VM interface<a class="headerlink" href="#org.qemu.Display1.VM-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.VM">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.VM</span></span><a class="headerlink" href="#org.qemu.Display1.VM" title="Permalink to this definition"></a></dt>
+<dd><p>This interface is implemented on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/VM</span></code>.</p>
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.VM.Name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Name</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.VM.Name" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The name of the VM.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.VM.UUID">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">UUID</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.VM.UUID" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The UUID of the VM.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.VM.ConsoleIDs">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ConsoleIDs</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">au</span></span><a class="headerlink" href="#org.qemu.Display1.VM.ConsoleIDs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The list of consoles available on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Console_$id</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Console-section">
+<h2>org.qemu.Display1.Console interface<a class="headerlink" href="#org.qemu.Display1.Console-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Console</span></span><a class="headerlink" href="#org.qemu.Display1.Console" title="Permalink to this definition"></a></dt>
+<dd><p>This interface is implemented on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Console_$id</span></code>. You
+may discover available consoles through introspection or with the
+<a class="reference internal" href="#org.qemu.Display1.VM.ConsoleIDs"><code class="xref dbus dbus-prop docutils literal notranslate"><span class="pre">org.qemu.Display1.VM.ConsoleIDs</span></code></a> property.</p>
+<p>A console is attached to a video device head. It may be “Graphic” or
+“Text” (see <a class="reference internal" href="#org.qemu.Display1.Console.Type"><code class="xref dbus dbus-prop docutils literal notranslate"><span class="pre">Type</span></code></a> and other properties).</p>
+<p>Interactions with a console may be done with
+<a class="reference internal" href="#org.qemu.Display1.Keyboard"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">org.qemu.Display1.Keyboard</span></code></a> and
+<a class="reference internal" href="#org.qemu.Display1.Mouse"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">org.qemu.Display1.Mouse</span></code></a> interfaces when available.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.RegisterListener">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">RegisterListener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">h</span></span><span class="w"> </span><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Console.RegisterListener" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listener</strong> (<em>h</em>) – a Unix socket FD, for peer-to-peer D-Bus communication.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Register a console listener, which will receive display updates, until
+it is disconnected.</p>
+<p>Multiple listeners may be registered simultaneously.</p>
+<p>The listener is expected to implement the
+<a class="reference internal" href="#org.qemu.Display1.Listener"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">org.qemu.Display1.Listener</span></code></a> interface.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.SetUIInfo">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetUIInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">q</span></span><span class="w"> </span><span class="n"><span class="pre">width_mm</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">q</span></span><span class="w"> </span><span class="n"><span class="pre">height_mm</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">xoff</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">yoff</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Console.SetUIInfo" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width_mm</strong> (<em>q</em>) – the physical display width in millimeters.</p></li>
+<li><p><strong>height_mm</strong> (<em>q</em>) – the physical display height in millimeters.</p></li>
+<li><p><strong>xoff</strong> (<em>i</em>) – horizontal offset, in pixels.</p></li>
+<li><p><strong>yoff</strong> (<em>i</em>) – vertical offset, in pixels.</p></li>
+<li><p><strong>width</strong> (<em>u</em>) – console width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>u</em>) – console height, in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Modify the dimensions and display settings.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.Label">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Label</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.Console.Label" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>A user-friendly name for the console (for ex: “VGA”).</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.Head">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Head</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">u</span></span><a class="headerlink" href="#org.qemu.Display1.Console.Head" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Graphical device head number.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.Type">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Type</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.Console.Type" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Console type (“Graphic” or “Text”).</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.Width">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Width</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">u</span></span><a class="headerlink" href="#org.qemu.Display1.Console.Width" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Console width, in pixels.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.Height">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Height</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">u</span></span><a class="headerlink" href="#org.qemu.Display1.Console.Height" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Console height, in pixels.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Console.DeviceAddress">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">DeviceAddress</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.Console.DeviceAddress" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The device address (ex: “pci/0000/02.0”).</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Keyboard-section">
+<h2>org.qemu.Display1.Keyboard interface<a class="headerlink" href="#org.qemu.Display1.Keyboard-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Keyboard">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Keyboard</span></span><a class="headerlink" href="#org.qemu.Display1.Keyboard" title="Permalink to this definition"></a></dt>
+<dd><p>This interface in implemented on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Console_$id</span></code> (see
+<a class="reference internal" href="#org.qemu.Display1.Console"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">Console</span></code></a>).</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Keyboard.Press">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">keycode</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Keyboard.Press" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keycode</strong> (<em>u</em>) – QEMU key number (xtkbd + special re-encoding of high bit)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Send a key press event.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Keyboard.Release">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">keycode</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Keyboard.Release" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keycode</strong> (<em>u</em>) – QEMU key number (xtkbd + special re-encoding of high bit)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Send a key release event.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Keyboard.Modifiers">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Modifiers</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">u</span></span><a class="headerlink" href="#org.qemu.Display1.Keyboard.Modifiers" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The active keyboard modifiers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scroll</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span>
+<span class="n">Num</span>    <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span>
+<span class="n">Caps</span>   <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Mouse-section">
+<h2>org.qemu.Display1.Mouse interface<a class="headerlink" href="#org.qemu.Display1.Mouse-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Mouse</span></span><a class="headerlink" href="#org.qemu.Display1.Mouse" title="Permalink to this definition"></a></dt>
+<dd><p>This interface in implemented on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Console_$id</span></code> (see
+<a class="reference internal" href="#org.qemu.Display1.Console"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">Console</span></code></a> documentation).</p>
+<p id="dbus-button-values"><strong>Button values</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Left</span>       <span class="o">=</span> <span class="mi">0</span>
+<span class="n">Middle</span>     <span class="o">=</span> <span class="mi">1</span>
+<span class="n">Right</span>      <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Wheel</span><span class="o">-</span><span class="n">up</span>   <span class="o">=</span> <span class="mi">3</span>
+<span class="n">Wheel</span><span class="o">-</span><span class="n">down</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">Side</span>       <span class="o">=</span> <span class="mi">5</span>
+<span class="n">Extra</span>      <span class="o">=</span> <span class="mi">6</span>
+</pre></div>
+</div>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse.Press">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Press</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">button</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Mouse.Press" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>button</strong> (<em>u</em>) – <a class="reference internal" href="#dbus-button-values"><span class="std std-ref">button value</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Send a mouse button press event.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse.Release">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">button</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Mouse.Release" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>button</strong> (<em>u</em>) – <a class="reference internal" href="#dbus-button-values"><span class="std std-ref">button value</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Send a mouse button release event.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse.SetAbsPosition">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetAbsPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Mouse.SetAbsPosition" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>u</em>) – X position, in pixels.</p></li>
+<li><p><strong>y</strong> (<em>u</em>) – Y position, in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Set the mouse pointer position.</p>
+<p>Returns an error if not <a class="reference internal" href="#org.qemu.Display1.Mouse.IsAbsolute"><code class="xref dbus dbus-prop docutils literal notranslate"><span class="pre">IsAbsolute</span></code></a>.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse.RelMotion">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">RelMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Mouse.RelMotion" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> (<em>i</em>) – X-delta, in pixels.</p></li>
+<li><p><strong>dy</strong> (<em>i</em>) – Y-delta, in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Move the mouse pointer position, relative to the current position.</p>
+<p>Returns an error if <a class="reference internal" href="#org.qemu.Display1.Mouse.IsAbsolute"><code class="xref dbus dbus-prop docutils literal notranslate"><span class="pre">IsAbsolute</span></code></a>.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Mouse.IsAbsolute">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">IsAbsolute</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">b</span></span><a class="headerlink" href="#org.qemu.Display1.Mouse.IsAbsolute" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Whether the mouse is using absolute movements.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Listener-section">
+<h2>org.qemu.Display1.Listener interface<a class="headerlink" href="#org.qemu.Display1.Listener-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Listener</span></span><a class="headerlink" href="#org.qemu.Display1.Listener" title="Permalink to this definition"></a></dt>
+<dd><p>This client-side interface must be available on
+<code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Listener</span></code> when registering the peer-to-peer
+connection with <a class="reference internal" href="#org.qemu.Display1.Chardev.Register"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">Register</span></code></a>.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.Scanout">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Scanout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">pixman_format</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.Scanout" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> (<em>u</em>) – display width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>u</em>) – display height, in pixels.</p></li>
+<li><p><strong>stride</strong> (<em>u</em>) – data stride, in bytes.</p></li>
+<li><p><strong>pixman_format</strong> (<em>u</em>) – image format (ex: <code class="docutils literal notranslate"><span class="pre">PIXMAN_X8R8G8B8</span></code>).</p></li>
+<li><p><strong>data</strong> (<em>ay</em>) – image data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Resize and update the display content.</p>
+<p>The data to transfer for the display update may be large. The preferred
+scanout method is <a class="reference internal" href="#org.qemu.Display1.Listener.ScanoutDMABUF"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">ScanoutDMABUF</span></code></a>, used whenever possible.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.Update">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">pixman_format</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.Update" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>i</em>) – X update position, in pixels.</p></li>
+<li><p><strong>y</strong> (<em>i</em>) – Y update position, in pixels.</p></li>
+<li><p><strong>width</strong> (<em>i</em>) – update width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>i</em>) – update height, in pixels.</p></li>
+<li><p><strong>stride</strong> (<em>u</em>) – data stride, in bytes.</p></li>
+<li><p><strong>pixman_format</strong> (<em>u</em>) – image format (ex: <code class="docutils literal notranslate"><span class="pre">PIXMAN_X8R8G8B8</span></code>).</p></li>
+<li><p><strong>data</strong> (<em>ay</em>) – display image data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Update the display content.</p>
+<p>This method is only called after a <a class="reference internal" href="#org.qemu.Display1.Listener.Scanout"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">Scanout</span></code></a> call.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.ScanoutDMABUF">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">ScanoutDMABUF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">h</span></span><span class="w"> </span><span class="n"><span class="pre">dmabuf</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">fourcc</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">modifier</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">y0_top</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.ScanoutDMABUF" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dmabuf</strong> (<em>h</em>) – the DMABUF file descriptor.</p></li>
+<li><p><strong>width</strong> (<em>u</em>) – display width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>u</em>) – display height, in pixels.</p></li>
+<li><p><strong>stride</strong> (<em>u</em>) – stride, in bytes.</p></li>
+<li><p><strong>fourcc</strong> (<em>u</em>) – DMABUF fourcc.</p></li>
+<li><p><strong>modifier</strong> (<em>t</em>) – DMABUF modifier.</p></li>
+<li><p><strong>y0_top</strong> (<em>b</em>) – whether Y position 0 is the top or not.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Resize and update the display content with a DMABUF.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.UpdateDMABUF">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">UpdateDMABUF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.UpdateDMABUF" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>i</em>) – the X update position, in pixels.</p></li>
+<li><p><strong>y</strong> (<em>i</em>) – the Y update position, in pixels.</p></li>
+<li><p><strong>width</strong> (<em>i</em>) – the update width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>i</em>) – the update height, in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Update the display content with the current DMABUF and the given region.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.Disable">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Disable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.Disable" title="Permalink to this definition"></a></dt>
+<dd><p>Disable the display (turn it off).</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.MouseSet">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">MouseSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.MouseSet" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>i</em>) – X mouse position, in pixels.</p></li>
+<li><p><strong>y</strong> (<em>i</em>) – Y mouse position, in pixels.</p></li>
+<li><p><strong>on</strong> (<em>i</em>) – whether the mouse is visible or not.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Set the mouse position and visibility.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Listener.CursorDefine">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">CursorDefine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">hot_x</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">i</span></span><span class="w"> </span><span class="n"><span class="pre">hot_y</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Listener.CursorDefine" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> (<em>i</em>) – cursor width, in pixels.</p></li>
+<li><p><strong>height</strong> (<em>i</em>) – cursor height, in pixels.</p></li>
+<li><p><strong>hot_x</strong> (<em>i</em>) – hot-spot X position, in pixels.</p></li>
+<li><p><strong>hot_y</strong> (<em>i</em>) – hot-spot Y position, in pixels.</p></li>
+<li><p><strong>data</strong> (<em>ay</em>) – the cursor data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Set the mouse cursor shape and hot-spot. The “data” must be ARGB, 32-bit
+per pixel.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Clipboard-section">
+<h2>org.qemu.Display1.Clipboard interface<a class="headerlink" href="#org.qemu.Display1.Clipboard-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Clipboard</span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard" title="Permalink to this definition"></a></dt>
+<dd><p>This interface must be implemented by both the client and the server on
+<code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Clipboard</span></code> to support clipboard sharing between
+the client and the guest.</p>
+<p>Once <a class="reference internal" href="#org.qemu.Display1.Chardev.Register"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">Register</span></code></a>’ed, method calls may be sent and received in both
+directions. Unregistered callers will get error replies.</p>
+<p id="dbus-clipboard-selection"><strong>Selection values</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Clipboard</span>   <span class="o">=</span> <span class="mi">0</span>
+<span class="n">Primary</span>     <span class="o">=</span> <span class="mi">1</span>
+<span class="n">Secondary</span>   <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p id="dbus-clipboard-serial"><strong>Serial counter</strong></p>
+<p>To solve potential clipboard races, clipboard grabs have an associated
+serial counter. It is set to 0 on registration, and incremented by 1 for
+each grab. The peer with the highest serial is the clipboard grab owner.</p>
+<p>When a grab with a lower serial is received, it should be discarded.</p>
+<p>When a grab is attempted with the same serial number as the current grab,
+the one coming from the client should have higher priority, and the client
+should gain clipboard grab ownership.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard.Register">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Register</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard.Register" title="Permalink to this definition"></a></dt>
+<dd><p>Register a clipboard session and reinitialize the serial counter.</p>
+<p>The client must register itself, and is granted an exclusive
+access for handling the clipboard.</p>
+<p>The server can reinitialize the session as well (to reset the counter).</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard.Unregister">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Unregister</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard.Unregister" title="Permalink to this definition"></a></dt>
+<dd><p>Unregister the clipboard session.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard.Grab">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Grab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">serial</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">as</span></span><span class="w"> </span><span class="n"><span class="pre">mimes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard.Grab" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selection</strong> (<em>u</em>) – a <a class="reference internal" href="#dbus-clipboard-selection"><span class="std std-ref">selection value</span></a>.</p></li>
+<li><p><strong>serial</strong> (<em>u</em>) – the current grab <a class="reference internal" href="#dbus-clipboard-serial"><span class="std std-ref">serial</span></a>.</p></li>
+<li><p><strong>mimes</strong> (<em>as</em>) – the list of available content MIME types.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Grab the clipboard, claiming current clipboard content.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard.Release">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard.Release" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selection</strong> (<em>u</em>) – a <a class="reference internal" href="#dbus-clipboard-selection"><span class="std std-ref">selection value</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Release the clipboard (does nothing if not the current owner).</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Clipboard.Request">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">as</span></span><span class="w"> </span><span class="n"><span class="pre">mimes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">s</span></span><span class="w"> </span><span class="n"><span class="pre">reply_mime</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Clipboard.Request" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selection</strong> (<em>u</em>) – a <a class="reference internal" href="#dbus-clipboard-selection"><span class="std std-ref">selection value</span></a></p></li>
+<li><p><strong>mimes</strong> (<em>as</em>) – requested MIME types (by order of preference).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>reply_mime</strong> (<em>s</em>) – the returned data MIME type.</p></li>
+<li><p><strong>data</strong> (<em>ay</em>) – the clipboard data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Request the clipboard content.</p>
+<p>Return an error if the clipboard is empty, or the requested MIME types
+are unavailable.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Audio-section">
+<h2>org.qemu.Display1.Audio interface<a class="headerlink" href="#org.qemu.Display1.Audio-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Audio">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Audio</span></span><a class="headerlink" href="#org.qemu.Display1.Audio" title="Permalink to this definition"></a></dt>
+<dd><p>Audio backend may be available on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Audio</span></code>.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Audio.RegisterOutListener">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">RegisterOutListener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">h</span></span><span class="w"> </span><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Audio.RegisterOutListener" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listener</strong> (<em>h</em>) – a Unix socket FD, for peer-to-peer D-Bus communication.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Register an audio backend playback handler.</p>
+<p>Multiple listeners may be registered simultaneously.</p>
+<p>The listener is expected to implement the
+<a class="reference internal" href="#org.qemu.Display1.AudioOutListener"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">org.qemu.Display1.AudioOutListener</span></code></a> interface.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Audio.RegisterInListener">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">RegisterInListener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">h</span></span><span class="w"> </span><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Audio.RegisterInListener" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listener</strong> (<em>h</em>) – a Unix socket FD, for peer-to-peer D-Bus communication.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Register an audio backend record handler.</p>
+<p>Multiple listeners may be registered simultaneously.</p>
+<p>The listener is expected to implement the
+<a class="reference internal" href="#org.qemu.Display1.AudioInListener"><code class="xref dbus dbus-iface docutils literal notranslate"><span class="pre">org.qemu.Display1.AudioInListener</span></code></a> interface.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.AudioOutListener-section">
+<h2>org.qemu.Display1.AudioOutListener interface<a class="headerlink" href="#org.qemu.Display1.AudioOutListener-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.AudioOutListener</span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener" title="Permalink to this definition"></a></dt>
+<dd><p>This client-side interface must be available on
+<code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/AudioOutListener</span></code> when registering the peer-to-peer
+connection with <a class="reference internal" href="#org.qemu.Display1.Audio.RegisterOutListener"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">RegisterOutListener</span></code></a>.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener.Init">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">y</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">is_signed</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">is_float</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">y</span></span><span class="w"> </span><span class="n"><span class="pre">nchannels</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">bytes_per_frame</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">bytes_per_second</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">be</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener.Init" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>bits</strong> (<em>y</em>) – PCM bits per sample.</p></li>
+<li><p><strong>is_signed</strong> (<em>b</em>) – whether the PCM data is signed.</p></li>
+<li><p><strong>is_float</strong> (<em>b</em>) – PCM floating point format.</p></li>
+<li><p><strong>freq</strong> (<em>u</em>) – the PCM frequency in Hz.</p></li>
+<li><p><strong>nchannels</strong> (<em>y</em>) – the number of channels.</p></li>
+<li><p><strong>bytes_per_frame</strong> (<em>u</em>) – the bytes per frame.</p></li>
+<li><p><strong>bytes_per_second</strong> (<em>u</em>) – the bytes per second.</p></li>
+<li><p><strong>be</strong> (<em>b</em>) – whether using big-endian format.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Initializes a PCM playback stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener.Fini">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Fini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener.Fini" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Finish &amp; close a playback stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener.SetEnabled">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetEnabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">enabled</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener.SetEnabled" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>enabled</strong> (<em>b</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Resume or suspend the playback stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener.SetVolume">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">mute</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">volume</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener.SetVolume" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>mute</strong> (<em>b</em>) – whether the stream is muted.</p></li>
+<li><p><strong>volume</strong> (<em>ay</em>) – the volume per-channel.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Set the stream volume and mute state (volume without unit, 0-255).</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioOutListener.Write">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioOutListener.Write" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>data</strong> (<em>ay</em>) – the PCM data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>PCM stream to play.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.AudioInListener-section">
+<h2>org.qemu.Display1.AudioInListener interface<a class="headerlink" href="#org.qemu.Display1.AudioInListener-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.AudioInListener</span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener" title="Permalink to this definition"></a></dt>
+<dd><p>This client-side interface must be available on
+<code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/AudioInListener</span></code> when registering the peer-to-peer
+connection with <a class="reference internal" href="#org.qemu.Display1.Audio.RegisterInListener"><code class="xref dbus dbus-meth docutils literal notranslate"><span class="pre">RegisterInListener</span></code></a>.</p>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener.Init">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">y</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">is_signed</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">is_float</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">y</span></span><span class="w"> </span><span class="n"><span class="pre">nchannels</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">bytes_per_frame</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">u</span></span><span class="w"> </span><span class="n"><span class="pre">bytes_per_second</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">be</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener.Init" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>bits</strong> (<em>y</em>) – PCM bits per sample.</p></li>
+<li><p><strong>is_signed</strong> (<em>b</em>) – whether the PCM data is signed.</p></li>
+<li><p><strong>is_float</strong> (<em>b</em>) – PCM floating point format.</p></li>
+<li><p><strong>freq</strong> (<em>u</em>) – the PCM frequency in Hz.</p></li>
+<li><p><strong>nchannels</strong> (<em>y</em>) – the number of channels.</p></li>
+<li><p><strong>bytes_per_frame</strong> (<em>u</em>) – the bytes per frame.</p></li>
+<li><p><strong>bytes_per_second</strong> (<em>u</em>) – the bytes per second.</p></li>
+<li><p><strong>be</strong> (<em>b</em>) – whether using big-endian format.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Initializes a PCM record stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener.Fini">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Fini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener.Fini" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Finish &amp; close a record stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener.SetEnabled">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetEnabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">enabled</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener.SetEnabled" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>enabled</strong> (<em>b</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Resume or suspend the record stream.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener.SetVolume">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SetVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">b</span></span><span class="w"> </span><span class="n"><span class="pre">mute</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">volume</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener.SetVolume" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>mute</strong> (<em>b</em>) – whether the stream is muted.</p></li>
+<li><p><strong>volume</strong> (<em>ay</em>) – the volume per-channel.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Set the stream volume and mute state (volume without unit, 0-255).</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.AudioInListener.Read">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="kt"><span class="pre">t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">ay</span></span><span class="w"> </span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.AudioInListener.Read" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>t</em>) – the stream ID.</p></li>
+<li><p><strong>size</strong> (<em>t</em>) – the amount to read, in bytes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ay</em>) – the recorded data (which may be less than requested).</p></li>
+</ul>
+</dd>
+</dl>
+<p>Read “size” bytes from the record stream.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="org.qemu.Display1.Chardev-section">
+<h2>org.qemu.Display1.Chardev interface<a class="headerlink" href="#org.qemu.Display1.Chardev-section" title="Permalink to this heading"></a></h2>
+<dl class="dbus interface">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev">
+<em class="property"><span class="pre">interface</span> </em><span class="sig-name descname"><span class="pre">org.qemu.Display1.Chardev</span></span><a class="headerlink" href="#org.qemu.Display1.Chardev" title="Permalink to this definition"></a></dt>
+<dd><p>Character devices may be available on <code class="docutils literal notranslate"><span class="pre">/org/qemu/Display1/Chardev_$id</span></code>.</p>
+<p>They may be used for different kind of streams, which are identified via
+their FQDN <a class="reference internal" href="#org.qemu.Display1.Chardev.Name"><code class="xref dbus dbus-prop docutils literal notranslate"><span class="pre">Name</span></code></a>.</p>
+<p id="dbus-chardev-fqdn">Here are some known reserved kind names (the <code class="docutils literal notranslate"><span class="pre">org.qemu</span></code> prefix is
+reserved by QEMU):</p>
+<dl class="simple">
+<dt>org.qemu.console.serial.0</dt><dd><p>A serial console stream.</p>
+</dd>
+<dt>org.qemu.monitor.hmp.0</dt><dd><p>A QEMU HMP human monitor.</p>
+</dd>
+<dt>org.qemu.monitor.qmp.0</dt><dd><p>A QEMU QMP monitor.</p>
+</dd>
+<dt>org.qemu.usbredir</dt><dd><p>A usbredir stream.</p>
+</dd>
+</dl>
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.Register">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">Register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="kt"><span class="pre">h</span></span><span class="w"> </span><span class="n"><span class="pre">stream</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.Register" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> (<em>h</em>) – a Unix FD to redirect the stream to.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Register a file-descriptor for the stream handling.</p>
+<p>The current handler, if any, will be replaced.</p>
+</dd></dl>
+
+<dl class="dbus method">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.SendBreak">
+<em class="property"><span class="pre">method</span> </em><span class="sig-name descname"><span class="pre">SendBreak</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="sig-paren">(</span><span class="sig-paren">)</span></span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.SendBreak" title="Permalink to this definition"></a></dt>
+<dd><p>Send a break event to the character device.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.Name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Name</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.Name" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The FQDN name to identify the kind of stream. See <a class="reference internal" href="#dbus-chardev-fqdn"><span class="std std-ref">reserved
+names</span></a>.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.FEOpened">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">FEOpened</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">b</span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.FEOpened" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Whether the front-end side is opened.</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.Echo">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Echo</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">b</span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.Echo" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>Whether the input should be echo’ed (for serial streams).</p>
+</dd></dl>
+
+<dl class="dbus member">
+<dt class="sig sig-object dbus" id="org.qemu.Display1.Chardev.Owner">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">Owner</span></span><span class="p"><span class="pre">:</span></span><span class="kt"><span class="pre">s</span></span><a class="headerlink" href="#org.qemu.Display1.Chardev.Owner" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Access</dt>
+<dd class="field-odd"><p>read-only</p>
+</dd>
+<dt class="field-even">Emits Changed</dt>
+<dd class="field-even"><p>yes</p>
+</dd>
+</dl>
+<p>The D-Bus unique name of the registered handler.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dbus-vmstate.html" class="btn btn-neutral float-left" title="D-Bus VMState" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="live-block-operations.html" class="btn btn-neutral float-right" title="Live Block Device Operations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

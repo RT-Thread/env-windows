@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU block drivers reference &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">QEMU block drivers reference</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/qemu-block-drivers.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-block-drivers-reference">
+<h1>QEMU block drivers reference<a class="headerlink" href="#qemu-block-drivers-reference" title="Permalink to this heading"></a></h1>
+<section id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<p>QEMU block driver reference manual</p>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h2>
+<section id="disk-image-file-formats">
+<h3>Disk image file formats<a class="headerlink" href="#disk-image-file-formats" title="Permalink to this heading"></a></h3>
+<p>QEMU supports many image file formats that can be used with VMs as well as with
+any of the tools (like <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code>). This includes the preferred formats
+raw and qcow2 as well as formats that are supported for compatibility with
+older QEMU versions or other hypervisors.</p>
+<p>Depending on the image format, different options can be passed to
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">create</span></code> and <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">convert</span></code> using the <code class="docutils literal notranslate"><span class="pre">-o</span></code> option.
+This section describes each format and the options that are supported for it.</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-raw">
+<span class="sig-name descname"><span class="pre">raw</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-raw" title="Permalink to this definition"></a></dt>
+<dd><p>Raw disk image format. This format has the advantage of
+being simple and easily exportable to all other emulators. If your
+file system supports <em>holes</em> (for example in ext2 or ext3 on
+Linux or NTFS on Windows), then only the written sectors will reserve
+space. Use <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">info</span></code> to know the real size used by the
+image or <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-ls</span></code> on Unix/Linux.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-raw-arg-preallocation">
+<span class="sig-name descname"><span class="pre">preallocation</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-raw-arg-preallocation" title="Permalink to this definition"></a></dt>
+<dd><p>Preallocation mode (allowed values: <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">falloc</span></code>,
+<code class="docutils literal notranslate"><span class="pre">full</span></code>). <code class="docutils literal notranslate"><span class="pre">falloc</span></code> mode preallocates space for image by
+calling <code class="docutils literal notranslate"><span class="pre">posix_fallocate()</span></code>. <code class="docutils literal notranslate"><span class="pre">full</span></code> mode preallocates space
+for image by writing data to underlying storage. This data may or
+may not be zero, depending on the storage location.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-qcow2">
+<span class="sig-name descname"><span class="pre">qcow2</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-qcow2" title="Permalink to this definition"></a></dt>
+<dd><p>QEMU image format, the most versatile format. Use it to have smaller
+images (useful if your filesystem does not supports holes, for example
+on Windows), zlib based compression and support of multiple VM
+snapshots.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-compat">
+<span class="sig-name descname"><span class="pre">compat</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-compat" title="Permalink to this definition"></a></dt>
+<dd><p>Determines the qcow2 version to use. <code class="docutils literal notranslate"><span class="pre">compat=0.10</span></code> uses the
+traditional image format that can be read by any QEMU since 0.10.
+<code class="docutils literal notranslate"><span class="pre">compat=1.1</span></code> enables image format extensions that only QEMU 1.1 and
+newer understand (this is the default). Amongst others, this includes
+zero clusters, which allow efficient copy-on-read for sparse images.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-backing_file">
+<span id="cmdoption-qcow2-arg-backing-file"></span><span class="sig-name descname"><span class="pre">backing_file</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-backing_file" title="Permalink to this definition"></a></dt>
+<dd><p>File name of a base image (see <code class="docutils literal notranslate"><span class="pre">create</span></code> subcommand)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-backing_fmt">
+<span id="cmdoption-qcow2-arg-backing-fmt"></span><span class="sig-name descname"><span class="pre">backing_fmt</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-backing_fmt" title="Permalink to this definition"></a></dt>
+<dd><p>Image format of the base image</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encryption">
+<span class="sig-name descname"><span class="pre">encryption</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encryption" title="Permalink to this definition"></a></dt>
+<dd><p>This option is deprecated and equivalent to <code class="docutils literal notranslate"><span class="pre">encrypt.format=aes</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.format">
+<span id="cmdoption-qcow2-arg-encrypt-format"></span><span class="sig-name descname"><span class="pre">encrypt.format</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.format" title="Permalink to this definition"></a></dt>
+<dd><p>If this is set to <code class="docutils literal notranslate"><span class="pre">luks</span></code>, it requests that the qcow2 payload (not
+qcow2 header) be encrypted using the LUKS format. The passphrase to
+use to unlock the LUKS key slot is given by the <code class="docutils literal notranslate"><span class="pre">encrypt.key-secret</span></code>
+parameter. LUKS encryption parameters can be tuned with the other
+<code class="docutils literal notranslate"><span class="pre">encrypt.*</span></code> parameters.</p>
+<p>If this is set to <code class="docutils literal notranslate"><span class="pre">aes</span></code>, the image is encrypted with 128-bit AES-CBC.
+The encryption key is given by the <code class="docutils literal notranslate"><span class="pre">encrypt.key-secret</span></code> parameter.
+This encryption format is considered to be flawed by modern cryptography
+standards, suffering from a number of design problems:</p>
+<ul class="simple">
+<li><p>The AES-CBC cipher is used with predictable initialization vectors based
+on the sector number. This makes it vulnerable to chosen plaintext attacks
+which can reveal the existence of encrypted data.</p></li>
+<li><p>The user passphrase is directly used as the encryption key. A poorly
+chosen or short passphrase will compromise the security of the encryption.</p></li>
+<li><p>In the event of the passphrase being compromised there is no way to
+change the passphrase to protect data in any qcow images. The files must
+be cloned, using a different encryption passphrase in the new file. The
+original file must then be securely erased using a program like shred,
+though even this is ineffective with many modern storage technologies.</p></li>
+</ul>
+<p>The use of this is no longer supported in system emulators. Support only
+remains in the command line utilities, for the purposes of data liberation
+and interoperability with old versions of QEMU. The <code class="docutils literal notranslate"><span class="pre">luks</span></code> format
+should be used instead.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.key-secret">
+<span id="cmdoption-qcow2-arg-encrypt-key-secret"></span><span class="sig-name descname"><span class="pre">encrypt.key-secret</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.key-secret" title="Permalink to this definition"></a></dt>
+<dd><p>Provides the ID of a <code class="docutils literal notranslate"><span class="pre">secret</span></code> object that contains the passphrase
+(<code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>) or encryption key (<code class="docutils literal notranslate"><span class="pre">encrypt.format=aes</span></code>).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.cipher-alg">
+<span id="cmdoption-qcow2-arg-encrypt-cipher-alg"></span><span class="sig-name descname"><span class="pre">encrypt.cipher-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.cipher-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the cipher algorithm and key length. Currently defaults
+to <code class="docutils literal notranslate"><span class="pre">aes-256</span></code>. Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.cipher-mode">
+<span id="cmdoption-qcow2-arg-encrypt-cipher-mode"></span><span class="sig-name descname"><span class="pre">encrypt.cipher-mode</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.cipher-mode" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the encryption mode to use. Currently defaults to <code class="docutils literal notranslate"><span class="pre">xts</span></code>.
+Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.ivgen-alg">
+<span id="cmdoption-qcow2-arg-encrypt-ivgen-alg"></span><span class="sig-name descname"><span class="pre">encrypt.ivgen-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.ivgen-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the initialization vector generator algorithm. Currently defaults
+to <code class="docutils literal notranslate"><span class="pre">plain64</span></code>. Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.ivgen-hash-alg">
+<span id="cmdoption-qcow2-arg-encrypt-ivgen-hash-alg"></span><span class="sig-name descname"><span class="pre">encrypt.ivgen-hash-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.ivgen-hash-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the hash algorithm to use with the initialization vector generator
+(if required). Defaults to <code class="docutils literal notranslate"><span class="pre">sha256</span></code>. Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.hash-alg">
+<span id="cmdoption-qcow2-arg-encrypt-hash-alg"></span><span class="sig-name descname"><span class="pre">encrypt.hash-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.hash-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the hash algorithm to use for PBKDF algorithm
+Defaults to <code class="docutils literal notranslate"><span class="pre">sha256</span></code>. Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-encrypt.iter-time">
+<span id="cmdoption-qcow2-arg-encrypt-iter-time"></span><span class="sig-name descname"><span class="pre">encrypt.iter-time</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-encrypt.iter-time" title="Permalink to this definition"></a></dt>
+<dd><p>Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
+Defaults to <code class="docutils literal notranslate"><span class="pre">2000</span></code>. Only used when <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-cluster_size">
+<span id="cmdoption-qcow2-arg-cluster-size"></span><span class="sig-name descname"><span class="pre">cluster_size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-cluster_size" title="Permalink to this definition"></a></dt>
+<dd><p>Changes the qcow2 cluster size (must be between 512 and 2M). Smaller cluster
+sizes can improve the image file size whereas larger cluster sizes generally
+provide better performance.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-preallocation">
+<span class="sig-name descname"><span class="pre">preallocation</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-preallocation" title="Permalink to this definition"></a></dt>
+<dd><p>Preallocation mode (allowed values: <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">metadata</span></code>, <code class="docutils literal notranslate"><span class="pre">falloc</span></code>,
+<code class="docutils literal notranslate"><span class="pre">full</span></code>). An image with preallocated metadata is initially larger but can
+improve performance when the image needs to grow. <code class="docutils literal notranslate"><span class="pre">falloc</span></code> and <code class="docutils literal notranslate"><span class="pre">full</span></code>
+preallocations are like the same options of <code class="docutils literal notranslate"><span class="pre">raw</span></code> format, but sets up
+metadata also.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-lazy_refcounts">
+<span id="cmdoption-qcow2-arg-lazy-refcounts"></span><span class="sig-name descname"><span class="pre">lazy_refcounts</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-lazy_refcounts" title="Permalink to this definition"></a></dt>
+<dd><p>If this option is set to <code class="docutils literal notranslate"><span class="pre">on</span></code>, reference count updates are postponed with
+the goal of avoiding metadata I/O and improving performance. This is
+particularly interesting with <code class="xref std std-option docutils literal notranslate"><span class="pre">cache=writethrough</span></code> which doesn’t batch
+metadata updates. The tradeoff is that after a host crash, the reference count
+tables must be rebuilt, i.e. on the next open an (automatic) <code class="docutils literal notranslate"><span class="pre">qemu-img</span>
+<span class="pre">check</span> <span class="pre">-r</span> <span class="pre">all</span></code> is required, which may take some time.</p>
+<p>This option can only be enabled if <code class="docutils literal notranslate"><span class="pre">compat=1.1</span></code> is specified.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow2-arg-nocow">
+<span class="sig-name descname"><span class="pre">nocow</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow2-arg-nocow" title="Permalink to this definition"></a></dt>
+<dd><p>If this option is set to <code class="docutils literal notranslate"><span class="pre">on</span></code>, it will turn off COW of the file. It’s only
+valid on btrfs, no effect on other file systems.</p>
+<p>Btrfs has low performance when hosting a VM image file, even more
+when the guest on the VM also using btrfs as file system. Turning off
+COW is a way to mitigate this bad performance. Generally there are two
+ways to turn off COW on btrfs:</p>
+<ul class="simple">
+<li><p>Disable it by mounting with nodatacow, then all newly created files
+will be NOCOW.</p></li>
+<li><p>For an empty file, add the NOCOW file attribute. That’s what this
+option does.</p></li>
+</ul>
+<p>Note: this option is only valid to new or empty files. If there is
+an existing file which is COW and has data blocks already, it couldn’t
+be changed to NOCOW by setting <code class="docutils literal notranslate"><span class="pre">nocow=on</span></code>. One can issue <code class="docutils literal notranslate"><span class="pre">lsattr</span>
+<span class="pre">filename</span></code> to check if the NOCOW flag is set or not (Capital ‘C’ is
+NOCOW flag).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-qed">
+<span class="sig-name descname"><span class="pre">qed</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-qed" title="Permalink to this definition"></a></dt>
+<dd><p>Old QEMU image format with support for backing files and compact image files
+(when your filesystem or transport medium does not support holes).</p>
+<p>When converting QED images to qcow2, you might want to consider using the
+<code class="docutils literal notranslate"><span class="pre">lazy_refcounts=on</span></code> option to get a more QED-like behaviour.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qed-arg-backing_file">
+<span id="cmdoption-qed-arg-backing-file"></span><span class="sig-name descname"><span class="pre">backing_file</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qed-arg-backing_file" title="Permalink to this definition"></a></dt>
+<dd><p>File name of a base image (see <code class="docutils literal notranslate"><span class="pre">create</span></code> subcommand).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qed-arg-backing_fmt">
+<span id="cmdoption-qed-arg-backing-fmt"></span><span class="sig-name descname"><span class="pre">backing_fmt</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qed-arg-backing_fmt" title="Permalink to this definition"></a></dt>
+<dd><p>Image file format of backing file (optional).  Useful if the format cannot be
+autodetected because it has no header, like some vhd/vpc files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qed-arg-cluster_size">
+<span id="cmdoption-qed-arg-cluster-size"></span><span class="sig-name descname"><span class="pre">cluster_size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qed-arg-cluster_size" title="Permalink to this definition"></a></dt>
+<dd><p>Changes the cluster size (must be power-of-2 between 4K and 64K). Smaller
+cluster sizes can improve the image file size whereas larger cluster sizes
+generally provide better performance.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qed-arg-table_size">
+<span id="cmdoption-qed-arg-table-size"></span><span class="sig-name descname"><span class="pre">table_size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qed-arg-table_size" title="Permalink to this definition"></a></dt>
+<dd><p>Changes the number of clusters per L1/L2 table (must be
+power-of-2 between 1 and 16).  There is normally no need to
+change this value but this option can between used for
+performance benchmarking.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-qcow">
+<span class="sig-name descname"><span class="pre">qcow</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-qcow" title="Permalink to this definition"></a></dt>
+<dd><p>Old QEMU image format with support for backing files, compact image files,
+encryption and compression.</p>
+<p>Supported options:</p>
+<blockquote>
+<div><dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow-arg-backing_file">
+<span id="cmdoption-qcow-arg-backing-file"></span><span class="sig-name descname"><span class="pre">backing_file</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow-arg-backing_file" title="Permalink to this definition"></a></dt>
+<dd><p>File name of a base image (see <code class="docutils literal notranslate"><span class="pre">create</span></code> subcommand)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow-arg-encryption">
+<span class="sig-name descname"><span class="pre">encryption</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow-arg-encryption" title="Permalink to this definition"></a></dt>
+<dd><p>This option is deprecated and equivalent to <code class="docutils literal notranslate"><span class="pre">encrypt.format=aes</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow-arg-encrypt.format">
+<span id="cmdoption-qcow-arg-encrypt-format"></span><span class="sig-name descname"><span class="pre">encrypt.format</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow-arg-encrypt.format" title="Permalink to this definition"></a></dt>
+<dd><p>If this is set to <code class="docutils literal notranslate"><span class="pre">aes</span></code>, the image is encrypted with 128-bit AES-CBC.
+The encryption key is given by the <code class="docutils literal notranslate"><span class="pre">encrypt.key-secret</span></code> parameter.
+This encryption format is considered to be flawed by modern cryptography
+standards, suffering from a number of design problems enumerated previously
+against the <code class="docutils literal notranslate"><span class="pre">qcow2</span></code> image format.</p>
+<p>The use of this is no longer supported in system emulators. Support only
+remains in the command line utilities, for the purposes of data liberation
+and interoperability with old versions of QEMU.</p>
+<p>Users requiring native encryption should use the <code class="docutils literal notranslate"><span class="pre">qcow2</span></code> format
+instead with <code class="docutils literal notranslate"><span class="pre">encrypt.format=luks</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-qcow-arg-encrypt.key-secret">
+<span id="cmdoption-qcow-arg-encrypt-key-secret"></span><span class="sig-name descname"><span class="pre">encrypt.key-secret</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-qcow-arg-encrypt.key-secret" title="Permalink to this definition"></a></dt>
+<dd><p>Provides the ID of a <code class="docutils literal notranslate"><span class="pre">secret</span></code> object that contains the encryption
+key (<code class="docutils literal notranslate"><span class="pre">encrypt.format=aes</span></code>).</p>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-luks">
+<span class="sig-name descname"><span class="pre">luks</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-luks" title="Permalink to this definition"></a></dt>
+<dd><p>LUKS v1 encryption format, compatible with Linux dm-crypt/cryptsetup</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-key-secret">
+<span class="sig-name descname"><span class="pre">key-secret</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-key-secret" title="Permalink to this definition"></a></dt>
+<dd><p>Provides the ID of a <code class="docutils literal notranslate"><span class="pre">secret</span></code> object that contains the passphrase.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-cipher-alg">
+<span class="sig-name descname"><span class="pre">cipher-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-cipher-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the cipher algorithm and key length. Currently defaults
+to <code class="docutils literal notranslate"><span class="pre">aes-256</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-cipher-mode">
+<span class="sig-name descname"><span class="pre">cipher-mode</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-cipher-mode" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the encryption mode to use. Currently defaults to <code class="docutils literal notranslate"><span class="pre">xts</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-ivgen-alg">
+<span class="sig-name descname"><span class="pre">ivgen-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-ivgen-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the initialization vector generator algorithm. Currently defaults
+to <code class="docutils literal notranslate"><span class="pre">plain64</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-ivgen-hash-alg">
+<span class="sig-name descname"><span class="pre">ivgen-hash-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-ivgen-hash-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the hash algorithm to use with the initialization vector generator
+(if required). Defaults to <code class="docutils literal notranslate"><span class="pre">sha256</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-hash-alg">
+<span class="sig-name descname"><span class="pre">hash-alg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-hash-alg" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the hash algorithm to use for PBKDF algorithm
+Defaults to <code class="docutils literal notranslate"><span class="pre">sha256</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-luks-arg-iter-time">
+<span class="sig-name descname"><span class="pre">iter-time</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-luks-arg-iter-time" title="Permalink to this definition"></a></dt>
+<dd><p>Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
+Defaults to <code class="docutils literal notranslate"><span class="pre">2000</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-vdi">
+<span class="sig-name descname"><span class="pre">vdi</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-vdi" title="Permalink to this definition"></a></dt>
+<dd><p>VirtualBox 1.1 compatible image format.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-vdi-arg-static">
+<span class="sig-name descname"><span class="pre">static</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-vdi-arg-static" title="Permalink to this definition"></a></dt>
+<dd><p>If this option is set to <code class="docutils literal notranslate"><span class="pre">on</span></code>, the image is created with metadata
+preallocation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-vmdk">
+<span class="sig-name descname"><span class="pre">vmdk</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-vmdk" title="Permalink to this definition"></a></dt>
+<dd><p>VMware 3 and 4 compatible image format.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-backing_file">
+<span id="cmdoption-image-formats-arg-backing-file"></span><span class="sig-name descname"><span class="pre">backing_file</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-backing_file" title="Permalink to this definition"></a></dt>
+<dd><p>File name of a base image (see <code class="docutils literal notranslate"><span class="pre">create</span></code> subcommand).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-compat6">
+<span class="sig-name descname"><span class="pre">compat6</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-compat6" title="Permalink to this definition"></a></dt>
+<dd><p>Create a VMDK version 6 image (instead of version 4)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-hwversion">
+<span class="sig-name descname"><span class="pre">hwversion</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-hwversion" title="Permalink to this definition"></a></dt>
+<dd><p>Specify vmdk virtual hardware version. Compat6 flag cannot be enabled
+if hwversion is specified.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-subformat">
+<span class="sig-name descname"><span class="pre">subformat</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-subformat" title="Permalink to this definition"></a></dt>
+<dd><p>Specifies which VMDK subformat to use. Valid options are
+<code class="docutils literal notranslate"><span class="pre">monolithicSparse</span></code> (default),
+<code class="docutils literal notranslate"><span class="pre">monolithicFlat</span></code>,
+<code class="docutils literal notranslate"><span class="pre">twoGbMaxExtentSparse</span></code>,
+<code class="docutils literal notranslate"><span class="pre">twoGbMaxExtentFlat</span></code> and
+<code class="docutils literal notranslate"><span class="pre">streamOptimized</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-vpc">
+<span class="sig-name descname"><span class="pre">vpc</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-vpc" title="Permalink to this definition"></a></dt>
+<dd><p>VirtualPC compatible image format (VHD).</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-vpc-arg-subformat">
+<span class="sig-name descname"><span class="pre">subformat</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-vpc-arg-subformat" title="Permalink to this definition"></a></dt>
+<dd><p>Specifies which VHD subformat to use. Valid options are
+<code class="docutils literal notranslate"><span class="pre">dynamic</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">fixed</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-VHDX">
+<span id="cmdoption-image-formats-arg-vhdx"></span><span class="sig-name descname"><span class="pre">VHDX</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-VHDX" title="Permalink to this definition"></a></dt>
+<dd><p>Hyper-V compatible image format (VHDX).</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-VHDX-arg-subformat">
+<span id="cmdoption-vhdx-arg-subformat"></span><span class="sig-name descname"><span class="pre">subformat</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-VHDX-arg-subformat" title="Permalink to this definition"></a></dt>
+<dd><p>Specifies which VHDX subformat to use. Valid options are
+<code class="docutils literal notranslate"><span class="pre">dynamic</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">fixed</span></code>.</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-VHDX-arg-block_state_zero">
+<span id="cmdoption-vhdx-arg-block-state-zero"></span><span class="sig-name descname"><span class="pre">block_state_zero</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-VHDX-arg-block_state_zero" title="Permalink to this definition"></a></dt>
+<dd><p>Force use of payload blocks of type ‘ZERO’.  Can be set to <code class="docutils literal notranslate"><span class="pre">on</span></code> (default)
+or <code class="docutils literal notranslate"><span class="pre">off</span></code>.  When set to <code class="docutils literal notranslate"><span class="pre">off</span></code>, new blocks will be created as
+<code class="docutils literal notranslate"><span class="pre">PAYLOAD_BLOCK_NOT_PRESENT</span></code>, which means parsers are free to return
+arbitrary data for those blocks.  Do not set to <code class="docutils literal notranslate"><span class="pre">off</span></code> when using
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">convert</span></code> with <code class="docutils literal notranslate"><span class="pre">subformat=dynamic</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-VHDX-arg-block_size">
+<span id="cmdoption-vhdx-arg-block-size"></span><span class="sig-name descname"><span class="pre">block_size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-VHDX-arg-block_size" title="Permalink to this definition"></a></dt>
+<dd><p>Block size; min 1 MB, max 256 MB.  0 means auto-calculate based on
+image size.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-VHDX-arg-log_size">
+<span id="cmdoption-vhdx-arg-log-size"></span><span class="sig-name descname"><span class="pre">log_size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-VHDX-arg-log_size" title="Permalink to this definition"></a></dt>
+<dd><p>Log size; min 1 MB.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="read-only-formats">
+<h3>Read-only formats<a class="headerlink" href="#read-only-formats" title="Permalink to this heading"></a></h3>
+<p>More disk image file formats are supported in a read-only mode.</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-bochs">
+<span class="sig-name descname"><span class="pre">bochs</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-bochs" title="Permalink to this definition"></a></dt>
+<dd><p>Bochs images of <code class="docutils literal notranslate"><span class="pre">growing</span></code> type.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-cloop">
+<span class="sig-name descname"><span class="pre">cloop</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-cloop" title="Permalink to this definition"></a></dt>
+<dd><p>Linux Compressed Loop image, useful only to reuse directly compressed
+CD-ROM images present for example in the Knoppix CD-ROMs.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-dmg">
+<span class="sig-name descname"><span class="pre">dmg</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-dmg" title="Permalink to this definition"></a></dt>
+<dd><p>Apple disk image.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-image-formats-arg-parallels">
+<span class="sig-name descname"><span class="pre">parallels</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-image-formats-arg-parallels" title="Permalink to this definition"></a></dt>
+<dd><p>Parallels disk image format.</p>
+</dd></dl>
+
+</section>
+<section id="using-host-drives">
+<h3>Using host drives<a class="headerlink" href="#using-host-drives" title="Permalink to this heading"></a></h3>
+<p>In addition to disk image files, QEMU can directly access host
+devices. We describe here the usage for QEMU version &gt;= 0.8.3.</p>
+<section id="linux">
+<h4>Linux<a class="headerlink" href="#linux" title="Permalink to this heading"></a></h4>
+<p>On Linux, you can directly use the host device filename instead of a
+disk image filename provided you have enough privileges to access
+it. For example, use <code class="docutils literal notranslate"><span class="pre">/dev/cdrom</span></code> to access to the CDROM.</p>
+<dl class="simple">
+<dt>CD</dt><dd><p>You can specify a CDROM device even if no CDROM is loaded. QEMU has
+specific code to detect CDROM insertion or removal. CDROM ejection by
+the guest OS is supported. Currently only data CDs are supported.</p>
+</dd>
+<dt>Floppy</dt><dd><p>You can specify a floppy device even if no floppy is loaded. Floppy
+removal is currently not detected accurately (if you change floppy
+without doing floppy access while the floppy is not loaded, the guest
+OS will think that the same floppy is loaded).
+Use of the host’s floppy device is deprecated, and support for it will
+be removed in a future release.</p>
+</dd>
+<dt>Hard disks</dt><dd><p>Hard disks can be used. Normally you must specify the whole disk
+(<code class="docutils literal notranslate"><span class="pre">/dev/hdb</span></code> instead of <code class="docutils literal notranslate"><span class="pre">/dev/hdb1</span></code>) so that the guest OS can
+see it as a partitioned disk. WARNING: unless you know what you do, it
+is better to only make READ-ONLY accesses to the hard disk otherwise
+you may corrupt your host data (use the <code class="docutils literal notranslate"><span class="pre">-snapshot</span></code> command
+line option or modify the device permissions accordingly).</p>
+</dd>
+</dl>
+</section>
+<section id="windows">
+<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this heading"></a></h4>
+<dl>
+<dt>CD</dt><dd><p>The preferred syntax is the drive letter (e.g. <code class="docutils literal notranslate"><span class="pre">d:</span></code>). The
+alternate syntax <code class="docutils literal notranslate"><span class="pre">\\.\d:</span></code> is supported. <code class="docutils literal notranslate"><span class="pre">/dev/cdrom</span></code> is
+supported as an alias to the first CDROM drive.</p>
+<p>Currently there is no specific code to handle removable media, so it
+is better to use the <code class="docutils literal notranslate"><span class="pre">change</span></code> or <code class="docutils literal notranslate"><span class="pre">eject</span></code> monitor commands to
+change or eject media.</p>
+</dd>
+<dt>Hard disks</dt><dd><p>Hard disks can be used with the syntax: <code class="docutils literal notranslate"><span class="pre">\\.\PhysicalDriveN</span></code>
+where <em>N</em> is the drive number (0 is the first hard disk).</p>
+<p>WARNING: unless you know what you do, it is better to only make
+READ-ONLY accesses to the hard disk otherwise you may corrupt your
+host data (use the <code class="docutils literal notranslate"><span class="pre">-snapshot</span></code> command line so that the
+modifications are written in a temporary file).</p>
+</dd>
+</dl>
+</section>
+<section id="mac-os-x">
+<h4>Mac OS X<a class="headerlink" href="#mac-os-x" title="Permalink to this heading"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">/dev/cdrom</span></code> is an alias to the first CDROM.</p>
+<p>Currently there is no specific code to handle removable media, so it
+is better to use the <code class="docutils literal notranslate"><span class="pre">change</span></code> or <code class="docutils literal notranslate"><span class="pre">eject</span></code> monitor commands to
+change or eject media.</p>
+</section>
+</section>
+<section id="virtual-fat-disk-images">
+<h3>Virtual FAT disk images<a class="headerlink" href="#virtual-fat-disk-images" title="Permalink to this heading"></a></h3>
+<p>QEMU can automatically create a virtual FAT disk image from a
+directory tree. In order to use it, just type:</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -hdb fat:/my_directory</pre>
+<p>Then you access access to all the files in the <code class="docutils literal notranslate"><span class="pre">/my_directory</span></code>
+directory without having to copy them in a disk image or to export
+them via SAMBA or NFS. The default access is <em>read-only</em>.</p>
+<p>Floppies can be emulated with the <code class="docutils literal notranslate"><span class="pre">:floppy:</span></code> option:</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -fda fat:floppy:/my_directory</pre>
+<p>A read/write support is available for testing (beta stage) with the
+<code class="docutils literal notranslate"><span class="pre">:rw:</span></code> option:</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -fda fat:floppy:rw:/my_directory</pre>
+<p>What you should <em>never</em> do:</p>
+<ul class="simple">
+<li><p>use non-ASCII filenames</p></li>
+<li><p>use “-snapshot” together with “:rw:”</p></li>
+<li><p>expect it to work when loadvm’ing</p></li>
+<li><p>write to the FAT directory on the host system while accessing it with the guest system</p></li>
+</ul>
+</section>
+<section id="nbd-access">
+<h3>NBD access<a class="headerlink" href="#nbd-access" title="Permalink to this heading"></a></h3>
+<p>QEMU can access directly to block device exported using the Network Block Device
+protocol.</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -hdb nbd://my_nbd_server.mydomain.org:1024/</pre>
+<p>If the NBD server is located on the same host, you can use an unix socket instead
+of an inet socket:</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -hdb nbd+unix://?socket=/tmp/my_socket</pre>
+<p>In this case, the block device must be exported using <code class="docutils literal notranslate"><span class="pre">qemu-nbd</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">nbd</span> <span class="o">--</span><span class="n">socket</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">my_socket</span> <span class="n">my_disk</span><span class="o">.</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">qemu-nbd</span></code> allows sharing of a disk between several guests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">nbd</span> <span class="o">--</span><span class="n">socket</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">my_socket</span> <span class="o">--</span><span class="n">share</span><span class="o">=</span><span class="mi">2</span> <span class="n">my_disk</span><span class="o">.</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+<p>and then you can use it with two guests:</p>
+<pre class="literal-block">qemu-system-x86_64 linux1.img -hdb nbd+unix://?socket=/tmp/my_socket
+qemu-system-x86_64 linux2.img -hdb nbd+unix://?socket=/tmp/my_socket</pre>
+<p>If the <code class="docutils literal notranslate"><span class="pre">nbd-server</span></code> uses named exports (supported since NBD 2.9.18, or with QEMU’s
+own embedded NBD server), you must specify an export name in the URI:</p>
+<pre class="literal-block">qemu-system-x86_64 -cdrom nbd://localhost/debian-500-ppc-netinst
+qemu-system-x86_64 -cdrom nbd://localhost/openSUSE-11.1-ppc-netinst</pre>
+<p>The URI syntax for NBD is supported since QEMU 1.3.  An alternative syntax is
+also available.  Here are some example of the older syntax:</p>
+<pre class="literal-block">qemu-system-x86_64 linux.img -hdb nbd:my_nbd_server.mydomain.org:1024
+qemu-system-x86_64 linux2.img -hdb nbd:unix:/tmp/my_socket
+qemu-system-x86_64 -cdrom nbd:localhost:10809:exportname=debian-500-ppc-netinst</pre>
+</section>
+<section id="iscsi-luns">
+<h3>iSCSI LUNs<a class="headerlink" href="#iscsi-luns" title="Permalink to this heading"></a></h3>
+<p>iSCSI is a popular protocol used to access SCSI devices across a computer
+network.</p>
+<p>There are two different ways iSCSI devices can be used by QEMU.</p>
+<p>The first method is to mount the iSCSI LUN on the host, and make it appear as
+any other ordinary SCSI device on the host and then to access this device as a
+/dev/sd device from QEMU. How to do this differs between host OSes.</p>
+<p>The second method involves using the iSCSI initiator that is built into
+QEMU. This provides a mechanism that works the same way regardless of which
+host OS you are running QEMU on. This section will describe this second method
+of using iSCSI together with QEMU.</p>
+<p>In QEMU, iSCSI devices are described using special iSCSI URLs. URL syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">iscsi</span><span class="p">:</span><span class="o">//</span><span class="p">[</span><span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span><span class="p">[</span><span class="o">%&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="p">]</span><span class="o">@</span><span class="p">]</span><span class="o">&lt;</span><span class="n">host</span><span class="o">&gt;</span><span class="p">[:</span><span class="o">&lt;</span><span class="n">port</span><span class="o">&gt;</span><span class="p">]</span><span class="o">/&lt;</span><span class="n">target</span><span class="o">-</span><span class="n">iqn</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;/&lt;</span><span class="n">lun</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Username and password are optional and only used if your target is set up
+using CHAP authentication for access control.
+Alternatively the username and password can also be set via environment
+variables to have these not show up in the process list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">LIBISCSI_CHAP_USERNAME</span><span class="o">=&lt;</span><span class="n">username</span><span class="o">&gt;</span>
+<span class="n">export</span> <span class="n">LIBISCSI_CHAP_PASSWORD</span><span class="o">=&lt;</span><span class="n">password</span><span class="o">&gt;</span>
+<span class="n">iscsi</span><span class="p">:</span><span class="o">//&lt;</span><span class="n">host</span><span class="o">&gt;/&lt;</span><span class="n">target</span><span class="o">-</span><span class="n">iqn</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;/&lt;</span><span class="n">lun</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Various session related parameters can be set via special options, either
+in a configuration file provided via ‘-readconfig’ or directly on the
+command line.</p>
+<p>If the initiator-name is not specified qemu will use a default name
+of ‘iqn.2008-11.org.linux-kvm[:&lt;uuid&gt;’] where &lt;uuid&gt; is the UUID of the
+virtual machine. If the UUID is not specified qemu will use
+‘iqn.2008-11.org.linux-kvm[:&lt;name&gt;’] where &lt;name&gt; is the name of the
+virtual machine.</p>
+<p>Setting a specific initiator name to use when logging in to the target:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">iscsi</span> <span class="n">initiator</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">iqn</span><span class="o">.</span><span class="n">qemu</span><span class="o">.</span><span class="n">test</span><span class="p">:</span><span class="n">my</span><span class="o">-</span><span class="n">initiator</span>
+</pre></div>
+</div>
+<p>Controlling which type of header digest to negotiate with the target:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">iscsi</span> <span class="n">header</span><span class="o">-</span><span class="n">digest</span><span class="o">=</span><span class="n">CRC32C</span><span class="o">|</span><span class="n">CRC32C</span><span class="o">-</span><span class="n">NONE</span><span class="o">|</span><span class="n">NONE</span><span class="o">-</span><span class="n">CRC32C</span><span class="o">|</span><span class="n">NONE</span>
+</pre></div>
+</div>
+<p>These can also be set via a configuration file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">iscsi</span><span class="p">]</span>
+  <span class="n">user</span> <span class="o">=</span> <span class="s2">&quot;CHAP username&quot;</span>
+  <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;CHAP password&quot;</span>
+  <span class="n">initiator</span><span class="o">-</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;iqn.qemu.test:my-initiator&quot;</span>
+  <span class="c1"># header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE</span>
+  <span class="n">header</span><span class="o">-</span><span class="n">digest</span> <span class="o">=</span> <span class="s2">&quot;CRC32C&quot;</span>
+</pre></div>
+</div>
+<p>Setting the target name allows different options for different targets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">iscsi</span> <span class="s2">&quot;iqn.target.name&quot;</span><span class="p">]</span>
+  <span class="n">user</span> <span class="o">=</span> <span class="s2">&quot;CHAP username&quot;</span>
+  <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;CHAP password&quot;</span>
+  <span class="n">initiator</span><span class="o">-</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;iqn.qemu.test:my-initiator&quot;</span>
+  <span class="c1"># header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE</span>
+  <span class="n">header</span><span class="o">-</span><span class="n">digest</span> <span class="o">=</span> <span class="s2">&quot;CRC32C&quot;</span>
+</pre></div>
+</div>
+<p>How to use a configuration file to set iSCSI configuration options:</p>
+<pre class="literal-block">cat &gt;iscsi.conf &lt;&lt;EOF
+[iscsi]
+  user = &quot;me&quot;
+  password = &quot;my password&quot;
+  initiator-name = &quot;iqn.qemu.test:my-initiator&quot;
+  header-digest = &quot;CRC32C&quot;
+EOF
+
+qemu-system-x86_64 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
+  -readconfig iscsi.conf</pre>
+<p>How to set up a simple iSCSI target on loopback and access it via QEMU:
+this example shows how to set up an iSCSI target with one CDROM and one DISK
+using the Linux STGT software target. This target is available on Red Hat based
+systems as the package ‘scsi-target-utils’.</p>
+<pre class="literal-block">tgtd --iscsi portal=127.0.0.1:3260
+tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.qemu.test
+tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 \
+    -b /IMAGES/disk.img --device-type=disk
+tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 2 \
+    -b /IMAGES/cd.iso --device-type=cd
+tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
+
+qemu-system-x86_64 -iscsi initiator-name=iqn.qemu.test:my-initiator \
+  -boot d -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
+  -cdrom iscsi://127.0.0.1/iqn.qemu.test/2</pre>
+</section>
+<section id="glusterfs-disk-images">
+<h3>GlusterFS disk images<a class="headerlink" href="#glusterfs-disk-images" title="Permalink to this heading"></a></h3>
+<p>GlusterFS is a user space distributed file system.</p>
+<p>You can boot from the GlusterFS disk image with the command:</p>
+<p>URI:</p>
+<pre class="literal-block">qemu-system-x86_64 -drive file=gluster[+TYPE]://[HOST}[:PORT]]/VOLUME/PATH
+                             [?socket=...][,file.debug=9][,file.logfile=...]</pre>
+<p>JSON:</p>
+<pre class="literal-block">qemu-system-x86_64 'json:{&quot;driver&quot;:&quot;qcow2&quot;,
+                         &quot;file&quot;:{&quot;driver&quot;:&quot;gluster&quot;,
+                                  &quot;volume&quot;:&quot;testvol&quot;,&quot;path&quot;:&quot;a.img&quot;,&quot;debug&quot;:9,&quot;logfile&quot;:&quot;...&quot;,
+                                  &quot;server&quot;:[{&quot;type&quot;:&quot;tcp&quot;,&quot;host&quot;:&quot;...&quot;,&quot;port&quot;:&quot;...&quot;},
+                                            {&quot;type&quot;:&quot;unix&quot;,&quot;socket&quot;:&quot;...&quot;}]}}'</pre>
+<p><em>gluster</em> is the protocol.</p>
+<p><em>TYPE</em> specifies the transport type used to connect to gluster
+management daemon (glusterd). Valid transport types are
+tcp and unix. In the URI form, if a transport type isn’t specified,
+then tcp type is assumed.</p>
+<p><em>HOST</em> specifies the server where the volume file specification for
+the given volume resides. This can be either a hostname or an ipv4 address.
+If transport type is unix, then <em>HOST</em> field should not be specified.
+Instead <em>socket</em> field needs to be populated with the path to unix domain
+socket.</p>
+<p><em>PORT</em> is the port number on which glusterd is listening. This is optional
+and if not specified, it defaults to port 24007. If the transport type is unix,
+then <em>PORT</em> should not be specified.</p>
+<p><em>VOLUME</em> is the name of the gluster volume which contains the disk image.</p>
+<p><em>PATH</em> is the path to the actual disk image that resides on gluster volume.</p>
+<p><em>debug</em> is the logging level of the gluster protocol driver. Debug levels
+are 0-9, with 9 being the most verbose, and 0 representing no debugging output.
+The default level is 4. The current logging levels defined in the gluster source
+are 0 - None, 1 - Emergency, 2 - Alert, 3 - Critical, 4 - Error, 5 - Warning,
+6 - Notice, 7 - Info, 8 - Debug, 9 - Trace</p>
+<p><em>logfile</em> is a commandline option to mention log file path which helps in
+logging to the specified file and also help in persisting the gfapi logs. The
+default is stderr.</p>
+<p>You can create a GlusterFS disk image with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">img</span> <span class="n">create</span> <span class="n">gluster</span><span class="p">:</span><span class="o">//</span><span class="n">HOST</span><span class="o">/</span><span class="n">VOLUME</span><span class="o">/</span><span class="n">PATH</span> <span class="n">SIZE</span>
+</pre></div>
+</div>
+<p>Examples</p>
+<pre class="literal-block">qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img
+qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4/testvol/a.img
+qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4:24007/testvol/dir/a.img
+qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]/testvol/dir/a.img
+qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]:24007/testvol/dir/a.img
+qemu-system-x86_64 -drive file=gluster+tcp://server.domain.com:24007/testvol/dir/a.img
+qemu-system-x86_64 -drive file=gluster+unix:///testvol/dir/a.img?socket=/tmp/glusterd.socket
+qemu-system-x86_64 -drive file=gluster+rdma://1.2.3.4:24007/testvol/a.img
+qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img,file.debug=9,file.logfile=/var/log/qemu-gluster.log
+qemu-system-x86_64 'json:{&quot;driver&quot;:&quot;qcow2&quot;,
+                         &quot;file&quot;:{&quot;driver&quot;:&quot;gluster&quot;,
+                                  &quot;volume&quot;:&quot;testvol&quot;,&quot;path&quot;:&quot;a.img&quot;,
+                                  &quot;debug&quot;:9,&quot;logfile&quot;:&quot;/var/log/qemu-gluster.log&quot;,
+                                  &quot;server&quot;:[{&quot;type&quot;:&quot;tcp&quot;,&quot;host&quot;:&quot;1.2.3.4&quot;,&quot;port&quot;:24007},
+                                            {&quot;type&quot;:&quot;unix&quot;,&quot;socket&quot;:&quot;/var/run/glusterd.socket&quot;}]}}'
+qemu-system-x86_64 -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
+                                     file.debug=9,file.logfile=/var/log/qemu-gluster.log,
+                                     file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
+                                     file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket</pre>
+</section>
+<section id="secure-shell-ssh-disk-images">
+<h3>Secure Shell (ssh) disk images<a class="headerlink" href="#secure-shell-ssh-disk-images" title="Permalink to this heading"></a></h3>
+<p>You can access disk images located on a remote ssh server
+by using the ssh protocol:</p>
+<pre class="literal-block">qemu-system-x86_64 -drive file=ssh://[USER&#64;]SERVER[:PORT]/PATH[?host_key_check=HOST_KEY_CHECK]</pre>
+<p>Alternative syntax using properties:</p>
+<pre class="literal-block">qemu-system-x86_64 -drive file.driver=ssh[,file.user=USER],file.host=SERVER[,file.port=PORT],file.path=PATH[,file.host_key_check=HOST_KEY_CHECK]</pre>
+<p><em>ssh</em> is the protocol.</p>
+<p><em>USER</em> is the remote user.  If not specified, then the local
+username is tried.</p>
+<p><em>SERVER</em> specifies the remote ssh server.  Any ssh server can be
+used, but it must implement the sftp-server protocol.  Most Unix/Linux
+systems should work without requiring any extra configuration.</p>
+<p><em>PORT</em> is the port number on which sshd is listening.  By default
+the standard ssh port (22) is used.</p>
+<p><em>PATH</em> is the path to the disk image.</p>
+<p>The optional <em>HOST_KEY_CHECK</em> parameter controls how the remote
+host’s key is checked.  The default is <code class="docutils literal notranslate"><span class="pre">yes</span></code> which means to use
+the local <code class="docutils literal notranslate"><span class="pre">.ssh/known_hosts</span></code> file.  Setting this to <code class="docutils literal notranslate"><span class="pre">no</span></code>
+turns off known-hosts checking.  Or you can check that the host key
+matches a specific fingerprint. The fingerprint can be provided in
+<code class="docutils literal notranslate"><span class="pre">md5</span></code>, <code class="docutils literal notranslate"><span class="pre">sha1</span></code>, or <code class="docutils literal notranslate"><span class="pre">sha256</span></code> format, however, it is strongly
+recommended to only use <code class="docutils literal notranslate"><span class="pre">sha256</span></code>, since the other options are
+considered insecure by modern standards. The fingerprint value
+must be given as a hex encoded string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">host_key_check</span><span class="o">=</span><span class="n">sha256</span><span class="p">:</span><span class="mi">04</span><span class="n">ce2ae89ff4295a6b9c4111640bdcb3297858ee55cb434d9dd88796e93aa795</span>
+</pre></div>
+</div>
+<p>The key string may optionally contain “:” separators between
+each pair of hex digits.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">$HOME/.ssh/known_hosts</span></code> file contains the base64 encoded
+host keys. These can be converted into the format needed for
+QEMU using a command such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ for key in `grep 10.33.8.112 known_hosts | awk &#39;{print $3}&#39;`
+  do
+    echo $key | base64 -d | sha256sum
+  done
+  6c3aa525beda9dc83eadfbd7e5ba7d976ecb59575d1633c87cd06ed2ed6e366f  -
+  12214fd9ea5b408086f98ecccd9958609bd9ac7c0ea316734006bc7818b45dc8  -
+  d36420137bcbd101209ef70c3b15dc07362fbe0fa53c5b135eba6e6afa82f0ce  -
+</pre></div>
+</div>
+<p>Note that there can be multiple keys present per host, each with
+different key ciphers. Care is needed to pick the key fingerprint
+that matches the cipher QEMU will negotiate with the remote server.</p>
+<p>Currently authentication must be done using ssh-agent.  Other
+authentication methods may be supported in future.</p>
+<p>Note: Many ssh servers do not support an <code class="docutils literal notranslate"><span class="pre">fsync</span></code>-style operation.
+The ssh driver cannot guarantee that disk flush requests are
+obeyed, and this causes a risk of disk corruption if the remote
+server or network goes down during writes.  The driver will
+print a warning when <code class="docutils literal notranslate"><span class="pre">fsync</span></code> is not supported:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">warning</span><span class="p">:</span> <span class="n">ssh</span> <span class="n">server</span> <span class="n">ssh</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="mi">22</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">support</span> <span class="n">fsync</span>
+</pre></div>
+</div>
+<p>With sufficiently new versions of libssh and OpenSSH, <code class="docutils literal notranslate"><span class="pre">fsync</span></code> is
+supported.</p>
+</section>
+<section id="nvme-disk-images">
+<h3>NVMe disk images<a class="headerlink" href="#nvme-disk-images" title="Permalink to this heading"></a></h3>
+<p>NVM Express (NVMe) storage controllers can be accessed directly by a userspace
+driver in QEMU.  This bypasses the host kernel file system and block layers
+while retaining QEMU block layer functionalities, such as block jobs, I/O
+throttling, image formats, etc.  Disk I/O performance is typically higher than
+with <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">file=/dev/sda</span></code> using either thread pool or linux-aio.</p>
+<p>The controller will be exclusively used by the QEMU process once started. To be
+able to share storage between multiple VMs and other applications on the host,
+please use the file based protocols.</p>
+<p>Before starting QEMU, bind the host NVMe controller to the host vfio-pci
+driver.  For example:</p>
+<pre class="literal-block"># modprobe vfio-pci
+# lspci -n -s 0000:06:0d.0
+06:0d.0 0401: 1102:0002 (rev 08)
+# echo 0000:06:0d.0 &gt; /sys/bus/pci/devices/0000:06:0d.0/driver/unbind
+# echo 1102 0002 &gt; /sys/bus/pci/drivers/vfio-pci/new_id
+
+# qemu-system-x86_64 -drive file=nvme://HOST:BUS:SLOT.FUNC/NAMESPACE</pre>
+<p>Alternative syntax using properties:</p>
+<pre class="literal-block">qemu-system-x86_64 -drive file.driver=nvme,file.device=HOST:BUS:SLOT.FUNC,file.namespace=NAMESPACE</pre>
+<p><em>HOST</em>:<em>BUS</em>:<em>SLOT</em>.<em>FUNC</em> is the NVMe controller’s PCI device
+address on the host.</p>
+<p><em>NAMESPACE</em> is the NVMe namespace number, starting from 1.</p>
+</section>
+<section id="disk-image-file-locking">
+<h3>Disk image file locking<a class="headerlink" href="#disk-image-file-locking" title="Permalink to this heading"></a></h3>
+<p>By default, QEMU tries to protect image files from unexpected concurrent
+access, as long as it’s supported by the block protocol driver and host
+operating system. If multiple QEMU processes (including QEMU emulators and
+utilities) try to open the same image with conflicting accessing modes, all but
+the first one will get an error.</p>
+<p>This feature is currently supported by the file protocol on Linux with the Open
+File Descriptor (OFD) locking API, and can be configured to fall back to POSIX
+locking if the POSIX host doesn’t support Linux OFD locking.</p>
+<p>To explicitly enable image locking, specify “locking=on” in the file protocol
+driver options. If OFD locking is not possible, a warning will be printed and
+the POSIX locking API will be used. In this case there is a risk that the lock
+will get silently lost when doing hot plugging and block jobs, due to the
+shortcomings of the POSIX locking API.</p>
+<p>QEMU transparently handles lock handover during shared storage migration.  For
+shared virtual disk images between multiple VMs, the “share-rw” device option
+should be used.</p>
+<p>By default, the guest has exclusive write access to its disk image. If the
+guest can safely share the disk image with other writers the
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,share-rw=on</span></code> parameter can be used.  This is only safe if
+the guest is running software, such as a cluster file system, that
+coordinates disk accesses to avoid corruption.</p>
+<p>Note that share-rw=on only declares the guest’s ability to share the disk.
+Some QEMU features, such as image file formats, require exclusive write access
+to the disk image and this is unaffected by the share-rw=on option.</p>
+<p>Alternatively, locking can be fully disabled by “locking=off” block device
+option. In the command line, the option is usually in the form of
+“file.locking=off” as the protocol driver is normally placed as a “file” child
+under a format driver. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">blockdev</span> <span class="n">driver</span><span class="o">=</span><span class="n">qcow2</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">image</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">locking</span><span class="o">=</span><span class="n">off</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">driver</span><span class="o">=</span><span class="n">file</span>
+</pre></div>
+</div>
+<p>To check if image locking is active, check the output of the “lslocks” command
+on host and see if there are locks held by the QEMU process on the image file.
+More than one byte could be locked by the QEMU instance, each byte of which
+reflects a particular permission that is acquired or protected by the running
+block driver.</p>
+</section>
+<section id="filter-drivers">
+<h3>Filter drivers<a class="headerlink" href="#filter-drivers" title="Permalink to this heading"></a></h3>
+<p>QEMU supports several filter drivers, which don’t store any data, but perform
+some additional tasks, hooking io requests.</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-filter-drivers-arg-preallocate">
+<span class="sig-name descname"><span class="pre">preallocate</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-filter-drivers-arg-preallocate" title="Permalink to this definition"></a></dt>
+<dd><p>The preallocate filter driver is intended to be inserted between format
+and protocol nodes and preallocates some additional space
+(expanding the protocol file) when writing past the file’s end. This can be
+useful for file-systems with slow allocation.</p>
+<p>Supported options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-preallocate-arg-prealloc-align">
+<span class="sig-name descname"><span class="pre">prealloc-align</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-preallocate-arg-prealloc-align" title="Permalink to this definition"></a></dt>
+<dd><p>On preallocation, align the file length to this value (in bytes), default 1M.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-preallocate-arg-prealloc-size">
+<span class="sig-name descname"><span class="pre">prealloc-size</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-preallocate-arg-prealloc-size" title="Permalink to this definition"></a></dt>
+<dd><p>How much to preallocate (in bytes), default 128M.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<p>The HTML documentation of QEMU for more precise information and Linux
+user mode emulator invocation.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

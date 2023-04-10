@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>loongson3 virt generic platform (virt) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">loongson3 virt generic platform (<code class="docutils literal notranslate"><span class="pre">virt</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/loongarch/loongson3.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="loongson3-virt-generic-platform-virt">
+<h1>loongson3 virt generic platform (<code class="docutils literal notranslate"><span class="pre">virt</span></code>)<a class="headerlink" href="#loongson3-virt-generic-platform-virt" title="Permalink to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine use gpex host bridge, and there are some
+emulated devices on virt board, such as loongson7a RTC device,
+IOAPIC device, ACPI device and so on.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine supports:
+- Gpex host bridge
+- Ls7a RTC device
+- Ls7a IOAPIC device
+- ACPI GED device
+- Fw_cfg device
+- PCI/PCIe devices
+- Memory device
+- CPU device. Type: la464-loongarch-cpu.</p>
+</section>
+<section id="cpu-and-machine-type">
+<h2>CPU and machine Type<a class="headerlink" href="#cpu-and-machine-type" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">qemu-system-loongarch64</span></code> provides emulation for virt
+machine. You can specify the machine type <code class="docutils literal notranslate"><span class="pre">virt</span></code> and
+cpu type <code class="docutils literal notranslate"><span class="pre">la464-loongarch-cpu</span></code>.</p>
+</section>
+<section id="boot-options">
+<h2>Boot options<a class="headerlink" href="#boot-options" title="Permalink to this heading"></a></h2>
+<p>We can boot the LoongArch virt machine by specifying the uefi bios,
+initrd, and linux kernel. And those source codes and binary files
+can be accessed by following steps.</p>
+<ol class="arabic simple">
+<li><p>booting command:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-loongarch64 -machine virt -m 4G -cpu la464-loongarch-cpu <span class="se">\</span>
+    -smp <span class="m">1</span> -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd initrd.img <span class="se">\</span>
+    -append <span class="s2">&quot;root=/dev/ram rdinit=/sbin/init console=ttyS0,115200&quot;</span> <span class="se">\</span>
+    --nographic
+</pre></div>
+</div>
+<p>Note: The running speed may be a little slow, as the performance of our
+qemu and uefi bios is not perfect, and it is being fixed.</p>
+<ol class="arabic simple" start="2">
+<li><p>cross compiler tools:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget https://github.com/loongson/build-tools/releases/download/ <span class="se">\</span>
+<span class="m">2022</span>.05.29/loongarch64-clfs-5.0-cross-tools-gcc-full.tar.xz
+
+tar -vxf loongarch64-clfs-5.0-cross-tools-gcc-full.tar.xz
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>qemu compile configure option:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./configure --disable-rdma --disable-pvrdma --prefix<span class="o">=</span>usr <span class="se">\</span>
+            --target-list<span class="o">=</span><span class="s2">&quot;loongarch64-softmmu&quot;</span> <span class="se">\</span>
+            --disable-libiscsi --disable-libnfs --disable-libpmem <span class="se">\</span>
+            --disable-glusterfs --enable-libusb --enable-usb-redir <span class="se">\</span>
+            --disable-opengl --disable-xen --enable-spice <span class="se">\</span>
+            --enable-debug --disable-capstone --disable-kvm <span class="se">\</span>
+            --enable-profiler
+make
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>uefi bios source code and compile method:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/loongson/edk2-LoongarchVirt.git
+
+<span class="nb">cd</span> edk2-LoongarchVirt
+
+git submodule update --init
+
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$YOUR_COMPILER_PATH</span>/bin:<span class="nv">$PATH</span>
+
+<span class="nb">export</span> <span class="nv">WORKSPACE</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>
+
+<span class="nb">export</span> <span class="nv">PACKAGES_PATH</span><span class="o">=</span><span class="nv">$WORKSPACE</span>/edk2-LoongarchVirt
+
+<span class="nb">export</span> <span class="nv">GCC5_LOONGARCH64_PREFIX</span><span class="o">=</span>loongarch64-unknown-linux-gnu-
+
+edk2-LoongarchVirt/edksetup.sh
+
+make -C edk2-LoongarchVirt/BaseTools
+
+build --buildtarget<span class="o">=</span>DEBUG --tagname<span class="o">=</span>GCC5 --arch<span class="o">=</span>LOONGARCH64  --platform<span class="o">=</span>OvmfPkg/LoongArchQemu/Loongson.dsc
+
+build --buildtarget<span class="o">=</span>RELEASE --tagname<span class="o">=</span>GCC5 --arch<span class="o">=</span>LOONGARCH64  --platform<span class="o">=</span>OvmfPkg/LoongArchQemu/Loongson.dsc
+</pre></div>
+</div>
+<p>The efi binary file path:</p>
+<blockquote>
+<div><p>Build/LoongArchQemu/DEBUG_GCC5/FV/QEMU_EFI.fd</p>
+<p>Build/LoongArchQemu/RELEASE_GCC5/FV/QEMU_EFI.fd</p>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>linux kernel source code and compile method:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/loongson/linux.git
+
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$YOUR_COMPILER_PATH</span>/bin:<span class="nv">$PATH</span>
+
+<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$YOUR_COMPILER_PATH</span>/lib:<span class="nv">$LD_LIBRARY_PATH</span>
+
+<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$YOUR_COMPILER_PATH</span>/loongarch64-unknown-linux-gnu/lib/:<span class="nv">$LD_LIBRARY_PATH</span>
+
+make <span class="nv">ARCH</span><span class="o">=</span>loongarch <span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-unknown-linux-gnu- loongson3_defconfig
+
+make <span class="nv">ARCH</span><span class="o">=</span>loongarch <span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-unknown-linux-gnu-
+
+make <span class="nv">ARCH</span><span class="o">=</span>loongarch <span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-unknown-linux-gnu- install
+
+make <span class="nv">ARCH</span><span class="o">=</span>loongarch <span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-unknown-linux-gnu- modules_install
+</pre></div>
+</div>
+<p>Note: The branch of linux source code is loongarch-next.</p>
+<ol class="arabic simple" start="6">
+<li><p>initrd file:</p></li>
+</ol>
+<blockquote>
+<div><p>You can use busybox tool and the linux modules to make a initrd file. Or you can access the
+binary files: <a class="reference external" href="https://github.com/yangxiaojuan-loongson/qemu-binary">https://github.com/yangxiaojuan-loongson/qemu-binary</a></p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

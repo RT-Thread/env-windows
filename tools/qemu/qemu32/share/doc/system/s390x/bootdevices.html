@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boot devices on s390x &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Protected Virtualization on s390x" href="protvirt.html" />
+    <link rel="prev" title="Subchannel passthrough via vfio-ccw" href="vfio-ccw.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-s390x.html#device-support">Device support</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-s390x.html#architectural-features">Architectural features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-s390x.html">s390x System emulator</a></li>
+      <li class="breadcrumb-item active">Boot devices on s390x</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/s390x/bootdevices.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="boot-devices-on-s390x">
+<h1>Boot devices on s390x<a class="headerlink" href="#boot-devices-on-s390x" title="Permalink to this heading"></a></h1>
+<section id="booting-with-bootindex-parameter">
+<h2>Booting with bootindex parameter<a class="headerlink" href="#booting-with-bootindex-parameter" title="Permalink to this heading"></a></h2>
+<p>For classical mainframe guests (i.e. LPAR or z/VM installations), you always
+have to explicitly specify the disk where you want to boot from (or “IPL” from,
+in s390x-speak – IPL means “Initial Program Load”). In particular, there can
+also be only one boot device according to the architecture specification, thus
+specifying multiple boot devices is not possible (yet).</p>
+<p>So for booting an s390x guest in QEMU, you should always mark the
+device where you want to boot from with the <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property, for
+example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">s390x</span> <span class="o">-</span><span class="n">drive</span> <span class="k">if</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">dr1</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">guest</span><span class="o">.</span><span class="n">qcow2</span> \
+                  <span class="o">-</span><span class="n">device</span> <span class="n">virtio</span><span class="o">-</span><span class="n">blk</span><span class="p">,</span><span class="n">drive</span><span class="o">=</span><span class="n">dr1</span><span class="p">,</span><span class="n">bootindex</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>For booting from a CD-ROM ISO image (which needs to include El-Torito boot
+information in order to be bootable), it is recommended to specify a <code class="docutils literal notranslate"><span class="pre">scsi-cd</span></code>
+device, for example like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">s390x</span> <span class="o">-</span><span class="n">blockdev</span> <span class="n">file</span><span class="p">,</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span><span class="n">filename</span><span class="o">=...</span> \
+                  <span class="o">-</span><span class="n">device</span> <span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span> \
+                  <span class="o">-</span><span class="n">device</span> <span class="n">scsi</span><span class="o">-</span><span class="n">cd</span><span class="p">,</span><span class="n">drive</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span><span class="n">bootindex</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Note that you really have to use the <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property to select the
+boot device. The old-fashioned <code class="docutils literal notranslate"><span class="pre">-boot</span> <span class="pre">order=...</span></code> command of QEMU (and
+also <code class="docutils literal notranslate"><span class="pre">-boot</span> <span class="pre">once=...</span></code>) is not supported on s390x.</p>
+</section>
+<section id="booting-without-bootindex-parameter">
+<h2>Booting without bootindex parameter<a class="headerlink" href="#booting-without-bootindex-parameter" title="Permalink to this heading"></a></h2>
+<p>The QEMU guest firmware (the so-called s390-ccw bios) has also some rudimentary
+support for scanning through the available block devices. So in case you did
+not specify a boot device with the <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property, there is still a
+chance that it finds a bootable device on its own and starts a guest operating
+system from it. However, this scanning algorithm is still very rough and may
+be incomplete, so that it might fail to detect a bootable device in many cases.
+It is really recommended to always specify the boot device with the
+<code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property instead.</p>
+<p>This also means that you should avoid the classical short-cut commands like
+<code class="docutils literal notranslate"><span class="pre">-hda</span></code>, <code class="docutils literal notranslate"><span class="pre">-cdrom</span></code> or <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=virtio</span></code>, since it is not possible to
+specify the <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> with these commands. Note that the convenience
+<code class="docutils literal notranslate"><span class="pre">-cdrom</span></code> option even does not give you a real (virtio-scsi) CD-ROM device on
+s390x. Due to technical limitations in the QEMU code base, you will get a
+virtio-blk device with this parameter instead, which might not be the right
+device type for installing a Linux distribution via ISO image. It is
+recommended to specify a CD-ROM device via <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">scsi-cd</span></code> (as mentioned
+above) instead.</p>
+</section>
+<section id="selecting-kernels-with-the-loadparm-property">
+<h2>Selecting kernels with the <code class="docutils literal notranslate"><span class="pre">loadparm</span></code> property<a class="headerlink" href="#selecting-kernels-with-the-loadparm-property" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">s390-ccw-virtio</span></code> machine supports the so-called <code class="docutils literal notranslate"><span class="pre">loadparm</span></code> parameter
+which can be used to select the kernel on the disk of the guest that the
+s390-ccw bios should boot. When starting QEMU, it can be specified like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">s390x</span> <span class="o">-</span><span class="n">machine</span> <span class="n">s390</span><span class="o">-</span><span class="n">ccw</span><span class="o">-</span><span class="n">virtio</span><span class="p">,</span><span class="n">loadparm</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The first way to use this parameter is to use the word <code class="docutils literal notranslate"><span class="pre">PROMPT</span></code> as the
+<code class="docutils literal notranslate"><span class="pre">&lt;string&gt;</span></code> here. In that case the s390-ccw bios will show a list of
+installed kernels on the disk of the guest and ask the user to enter a number
+to chose which kernel should be booted – similar to what can be achieved by
+specifying the <code class="docutils literal notranslate"><span class="pre">-boot</span> <span class="pre">menu=on</span></code> option when starting QEMU. Note that the menu
+list will only show the names of the installed kernels when using a DASD-like
+disk image with 4k byte sectors. On normal SCSI-style disks with 512-byte
+sectors, there is not enough space for the zipl loader on the disk to store
+the kernel names, so you only get a list without names here.</p>
+<p>The second way to use this parameter is to use a number in the range from 0
+to 31. The numbers that can be used here correspond to the numbers that are
+shown when using the <code class="docutils literal notranslate"><span class="pre">PROMPT</span></code> option, and the s390-ccw bios will then try
+to automatically boot the kernel that is associated with the given number.
+Note that <code class="docutils literal notranslate"><span class="pre">0</span></code> can be used to boot the default entry.</p>
+</section>
+<section id="booting-from-a-network-device">
+<h2>Booting from a network device<a class="headerlink" href="#booting-from-a-network-device" title="Permalink to this heading"></a></h2>
+<p>Beside the normal guest firmware (which is loaded from the file <code class="docutils literal notranslate"><span class="pre">s390-ccw.img</span></code>
+in the data directory of QEMU, or via the <code class="docutils literal notranslate"><span class="pre">-bios</span></code> option), QEMU ships with
+a small TFTP network bootloader firmware for virtio-net-ccw devices, too. This
+firmware is loaded from a file called <code class="docutils literal notranslate"><span class="pre">s390-netboot.img</span></code> in the QEMU data
+directory. In case you want to load it from a different filename instead,
+you can specify it via the <code class="docutils literal notranslate"><span class="pre">-global</span> <span class="pre">s390-ipl.netboot_fw=filename</span></code>
+command line option.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property is especially important for booting via the network.
+If you don’t specify the <code class="docutils literal notranslate"><span class="pre">bootindex</span></code> property here, the network bootloader
+firmware code won’t get loaded into the guest memory so that the network boot
+will fail. For a successful network boot, try something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">s390x</span> <span class="o">-</span><span class="n">netdev</span> <span class="n">user</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span><span class="n">tftp</span><span class="o">=...</span><span class="p">,</span><span class="n">bootfile</span><span class="o">=...</span> \
+                  <span class="o">-</span><span class="n">device</span> <span class="n">virtio</span><span class="o">-</span><span class="n">net</span><span class="o">-</span><span class="n">ccw</span><span class="p">,</span><span class="n">netdev</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span><span class="n">bootindex</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>The network bootloader firmware also has basic support for pxelinux.cfg-style
+configuration files. See the <a class="reference external" href="https://wiki.syslinux.org/wiki/index.php?title=PXELINUX#Configuration">PXELINUX Configuration page</a>
+for details how to set up the configuration file on your TFTP server.
+The supported configuration file entries are <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>, <code class="docutils literal notranslate"><span class="pre">LABEL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">KERNEL</span></code>, <code class="docutils literal notranslate"><span class="pre">INITRD</span></code> and <code class="docutils literal notranslate"><span class="pre">APPEND</span></code> (see the <a class="reference external" href="https://wiki.syslinux.org/wiki/index.php?title=Config">Syslinux Config file syntax</a> for more
+information).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vfio-ccw.html" class="btn btn-neutral float-left" title="Subchannel passthrough via vfio-ccw" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="protvirt.html" class="btn btn-neutral float-right" title="Protected Virtualization on s390x" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

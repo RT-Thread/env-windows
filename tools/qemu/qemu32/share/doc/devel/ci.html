@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CI &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to use the QAPI code generator" href="qapi-code-gen.html" />
+    <link rel="prev" title="Qtest Driver Framework" href="qgraph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CI</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#definition-of-terms">Definition of terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#custom-ci-cd-variables">Custom CI/CD variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#jobs-on-custom-runners">Jobs on Custom Runners</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-build.html">QEMU Build and Test System</a></li>
+      <li class="breadcrumb-item active">CI</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/ci.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ci">
+<span id="id1"></span><h1>CI<a class="headerlink" href="#ci" title="Permalink to this heading"></a></h1>
+<p>Most of QEMU’s CI is run on GitLab’s infrastructure although a number
+of other CI services are used for specialised purposes. The most up to
+date information about them and their status can be found on the
+<a class="reference external" href="https://wiki.qemu.org/Testing/CI">project wiki testing page</a>.</p>
+<section id="definition-of-terms">
+<h2>Definition of terms<a class="headerlink" href="#definition-of-terms" title="Permalink to this heading"></a></h2>
+<p>This section defines the terms used in this document and correlates them with
+what is currently used on QEMU.</p>
+<section id="automated-tests">
+<h3>Automated tests<a class="headerlink" href="#automated-tests" title="Permalink to this heading"></a></h3>
+<p>An automated test is written on a test framework using its generic test
+functions/classes. The test framework can run the tests and report their
+success or failure <a class="footnote-reference brackets" href="#id11" id="id2">1</a>.</p>
+<p>An automated test has essentially three parts:</p>
+<ol class="arabic simple">
+<li><p>The test initialization of the parameters, where the expected parameters,
+like inputs and expected results, are set up;</p></li>
+<li><p>The call to the code that should be tested;</p></li>
+<li><p>An assertion, comparing the result from the previous call with the expected
+result set during the initialization of the parameters. If the result
+matches the expected result, the test has been successful; otherwise, it has
+failed.</p></li>
+</ol>
+</section>
+<section id="unit-testing">
+<h3>Unit testing<a class="headerlink" href="#unit-testing" title="Permalink to this heading"></a></h3>
+<p>A unit test is responsible for exercising individual software components as a
+unit, like interfaces, data structures, and functionality, uncovering errors
+within the boundaries of a component. The verification effort is in the
+smallest software unit and focuses on the internal processing logic and data
+structures. A test case of unit tests should be designed to uncover errors due
+to erroneous computations, incorrect comparisons, or improper control flow <a class="footnote-reference brackets" href="#id12" id="id3">2</a>.</p>
+<p>On QEMU, unit testing is represented by the ‘check-unit’ target from ‘make’.</p>
+</section>
+<section id="functional-testing">
+<h3>Functional testing<a class="headerlink" href="#functional-testing" title="Permalink to this heading"></a></h3>
+<p>A functional test focuses on the functional requirement of the software.
+Deriving sets of input conditions, the functional tests should fully exercise
+all the functional requirements for a program. Functional testing is
+complementary to other testing techniques, attempting to find errors like
+incorrect or missing functions, interface errors, behavior errors, and
+initialization and termination errors <a class="footnote-reference brackets" href="#id13" id="id4">3</a>.</p>
+<p>On QEMU, functional testing is represented by the ‘check-qtest’ target from
+‘make’.</p>
+</section>
+<section id="system-testing">
+<h3>System testing<a class="headerlink" href="#system-testing" title="Permalink to this heading"></a></h3>
+<p>System tests ensure all application elements mesh properly while the overall
+functionality and performance are achieved <a class="footnote-reference brackets" href="#id14" id="id5">4</a>. Some or all system components
+are integrated to create a complete system to be tested as a whole. System
+testing ensures that components are compatible, interact correctly, and
+transfer the right data at the right time across their interfaces. As system
+testing focuses on interactions, use case-based testing is a practical approach
+to system testing <a class="footnote-reference brackets" href="#id15" id="id6">5</a>. Note that, in some cases, system testing may require
+interaction with third-party software, like operating system images, databases,
+networks, and so on.</p>
+<p>On QEMU, system testing is represented by the ‘check-avocado’ target from
+‘make’.</p>
+</section>
+<section id="flaky-tests">
+<h3>Flaky tests<a class="headerlink" href="#flaky-tests" title="Permalink to this heading"></a></h3>
+<p>A flaky test is defined as a test that exhibits both a passing and a failing
+result with the same code on different runs. Some usual reasons for an
+intermittent/flaky test are async wait, concurrency, and test order dependency
+<a class="footnote-reference brackets" href="#id16" id="id7">6</a>.</p>
+</section>
+<section id="gating">
+<h3>Gating<a class="headerlink" href="#gating" title="Permalink to this heading"></a></h3>
+<p>A gate restricts the move of code from one stage to another on a
+test/deployment pipeline. The step move is granted with approval. The approval
+can be a manual intervention or a set of tests succeeding <a class="footnote-reference brackets" href="#id17" id="id8">7</a>.</p>
+<p>On QEMU, the gating process happens during the pull request. The approval is
+done by the project leader running its own set of tests. The pull request gets
+merged when the tests succeed.</p>
+</section>
+<section id="continuous-integration-ci">
+<h3>Continuous Integration (CI)<a class="headerlink" href="#continuous-integration-ci" title="Permalink to this heading"></a></h3>
+<p>Continuous integration (CI) requires the builds of the entire application and
+the execution of a comprehensive set of automated tests every time there is a
+need to commit any set of changes <a class="footnote-reference brackets" href="#id18" id="id9">8</a>. The automated tests can be composed of
+the unit, functional, system, and other tests.</p>
+<p>Keynotes about continuous integration (CI) <a class="footnote-reference brackets" href="#id19" id="id10">9</a>:</p>
+<ol class="arabic simple">
+<li><p>System tests may depend on external software (operating system images,
+firmware, database, network).</p></li>
+<li><p>It may take a long time to build and test. It may be impractical to build
+the system being developed several times per day.</p></li>
+<li><p>If the development platform is different from the target platform, it may
+not be possible to run system tests in the developer’s private workspace.
+There may be differences in hardware, operating system, or installed
+software. Therefore, more time is required for testing the system.</p></li>
+</ol>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h3>
+<dl class="footnote brackets">
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p>Sommerville, Ian (2016). Software Engineering. p. 233.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dd><p>Pressman, Roger S. &amp; Maxim, Bruce R. (2020). Software Engineering,
+A Practitioner’s Approach. p. 48, 376, 378, 381.</p>
+</dd>
+<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
+<dd><p>Pressman, Roger S. &amp; Maxim, Bruce R. (2020). Software Engineering,
+A Practitioner’s Approach. p. 388.</p>
+</dd>
+<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
+<dd><p>Pressman, Roger S. &amp; Maxim, Bruce R. (2020). Software Engineering,
+A Practitioner’s Approach. Software Engineering, p. 377.</p>
+</dd>
+<dt class="label" id="id15"><span class="brackets"><a class="fn-backref" href="#id6">5</a></span></dt>
+<dd><p>Sommerville, Ian (2016). Software Engineering. p. 59, 232, 240.</p>
+</dd>
+<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
+<dd><p>Luo, Qingzhou, et al. An empirical analysis of flaky tests.
+Proceedings of the 22nd ACM SIGSOFT International Symposium on
+Foundations of Software Engineering. 2014.</p>
+</dd>
+<dt class="label" id="id17"><span class="brackets"><a class="fn-backref" href="#id8">7</a></span></dt>
+<dd><p>Humble, Jez &amp; Farley, David (2010). Continuous Delivery:
+Reliable Software Releases Through Build, Test, and Deployment, p. 122.</p>
+</dd>
+<dt class="label" id="id18"><span class="brackets"><a class="fn-backref" href="#id9">8</a></span></dt>
+<dd><p>Humble, Jez &amp; Farley, David (2010). Continuous Delivery:
+Reliable Software Releases Through Build, Test, and Deployment, p. 55.</p>
+</dd>
+<dt class="label" id="id19"><span class="brackets"><a class="fn-backref" href="#id10">9</a></span></dt>
+<dd><p>Sommerville, Ian (2016). Software Engineering. p. 743.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="custom-ci-cd-variables">
+<span id="ci-var"></span><h2>Custom CI/CD variables<a class="headerlink" href="#custom-ci-cd-variables" title="Permalink to this heading"></a></h2>
+<p>QEMU CI pipelines can be tuned by setting some CI environment variables.</p>
+<section id="set-variable-globally-in-the-user-s-ci-namespace">
+<h3>Set variable globally in the user’s CI namespace<a class="headerlink" href="#set-variable-globally-in-the-user-s-ci-namespace" title="Permalink to this heading"></a></h3>
+<p>Variables can be set globally in the user’s CI namespace setting.</p>
+<p>For further information about how to set these variables, please refer to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">docs</span><span class="o">.</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ee</span><span class="o">/</span><span class="n">ci</span><span class="o">/</span><span class="n">variables</span><span class="o">/</span><span class="c1">#add-a-cicd-variable-to-a-project</span>
+</pre></div>
+</div>
+</section>
+<section id="set-variable-manually-when-pushing-a-branch-or-tag-to-the-user-s-repository">
+<h3>Set variable manually when pushing a branch or tag to the user’s repository<a class="headerlink" href="#set-variable-manually-when-pushing-a-branch-or-tag-to-the-user-s-repository" title="Permalink to this heading"></a></h3>
+<p>Variables can be set manually when pushing a branch or tag, using
+git-push command line arguments.</p>
+<p>Example setting the QEMU_CI_EXAMPLE_VAR variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="o">-</span><span class="n">o</span> <span class="n">ci</span><span class="o">.</span><span class="n">variable</span><span class="o">=</span><span class="s2">&quot;QEMU_CI_EXAMPLE_VAR=value&quot;</span> <span class="n">myrepo</span> <span class="n">mybranch</span>
+</pre></div>
+</div>
+<p>For further information about how to set these variables, please refer to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">docs</span><span class="o">.</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ee</span><span class="o">/</span><span class="n">user</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">push_options</span><span class="o">.</span><span class="n">html</span><span class="c1">#push-options-for-gitlab-cicd</span>
+</pre></div>
+</div>
+</section>
+<section id="setting-aliases-in-your-git-config">
+<h3>Setting aliases in your git config<a class="headerlink" href="#setting-aliases-in-your-git-config" title="Permalink to this heading"></a></h3>
+<p>You can use aliases to make it easier to push branches with different
+CI configurations. For example define an alias for triggering CI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="n">local</span> <span class="n">alias</span><span class="o">.</span><span class="n">push</span><span class="o">-</span><span class="n">ci</span> <span class="s2">&quot;push -o ci.variable=QEMU_CI=1&quot;</span>
+<span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="n">local</span> <span class="n">alias</span><span class="o">.</span><span class="n">push</span><span class="o">-</span><span class="n">ci</span><span class="o">-</span><span class="n">now</span> <span class="s2">&quot;push -o ci.variable=QEMU_CI=2&quot;</span>
+</pre></div>
+</div>
+<p>Which lets you run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span><span class="o">-</span><span class="n">ci</span>
+</pre></div>
+</div>
+<p>to create the pipeline, or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span><span class="o">-</span><span class="n">ci</span><span class="o">-</span><span class="n">now</span>
+</pre></div>
+</div>
+<p>to create and run the pipeline</p>
+</section>
+<section id="variable-naming-and-grouping">
+<h3>Variable naming and grouping<a class="headerlink" href="#variable-naming-and-grouping" title="Permalink to this heading"></a></h3>
+<p>The variables used by QEMU’s CI configuration are grouped together
+in a handful of namespaces</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>QEMU_JOB_nnnn - variables to be defined in individual jobs
+or templates, to influence the shared rules defined in the
+.base_job_template.</p></li>
+<li><p>QEMU_CI_nnn - variables to be set by contributors in their
+repository CI settings, or as git push variables, to influence
+which jobs get run in a pipeline</p></li>
+<li><p>nnn - other misc variables not falling into the above
+categories, or using different names for historical reasons
+and not yet converted.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="maintainer-controlled-job-variables">
+<h3>Maintainer controlled job variables<a class="headerlink" href="#maintainer-controlled-job-variables" title="Permalink to this heading"></a></h3>
+<p>The following variables may be set when defining a job in the
+CI configuration file.</p>
+<section id="qemu-job-cirrus">
+<h4>QEMU_JOB_CIRRUS<a class="headerlink" href="#qemu-job-cirrus" title="Permalink to this heading"></a></h4>
+<p>The job makes use of Cirrus CI infrastructure, requiring the
+configuration setup for cirrus-run to be present in the repository</p>
+</section>
+<section id="qemu-job-optional">
+<h4>QEMU_JOB_OPTIONAL<a class="headerlink" href="#qemu-job-optional" title="Permalink to this heading"></a></h4>
+<p>The job is expected to be successful in general, but is not run
+by default due to need to conserve limited CI resources. It is
+available to be started manually by the contributor in the CI
+pipelines UI.</p>
+</section>
+<section id="qemu-job-only-forks">
+<h4>QEMU_JOB_ONLY_FORKS<a class="headerlink" href="#qemu-job-only-forks" title="Permalink to this heading"></a></h4>
+<p>The job results are only of interest to contributors prior to
+submitting code. They are not required as part of the gating
+CI pipeline.</p>
+</section>
+<section id="qemu-job-skipped">
+<h4>QEMU_JOB_SKIPPED<a class="headerlink" href="#qemu-job-skipped" title="Permalink to this heading"></a></h4>
+<p>The job is not reliably successsful in general, so is not
+currently suitable to be run by default. Ideally this should
+be a temporary marker until the problems can be addressed, or
+the job permanently removed.</p>
+</section>
+<section id="qemu-job-publish">
+<h4>QEMU_JOB_PUBLISH<a class="headerlink" href="#qemu-job-publish" title="Permalink to this heading"></a></h4>
+<p>The job is for publishing content after a branch has been
+merged into the upstream default branch.</p>
+</section>
+<section id="qemu-job-avocado">
+<h4>QEMU_JOB_AVOCADO<a class="headerlink" href="#qemu-job-avocado" title="Permalink to this heading"></a></h4>
+<p>The job runs the Avocado integration test suite</p>
+</section>
+</section>
+<section id="contributor-controlled-runtime-variables">
+<h3>Contributor controlled runtime variables<a class="headerlink" href="#contributor-controlled-runtime-variables" title="Permalink to this heading"></a></h3>
+<p>The following variables may be set by contributors to control
+job execution</p>
+<section id="qemu-ci">
+<h4>QEMU_CI<a class="headerlink" href="#qemu-ci" title="Permalink to this heading"></a></h4>
+<p>By default, no pipelines will be created on contributor forks
+in order to preserve CI credits</p>
+<p>Set this variable to 1 to create the pipelines, but leave all
+the jobs to be manually started from the UI</p>
+<p>Set this variable to 2 to create the pipelines and run all
+the jobs immediately, as was historicaly behaviour</p>
+</section>
+<section id="qemu-ci-avocado-testing">
+<h4>QEMU_CI_AVOCADO_TESTING<a class="headerlink" href="#qemu-ci-avocado-testing" title="Permalink to this heading"></a></h4>
+<p>By default, tests using the Avocado framework are not run automatically in
+the pipelines (because multiple artifacts have to be downloaded, and if
+these artifacts are not already cached, downloading them make the jobs
+reach the timeout limit). Set this variable to have the tests using the
+Avocado framework run automatically.</p>
+</section>
+</section>
+<section id="other-misc-variables">
+<h3>Other misc variables<a class="headerlink" href="#other-misc-variables" title="Permalink to this heading"></a></h3>
+<p>These variables are primarily to control execution of jobs on
+private runners</p>
+<section id="aarch64-runner-available">
+<h4>AARCH64_RUNNER_AVAILABLE<a class="headerlink" href="#aarch64-runner-available" title="Permalink to this heading"></a></h4>
+<p>If you’ve got access to an aarch64 host that can be used as a gitlab-CI
+runner, you can set this variable to enable the tests that require this
+kind of host. The runner should be tagged with “aarch64”.</p>
+</section>
+<section id="aarch32-runner-available">
+<h4>AARCH32_RUNNER_AVAILABLE<a class="headerlink" href="#aarch32-runner-available" title="Permalink to this heading"></a></h4>
+<p>If you’ve got access to an armhf host or an arch64 host that can run
+aarch32 EL0 code to be used as a gitlab-CI runner, you can set this
+variable to enable the tests that require this kind of host. The
+runner should be tagged with “aarch32”.</p>
+</section>
+<section id="s390x-runner-available">
+<h4>S390X_RUNNER_AVAILABLE<a class="headerlink" href="#s390x-runner-available" title="Permalink to this heading"></a></h4>
+<p>If you’ve got access to an IBM Z host that can be used as a gitlab-CI
+runner, you can set this variable to enable the tests that require this
+kind of host. The runner should be tagged with “s390x”.</p>
+</section>
+<section id="centos-stream-8-x86-64-runner-available">
+<h4>CENTOS_STREAM_8_x86_64_RUNNER_AVAILABLE<a class="headerlink" href="#centos-stream-8-x86-64-runner-available" title="Permalink to this heading"></a></h4>
+<p>If you’ve got access to a CentOS Stream 8 x86_64 host that can be
+used as a gitlab-CI runner, you can set this variable to enable the
+tests that require this kind of host. The runner should be tagged with
+both “centos_stream_8” and “x86_64”.</p>
+</section>
+</section>
+</section>
+<section id="jobs-on-custom-runners">
+<h2>Jobs on Custom Runners<a class="headerlink" href="#jobs-on-custom-runners" title="Permalink to this heading"></a></h2>
+<p>Besides the jobs run under the various CI systems listed before, there
+are a number additional jobs that will run before an actual merge.
+These use the same GitLab CI’s service/framework already used for all
+other GitLab based CI jobs, but rely on additional systems, not the
+ones provided by GitLab as “shared runners”.</p>
+<p>The architecture of GitLab’s CI service allows different machines to
+be set up with GitLab’s “agent”, called gitlab-runner, which will take
+care of running jobs created by events such as a push to a branch.
+Here, the combination of a machine, properly configured with GitLab’s
+gitlab-runner, is called a “custom runner”.</p>
+<p>The GitLab CI jobs definition for the custom runners are located under:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">custom</span><span class="o">-</span><span class="n">runners</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Custom runners entail custom machines.  To see a list of the machines
+currently deployed in the QEMU GitLab CI and their maintainers, please
+refer to the QEMU <a class="reference external" href="https://wiki.qemu.org/AdminContacts">wiki</a>.</p>
+<section id="machine-setup-howto">
+<h3>Machine Setup Howto<a class="headerlink" href="#machine-setup-howto" title="Permalink to this heading"></a></h3>
+<p>For all Linux based systems, the setup can be mostly automated by the
+execution of two Ansible playbooks.  Create an <code class="docutils literal notranslate"><span class="pre">inventory</span></code> file
+under <code class="docutils literal notranslate"><span class="pre">scripts/ci/setup</span></code>, such as this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fully</span><span class="o">.</span><span class="n">qualified</span><span class="o">.</span><span class="n">domain</span>
+<span class="n">other</span><span class="o">.</span><span class="n">machine</span><span class="o">.</span><span class="n">hostname</span>
+</pre></div>
+</div>
+<p>You may need to set some variables in the inventory file itself.  One
+very common need is to tell Ansible to use a Python 3 interpreter on
+those hosts.  This would look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fully</span><span class="o">.</span><span class="n">qualified</span><span class="o">.</span><span class="n">domain</span> <span class="n">ansible_python_interpreter</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python3</span>
+<span class="n">other</span><span class="o">.</span><span class="n">machine</span><span class="o">.</span><span class="n">hostname</span> <span class="n">ansible_python_interpreter</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python3</span>
+</pre></div>
+</div>
+<section id="build-environment">
+<h4>Build environment<a class="headerlink" href="#build-environment" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">scripts/ci/setup/build-environment.yml</span></code> Ansible playbook will
+set up machines with the environment needed to perform builds and run
+QEMU tests.  This playbook consists on the installation of various
+required packages (and a general package update while at it).  It
+currently covers a number of different Linux distributions, but it can
+be expanded to cover other systems.</p>
+<p>The minimum required version of Ansible successfully tested in this
+playbook is 2.8.0 (a version check is embedded within the playbook
+itself).  To run the playbook, execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">scripts</span><span class="o">/</span><span class="n">ci</span><span class="o">/</span><span class="n">setup</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span> <span class="n">build</span><span class="o">-</span><span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Please note that most of the tasks in the playbook require superuser
+privileges, such as those from the <code class="docutils literal notranslate"><span class="pre">root</span></code> account or those obtained
+by <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.  If necessary, please refer to <code class="docutils literal notranslate"><span class="pre">ansible-playbook</span></code>
+options such as <code class="docutils literal notranslate"><span class="pre">--become</span></code>, <code class="docutils literal notranslate"><span class="pre">--become-method</span></code>, <code class="docutils literal notranslate"><span class="pre">--become-user</span></code>
+and <code class="docutils literal notranslate"><span class="pre">--ask-become-pass</span></code>.</p>
+</section>
+<section id="gitlab-runner-setup-and-registration">
+<h4>gitlab-runner setup and registration<a class="headerlink" href="#gitlab-runner-setup-and-registration" title="Permalink to this heading"></a></h4>
+<p>The gitlab-runner agent needs to be installed on each machine that
+will run jobs.  The association between a machine and a GitLab project
+happens with a registration token.  To find the registration token for
+your repository/project, navigate on GitLab’s web UI to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Settings (the gears-like icon at the bottom of the left hand side
+vertical toolbar), then</p></li>
+<li><p>CI/CD, then</p></li>
+<li><p>Runners, and click on the “Expand” button, then</p></li>
+<li><p>Under “Set up a specific Runner manually”, look for the value under
+“And this registration token:”</p></li>
+</ul>
+</div></blockquote>
+<p>Copy the <code class="docutils literal notranslate"><span class="pre">scripts/ci/setup/vars.yml.template</span></code> file to
+<code class="docutils literal notranslate"><span class="pre">scripts/ci/setup/vars.yml</span></code>.  Then, set the
+<code class="docutils literal notranslate"><span class="pre">gitlab_runner_registration_token</span></code> variable to the value obtained
+earlier.</p>
+<p>To run the playbook, execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">scripts</span><span class="o">/</span><span class="n">ci</span><span class="o">/</span><span class="n">setup</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span> <span class="n">gitlab</span><span class="o">-</span><span class="n">runner</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Following the registration, it’s necessary to configure the runner tags,
+and optionally other configurations on the GitLab UI.  Navigate to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Settings (the gears like icon), then</p></li>
+<li><p>CI/CD, then</p></li>
+<li><p>Runners, and click on the “Expand” button, then</p></li>
+<li><p>“Runners activated for this project”, then</p></li>
+<li><p>Click on the “Edit” icon (next to the “Lock” Icon)</p></li>
+</ul>
+</div></blockquote>
+<p>Tags are very important as they are used to route specific jobs to
+specific types of runners, so it’s a good idea to double check that
+the automatically created tags are consistent with the OS and
+architecture.  For instance, an Ubuntu 20.04 aarch64 system should
+have tags set as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ubuntu_20</span><span class="mf">.04</span><span class="p">,</span><span class="n">aarch64</span>
+</pre></div>
+</div>
+<p>Because the job definition at <code class="docutils literal notranslate"><span class="pre">.gitlab-ci.d/custom-runners.yml</span></code>
+would contain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ubuntu</span><span class="o">-</span><span class="mf">20.04</span><span class="o">-</span><span class="n">aarch64</span><span class="o">-</span><span class="nb">all</span><span class="p">:</span>
+ <span class="n">tags</span><span class="p">:</span>
+ <span class="o">-</span> <span class="n">ubuntu_20</span><span class="mf">.04</span>
+ <span class="o">-</span> <span class="n">aarch64</span>
+</pre></div>
+</div>
+<p>It’s also recommended to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>increase the “Maximum job timeout” to something like <code class="docutils literal notranslate"><span class="pre">2h</span></code></p></li>
+<li><p>give it a better Description</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qgraph.html" class="btn btn-neutral float-left" title="Qtest Driver Framework" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qapi-code-gen.html" class="btn btn-neutral float-right" title="How to use the QAPI code generator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU TPM Device &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="APEI tables generating and CPER record" href="acpi_hest_ghes.html" />
+    <link rel="prev" title="QEMU and ACPI BIOS Generic Event Device interface" href="acpi_hw_reduced_hotplug.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU TPM Device</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#guest-side-hardware-interface">Guest-side hardware interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tis-interface">TIS interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#crb-interface">CRB interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spapr-interface">SPAPR interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#fw-cfg-interface">fw_cfg interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acpi-interface">ACPI interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#acpi-ppi-interface">ACPI PPI Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tpm-backend-devices">TPM backend devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-qemu-tpm-passthrough-device">The QEMU TPM passthrough device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-qemu-tpm-emulator-device">The QEMU TPM emulator device</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#migration-with-the-tpm-emulator">Migration with the TPM emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#troubleshooting-migration">Troubleshooting migration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation Guest Hardware Specifications</a></li>
+      <li class="breadcrumb-item active">QEMU TPM Device</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/specs/tpm.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-tpm-device">
+<h1>QEMU TPM Device<a class="headerlink" href="#qemu-tpm-device" title="Permalink to this heading"></a></h1>
+<section id="guest-side-hardware-interface">
+<h2>Guest-side hardware interface<a class="headerlink" href="#guest-side-hardware-interface" title="Permalink to this heading"></a></h2>
+<section id="tis-interface">
+<h3>TIS interface<a class="headerlink" href="#tis-interface" title="Permalink to this heading"></a></h3>
+<p>The QEMU TPM emulation implements a TPM TIS hardware interface
+following the Trusted Computing Group’s specification “TCG PC Client
+Specific TPM Interface Specification (TIS)”, Specification Version
+1.3, 21 March 2013. (see the <a class="reference external" href="https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/">TIS specification</a>, or a later version
+of it).</p>
+<p>The TIS interface makes a memory mapped IO region in the area
+0xfed40000-0xfed44fff available to the guest operating system.</p>
+<dl class="simple">
+<dt>QEMU files related to TPM TIS interface:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_tis_common.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_tis_isa.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_tis_sysbus.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_tis.h</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p>Both an ISA device and a sysbus device are available. The former is
+used with pc/q35 machine while the latter can be instantiated in the
+Arm virt machine.</p>
+</section>
+<section id="crb-interface">
+<h3>CRB interface<a class="headerlink" href="#crb-interface" title="Permalink to this heading"></a></h3>
+<p>QEMU also implements a TPM CRB interface following the Trusted
+Computing Group’s specification “TCG PC Client Platform TPM Profile
+(PTP) Specification”, Family “2.0”, Level 00 Revision 01.03 v22, May
+22, 2017. (see the <a class="reference external" href="https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/">CRB specification</a>, or a later version of it)</p>
+<p>The CRB interface makes a memory mapped IO region in the area
+0xfed40000-0xfed40fff (1 locality) available to the guest
+operating system.</p>
+<dl class="simple">
+<dt>QEMU files related to TPM CRB interface:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_crb.c</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="spapr-interface">
+<h3>SPAPR interface<a class="headerlink" href="#spapr-interface" title="Permalink to this heading"></a></h3>
+<p>pSeries (ppc64) machines offer a tpm-spapr device model.</p>
+<dl class="simple">
+<dt>QEMU files related to the SPAPR interface:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/tpm/tpm_spapr.c</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</section>
+<section id="fw-cfg-interface">
+<h2>fw_cfg interface<a class="headerlink" href="#fw-cfg-interface" title="Permalink to this heading"></a></h2>
+<p>The bios/firmware may read the <code class="docutils literal notranslate"><span class="pre">&quot;etc/tpm/config&quot;</span></code> fw_cfg entry for
+configuring the guest appropriately.</p>
+<p>The entry of 6 bytes has the following content, in little-endian:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define TPM_VERSION_UNSPEC          0</span>
+<span class="cp">#define TPM_VERSION_1_2             1</span>
+<span class="cp">#define TPM_VERSION_2_0             2</span>
+
+<span class="cp">#define TPM_PPI_VERSION_NONE        0</span>
+<span class="cp">#define TPM_PPI_VERSION_1_30        1</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">FwCfgTPMConfig</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">tpmppi_address</span><span class="p">;</span><span class="w">         </span><span class="cm">/* PPI memory location */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">tpm_version</span><span class="p">;</span><span class="w">             </span><span class="cm">/* TPM version */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">tpmppi_version</span><span class="p">;</span><span class="w">          </span><span class="cm">/* PPI version */</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="acpi-interface">
+<h2>ACPI interface<a class="headerlink" href="#acpi-interface" title="Permalink to this heading"></a></h2>
+<p>The TPM device is defined with ACPI ID “PNP0C31”. QEMU builds a SSDT
+and passes it into the guest through the fw_cfg device. The device
+description contains the base address of the TIS interface 0xfed40000
+and the size of the MMIO area (0x5000). In case a TPM2 is used by
+QEMU, a TPM2 ACPI table is also provided.  The device is described to
+be used in polling mode rather than interrupt mode primarily because
+no unused IRQ could be found.</p>
+<p>To support measurement logs to be written by the firmware,
+e.g. SeaBIOS, a TCPA table is implemented. This table provides a 64kb
+buffer where the firmware can write its log into. For TPM 2 only a
+more recent version of the TPM2 table provides support for
+measurements logs and a TCPA table does not need to be created.</p>
+<p>The TCPA and TPM2 ACPI tables follow the Trusted Computing Group
+specification “TCG ACPI Specification” Family “1.2” and “2.0”, Level
+00 Revision 00.37. (see the <a class="reference external" href="https://trustedcomputinggroup.org/tcg-acpi-specification/">ACPI specification</a>, or a later version
+of it)</p>
+<section id="acpi-ppi-interface">
+<h3>ACPI PPI Interface<a class="headerlink" href="#acpi-ppi-interface" title="Permalink to this heading"></a></h3>
+<p>QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and
+TPM 2. This interface requires ACPI and firmware support. (see the
+<a class="reference external" href="https://trustedcomputinggroup.org/resource/tcg-physical-presence-interface-specification/">PPI specification</a>)</p>
+<p>PPI enables a system administrator (root) to request a modification to
+the TPM upon reboot. The PPI specification defines the operation
+requests and the actions the firmware has to take. The system
+administrator passes the operation request number to the firmware
+through an ACPI interface which writes this number to a memory
+location that the firmware knows. Upon reboot, the firmware finds the
+number and sends commands to the TPM. The firmware writes the TPM
+result code and the operation request number to a memory location that
+ACPI can read from and pass the result on to the administrator.</p>
+<p>The PPI specification defines a set of mandatory and optional
+operations for the firmware to implement. The ACPI interface also
+allows an administrator to list the supported operations. In QEMU the
+ACPI code is generated by QEMU, yet the firmware needs to implement
+support on a per-operations basis, and different firmwares may support
+a different subset. Therefore, QEMU introduces the virtual memory
+device for PPI where the firmware can indicate which operations it
+supports and ACPI can enable the ones that are supported and disable
+all others. This interface lies in main memory and has the following
+layout:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Offset</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">func</span></code></p></td>
+<td><p>0x100</p></td>
+<td><p>0x000</p></td>
+<td><p>Firmware sets values for each supported
+operation. See defined values below.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ppin</span></code></p></td>
+<td><p>0x1</p></td>
+<td><p>0x100</p></td>
+<td><p>SMI interrupt to use. Set by firmware.
+Not supported.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppip</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x101</p></td>
+<td><p>ACPI function index to pass to SMM code.
+Set by ACPI. Not supported.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pprp</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x105</p></td>
+<td><p>Result of last executed operation. Set by
+firmware. See function index 5 for values.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pprq</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x109</p></td>
+<td><p>Operation request number to execute. See
+‘Physical Presence Interface Operation
+Summary’ tables in specs. Set by ACPI.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pprm</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x10d</p></td>
+<td><p>Operation request optional parameter.
+Values depend on operation. Set by ACPI.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lppr</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x111</p></td>
+<td><p>Last executed operation request number.
+Copied from pprq field by firmware.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fret</span></code></p></td>
+<td><p>0x4</p></td>
+<td><p>0x115</p></td>
+<td><p>Result code from SMM function.
+Not supported.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">res1</span></code></p></td>
+<td><p>0x40</p></td>
+<td><p>0x119</p></td>
+<td><p>Reserved for future use</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">next_step</span></code></p></td>
+<td><p>0x1</p></td>
+<td><p>0x159</p></td>
+<td><p>Operation to execute after reboot by
+firmware. Used by firmware.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">movv</span></code></p></td>
+<td><p>0x1</p></td>
+<td><p>0x15a</p></td>
+<td><p>Memory overwrite variable</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The following values are supported for the <code class="docutils literal notranslate"><span class="pre">func</span></code> field. They
+correspond to the values used by ACPI function index 8.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 86%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Operation is not implemented.</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Operation is only accessible through firmware.</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>Operation is blocked for OS by firmware configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Operation is allowed and physically present user required.</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Operation is allowed and physically present user is not
+required.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The location of the table is given by the fw_cfg <code class="docutils literal notranslate"><span class="pre">tpmppi_address</span></code>
+field.  The PPI memory region size is 0x400 (<code class="docutils literal notranslate"><span class="pre">TPM_PPI_ADDR_SIZE</span></code>) to
+leave enough room for future updates.</p>
+<dl class="simple">
+<dt>QEMU files related to TPM ACPI tables:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hw/i386/acpi-build.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/hw/acpi/tpm.h</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</section>
+<section id="tpm-backend-devices">
+<h2>TPM backend devices<a class="headerlink" href="#tpm-backend-devices" title="Permalink to this heading"></a></h2>
+<p>The TPM implementation is split into two parts, frontend and
+backend. The frontend part is the hardware interface, such as the TPM
+TIS interface described earlier, and the other part is the TPM backend
+interface. The backend interfaces implement the interaction with a TPM
+device, which may be a physical or an emulated device. The split
+between the front- and backend devices allows a frontend to be
+connected with any available backend. This enables the TIS interface
+to be used with the passthrough backend or the swtpm backend.</p>
+<dl class="simple">
+<dt>QEMU files related to TPM backends:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">backends/tpm.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/sysemu/tpm.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/sysemu/tpm_backend.h</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<section id="the-qemu-tpm-passthrough-device">
+<h3>The QEMU TPM passthrough device<a class="headerlink" href="#the-qemu-tpm-passthrough-device" title="Permalink to this heading"></a></h3>
+<p>In case QEMU is run on Linux as the host operating system it is
+possible to make the hardware TPM device available to a single QEMU
+guest. In this case the user must make sure that no other program is
+using the device, e.g., /dev/tpm0, before trying to start QEMU with
+it.</p>
+<p>The passthrough driver uses the host’s TPM device for sending TPM
+commands and receiving responses from. Besides that it accesses the
+TPM device’s sysfs entry for support of command cancellation. Since
+none of the state of a hardware TPM can be migrated between hosts,
+virtual machine migration is disabled when the TPM passthrough driver
+is used.</p>
+<p>Since the host’s TPM device will already be initialized by the host’s
+firmware, certain commands, e.g. <code class="docutils literal notranslate"><span class="pre">TPM_Startup()</span></code>, sent by the
+virtual firmware for device initialization, will fail. In this case
+the firmware should not use the TPM.</p>
+<p>Sharing the device with the host is generally not a recommended usage
+scenario for a TPM device. The primary reason for this is that two
+operating systems can then access the device’s single set of
+resources, such as platform configuration registers
+(PCRs). Applications or kernel security subsystems, such as the Linux
+Integrity Measurement Architecture (IMA), are not expecting to share
+PCRs.</p>
+<dl class="simple">
+<dt>QEMU files related to the TPM passthrough device:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">backends/tpm/tpm_passthrough.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backends/tpm/tpm_util.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/sysemu/tpm_util.h</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p>Command line to start QEMU with the TPM passthrough device using the host’s
+hardware TPM <code class="docutils literal notranslate"><span class="pre">/dev/tpm0</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-x86_64 -display sdl -accel kvm \</span>
+<span class="go">-m 1024 -boot d -bios bios-256k.bin -boot menu=on \</span>
+<span class="go">-tpmdev passthrough,id=tpm0,path=/dev/tpm0 \</span>
+<span class="go">-device tpm-tis,tpmdev=tpm0 test.img</span>
+</pre></div>
+</div>
+<p>The following commands should result in similar output inside the VM
+with a Linux kernel that either has the TPM TIS driver built-in or
+available as a module (assuming a TPM 2 is passed through):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>dmesg <span class="p">|</span> grep -i tpm
+<span class="go">[    0.012560] ACPI: TPM2 0x000000000BFFD1900 00004C (v04 BOCHS  \</span>
+<span class="go">    BXPC     0000001 BXPC 00000001)</span>
+
+<span class="gp"># </span>ls -l /dev/tpm*
+<span class="go">crw-rw----. 1 tss root  10,   224 Sep  6 12:36 /dev/tpm0</span>
+<span class="go">crw-rw----. 1 tss rss  253, 65536 Sep  6 12:36 /dev/tpmrm0</span>
+
+<span class="go">Starting with Linux 5.12 there are PCR entries for TPM 2 in sysfs:</span>
+<span class="gp"># </span>find /sys/devices/ -type f <span class="p">|</span> grep pcr-sha
+<span class="go">...</span>
+<span class="go">/sys/devices/LNXSYSTEM:00/LNXSYBUS:00/MSFT0101:00/tpm/tpm0/pcr-sha256/1</span>
+<span class="go">...</span>
+<span class="go">/sys/devices/LNXSYSTEM:00/LNXSYBUS:00/MSFT0101:00/tpm/tpm0/pcr-sha256/9</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+</section>
+<section id="the-qemu-tpm-emulator-device">
+<h3>The QEMU TPM emulator device<a class="headerlink" href="#the-qemu-tpm-emulator-device" title="Permalink to this heading"></a></h3>
+<p>The TPM emulator device uses an external TPM emulator called ‘swtpm’
+for sending TPM commands to and receiving responses from. The swtpm
+program must have been started before trying to access it through the
+TPM emulator with QEMU.</p>
+<p>The TPM emulator implements a command channel for transferring TPM
+commands and responses as well as a control channel over which control
+commands can be sent. (see the <a class="reference external" href="https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioctls.pod">SWTPM protocol</a> specification)</p>
+<p>The control channel serves the purpose of resetting, initializing, and
+migrating the TPM state, among other things.</p>
+<p>The swtpm program behaves like a hardware TPM and therefore needs to
+be initialized by the firmware running inside the QEMU virtual
+machine.  One necessary step for initializing the device is to send
+the TPM_Startup command to it. SeaBIOS, for example, has been
+instrumented to initialize a TPM 1.2 or TPM 2 device using this
+command.</p>
+<dl class="simple">
+<dt>QEMU files related to the TPM emulator device:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">backends/tpm/tpm_emulator.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backends/tpm/tpm_util.c</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/sysemu/tpm_util.h</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p>The following commands start the swtpm with a UnixIO control channel over
+a socket interface. They do not need to be run as root.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mkdir /tmp/mytpm1</span>
+<span class="go">swtpm socket --tpmstate dir=/tmp/mytpm1 \</span>
+<span class="go">  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  --tpm2 \</span>
+<span class="go">  --log level=20</span>
+</pre></div>
+</div>
+<p>Command line to start QEMU with the TPM emulator device communicating
+with the swtpm (x86):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-x86_64 -display sdl -accel kvm \</span>
+<span class="go">  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \</span>
+<span class="go">  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  -tpmdev emulator,id=tpm0,chardev=chrtpm \</span>
+<span class="go">  -device tpm-tis,tpmdev=tpm0 test.img</span>
+</pre></div>
+</div>
+<p>In case a pSeries machine is emulated, use the following command line:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-ppc64 -display sdl -machine pseries,accel=kvm \</span>
+<span class="go">  -m 1024 -bios slof.bin -boot menu=on \</span>
+<span class="go">  -nodefaults -device VGA -device pci-ohci -device usb-kbd \</span>
+<span class="go">  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  -tpmdev emulator,id=tpm0,chardev=chrtpm \</span>
+<span class="go">  -device tpm-spapr,tpmdev=tpm0 \</span>
+<span class="go">  -device spapr-vscsi,id=scsi0,reg=0x00002000 \</span>
+<span class="go">  -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0 \</span>
+<span class="go">  -drive file=test.img,format=raw,if=none,id=drive-virtio-disk0</span>
+</pre></div>
+</div>
+<p>In case an Arm virt machine is emulated, use the following command line:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-aarch64 -machine virt,gic-version=3,accel=kvm \</span>
+<span class="go">  -cpu host -m 4G \</span>
+<span class="go">  -nographic -no-acpi \</span>
+<span class="go">  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  -tpmdev emulator,id=tpm0,chardev=chrtpm \</span>
+<span class="go">  -device tpm-tis-device,tpmdev=tpm0 \</span>
+<span class="go">  -device virtio-blk-pci,drive=drv0 \</span>
+<span class="go">  -drive format=qcow2,file=hda.qcow2,if=none,id=drv0 \</span>
+<span class="go">  -drive if=pflash,format=raw,file=flash0.img,readonly=on \</span>
+<span class="go">  -drive if=pflash,format=raw,file=flash1.img</span>
+</pre></div>
+</div>
+<p>In case SeaBIOS is used as firmware, it should show the TPM menu item
+after entering the menu with ‘ESC’.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Select boot device:</span>
+<span class="go">1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]</span>
+<span class="go">[...]</span>
+<span class="go">5. Legacy option rom</span>
+
+<span class="go">t. TPM Configuration</span>
+</pre></div>
+</div>
+<p>The following commands should result in similar output inside the VM
+with a Linux kernel that either has the TPM TIS driver built-in or
+available as a module:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>dmesg <span class="p">|</span> grep -i tpm
+<span class="go">[    0.012560] ACPI: TPM2 0x000000000BFFD1900 00004C (v04 BOCHS  \</span>
+<span class="go">    BXPC     0000001 BXPC 00000001)</span>
+
+<span class="gp"># </span>ls -l /dev/tpm*
+<span class="go">crw-rw----. 1 tss root  10,   224 Sep  6 12:36 /dev/tpm0</span>
+<span class="go">crw-rw----. 1 tss rss  253, 65536 Sep  6 12:36 /dev/tpmrm0</span>
+
+<span class="go">Starting with Linux 5.12 there are PCR entries for TPM 2 in sysfs:</span>
+<span class="gp"># </span>find /sys/devices/ -type f <span class="p">|</span> grep pcr-sha
+<span class="go">...</span>
+<span class="go">/sys/devices/LNXSYSTEM:00/LNXSYBUS:00/MSFT0101:00/tpm/tpm0/pcr-sha256/1</span>
+<span class="go">...</span>
+<span class="go">/sys/devices/LNXSYSTEM:00/LNXSYBUS:00/MSFT0101:00/tpm/tpm0/pcr-sha256/9</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="migration-with-the-tpm-emulator">
+<h2>Migration with the TPM emulator<a class="headerlink" href="#migration-with-the-tpm-emulator" title="Permalink to this heading"></a></h2>
+<p>The TPM emulator supports the following types of virtual machine
+migration:</p>
+<ul class="simple">
+<li><p>VM save / restore (migration into a file)</p></li>
+<li><p>Network migration</p></li>
+<li><p>Snapshotting (migration into storage like QoW2 or QED)</p></li>
+</ul>
+<p>The following command sequences can be used to test VM save / restore.</p>
+<p>In a 1st terminal start an instance of a swtpm using the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mkdir /tmp/mytpm1</span>
+<span class="go">swtpm socket --tpmstate dir=/tmp/mytpm1 \</span>
+<span class="go">  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  --tpm2 \</span>
+<span class="go">  --log level=20</span>
+</pre></div>
+</div>
+<p>In a 2nd terminal start the VM:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-x86_64 -display sdl -accel kvm \</span>
+<span class="go">  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \</span>
+<span class="go">  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  -tpmdev emulator,id=tpm0,chardev=chrtpm \</span>
+<span class="go">  -device tpm-tis,tpmdev=tpm0 \</span>
+<span class="go">  -monitor stdio \</span>
+<span class="go">  test.img</span>
+</pre></div>
+</div>
+<p>Verify that the attached TPM is working as expected using applications
+inside the VM.</p>
+<p>To store the state of the VM use the following command in the QEMU
+monitor in the 2nd terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(qemu)</span> <span class="go">migrate &quot;exec:cat &gt; testvm.bin&quot;</span>
+<span class="gp gp-VirtualEnv">(qemu)</span> <span class="go">quit</span>
+</pre></div>
+</div>
+<p>At this point a file called <code class="docutils literal notranslate"><span class="pre">testvm.bin</span></code> should exists and the swtpm
+and QEMU processes should have ended.</p>
+<p>To test ‘VM restore’ you have to start the swtpm with the same
+parameters as before. If previously a TPM 2 [–tpm2] was saved, –tpm2
+must now be passed again on the command line.</p>
+<p>In the 1st terminal restart the swtpm with the same command line as
+before:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">swtpm socket --tpmstate dir=/tmp/mytpm1 \</span>
+<span class="go">  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  --log level=20 --tpm2</span>
+</pre></div>
+</div>
+<p>In the 2nd terminal restore the state of the VM using the additional
+‘-incoming’ option.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-x86_64 -display sdl -accel kvm \</span>
+<span class="go">  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \</span>
+<span class="go">  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \</span>
+<span class="go">  -tpmdev emulator,id=tpm0,chardev=chrtpm \</span>
+<span class="go">  -device tpm-tis,tpmdev=tpm0 \</span>
+<span class="go">  -incoming &quot;exec:cat &lt; testvm.bin&quot; \</span>
+<span class="go">  test.img</span>
+</pre></div>
+</div>
+<section id="troubleshooting-migration">
+<h3>Troubleshooting migration<a class="headerlink" href="#troubleshooting-migration" title="Permalink to this heading"></a></h3>
+<p>There are several reasons why migration may fail. In case of problems,
+please ensure that the command lines adhere to the following rules
+and, if possible, that identical versions of QEMU and swtpm are used
+at all times.</p>
+<p>VM save and restore:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>QEMU command line parameters should be identical apart from the
+‘-incoming’ option on VM restore</p></li>
+<li><p>swtpm command line parameters should be identical</p></li>
+</ul>
+</div></blockquote>
+<p>VM migration to ‘localhost’:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>QEMU command line parameters should be identical apart from the
+‘-incoming’ option on the destination side</p></li>
+<li><p>swtpm command line parameters should point to two different
+directories on the source and destination swtpm (–tpmstate dir=…)
+(especially if different versions of libtpms were to be used on the
+same machine).</p></li>
+</ul>
+</div></blockquote>
+<p>VM migration across the network:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>QEMU command line parameters should be identical apart from the
+‘-incoming’ option on the destination side</p></li>
+<li><p>swtpm command line parameters should be identical</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>VM Snapshotting:</dt><dd><ul class="simple">
+<li><p>QEMU command line parameters should be identical</p></li>
+<li><p>swtpm command line parameters should be identical</p></li>
+</ul>
+</dd>
+</dl>
+<p>Besides that, migration failure reasons on the swtpm level may include
+the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the versions of the swtpm on the source and destination sides are
+incompatible</p>
+<ul>
+<li><p>downgrading of TPM state may not be supported</p></li>
+<li><p>the source and destination libtpms were compiled with different
+compile-time options and the destination side refuses to accept the
+state</p></li>
+</ul>
+</li>
+<li><p>different migration keys are used on the source and destination side
+and the destination side cannot decrypt the migrated state
+(swtpm … –migration-key … )</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="acpi_hw_reduced_hotplug.html" class="btn btn-neutral float-left" title="QEMU and ACPI BIOS Generic Event Device interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acpi_hest_ghes.html" class="btn btn-neutral float-right" title="APEI tables generating and CPER record" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

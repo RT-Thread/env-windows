@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuvoton iBMC boards (*-bmc, npcm750-evb, quanta-gsj) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NXP i.MX25 PDK board (imx25-pdk)" href="imx25-pdk.html" />
+    <link rel="prev" title="Nokia N800 and N810 tablets (n800, n810)" href="nseries.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">Nuvoton iBMC boards (<code class="docutils literal notranslate"><span class="pre">*-bmc</span></code>, <code class="docutils literal notranslate"><span class="pre">npcm750-evb</span></code>, <code class="docutils literal notranslate"><span class="pre">quanta-gsj</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/nuvoton.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nuvoton-ibmc-boards-bmc-npcm750-evb-quanta-gsj">
+<h1>Nuvoton iBMC boards (<code class="docutils literal notranslate"><span class="pre">*-bmc</span></code>, <code class="docutils literal notranslate"><span class="pre">npcm750-evb</span></code>, <code class="docutils literal notranslate"><span class="pre">quanta-gsj</span></code>)<a class="headerlink" href="#nuvoton-ibmc-boards-bmc-npcm750-evb-quanta-gsj" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference external" href="https://www.nuvoton.com/products/cloud-computing/ibmc/">Nuvoton iBMC</a> chips (NPCM7xx) are a family of ARM-based SoCs that are
+designed to be used as Baseboard Management Controllers (BMCs) in various
+servers. They all feature one or two ARM Cortex-A9 CPU cores, as well as an
+assortment of peripherals targeted for either Enterprise or Data Center /
+Hyperscale applications. The former is a superset of the latter, so NPCM750 has
+all the peripherals of NPCM730 and more.</p>
+<p>The NPCM750 SoC has two Cortex-A9 cores and is targeted for the Enterprise
+segment. The following machines are based on this chip :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">npcm750-evb</span></code>       Nuvoton NPCM750 Evaluation board</p></li>
+</ul>
+<p>The NPCM730 SoC has two Cortex-A9 cores and is targeted for Data Center and
+Hyperscale applications. The following machines are based on this chip :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quanta-gbs-bmc</span></code>    Quanta GBS server BMC</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quanta-gsj</span></code>        Quanta GSJ server BMC</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kudo-bmc</span></code>          Fii USA Kudo server BMC</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mori-bmc</span></code>          Fii USA Mori server BMC</p></li>
+</ul>
+<p>There are also two more SoCs, NPCM710 and NPCM705, which are single-core
+variants of NPCM750 and NPCM730, respectively. These are currently not
+supported by QEMU.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>SMP (Dual Core Cortex-A9)</p></li>
+<li><p>Cortex-A9MPCore built-in peripherals: SCU, GIC, Global Timer, Private Timer
+and Watchdog.</p></li>
+<li><p>SRAM, ROM and DRAM mappings</p></li>
+<li><p>System Global Control Registers (GCR)</p></li>
+<li><p>Clock and reset controller (CLK)</p></li>
+<li><p>Timer controller (TIM)</p></li>
+<li><p>Serial ports (16550-based)</p></li>
+<li><p>DDR4 memory controller (dummy interface indicating memory training is done)</p></li>
+<li><p>OTP controllers (no protection features)</p></li>
+<li><p>Flash Interface Unit (FIU; no protection features)</p></li>
+<li><p>Random Number Generator (RNG)</p></li>
+<li><p>USB host (USBH)</p></li>
+<li><p>GPIO controller</p></li>
+<li><p>Analog to Digital Converter (ADC)</p></li>
+<li><p>Pulse Width Modulation (PWM)</p></li>
+<li><p>SMBus controller (SMBF)</p></li>
+<li><p>Ethernet controller (EMC)</p></li>
+<li><p>Tachometer</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="missing-devices">
+<h2>Missing devices<a class="headerlink" href="#missing-devices" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>LPC/eSPI host-to-BMC interface, including</p>
+<ul>
+<li><p>Keyboard and mouse controller interface (KBCI)</p></li>
+<li><p>Keyboard Controller Style (KCS) channels</p></li>
+<li><p>BIOS POST code FIFO</p></li>
+<li><p>System Wake-up Control (SWC)</p></li>
+<li><p>Shared memory (SHM)</p></li>
+<li><p>eSPI slave interface</p></li>
+</ul>
+</li>
+<li><p>Ethernet controller (GMAC)</p></li>
+<li><p>USB device (USBD)</p></li>
+<li><p>Peripheral SPI controller (PSPI)</p></li>
+<li><p>SD/MMC host</p></li>
+<li><p>PECI interface</p></li>
+<li><p>PCI and PCIe root complex and bridges</p></li>
+<li><p>VDM and MCTP support</p></li>
+<li><p>Serial I/O expansion</p></li>
+<li><p>LPC/eSPI host</p></li>
+<li><p>Coprocessor</p></li>
+<li><p>Graphics</p></li>
+<li><p>Video capture</p></li>
+<li><p>Encoding compression engine</p></li>
+<li><p>Security features</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="boot-options">
+<h2>Boot options<a class="headerlink" href="#boot-options" title="Permalink to this heading"></a></h2>
+<p>The Nuvoton machines can boot from an OpenBMC firmware image, or directly into
+a kernel using the <code class="docutils literal notranslate"><span class="pre">-kernel</span></code> option. OpenBMC images for <code class="docutils literal notranslate"><span class="pre">quanta-gsj</span></code> and
+possibly others can be downloaded from the OpenBMC jenkins :</p>
+<blockquote>
+<div><p><a class="reference external" href="https://jenkins.openbmc.org/">https://jenkins.openbmc.org/</a></p>
+</div></blockquote>
+<p>The firmware image should be attached as an MTD drive. Example :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -machine quanta-gsj -nographic <span class="se">\</span>
+    -drive <span class="nv">file</span><span class="o">=</span>image-bmc,if<span class="o">=</span>mtd,bus<span class="o">=</span><span class="m">0</span>,unit<span class="o">=</span><span class="m">0</span>,format<span class="o">=</span>raw
+</pre></div>
+</div>
+<p>The default root password for test images is usually <code class="docutils literal notranslate"><span class="pre">0penBmc</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nseries.html" class="btn btn-neutral float-left" title="Nokia N800 and N810 tablets (n800, n810)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="imx25-pdk.html" class="btn btn-neutral float-right" title="NXP i.MX25 PDK board (imx25-pdk)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

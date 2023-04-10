@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyper-V Enlightenments &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Paravirtualized KVM features" href="kvm-pv.html" />
+    <link rel="prev" title="Recommendations for KVM CPU model configuration on x86 hosts" href="cpu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-i386.html">x86 System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-i386.html#architectural-features">Architectural features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#os-requirements">OS requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-i386.html">x86 System emulator</a></li>
+      <li class="breadcrumb-item active">Hyper-V Enlightenments</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/i386/hyperv.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hyper-v-enlightenments">
+<h1>Hyper-V Enlightenments<a class="headerlink" href="#hyper-v-enlightenments" title="Permalink to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h2>
+<p>In some cases when implementing a hardware interface in software is slow, KVM
+implements its own paravirtualized interfaces. This works well for Linux as
+guest support for such features is added simultaneously with the feature itself.
+It may, however, be hard-to-impossible to add support for these interfaces to
+proprietary OSes, namely, Microsoft Windows.</p>
+<p>KVM on x86 implements Hyper-V Enlightenments for Windows guests. These features
+make Windows and Hyper-V guests think they’re running on top of a Hyper-V
+compatible hypervisor and use Hyper-V specific features.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading"></a></h2>
+<p>No Hyper-V enlightenments are enabled by default by either KVM or QEMU. In
+QEMU, individual enlightenments can be enabled through CPU flags, e.g:</p>
+<pre class="literal-block">qemu-system-x86_64 --enable-kvm --cpu host,hv_relaxed,hv_vpindex,hv_time, ...</pre>
+<p>Sometimes there are dependencies between enlightenments, QEMU is supposed to
+check that the supplied configuration is sane.</p>
+<p>When any set of the Hyper-V enlightenments is enabled, QEMU changes hypervisor
+identification (CPUID 0x40000000..0x4000000A) to Hyper-V. KVM identification
+and features are kept in leaves 0x40000100..0x40000101.</p>
+</section>
+<section id="existing-enlightenments">
+<h2>Existing enlightenments<a class="headerlink" href="#existing-enlightenments" title="Permalink to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-relaxed</span></code></dt><dd><p>This feature tells guest OS to disable watchdog timeouts as it is running on a
+hypervisor. It is known that some Windows versions will do this even when they
+see ‘hypervisor’ CPU flag.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-vapic</span></code></dt><dd><p>Provides so-called VP Assist page MSR to guest allowing it to work with APIC
+more efficiently. In particular, this enlightenment allows paravirtualized
+(exit-less) EOI processing.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-spinlocks</span></code> = xxx</dt><dd><p>Enables paravirtualized spinlocks. The parameter indicates how many times
+spinlock acquisition should be attempted before indicating the situation to the
+hypervisor. A special value 0xffffffff indicates “never notify”.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code></dt><dd><p>Provides HV_X64_MSR_VP_INDEX (0x40000002) MSR to the guest which has Virtual
+processor index information. This enlightenment makes sense in conjunction with
+hv-synic, hv-stimer and other enlightenments which require the guest to know its
+Virtual Processor indices (e.g. when VP index needs to be passed in a
+hypercall).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-runtime</span></code></dt><dd><p>Provides HV_X64_MSR_VP_RUNTIME (0x40000010) MSR to the guest. The MSR keeps the
+virtual processor run time in 100ns units. This gives guest operating system an
+idea of how much time was ‘stolen’ from it (when the virtual CPU was preempted
+to perform some other work).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-crash</span></code></dt><dd><p>Provides HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 (0x40000100..0x40000105) and
+HV_X64_MSR_CRASH_CTL (0x40000105) MSRs to the guest. These MSRs are written to
+by the guest when it crashes, HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 MSRs
+contain additional crash information. This information is outputted in QEMU log
+and through QAPI.
+Note: unlike under genuine Hyper-V, write to HV_X64_MSR_CRASH_CTL causes guest
+to shutdown. This effectively blocks crash dump generation by Windows.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-time</span></code></dt><dd><p>Enables two Hyper-V-specific clocksources available to the guest: MSR-based
+Hyper-V clocksource (HV_X64_MSR_TIME_REF_COUNT, 0x40000020) and Reference TSC
+page (enabled via MSR HV_X64_MSR_REFERENCE_TSC, 0x40000021). Both clocksources
+are per-guest, Reference TSC page clocksource allows for exit-less time stamp
+readings. Using this enlightenment leads to significant speedup of all timestamp
+related operations.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-synic</span></code></dt><dd><p>Enables Hyper-V Synthetic interrupt controller - an extension of a local APIC.
+When enabled, this enlightenment provides additional communication facilities
+to the guest: SynIC messages and Events. This is a pre-requisite for
+implementing VMBus devices (not yet in QEMU). Additionally, this enlightenment
+is needed to enable Hyper-V synthetic timers. SynIC is controlled through MSRs
+HV_X64_MSR_SCONTROL..HV_X64_MSR_EOM (0x40000080..0x40000084) and
+HV_X64_MSR_SINT0..HV_X64_MSR_SINT15 (0x40000090..0x4000009F)</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-stimer</span></code></dt><dd><p>Enables Hyper-V synthetic timers. There are four synthetic timers per virtual
+CPU controlled through HV_X64_MSR_STIMER0_CONFIG..HV_X64_MSR_STIMER3_COUNT
+(0x400000B0..0x400000B7) MSRs. These timers can work either in single-shot or
+periodic mode. It is known that certain Windows versions revert to using HPET
+(or even RTC when HPET is unavailable) extensively when this enlightenment is
+not provided; this can lead to significant CPU consumption, even when virtual
+CPU is idle.</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-synic</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-time</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-tlbflush</span></code></dt><dd><p>Enables paravirtualized TLB shoot-down mechanism. On x86 architecture, remote
+TLB flush procedure requires sending IPIs and waiting for other CPUs to perform
+local TLB flush. In virtualized environment some virtual CPUs may not even be
+scheduled at the time of the call and may not require flushing (or, flushing
+may be postponed until the virtual CPU is scheduled). hv-tlbflush enlightenment
+implements TLB shoot-down through hypervisor enabling the optimization.</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-ipi</span></code></dt><dd><p>Enables paravirtualized IPI send mechanism. HvCallSendSyntheticClusterIpi
+hypercall may target more than 64 virtual CPUs simultaneously, doing the same
+through APIC requires more than one access (and thus exit to the hypervisor).</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-vendor-id</span></code> = xxx</dt><dd><p>This changes Hyper-V identification in CPUID 0x40000000.EBX-EDX from the default
+“Microsoft Hv”. The parameter should be no longer than 12 characters. According
+to the specification, guests shouldn’t use this information and it is unknown
+if there is a Windows version which acts differently.
+Note: hv-vendor-id is not an enlightenment and thus doesn’t enable Hyper-V
+identification when specified without some other enlightenment.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-reset</span></code></dt><dd><p>Provides HV_X64_MSR_RESET (0x40000003) MSR to the guest allowing it to reset
+itself by writing to it. Even when this MSR is enabled, it is not a recommended
+way for Windows to perform system reboot and thus it may not be used.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-frequencies</span></code></dt><dd><p>Provides HV_X64_MSR_TSC_FREQUENCY (0x40000022) and HV_X64_MSR_APIC_FREQUENCY
+(0x40000023) allowing the guest to get its TSC/APIC frequencies without doing
+measurements.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-reenlightenment</span></code></dt><dd><p>The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
+enabled, it provides HV_X64_MSR_REENLIGHTENMENT_CONTROL (0x40000106),
+HV_X64_MSR_TSC_EMULATION_CONTROL (0x40000107)and HV_X64_MSR_TSC_EMULATION_STATUS
+(0x40000108) MSRs allowing the guest to get notified when TSC frequency changes
+(only happens on migration) and keep using old frequency (through emulation in
+the hypervisor) until it is ready to switch to the new one. This, in conjunction
+with <code class="docutils literal notranslate"><span class="pre">hv-frequencies</span></code>, allows Hyper-V on KVM to pass stable clocksource
+(Reference TSC page) to its own guests.</p>
+<p>Note, KVM doesn’t fully support re-enlightenment notifications and doesn’t
+emulate TSC accesses after migration so ‘tsc-frequency=’ CPU option also has to
+be specified to make migration succeed. The destination host has to either have
+the same TSC frequency or support TSC scaling CPU feature.</p>
+<p>Recommended: <code class="docutils literal notranslate"><span class="pre">hv-frequencies</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-evmcs</span></code></dt><dd><p>The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
+enabled, it provides Enlightened VMCS version 1 feature to the guest. The feature
+implements paravirtualized protocol between L0 (KVM) and L1 (Hyper-V)
+hypervisors making L2 exits to the hypervisor faster. The feature is Intel-only.</p>
+<p>Note: some virtualization features (e.g. Posted Interrupts) are disabled when
+hv-evmcs is enabled. It may make sense to measure your nested workload with and
+without the feature to find out if enabling it is beneficial.</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vapic</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-stimer-direct</span></code></dt><dd><p>Hyper-V specification allows synthetic timer operation in two modes: “classic”,
+when expiration event is delivered as SynIC message and “direct”, when the event
+is delivered via normal interrupt. It is known that nested Hyper-V can only
+use synthetic timers in direct mode and thus <code class="docutils literal notranslate"><span class="pre">hv-stimer-direct</span></code> needs to be
+enabled.</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-synic</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-time</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-stimer</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-avic</span></code> (<code class="docutils literal notranslate"><span class="pre">hv-apicv</span></code>)</dt><dd><p>The enlightenment allows to use Hyper-V SynIC with hardware APICv/AVIC enabled.
+Normally, Hyper-V SynIC disables these hardware feature and suggests the guest
+to use paravirtualized AutoEOI feature.
+Note: enabling this feature on old hardware (without APICv/AVIC support) may
+have negative effect on guest’s performance.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-no-nonarch-coresharing</span></code> = on/off/auto</dt><dd><p>This enlightenment tells guest OS that virtual processors will never share a
+physical core unless they are reported as sibling SMT threads. This information
+is required by Windows and Hyper-V guests to properly mitigate SMT related CPU
+vulnerabilities.</p>
+<p>When the option is set to ‘auto’ QEMU will enable the feature only when KVM
+reports that non-architectural coresharing is impossible, this means that
+hyper-threading is not supported or completely disabled on the host. This
+setting also prevents migration as SMT settings on the destination may differ.
+When the option is set to ‘on’ QEMU will always enable the feature, regardless
+of host setup. To keep guests secure, this can only be used in conjunction with
+exposing correct vCPU topology and vCPU pinning.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-version-id-build</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-version-id-major</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-version-id-minor</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-version-id-spack</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-version-id-sbranch</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-version-id-snumber</span></code></dt><dd><p>This changes Hyper-V version identification in CPUID 0x40000002.EAX-EDX from the
+default (WS2016).</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-build</span></code> sets ‘Build Number’ (32 bits)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-major</span></code> sets ‘Major Version’ (16 bits)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-minor</span></code> sets ‘Minor Version’ (16 bits)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-spack</span></code> sets ‘Service Pack’ (32 bits)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-sbranch</span></code> sets ‘Service Branch’ (8 bits)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hv-version-id-snumber</span></code> sets ‘Service Number’ (24 bits)</p></li>
+</ul>
+<p>Note: hv-version-id-* are not enlightenments and thus don’t enable Hyper-V
+identification when specified without any other enlightenments.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-syndbg</span></code></dt><dd><p>Enables Hyper-V synthetic debugger interface, this is a special interface used
+by Windows Kernel debugger to send the packets through, rather than sending
+them via serial/network .
+When enabled, this enlightenment provides additional communication facilities
+to the guest: SynDbg messages.
+This new communication is used by Windows Kernel debugger rather than sending
+packets via serial/network, adding significant performance boost over the other
+comm channels.
+This enlightenment requires a VMBus device (-device vmbus-bridge,irq=15).</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-relaxed</span></code>, <code class="docutils literal notranslate"><span class="pre">hv_time</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-vapic</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-vpindex</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-synic</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-runtime</span></code>, <code class="docutils literal notranslate"><span class="pre">hv-stimer</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-emsr-bitmap</span></code></dt><dd><p>The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
+enabled, it allows L0 (KVM) and L1 (Hyper-V) hypervisors to collaborate to
+avoid unnecessary updates to L2 MSR-Bitmap upon vmexits. While the protocol is
+supported for both VMX (Intel) and SVM (AMD), the VMX implementation requires
+Enlightened VMCS (<code class="docutils literal notranslate"><span class="pre">hv-evmcs</span></code>) feature to also be enabled.</p>
+<p>Recommended: <code class="docutils literal notranslate"><span class="pre">hv-evmcs</span></code> (Intel)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-xmm-input</span></code></dt><dd><p>Hyper-V specification allows to pass parameters for certain hypercalls using XMM
+registers (“XMM Fast Hypercall Input”). When the feature is in use, it allows
+for faster hypercalls processing as KVM can avoid reading guest’s memory.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-tlbflush-ext</span></code></dt><dd><p>Allow for extended GVA ranges to be passed to Hyper-V TLB flush hypercalls
+(HvFlushVirtualAddressList/HvFlushVirtualAddressListEx).</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-tlbflush</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-tlbflush-direct</span></code></dt><dd><p>The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
+enabled, it allows L0 (KVM) to directly handle TLB flush hypercalls from L2
+guest without the need to exit to L1 (Hyper-V) hypervisor. While the feature is
+supported for both VMX (Intel) and SVM (AMD), the VMX implementation requires
+Enlightened VMCS (<code class="docutils literal notranslate"><span class="pre">hv-evmcs</span></code>) feature to also be enabled.</p>
+<p>Requires: <code class="docutils literal notranslate"><span class="pre">hv-vapic</span></code></p>
+<p>Recommended: <code class="docutils literal notranslate"><span class="pre">hv-evmcs</span></code> (Intel)</p>
+</dd>
+</dl>
+</section>
+<section id="supplementary-features">
+<h2>Supplementary features<a class="headerlink" href="#supplementary-features" title="Permalink to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-passthrough</span></code></dt><dd><p>In some cases (e.g. during development) it may make sense to use QEMU in
+‘pass-through’ mode and give Windows guests all enlightenments currently
+supported by KVM. This pass-through mode is enabled by “hv-passthrough” CPU
+flag.</p>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">hv-passthrough</span></code> flag only enables enlightenments which are known to QEMU
+(have corresponding ‘hv-’ flag) and copies <code class="docutils literal notranslate"><span class="pre">hv-spinlocks</span></code> and <code class="docutils literal notranslate"><span class="pre">hv-vendor-id</span></code>
+values from KVM to QEMU. <code class="docutils literal notranslate"><span class="pre">hv-passthrough</span></code> overrides all other ‘hv-’ settings on
+the command line. Also, enabling this flag effectively prevents migration as the
+list of enabled enlightenments may differ between target and destination hosts.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hv-enforce-cpuid</span></code></dt><dd><p>By default, KVM allows the guest to use all currently supported Hyper-V
+enlightenments when Hyper-V CPUID interface was exposed, regardless of if
+some features were not announced in guest visible CPUIDs. <code class="docutils literal notranslate"><span class="pre">hv-enforce-cpuid</span></code>
+feature alters this behavior and only allows the guest to use exposed Hyper-V
+enlightenments.</p>
+</dd>
+</dl>
+</section>
+<section id="useful-links">
+<h2>Useful links<a class="headerlink" href="#useful-links" title="Permalink to this heading"></a></h2>
+<p>Hyper-V Top Level Functional specification and other information:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/MicrosoftDocs/Virtualization-Documentation">https://github.com/MicrosoftDocs/Virtualization-Documentation</a></p></li>
+<li><p><a class="reference external" href="https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/tlfs">https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/tlfs</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cpu.html" class="btn btn-neutral float-left" title="Recommendations for KVM CPU model configuration on x86 hosts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kvm-pv.html" class="btn btn-neutral float-right" title="Paravirtualized KVM features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

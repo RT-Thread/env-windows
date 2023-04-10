@@ -1,0 +1,399 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "QEMU-NBD" "8" "Dec 30, 2022" "7.2.0" "QEMU"
+.SH NAME
+qemu-nbd \- QEMU Disk Network Block Device Server
+.SH SYNOPSIS
+.sp
+\fBqemu\-nbd\fP [\fIOPTION\fP]... \fIfilename\fP
+.sp
+\fBqemu\-nbd\fP \-L [\fIOPTION\fP]...
+.sp
+\fBqemu\-nbd\fP \-d \fIdev\fP
+.SH DESCRIPTION
+.sp
+Export a QEMU disk image using the NBD protocol.
+.sp
+Other uses:
+.INDENT 0.0
+.IP \(bu 2
+Bind a /dev/nbdX block device to a QEMU server (on Linux).
+.IP \(bu 2
+As a client to query exports of a remote NBD server.
+.UNINDENT
+.SH OPTIONS
+.sp
+\fIfilename\fP is a disk image filename, or a set of block
+driver options if \fI\%\-\-image\-opts\fP is specified.
+.sp
+\fIdev\fP is an NBD device.
+.INDENT 0.0
+.TP
+.B \-\-object type,id=ID,...
+Define a new instance of the \fItype\fP object class identified by \fIID\fP\&.
+See the \fBqemu(1)\fP manual page for full details of the properties
+supported. The common object types that it makes sense to define are the
+\fBsecret\fP object, which is used to supply passwords and/or encryption
+keys, and the \fBtls\-creds\fP object, which is used to supply TLS
+credentials for the \fBqemu\-nbd\fP server or client.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-p, \-\-port=PORT
+TCP port to listen on as a server, or connect to as a client
+(default \fB10809\fP).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-o, \-\-offset=OFFSET
+The offset into the image.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-b, \-\-bind=IFACE
+The interface to bind to as a server, or connect to as a client
+(default \fB0.0.0.0\fP).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-k, \-\-socket=PATH
+Use a unix socket with path \fIPATH\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-image\-opts
+Treat \fIfilename\fP as a set of image options, instead of a plain
+filename. If this flag is specified, the \fB\-f\fP flag should
+not be used, instead the \fBformat=\fP option should be set.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-f, \-\-format=FMT
+Force the use of the block driver for format \fIFMT\fP instead of
+auto\-detecting.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-r, \-\-read\-only
+Export the disk as read\-only.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-A, \-\-allocation\-depth
+Expose allocation depth information via the
+\fBqemu:allocation\-depth\fP metadata context accessible through
+NBD_OPT_SET_META_CONTEXT.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-B, \-\-bitmap=NAME
+If \fIfilename\fP has a qcow2 persistent bitmap \fINAME\fP, expose
+that bitmap via the \fBqemu:dirty\-bitmap:NAME\fP metadata context
+accessible through NBD_OPT_SET_META_CONTEXT.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-s, \-\-snapshot
+Use \fIfilename\fP as an external snapshot, create a temporary
+file with \fBbacking_file=\fP\fIfilename\fP, redirect the write to
+the temporary one.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-l, \-\-load\-snapshot=SNAPSHOT_PARAM
+Load an internal snapshot inside \fIfilename\fP and export it
+as an read\-only device, SNAPSHOT_PARAM format is
+\fBsnapshot.id=[ID],snapshot.name=[NAME]\fP or \fB[ID_OR_NAME]\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cache=CACHE
+The cache mode to be used with the file. Valid values are:
+\fBnone\fP, \fBwriteback\fP (the default), \fBwritethrough\fP,
+\fBdirectsync\fP and \fBunsafe\fP\&. See the documentation of
+the emulator\(aqs \fB\-drive cache=...\fP option for more info.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-n, \-\-nocache
+Equivalent to \fI\%\-\-cache=none\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-aio=AIO
+Set the asynchronous I/O mode between \fBthreads\fP (the default),
+\fBnative\fP (Linux only), and \fBio_uring\fP (Linux 5.1+).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-discard=DISCARD
+Control whether \fBdiscard\fP (also known as \fBtrim\fP or \fBunmap\fP)
+requests are ignored or passed to the filesystem. \fIDISCARD\fP is one of
+\fBignore\fP (or \fBoff\fP), \fBunmap\fP (or \fBon\fP).  The default is
+\fBignore\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-detect\-zeroes=DETECT_ZEROES
+Control the automatic conversion of plain zero writes by the OS to
+driver\-specific optimized zero write commands.  \fIDETECT_ZEROES\fP is one of
+\fBoff\fP, \fBon\fP, or \fBunmap\fP\&.  \fBunmap\fP
+converts a zero write to an unmap operation and can only be used if
+\fIDISCARD\fP is set to \fBunmap\fP\&.  The default is \fBoff\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-c, \-\-connect=DEV
+Connect \fIfilename\fP to NBD device \fIDEV\fP (Linux only).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-d, \-\-disconnect
+Disconnect the device \fIDEV\fP (Linux only).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-e, \-\-shared=NUM
+Allow up to \fINUM\fP clients to share the device (default
+\fB1\fP), 0 for unlimited.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-t, \-\-persistent
+Don\(aqt exit on the last connection.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-x, \-\-export\-name=NAME
+Set the NBD volume export name (default of a zero\-length string).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-D, \-\-description=DESCRIPTION
+Set the NBD volume export description, as a human\-readable
+string.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-L, \-\-list
+Connect as a client and list all details about the exports exposed by
+a remote NBD server.  This enables list mode, and is incompatible
+with options that change behavior related to a specific export (such as
+\fI\%\-\-export\-name\fP, \fI\%\-\-offset\fP, ...).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-tls\-creds=ID
+Enable mandatory TLS encryption for the server by setting the ID
+of the TLS credentials object previously created with the
+\fI\%\-\-object\fP option; or provide the credentials needed for
+connecting as a client in list mode.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-tls\-hostname=hostname
+When validating an x509 certificate received over a TLS connection,
+the hostname that the NBD client used to connect will be checked
+against information in the server provided certificate. Sometimes
+it might be required to override the hostname used to perform this
+check. For example, if the NBD client is using a tunnel from localhost
+to connect to the remote server, the \fI\%\-\-tls\-hostname\fP option should
+be used to set the officially expected hostname of the remote NBD
+server. This can also be used if accessing NBD over a UNIX socket
+where there is no inherent hostname available. This is only permitted
+when acting as a NBD client with the \fI\%\-\-list\fP option.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-fork
+Fork off the server process and exit the parent once the server is running.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pid\-file=PATH
+Store the server\(aqs process ID in the given file.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-tls\-authz=ID
+Specify the ID of a qauthz object previously created with the
+\fI\%\-\-object\fP option. This will be used to authorize connecting users
+against their x509 distinguished name.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-v, \-\-verbose
+Display extra debugging information.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+Display this help and exit.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-V, \-\-version
+Display version information and exit.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-T, \-\-trace [[enable=]PATTERN][,events=FILE][,file=FILE]
+Specify tracing options.
+.sp
+\fB[enable=]PATTERN\fP
+.INDENT 7.0
+.INDENT 3.5
+Immediately enable events matching \fIPATTERN\fP
+(either event name or a globbing pattern).  This option is only
+available if QEMU has been compiled with the \fBsimple\fP, \fBlog\fP
+or \fBftrace\fP tracing backend.  To specify multiple events or patterns,
+specify the \fB\-trace\fP option multiple times.
+.sp
+Use \fB\-trace help\fP to print a list of names of trace points.
+.UNINDENT
+.UNINDENT
+.sp
+\fBevents=FILE\fP
+.INDENT 7.0
+.INDENT 3.5
+Immediately enable events listed in \fIFILE\fP\&.
+The file must contain one event name (as listed in the \fBtrace\-events\-all\fP
+file) per line; globbing patterns are accepted too.  This option is only
+available if QEMU has been compiled with the \fBsimple\fP, \fBlog\fP or
+\fBftrace\fP tracing backend.
+.UNINDENT
+.UNINDENT
+.sp
+\fBfile=FILE\fP
+.INDENT 7.0
+.INDENT 3.5
+Log output traces to \fIFILE\fP\&.
+This option is only available if QEMU has been compiled with
+the \fBsimple\fP tracing backend.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH EXAMPLES
+.sp
+Start a server listening on port 10809 that exposes only the
+guest\-visible contents of a qcow2 file, with no TLS encryption, and
+with the default export name (an empty string). The command is
+one\-shot, and will block until the first successful client
+disconnects:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-nbd \-f qcow2 file.qcow2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Start a long\-running server listening with encryption on port 10810,
+and allow clients with a specific X.509 certificate to connect to
+a 1 megabyte subset of a raw file, using the export name \(aqsubset\(aq:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-nbd \e
+  \-\-object tls\-creds\-x509,id=tls0,endpoint=server,dir=/path/to/qemutls \e
+  \-\-object \(aqauthz\-simple,id=auth0,identity=CN=laptop.example.com,,\e
+            O=Example Org,,L=London,,ST=London,,C=GB\(aq \e
+  \-\-tls\-creds tls0 \-\-tls\-authz auth0 \e
+  \-t \-x subset \-p 10810 \e
+  \-\-image\-opts driver=raw,offset=1M,size=1M,file.driver=file,file.filename=file.raw
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Serve a read\-only copy of a guest image over a Unix socket with as
+many as 5 simultaneous readers, with a persistent process forked as a
+daemon:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-nbd \-\-fork \-\-persistent \-\-shared=5 \-\-socket=/path/to/sock \e
+  \-\-read\-only \-\-format=qcow2 file.qcow2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Expose the guest\-visible contents of a qcow2 file via a block device
+/dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
+partitions found within), then disconnect the device when done.
+Access to bind \fBqemu\-nbd\fP to a /dev/nbd device generally requires root
+privileges, and may also require the execution of \fBmodprobe nbd\fP
+to enable the kernel NBD client module.  \fICAUTION\fP: Do not use
+this method to mount filesystems from an untrusted guest image \- a
+malicious guest may have prepared the image to attempt to trigger
+kernel bugs in partition probing or file system mounting.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-nbd \-c /dev/nbd0 \-f qcow2 file.qcow2
+qemu\-nbd \-d /dev/nbd0
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Query a remote server to see details about what export(s) it is
+serving on port 10809, and authenticating via PSK:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+qemu\-nbd \e
+  \-\-object tls\-creds\-psk,id=tls0,dir=/tmp/keys,username=eblake,endpoint=client \e
+  \-\-tls\-creds tls0 \-L \-b remote.example.com
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH SEE ALSO
+.sp
+\fBqemu(1)\fP, \fBqemu\-img(1)\fP
+.SH AUTHOR
+Anthony Liguori <anthony@codemonkey.ws>
+.SH COPYRIGHT
+2022, The QEMU Project Developers
+.\" Generated by docutils manpage writer.
+.

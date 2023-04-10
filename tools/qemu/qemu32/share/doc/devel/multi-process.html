@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-process QEMU &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reset in QEMU: the Resettable interface" href="reset.html" />
+    <link rel="prev" title="Migration" href="migration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Multi-process QEMU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-services">QEMU services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#separating-io-services">Separating IO services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#new-separation-model-based-on-proxy-objects">New separation model based on proxy objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#disaggregated-cpu-emulation">Disaggregated CPU emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host-access-controls">Host access controls</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-internals.html">Internal Subsystem Information</a></li>
+      <li class="breadcrumb-item active">Multi-process QEMU</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/multi-process.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="multi-process-qemu">
+<h1>Multi-process QEMU<a class="headerlink" href="#multi-process-qemu" title="Permalink to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is the design document for multi-process QEMU. It does not
+necessarily reflect the status of the current implementation, which
+may lack features or be considerably different from what is described
+in this document. This document is still useful as a description of
+the goals and general direction of this feature.</p>
+<p>Please refer to the following wiki for latest details:
+<a class="reference external" href="https://wiki.qemu.org/Features/MultiProcessQEMU">https://wiki.qemu.org/Features/MultiProcessQEMU</a></p>
+</div>
+<p>QEMU is often used as the hypervisor for virtual machines running in the
+Oracle cloud. Since one of the advantages of cloud computing is the
+ability to run many VMs from different tenants in the same cloud
+infrastructure, a guest that compromised its hypervisor could
+potentially use the hypervisor’s access privileges to access data it is
+not authorized for.</p>
+<p>QEMU can be susceptible to security attacks because it is a large,
+monolithic program that provides many features to the VMs it services.
+Many of these features can be configured out of QEMU, but even a reduced
+configuration QEMU has a large amount of code a guest can potentially
+attack. Separating QEMU reduces the attack surface by aiding to
+limit each component in the system to only access the resources that
+it needs to perform its job.</p>
+<section id="qemu-services">
+<h2>QEMU services<a class="headerlink" href="#qemu-services" title="Permalink to this heading"></a></h2>
+<p>QEMU can be broadly described as providing three main services. One is a
+VM control point, where VMs can be created, migrated, re-configured, and
+destroyed. A second is to emulate the CPU instructions within the VM,
+often accelerated by HW virtualization features such as Intel’s VT
+extensions. Finally, it provides IO services to the VM by emulating HW
+IO devices, such as disk and network devices.</p>
+<section id="a-multi-process-qemu">
+<h3>A multi-process QEMU<a class="headerlink" href="#a-multi-process-qemu" title="Permalink to this heading"></a></h3>
+<p>A multi-process QEMU involves separating QEMU services into separate
+host processes. Each of these processes can be given only the privileges
+it needs to provide its service, e.g., a disk service could be given
+access only to the disk images it provides, and not be allowed to
+access other files, or any network devices. An attacker who compromised
+this service would not be able to use this exploit to access files or
+devices beyond what the disk service was given access to.</p>
+<p>A QEMU control process would remain, but in multi-process mode, will
+have no direct interfaces to the VM. During VM execution, it would still
+provide the user interface to hot-plug devices or live migrate the VM.</p>
+<p>A first step in creating a multi-process QEMU is to separate IO services
+from the main QEMU program, which would continue to provide CPU
+emulation. i.e., the control process would also be the CPU emulation
+process. In a later phase, CPU emulation could be separated from the
+control process.</p>
+</section>
+</section>
+<section id="separating-io-services">
+<h2>Separating IO services<a class="headerlink" href="#separating-io-services" title="Permalink to this heading"></a></h2>
+<p>Separating IO services into individual host processes is a good place to
+begin for a couple of reasons. One is the sheer number of IO devices QEMU
+can emulate provides a large surface of interfaces which could potentially
+be exploited, and, indeed, have been a source of exploits in the past.
+Another is the modular nature of QEMU device emulation code provides
+interface points where the QEMU functions that perform device emulation
+can be separated from the QEMU functions that manage the emulation of
+guest CPU instructions. The devices emulated in the separate process are
+referred to as remote devices.</p>
+<section id="qemu-device-emulation">
+<h3>QEMU device emulation<a class="headerlink" href="#qemu-device-emulation" title="Permalink to this heading"></a></h3>
+<p>QEMU uses an object oriented SW architecture for device emulation code.
+Configured objects are all compiled into the QEMU binary, then objects
+are instantiated by name when used by the guest VM. For example, the
+code to emulate a device named “foo” is always present in QEMU, but its
+instantiation code is only run when the device is included in the target
+VM. (e.g., via the QEMU command line as <em>-device foo</em>)</p>
+<p>The object model is hierarchical, so device emulation code names its
+parent object (such as “pci-device” for a PCI device) and QEMU will
+instantiate a parent object before calling the device’s instantiation
+code.</p>
+</section>
+<section id="current-separation-models">
+<h3>Current separation models<a class="headerlink" href="#current-separation-models" title="Permalink to this heading"></a></h3>
+<p>In order to separate the device emulation code from the CPU emulation
+code, the device object code must run in a different process. There are
+a couple of existing QEMU features that can run emulation code
+separately from the main QEMU process. These are examined below.</p>
+<section id="vhost-user-model">
+<h4>vhost user model<a class="headerlink" href="#vhost-user-model" title="Permalink to this heading"></a></h4>
+<p>Virtio guest device drivers can be connected to vhost user applications
+in order to perform their IO operations. This model uses special virtio
+device drivers in the guest and vhost user device objects in QEMU, but
+once the QEMU vhost user code has configured the vhost user application,
+mission-mode IO is performed by the application. The vhost user
+application is a daemon process that can be contacted via a known UNIX
+domain socket.</p>
+<section id="vhost-socket">
+<h5>vhost socket<a class="headerlink" href="#vhost-socket" title="Permalink to this heading"></a></h5>
+<p>As mentioned above, one of the tasks of the vhost device object within
+QEMU is to contact the vhost application and send it configuration
+information about this device instance. As part of the configuration
+process, the application can also be sent other file descriptors over
+the socket, which then can be used by the vhost user application in
+various ways, some of which are described below.</p>
+</section>
+<section id="vhost-mmio-store-acceleration">
+<h5>vhost MMIO store acceleration<a class="headerlink" href="#vhost-mmio-store-acceleration" title="Permalink to this heading"></a></h5>
+<p>VMs are often run using HW virtualization features via the KVM kernel
+driver. This driver allows QEMU to accelerate the emulation of guest CPU
+instructions by running the guest in a virtual HW mode. When the guest
+executes instructions that cannot be executed by virtual HW mode,
+execution returns to the KVM driver so it can inform QEMU to emulate the
+instructions in SW.</p>
+<p>One of the events that can cause a return to QEMU is when a guest device
+driver accesses an IO location. QEMU then dispatches the memory
+operation to the corresponding QEMU device object. In the case of a
+vhost user device, the memory operation would need to be sent over a
+socket to the vhost application. This path is accelerated by the QEMU
+virtio code by setting up an eventfd file descriptor that the vhost
+application can directly receive MMIO store notifications from the KVM
+driver, instead of needing them to be sent to the QEMU process first.</p>
+</section>
+<section id="vhost-interrupt-acceleration">
+<h5>vhost interrupt acceleration<a class="headerlink" href="#vhost-interrupt-acceleration" title="Permalink to this heading"></a></h5>
+<p>Another optimization used by the vhost application is the ability to
+directly inject interrupts into the VM via the KVM driver, again,
+bypassing the need to send the interrupt back to the QEMU process first.
+The QEMU virtio setup code configures the KVM driver with an eventfd
+that triggers the device interrupt in the guest when the eventfd is
+written. This irqfd file descriptor is then passed to the vhost user
+application program.</p>
+</section>
+<section id="vhost-access-to-guest-memory">
+<h5>vhost access to guest memory<a class="headerlink" href="#vhost-access-to-guest-memory" title="Permalink to this heading"></a></h5>
+<p>The vhost application is also allowed to directly access guest memory,
+instead of needing to send the data as messages to QEMU. This is also
+done with file descriptors sent to the vhost user application by QEMU.
+These descriptors can be passed to <code class="docutils literal notranslate"><span class="pre">mmap()</span></code> by the vhost application
+to map the guest address space into the vhost application.</p>
+<p>IOMMUs introduce another level of complexity, since the address given to
+the guest virtio device to DMA to or from is not a guest physical
+address. This case is handled by having vhost code within QEMU register
+as a listener for IOMMU mapping changes. The vhost application maintains
+a cache of IOMMMU translations: sending translation requests back to
+QEMU on cache misses, and in turn receiving flush requests from QEMU
+when mappings are purged.</p>
+</section>
+<section id="applicability-to-device-separation">
+<h5>applicability to device separation<a class="headerlink" href="#applicability-to-device-separation" title="Permalink to this heading"></a></h5>
+<p>Much of the vhost model can be re-used by separated device emulation. In
+particular, the ideas of using a socket between QEMU and the device
+emulation application, using a file descriptor to inject interrupts into
+the VM via KVM, and allowing the application to <code class="docutils literal notranslate"><span class="pre">mmap()</span></code> the guest
+should be re used.</p>
+<p>There are, however, some notable differences between how a vhost
+application works and the needs of separated device emulation. The most
+basic is that vhost uses custom virtio device drivers which always
+trigger IO with MMIO stores. A separated device emulation model must
+work with existing IO device models and guest device drivers. MMIO loads
+break vhost store acceleration since they are synchronous - guest
+progress cannot continue until the load has been emulated. By contrast,
+stores are asynchronous, the guest can continue after the store event
+has been sent to the vhost application.</p>
+<p>Another difference is that in the vhost user model, a single daemon can
+support multiple QEMU instances. This is contrary to the security regime
+desired, in which the emulation application should only be allowed to
+access the files or devices the VM it’s running on behalf of can access.
+#### qemu-io model</p>
+<p><code class="docutils literal notranslate"><span class="pre">qemu-io</span></code> is a test harness used to test changes to the QEMU block backend
+object code (e.g., the code that implements disk images for disk driver
+emulation). <code class="docutils literal notranslate"><span class="pre">qemu-io</span></code> is not a device emulation application per se, but it
+does compile the QEMU block objects into a separate binary from the main
+QEMU one. This could be useful for disk device emulation, since its
+emulation applications will need to include the QEMU block objects.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="new-separation-model-based-on-proxy-objects">
+<h2>New separation model based on proxy objects<a class="headerlink" href="#new-separation-model-based-on-proxy-objects" title="Permalink to this heading"></a></h2>
+<p>A different model based on proxy objects in the QEMU program
+communicating with remote emulation programs could provide separation
+while minimizing the changes needed to the device emulation code. The
+rest of this section is a discussion of how a proxy object model would
+work.</p>
+<section id="remote-emulation-processes">
+<h3>Remote emulation processes<a class="headerlink" href="#remote-emulation-processes" title="Permalink to this heading"></a></h3>
+<p>The remote emulation process will run the QEMU object hierarchy without
+modification. The device emulation objects will be also be based on the
+QEMU code, because for anything but the simplest device, it would not be
+a tractable to re-implement both the object model and the many device
+backends that QEMU has.</p>
+<p>The processes will communicate with the QEMU process over UNIX domain
+sockets. The processes can be executed either as standalone processes,
+or be executed by QEMU. In both cases, the host backends the emulation
+processes will provide are specified on its command line, as they would
+be for QEMU. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">disk</span><span class="o">-</span><span class="n">proc</span> <span class="o">-</span><span class="n">blockdev</span> <span class="n">driver</span><span class="o">=</span><span class="n">file</span><span class="p">,</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">file0</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">disk</span><span class="o">-</span><span class="n">file0</span>  \
+<span class="o">-</span><span class="n">blockdev</span> <span class="n">driver</span><span class="o">=</span><span class="n">qcow2</span><span class="p">,</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">drive0</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">file0</span>
+</pre></div>
+</div>
+<p>would indicate process <em>disk-proc</em> uses a qcow2 emulated disk named
+<em>file0</em> as its backend.</p>
+<p>Emulation processes may emulate more than one guest controller. A common
+configuration might be to put all controllers of the same device class
+(e.g., disk, network, etc.) in a single process, so that all backends of
+the same type can be managed by a single QMP monitor.</p>
+<section id="communication-with-qemu">
+<h4>communication with QEMU<a class="headerlink" href="#communication-with-qemu" title="Permalink to this heading"></a></h4>
+<p>The first argument to the remote emulation process will be a Unix domain
+socket that connects with the Proxy object. This is a required argument.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">disk</span><span class="o">-</span><span class="n">proc</span> <span class="o">&lt;</span><span class="n">socket</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">backend</span> <span class="nb">list</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="remote-process-qmp-monitor">
+<h4>remote process QMP monitor<a class="headerlink" href="#remote-process-qmp-monitor" title="Permalink to this heading"></a></h4>
+<p>Remote emulation processes can be monitored via QMP, similar to QEMU
+itself. The QMP monitor socket is specified the same as for a QEMU
+process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">disk</span><span class="o">-</span><span class="n">proc</span> <span class="o">-</span><span class="n">qmp</span> <span class="n">unix</span><span class="p">:</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">disk</span><span class="o">-</span><span class="n">mon</span><span class="p">,</span><span class="n">server</span>
+</pre></div>
+</div>
+<p>can be monitored over the UNIX socket path <em>/tmp/disk-mon</em>.</p>
+</section>
+</section>
+<section id="qemu-command-line">
+<h3>QEMU command line<a class="headerlink" href="#qemu-command-line" title="Permalink to this heading"></a></h3>
+<p>Each remote device emulated in a remote process on the host is
+represented as a <em>-device</em> of type <em>pci-proxy-dev</em>. A socket
+sub-option to this option specifies the Unix socket that connects
+to the remote process. An <em>id</em> sub-option is required, and it should
+be the same id as used in the remote process.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">x86_64</span> <span class="o">...</span> <span class="o">-</span><span class="n">device</span> <span class="n">pci</span><span class="o">-</span><span class="n">proxy</span><span class="o">-</span><span class="n">dev</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">lsi0</span><span class="p">,</span><span class="n">socket</span><span class="o">=</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>can be used to add a device emulated in a remote process</p>
+</section>
+<section id="qemu-management-of-remote-processes">
+<h3>QEMU management of remote processes<a class="headerlink" href="#qemu-management-of-remote-processes" title="Permalink to this heading"></a></h3>
+<p>QEMU is not aware of the type of type of the remote PCI device. It is
+a pass through device as far as QEMU is concerned.</p>
+<section id="communication-with-emulation-process">
+<h4>communication with emulation process<a class="headerlink" href="#communication-with-emulation-process" title="Permalink to this heading"></a></h4>
+<section id="primary-channel">
+<h5>primary channel<a class="headerlink" href="#primary-channel" title="Permalink to this heading"></a></h5>
+<p>The primary channel (referred to as com in the code) is used to bootstrap
+the remote process. It is also used to pass on device-agnostic commands
+like reset.</p>
+</section>
+<section id="per-device-channels">
+<h5>per-device channels<a class="headerlink" href="#per-device-channels" title="Permalink to this heading"></a></h5>
+<p>Each remote device communicates with QEMU using a dedicated communication
+channel. The proxy object sets up this channel using the primary
+channel during its initialization.</p>
+</section>
+</section>
+</section>
+<section id="qemu-device-proxy-objects">
+<h3>QEMU device proxy objects<a class="headerlink" href="#qemu-device-proxy-objects" title="Permalink to this heading"></a></h3>
+<p>QEMU has an object model based on sub-classes inherited from the
+“object” super-class. The sub-classes that are of interest here are the
+“device” and “bus” sub-classes whose child sub-classes make up the
+device tree of a QEMU emulated system.</p>
+<p>The proxy object model will use device proxy objects to replace the
+device emulation code within the QEMU process. These objects will live
+in the same place in the object and bus hierarchies as the objects they
+replace. i.e., the proxy object for an LSI SCSI controller will be a
+sub-class of the “pci-device” class, and will have the same PCI bus
+parent and the same SCSI bus child objects as the LSI controller object
+it replaces.</p>
+<p>It is worth noting that the same proxy object is used to mediate with
+all types of remote PCI devices.</p>
+<section id="object-initialization">
+<h4>object initialization<a class="headerlink" href="#object-initialization" title="Permalink to this heading"></a></h4>
+<p>The Proxy device objects are initialized in the exact same manner in
+which any other QEMU device would be initialized.</p>
+<p>In addition, the Proxy objects perform the following two tasks:
+- Parses the “socket” sub option and connects to the remote process
+using this channel
+- Uses the “id” sub-option to connect to the emulated device on the
+separate process</p>
+<section id="class-init">
+<h5>class_init<a class="headerlink" href="#class-init" title="Permalink to this heading"></a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">class_init()</span></code> method of a proxy object will, in general behave
+similarly to the object it replaces, including setting any static
+properties and methods needed by the proxy.</p>
+</section>
+<section id="instance-init-realize">
+<h5>instance_init / realize<a class="headerlink" href="#instance-init-realize" title="Permalink to this heading"></a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">instance_init()</span></code> and <code class="docutils literal notranslate"><span class="pre">realize()</span></code> functions would only need to
+perform tasks related to being a proxy, such are registering its own
+MMIO handlers, or creating a child bus that other proxy devices can be
+attached to later.</p>
+<p>Other tasks will be device-specific. For example, PCI device objects
+will initialize the PCI config space in order to make a valid PCI device
+tree within the QEMU process.</p>
+</section>
+</section>
+<section id="address-space-registration">
+<h4>address space registration<a class="headerlink" href="#address-space-registration" title="Permalink to this heading"></a></h4>
+<p>Most devices are driven by guest device driver accesses to IO addresses
+or ports. The QEMU device emulation code uses QEMU’s memory region
+function calls (such as <code class="docutils literal notranslate"><span class="pre">memory_region_init_io()</span></code>) to add callback
+functions that QEMU will invoke when the guest accesses the device’s
+areas of the IO address space. When a guest driver does access the
+device, the VM will exit HW virtualization mode and return to QEMU,
+which will then lookup and execute the corresponding callback function.</p>
+<p>A proxy object would need to mirror the memory region calls the actual
+device emulator would perform in its initialization code, but with its
+own callbacks. When invoked by QEMU as a result of a guest IO operation,
+they will forward the operation to the device emulation process.</p>
+</section>
+<section id="pci-config-space">
+<h4>PCI config space<a class="headerlink" href="#pci-config-space" title="Permalink to this heading"></a></h4>
+<p>PCI devices also have a configuration space that can be accessed by the
+guest driver. Guest accesses to this space is not handled by the device
+emulation object, but by its PCI parent object. Much of this space is
+read-only, but certain registers (especially BAR and MSI-related ones)
+need to be propagated to the emulation process.</p>
+<section id="pci-parent-proxy">
+<h5>PCI parent proxy<a class="headerlink" href="#pci-parent-proxy" title="Permalink to this heading"></a></h5>
+<p>One way to propagate guest PCI config accesses is to create a
+“pci-device-proxy” class that can serve as the parent of a PCI device
+proxy object. This class’s parent would be “pci-device” and it would
+override the PCI parent’s <code class="docutils literal notranslate"><span class="pre">config_read()</span></code> and <code class="docutils literal notranslate"><span class="pre">config_write()</span></code>
+methods with ones that forward these operations to the emulation
+program.</p>
+</section>
+</section>
+<section id="interrupt-receipt">
+<h4>interrupt receipt<a class="headerlink" href="#interrupt-receipt" title="Permalink to this heading"></a></h4>
+<p>A proxy for a device that generates interrupts will need to create a
+socket to receive interrupt indications from the emulation process. An
+incoming interrupt indication would then be sent up to its bus parent to
+be injected into the guest. For example, a PCI device object may use
+<code class="docutils literal notranslate"><span class="pre">pci_set_irq()</span></code>.</p>
+</section>
+<section id="live-migration">
+<h4>live migration<a class="headerlink" href="#live-migration" title="Permalink to this heading"></a></h4>
+<p>The proxy will register to save and restore any <em>vmstate</em> it needs over
+a live migration event. The device proxy does not need to manage the
+remote device’s <em>vmstate</em>; that will be handled by the remote process
+proxy (see below).</p>
+</section>
+</section>
+<section id="qemu-remote-device-operation">
+<h3>QEMU remote device operation<a class="headerlink" href="#qemu-remote-device-operation" title="Permalink to this heading"></a></h3>
+<p>Generic device operations, such as DMA, will be performed by the remote
+process proxy by sending messages to the remote process.</p>
+<section id="dma-operations">
+<h4>DMA operations<a class="headerlink" href="#dma-operations" title="Permalink to this heading"></a></h4>
+<p>DMA operations would be handled much like vhost applications do. One of
+the initial messages sent to the emulation process is a guest memory
+table. Each entry in this table consists of a file descriptor and size
+that the emulation process can <code class="docutils literal notranslate"><span class="pre">mmap()</span></code> to directly access guest
+memory, similar to <code class="docutils literal notranslate"><span class="pre">vhost_user_set_mem_table()</span></code>. Note guest memory
+must be backed by file descriptors, such as when QEMU is given the
+<em>-mem-path</em> command line option.</p>
+</section>
+<section id="iommu-operations">
+<h4>IOMMU operations<a class="headerlink" href="#iommu-operations" title="Permalink to this heading"></a></h4>
+<p>When the emulated system includes an IOMMU, the remote process proxy in
+QEMU will need to create a socket for IOMMU requests from the emulation
+process. It will handle those requests with an
+<code class="docutils literal notranslate"><span class="pre">address_space_get_iotlb_entry()</span></code> call. In order to handle IOMMU
+unmaps, the remote process proxy will also register as a listener on the
+device’s DMA address space. When an IOMMU memory region is created
+within the DMA address space, an IOMMU notifier for unmaps will be added
+to the memory region that will forward unmaps to the emulation process
+over the IOMMU socket.</p>
+</section>
+<section id="device-hot-plug-via-qmp">
+<h4>device hot-plug via QMP<a class="headerlink" href="#device-hot-plug-via-qmp" title="Permalink to this heading"></a></h4>
+<p>An QMP “device_add” command can add a device emulated by a remote
+process. It will also have “rid” option to the command, just as the
+<em>-device</em> command line option does. The remote process may either be one
+started at QEMU startup, or be one added by the “add-process” QMP
+command described above. In either case, the remote process proxy will
+forward the new device’s JSON description to the corresponding emulation
+process.</p>
+</section>
+<section id="id1">
+<h4>live migration<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<p>The remote process proxy will also register for live migration
+notifications with <code class="docutils literal notranslate"><span class="pre">vmstate_register()</span></code>. When called to save state,
+the proxy will send the remote process a secondary socket file
+descriptor to save the remote process’s device <em>vmstate</em> over. The
+incoming byte stream length and data will be saved as the proxy’s
+<em>vmstate</em>. When the proxy is resumed on its new host, this <em>vmstate</em>
+will be extracted, and a secondary socket file descriptor will be sent
+to the new remote process through which it receives the <em>vmstate</em> in
+order to restore the devices there.</p>
+</section>
+</section>
+<section id="device-emulation-in-remote-process">
+<h3>device emulation in remote process<a class="headerlink" href="#device-emulation-in-remote-process" title="Permalink to this heading"></a></h3>
+<p>The parts of QEMU that the emulation program will need include the
+object model; the memory emulation objects; the device emulation objects
+of the targeted device, and any dependent devices; and, the device’s
+backends. It will also need code to setup the machine environment,
+handle requests from the QEMU process, and route machine-level requests
+(such as interrupts or IOMMU mappings) back to the QEMU process.</p>
+<section id="initialization">
+<h4>initialization<a class="headerlink" href="#initialization" title="Permalink to this heading"></a></h4>
+<p>The process initialization sequence will follow the same sequence
+followed by QEMU. It will first initialize the backend objects, then
+device emulation objects. The JSON descriptions sent by the QEMU process
+will drive which objects need to be created.</p>
+<ul class="simple">
+<li><p>address spaces</p></li>
+</ul>
+<p>Before the device objects are created, the initial address spaces and
+memory regions must be configured with <code class="docutils literal notranslate"><span class="pre">memory_map_init()</span></code>. This
+creates a RAM memory region object (<em>system_memory</em>) and an IO memory
+region object (<em>system_io</em>).</p>
+<ul class="simple">
+<li><p>RAM</p></li>
+</ul>
+<p>RAM memory region creation will follow how <code class="docutils literal notranslate"><span class="pre">pc_memory_init()</span></code> creates
+them, but must use <code class="docutils literal notranslate"><span class="pre">memory_region_init_ram_from_fd()</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">memory_region_allocate_system_memory()</span></code>. The file descriptors needed
+will be supplied by the guest memory table from above. Those RAM regions
+would then be added to the <em>system_memory</em> memory region with
+<code class="docutils literal notranslate"><span class="pre">memory_region_add_subregion()</span></code>.</p>
+<ul class="simple">
+<li><p>PCI</p></li>
+</ul>
+<p>IO initialization will be driven by the JSON descriptions sent from the
+QEMU process. For a PCI device, a PCI bus will need to be created with
+<code class="docutils literal notranslate"><span class="pre">pci_root_bus_new()</span></code>, and a PCI memory region will need to be created
+and added to the <em>system_memory</em> memory region with
+<code class="docutils literal notranslate"><span class="pre">memory_region_add_subregion_overlap()</span></code>. The overlap version is
+required for architectures where PCI memory overlaps with RAM memory.</p>
+</section>
+<section id="mmio-handling">
+<h4>MMIO handling<a class="headerlink" href="#mmio-handling" title="Permalink to this heading"></a></h4>
+<p>The device emulation objects will use <code class="docutils literal notranslate"><span class="pre">memory_region_init_io()</span></code> to
+install their MMIO handlers, and <code class="docutils literal notranslate"><span class="pre">pci_register_bar()</span></code> to associate
+those handlers with a PCI BAR, as they do within QEMU currently.</p>
+<p>In order to use <code class="docutils literal notranslate"><span class="pre">address_space_rw()</span></code> in the emulation process to
+handle MMIO requests from QEMU, the PCI physical addresses must be the
+same in the QEMU process and the device emulation process. In order to
+accomplish that, guest BAR programming must also be forwarded from QEMU
+to the emulation process.</p>
+</section>
+<section id="interrupt-injection">
+<h4>interrupt injection<a class="headerlink" href="#interrupt-injection" title="Permalink to this heading"></a></h4>
+<p>When device emulation wants to inject an interrupt into the VM, the
+request climbs the device’s bus object hierarchy until the point where a
+bus object knows how to signal the interrupt to the guest. The details
+depend on the type of interrupt being raised.</p>
+<ul class="simple">
+<li><p>PCI pin interrupts</p></li>
+</ul>
+<p>On x86 systems, there is an emulated IOAPIC object attached to the root
+PCI bus object, and the root PCI object forwards interrupt requests to
+it. The IOAPIC object, in turn, calls the KVM driver to inject the
+corresponding interrupt into the VM. The simplest way to handle this in
+an emulation process would be to setup the root PCI bus driver (via
+<code class="docutils literal notranslate"><span class="pre">pci_bus_irqs()</span></code>) to send a interrupt request back to the QEMU
+process, and have the device proxy object reflect it up the PCI tree
+there.</p>
+<ul class="simple">
+<li><p>PCI MSI/X interrupts</p></li>
+</ul>
+<p>PCI MSI/X interrupts are implemented in HW as DMA writes to a
+CPU-specific PCI address. In QEMU on x86, a KVM APIC object receives
+these DMA writes, then calls into the KVM driver to inject the interrupt
+into the VM. A simple emulation process implementation would be to send
+the MSI DMA address from QEMU as a message at initialization, then
+install an address space handler at that address which forwards the MSI
+message back to QEMU.</p>
+</section>
+<section id="id2">
+<h4>DMA operations<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<p>When a emulation object wants to DMA into or out of guest memory, it
+first must use dma_memory_map() to convert the DMA address to a local
+virtual address. The emulation process memory region objects setup above
+will be used to translate the DMA address to a local virtual address the
+device emulation code can access.</p>
+</section>
+<section id="iommu">
+<h4>IOMMU<a class="headerlink" href="#iommu" title="Permalink to this heading"></a></h4>
+<p>When an IOMMU is in use in QEMU, DMA translation uses IOMMU memory
+regions to translate the DMA address to a guest physical address before
+that physical address can be translated to a local virtual address. The
+emulation process will need similar functionality.</p>
+<ul class="simple">
+<li><p>IOTLB cache</p></li>
+</ul>
+<p>The emulation process will maintain a cache of recent IOMMU translations
+(the IOTLB). When the translate() callback of an IOMMU memory region is
+invoked, the IOTLB cache will be searched for an entry that will map the
+DMA address to a guest PA. On a cache miss, a message will be sent back
+to QEMU requesting the corresponding translation entry, which be both be
+used to return a guest address and be added to the cache.</p>
+<ul class="simple">
+<li><p>IOTLB purge</p></li>
+</ul>
+<p>The IOMMU emulation will also need to act on unmap requests from QEMU.
+These happen when the guest IOMMU driver purges an entry from the
+guest’s translation table.</p>
+</section>
+<section id="id3">
+<h4>live migration<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
+<p>When a remote process receives a live migration indication from QEMU, it
+will set up a channel using the received file descriptor with
+<code class="docutils literal notranslate"><span class="pre">qio_channel_socket_new_fd()</span></code>. This channel will be used to create a
+<em>QEMUfile</em> that can be passed to <code class="docutils literal notranslate"><span class="pre">qemu_save_device_state()</span></code> to send
+the process’s device state back to QEMU. This method will be reversed on
+restore - the channel will be passed to <code class="docutils literal notranslate"><span class="pre">qemu_loadvm_state()</span></code> to
+restore the device state.</p>
+</section>
+</section>
+<section id="accelerating-device-emulation">
+<h3>Accelerating device emulation<a class="headerlink" href="#accelerating-device-emulation" title="Permalink to this heading"></a></h3>
+<p>The messages that are required to be sent between QEMU and the emulation
+process can add considerable latency to IO operations. The optimizations
+described below attempt to ameliorate this effect by allowing the
+emulation process to communicate directly with the kernel KVM driver.
+The KVM file descriptors created would be passed to the emulation process
+via initialization messages, much like the guest memory table is done.
+#### MMIO acceleration</p>
+<p>Vhost user applications can receive guest virtio driver stores directly
+from KVM. The issue with the eventfd mechanism used by vhost user is
+that it does not pass any data with the event indication, so it cannot
+handle guest loads or guest stores that carry store data. This concept
+could, however, be expanded to cover more cases.</p>
+<p>The expanded idea would require a new type of KVM device:
+<em>KVM_DEV_TYPE_USER</em>. This device has two file descriptors: a master
+descriptor that QEMU can use for configuration, and a slave descriptor
+that the emulation process can use to receive MMIO notifications. QEMU
+would create both descriptors using the KVM driver, and pass the slave
+descriptor to the emulation process via an initialization message.</p>
+<section id="data-structures">
+<h4>data structures<a class="headerlink" href="#data-structures" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p>guest physical range</p></li>
+</ul>
+<p>The guest physical range structure describes the address range that a
+device will respond to. It includes the base and length of the range, as
+well as which bus the range resides on (e.g., on an x86machine, it can
+specify whether the range refers to memory or IO addresses).</p>
+<p>A device can have multiple physical address ranges it responds to (e.g.,
+a PCI device can have multiple BARs), so the structure will also include
+an enumerated identifier to specify which of the device’s ranges is
+being referred to.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>addr</p></td>
+<td><p>range base address</p></td>
+</tr>
+<tr class="row-odd"><td><p>len</p></td>
+<td><p>range length</p></td>
+</tr>
+<tr class="row-even"><td><p>bus</p></td>
+<td><p>addr type (memory or IO)</p></td>
+</tr>
+<tr class="row-odd"><td><p>id</p></td>
+<td><p>range ID (e.g., PCI BAR)</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>MMIO request structure</p></li>
+</ul>
+<p>This structure describes an MMIO operation. It includes which guest
+physical range the MMIO was within, the offset within that range, the
+MMIO type (e.g., load or store), and its length and data. It also
+includes a sequence number that can be used to reply to the MMIO, and
+the CPU that issued the MMIO.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>rid</p></td>
+<td><p>range MMIO is within</p></td>
+</tr>
+<tr class="row-odd"><td><p>offset</p></td>
+<td><p>offset within <em>rid</em></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p>e.g., load or store</p></td>
+</tr>
+<tr class="row-odd"><td><p>len</p></td>
+<td><p>MMIO length</p></td>
+</tr>
+<tr class="row-even"><td><p>data</p></td>
+<td><p>store data</p></td>
+</tr>
+<tr class="row-odd"><td><p>seq</p></td>
+<td><p>sequence ID</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>MMIO request queues</p></li>
+</ul>
+<p>MMIO request queues are FIFO arrays of MMIO request structures. There
+are two queues: pending queue is for MMIOs that haven’t been read by the
+emulation program, and the sent queue is for MMIOs that haven’t been
+acknowledged. The main use of the second queue is to validate MMIO
+replies from the emulation program.</p>
+<ul class="simple">
+<li><p>scoreboard</p></li>
+</ul>
+<p>Each CPU in the VM is emulated in QEMU by a separate thread, so multiple
+MMIOs may be waiting to be consumed by an emulation program and multiple
+threads may be waiting for MMIO replies. The scoreboard would contain a
+wait queue and sequence number for the per-CPU threads, allowing them to
+be individually woken when the MMIO reply is received from the emulation
+program. It also tracks the number of posted MMIO stores to the device
+that haven’t been replied to, in order to satisfy the PCI constraint
+that a load to a device will not complete until all previous stores to
+that device have been completed.</p>
+<ul class="simple">
+<li><p>device shadow memory</p></li>
+</ul>
+<p>Some MMIO loads do not have device side-effects. These MMIOs can be
+completed without sending a MMIO request to the emulation program if the
+emulation program shares a shadow image of the device’s memory image
+with the KVM driver.</p>
+<p>The emulation program will ask the KVM driver to allocate memory for the
+shadow image, and will then use <code class="docutils literal notranslate"><span class="pre">mmap()</span></code> to directly access it. The
+emulation program can control KVM access to the shadow image by sending
+KVM an access map telling it which areas of the image have no
+side-effects (and can be completed immediately), and which require a
+MMIO request to the emulation program. The access map can also inform
+the KVM drive which size accesses are allowed to the image.</p>
+</section>
+<section id="master-descriptor">
+<h4>master descriptor<a class="headerlink" href="#master-descriptor" title="Permalink to this heading"></a></h4>
+<p>The master descriptor is used by QEMU to configure the new KVM device.
+The descriptor would be returned by the KVM driver when QEMU issues a
+<em>KVM_CREATE_DEVICE</em> <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> with a <em>KVM_DEV_TYPE_USER</em> type.</p>
+<p>KVM_DEV_TYPE_USER device ops</p>
+<p>The <em>KVM_DEV_TYPE_USER</em> operations vector will be registered by a
+<code class="docutils literal notranslate"><span class="pre">kvm_register_device_ops()</span></code> call when the KVM system in initialized by
+<code class="docutils literal notranslate"><span class="pre">kvm_init()</span></code>. These device ops are called by the KVM driver when QEMU
+executes certain <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> operations on its KVM file descriptor. They
+include:</p>
+<ul class="simple">
+<li><p>create</p></li>
+</ul>
+<p>This routine is called when QEMU issues a <em>KVM_CREATE_DEVICE</em>
+<code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> on its per-VM file descriptor. It will allocate and
+initialize a KVM user device specific data structure, and assign the
+<em>kvm_device</em> private field to it.</p>
+<ul class="simple">
+<li><p>ioctl</p></li>
+</ul>
+<p>This routine is invoked when QEMU issues an <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> on the master
+descriptor. The <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> commands supported are defined by the KVM
+device type. <em>KVM_DEV_TYPE_USER</em> ones will need several commands:</p>
+<p><em>KVM_DEV_USER_SLAVE_FD</em> creates the slave file descriptor that will
+be passed to the device emulation program. Only one slave can be created
+by each master descriptor. The file operations performed by this
+descriptor are described below.</p>
+<p>The <em>KVM_DEV_USER_PA_RANGE</em> command configures a guest physical
+address range that the slave descriptor will receive MMIO notifications
+for. The range is specified by a guest physical range structure
+argument. For buses that assign addresses to devices dynamically, this
+command can be executed while the guest is running, such as the case
+when a guest changes a device’s PCI BAR registers.</p>
+<p><em>KVM_DEV_USER_PA_RANGE</em> will use <code class="docutils literal notranslate"><span class="pre">kvm_io_bus_register_dev()</span></code> to
+register <em>kvm_io_device_ops</em> callbacks to be invoked when the guest
+performs a MMIO operation within the range. When a range is changed,
+<code class="docutils literal notranslate"><span class="pre">kvm_io_bus_unregister_dev()</span></code> is used to remove the previous
+instantiation.</p>
+<p><em>KVM_DEV_USER_TIMEOUT</em> will configure a timeout value that specifies
+how long KVM will wait for the emulation process to respond to a MMIO
+indication.</p>
+<ul class="simple">
+<li><p>destroy</p></li>
+</ul>
+<p>This routine is called when the VM instance is destroyed. It will need
+to destroy the slave descriptor; and free any memory allocated by the
+driver, as well as the <em>kvm_device</em> structure itself.</p>
+</section>
+<section id="slave-descriptor">
+<h4>slave descriptor<a class="headerlink" href="#slave-descriptor" title="Permalink to this heading"></a></h4>
+<p>The slave descriptor will have its own file operations vector, which
+responds to system calls on the descriptor performed by the device
+emulation program.</p>
+<ul class="simple">
+<li><p>read</p></li>
+</ul>
+<p>A read returns any pending MMIO requests from the KVM driver as MMIO
+request structures. Multiple structures can be returned if there are
+multiple MMIO operations pending. The MMIO requests are moved from the
+pending queue to the sent queue, and if there are threads waiting for
+space in the pending to add new MMIO operations, they will be woken
+here.</p>
+<ul class="simple">
+<li><p>write</p></li>
+</ul>
+<p>A write also consists of a set of MMIO requests. They are compared to
+the MMIO requests in the sent queue. Matches are removed from the sent
+queue, and any threads waiting for the reply are woken. If a store is
+removed, then the number of posted stores in the per-CPU scoreboard is
+decremented. When the number is zero, and a non side-effect load was
+waiting for posted stores to complete, the load is continued.</p>
+<ul class="simple">
+<li><p>ioctl</p></li>
+</ul>
+<p>There are several ioctl()s that can be performed on the slave
+descriptor.</p>
+<p>A <em>KVM_DEV_USER_SHADOW_SIZE</em> <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> causes the KVM driver to
+allocate memory for the shadow image. This memory can later be
+<code class="docutils literal notranslate"><span class="pre">mmap()</span></code>ed by the emulation process to share the emulation’s view of
+device memory with the KVM driver.</p>
+<p>A <em>KVM_DEV_USER_SHADOW_CTRL</em> <code class="docutils literal notranslate"><span class="pre">ioctl()</span></code> controls access to the
+shadow image. It will send the KVM driver a shadow control map, which
+specifies which areas of the image can complete guest loads without
+sending the load request to the emulation program. It will also specify
+the size of load operations that are allowed.</p>
+<ul class="simple">
+<li><p>poll</p></li>
+</ul>
+<p>An emulation program will use the <code class="docutils literal notranslate"><span class="pre">poll()</span></code> call with a <em>POLLIN</em> flag
+to determine if there are MMIO requests waiting to be read. It will
+return if the pending MMIO request queue is not empty.</p>
+<ul class="simple">
+<li><p>mmap</p></li>
+</ul>
+<p>This call allows the emulation program to directly access the shadow
+image allocated by the KVM driver. As device emulation updates device
+memory, changes with no side-effects will be reflected in the shadow,
+and the KVM driver can satisfy guest loads from the shadow image without
+needing to wait for the emulation program.</p>
+</section>
+<section id="kvm-io-device-ops">
+<h4>kvm_io_device ops<a class="headerlink" href="#kvm-io-device-ops" title="Permalink to this heading"></a></h4>
+<p>Each KVM per-CPU thread can handle MMIO operation on behalf of the guest
+VM. KVM will use the MMIO’s guest physical address to search for a
+matching <em>kvm_io_device</em> to see if the MMIO can be handled by the KVM
+driver instead of exiting back to QEMU. If a match is found, the
+corresponding callback will be invoked.</p>
+<ul class="simple">
+<li><p>read</p></li>
+</ul>
+<p>This callback is invoked when the guest performs a load to the device.
+Loads with side-effects must be handled synchronously, with the KVM
+driver putting the QEMU thread to sleep waiting for the emulation
+process reply before re-starting the guest. Loads that do not have
+side-effects may be optimized by satisfying them from the shadow image,
+if there are no outstanding stores to the device by this CPU. PCI memory
+ordering demands that a load cannot complete before all older stores to
+the same device have been completed.</p>
+<ul class="simple">
+<li><p>write</p></li>
+</ul>
+<p>Stores can be handled asynchronously unless the pending MMIO request
+queue is full. In this case, the QEMU thread must sleep waiting for
+space in the queue. Stores will increment the number of posted stores in
+the per-CPU scoreboard, in order to implement the PCI ordering
+constraint above.</p>
+</section>
+<section id="interrupt-acceleration">
+<h4>interrupt acceleration<a class="headerlink" href="#interrupt-acceleration" title="Permalink to this heading"></a></h4>
+<p>This performance optimization would work much like a vhost user
+application does, where the QEMU process sets up <em>eventfds</em> that cause
+the device’s corresponding interrupt to be triggered by the KVM driver.
+These irq file descriptors are sent to the emulation process at
+initialization, and are used when the emulation code raises a device
+interrupt.</p>
+<section id="intx-acceleration">
+<h5>intx acceleration<a class="headerlink" href="#intx-acceleration" title="Permalink to this heading"></a></h5>
+<p>Traditional PCI pin interrupts are level based, so, in addition to an
+irq file descriptor, a re-sampling file descriptor needs to be sent to
+the emulation program. This second file descriptor allows multiple
+devices sharing an irq to be notified when the interrupt has been
+acknowledged by the guest, so they can re-trigger the interrupt if their
+device has not de-asserted its interrupt.</p>
+<p>intx irq descriptor</p>
+<p>The irq descriptors are created by the proxy object
+<code class="docutils literal notranslate"><span class="pre">using</span> <span class="pre">event_notifier_init()</span></code> to create the irq and re-sampling
+<em>eventds</em>, and <code class="docutils literal notranslate"><span class="pre">kvm_vm_ioctl(KVM_IRQFD)</span></code> to bind them to an interrupt.
+The interrupt route can be found with
+<code class="docutils literal notranslate"><span class="pre">pci_device_route_intx_to_irq()</span></code>.</p>
+<p>intx routing changes</p>
+<p>Intx routing can be changed when the guest programs the APIC the device
+pin is connected to. The proxy object in QEMU will use
+<code class="docutils literal notranslate"><span class="pre">pci_device_set_intx_routing_notifier()</span></code> to be informed of any guest
+changes to the route. This handler will broadly follow the VFIO
+interrupt logic to change the route: de-assigning the existing irq
+descriptor from its route, then assigning it the new route. (see
+<code class="docutils literal notranslate"><span class="pre">vfio_intx_update()</span></code>)</p>
+</section>
+<section id="msi-x-acceleration">
+<h5>MSI/X acceleration<a class="headerlink" href="#msi-x-acceleration" title="Permalink to this heading"></a></h5>
+<p>MSI/X interrupts are sent as DMA transactions to the host. The interrupt
+data contains a vector that is programmed by the guest, A device may have
+multiple MSI interrupts associated with it, so multiple irq descriptors
+may need to be sent to the emulation program.</p>
+<p>MSI/X irq descriptor</p>
+<p>This case will also follow the VFIO example. For each MSI/X interrupt,
+an <em>eventfd</em> is created, a virtual interrupt is allocated by
+<code class="docutils literal notranslate"><span class="pre">kvm_irqchip_add_msi_route()</span></code>, and the virtual interrupt is bound to
+the eventfd with <code class="docutils literal notranslate"><span class="pre">kvm_irqchip_add_irqfd_notifier()</span></code>.</p>
+<p>MSI/X config space changes</p>
+<p>The guest may dynamically update several MSI-related tables in the
+device’s PCI config space. These include per-MSI interrupt enables and
+vector data. Additionally, MSIX tables exist in device memory space, not
+config space. Much like the BAR case above, the proxy object must look
+at guest config space programming to keep the MSI interrupt state
+consistent between QEMU and the emulation program.</p>
+</section>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="disaggregated-cpu-emulation">
+<h2>Disaggregated CPU emulation<a class="headerlink" href="#disaggregated-cpu-emulation" title="Permalink to this heading"></a></h2>
+<p>After IO services have been disaggregated, a second phase would be to
+separate a process to handle CPU instruction emulation from the main
+QEMU control function. There are no object separation points for this
+code, so the first task would be to create one.</p>
+</section>
+<section id="host-access-controls">
+<h2>Host access controls<a class="headerlink" href="#host-access-controls" title="Permalink to this heading"></a></h2>
+<p>Separating QEMU relies on the host OS’s access restriction mechanisms to
+enforce that the differing processes can only access the objects they
+are entitled to. There are a couple types of mechanisms usually provided
+by general purpose OSs.</p>
+<section id="discretionary-access-control">
+<h3>Discretionary access control<a class="headerlink" href="#discretionary-access-control" title="Permalink to this heading"></a></h3>
+<p>Discretionary access control allows each user to control who can access
+their files. In Linux, this type of control is usually too coarse for
+QEMU separation, since it only provides three separate access controls:
+one for the same user ID, the second for users IDs with the same group
+ID, and the third for all other user IDs. Each device instance would
+need a separate user ID to provide access control, which is likely to be
+unwieldy for dynamically created VMs.</p>
+</section>
+<section id="mandatory-access-control">
+<h3>Mandatory access control<a class="headerlink" href="#mandatory-access-control" title="Permalink to this heading"></a></h3>
+<p>Mandatory access control allows the OS to add an additional set of
+controls on top of discretionary access for the OS to control. It also
+adds other attributes to processes and files such as types, roles, and
+categories, and can establish rules for how processes and files can
+interact.</p>
+<section id="type-enforcement">
+<h4>Type enforcement<a class="headerlink" href="#type-enforcement" title="Permalink to this heading"></a></h4>
+<p>Type enforcement assigns a <em>type</em> attribute to processes and files, and
+allows rules to be written on what operations a process with a given
+type can perform on a file with a given type. QEMU separation could take
+advantage of type enforcement by running the emulation processes with
+different types, both from the main QEMU process, and from the emulation
+processes of different classes of devices.</p>
+<p>For example, guest disk images and disk emulation processes could have
+types separate from the main QEMU process and non-disk emulation
+processes, and the type rules could prevent processes other than disk
+emulation ones from accessing guest disk images. Similarly, network
+emulation processes can have a type separate from the main QEMU process
+and non-network emulation process, and only that type can access the
+host tun/tap device used to provide guest networking.</p>
+</section>
+<section id="category-enforcement">
+<h4>Category enforcement<a class="headerlink" href="#category-enforcement" title="Permalink to this heading"></a></h4>
+<p>Category enforcement assigns a set of numbers within a given range to
+the process or file. The process is granted access to the file if the
+process’s set is a superset of the file’s set. This enforcement can be
+used to separate multiple instances of devices in the same class.</p>
+<p>For example, if there are multiple disk devices provides to a guest,
+each device emulation process could be provisioned with a separate
+category. The different device emulation processes would not be able to
+access each other’s backing disk images.</p>
+<p>Alternatively, categories could be used in lieu of the type enforcement
+scheme described above. In this scenario, different categories would be
+used to prevent device emulation processes in different classes from
+accessing resources assigned to other classes.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="migration.html" class="btn btn-neutral float-left" title="Migration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reset.html" class="btn btn-neutral float-right" title="Reset in QEMU: the Resettable interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modelling a clock tree in QEMU &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="eBPF RSS virtio-net support" href="ebpf_rss.html" />
+    <link rel="prev" title="block-coroutine-wrapper" href="block-coroutine-wrapper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Modelling a clock tree in QEMU</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#what-are-clocks">What are clocks?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-clock-state">The clock state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adding-a-new-clock">Adding a new clock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clock-callbacks">Clock callbacks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#retrieving-clocks-from-a-device">Retrieving clocks from a device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connecting-two-clocks-together">Connecting two clocks together</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clock-multiplier-and-divider-settings">Clock multiplier and divider settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unconnected-input-clocks">Unconnected input clocks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fetching-clock-frequency-period">Fetching clock frequency/period</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calculating-expiry-deadlines">Calculating expiry deadlines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#obtaining-tick-counts">Obtaining tick counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#changing-a-clock-period">Changing a clock period</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aliasing-clocks">Aliasing clocks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migration">Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-migration.html">VFIO device Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-internals.html">Internal Subsystem Information</a></li>
+      <li class="breadcrumb-item active">Modelling a clock tree in QEMU</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/clocks.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modelling-a-clock-tree-in-qemu">
+<h1>Modelling a clock tree in QEMU<a class="headerlink" href="#modelling-a-clock-tree-in-qemu" title="Permalink to this heading"></a></h1>
+<section id="what-are-clocks">
+<h2>What are clocks?<a class="headerlink" href="#what-are-clocks" title="Permalink to this heading"></a></h2>
+<p>Clocks are QOM objects developed for the purpose of modelling the
+distribution of clocks in QEMU.</p>
+<p>They allow us to model the clock distribution of a platform and detect
+configuration errors in the clock tree such as badly configured PLL, clock
+source selection or disabled clock.</p>
+<p>The object is <em>Clock</em> and its QOM name is <code class="docutils literal notranslate"><span class="pre">clock</span></code> (in C code, the macro
+<code class="docutils literal notranslate"><span class="pre">TYPE_CLOCK</span></code>).</p>
+<p>Clocks are typically used with devices where they are used to model inputs
+and outputs. They are created in a similar way to GPIOs. Inputs and outputs
+of different devices can be connected together.</p>
+<p>In these cases a Clock object is a child of a Device object, but this
+is not a requirement. Clocks can be independent of devices. For
+example it is possible to create a clock outside of any device to
+model the main clock source of a machine.</p>
+<p>Here is an example of clocks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+---------+</span>      <span class="o">+----------------------+</span>   <span class="o">+--------------+</span>
+<span class="o">|</span> <span class="n">Clock</span> <span class="mi">1</span> <span class="o">|</span>      <span class="o">|</span>       <span class="n">Device</span> <span class="n">B</span>       <span class="o">|</span>   <span class="o">|</span>   <span class="n">Device</span> <span class="n">C</span>   <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span>      <span class="o">|</span> <span class="o">+-------+</span>  <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|&gt;&gt;-+--&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">2</span><span class="o">|</span>  <span class="o">|</span><span class="n">Clock</span> <span class="mi">3</span><span class="o">|&gt;&gt;---&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">6</span><span class="o">|</span>    <span class="o">|</span>
+<span class="o">+---------+</span>   <span class="o">|</span>  <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span> <span class="o">+-------+</span>  <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">+--------------+</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">|</span><span class="n">Clock</span> <span class="mi">4</span><span class="o">|&gt;&gt;</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">+--------------+</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">|</span>   <span class="n">Device</span> <span class="n">D</span>   <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">|</span><span class="n">Clock</span> <span class="mi">5</span><span class="o">|&gt;&gt;---&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">7</span><span class="o">|</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">|</span>            <span class="o">+-------+</span> <span class="o">|</span>   <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+              <span class="o">|</span>  <span class="o">+----------------------+</span>   <span class="o">|</span>              <span class="o">|</span>
+              <span class="o">|</span>                             <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+              <span class="o">+-----------------------------&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">8</span><span class="o">|</span>    <span class="o">|</span>
+                                            <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>    <span class="o">|</span>
+                                            <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>
+                                            <span class="o">+--------------+</span>
+</pre></div>
+</div>
+<p>Clocks are defined in the <code class="docutils literal notranslate"><span class="pre">include/hw/clock.h</span></code> header and device
+related functions are defined in the <code class="docutils literal notranslate"><span class="pre">include/hw/qdev-clock.h</span></code>
+header.</p>
+</section>
+<section id="the-clock-state">
+<h2>The clock state<a class="headerlink" href="#the-clock-state" title="Permalink to this heading"></a></h2>
+<p>The state of a clock is its period; it is stored as an integer
+representing it in units of 2 <sup>-32</sup> ns. The special value of 0 is used to
+represent the clock being inactive or gated. The clocks do not model
+the signal itself (pin toggling) or other properties such as the duty
+cycle.</p>
+<p>All clocks contain this state: outputs as well as inputs. This allows
+the current period of a clock to be fetched at any time. When a clock
+is updated, the value is immediately propagated to all connected
+clocks in the tree.</p>
+<p>To ease interaction with clocks, helpers with a unit suffix are defined for
+every clock state setter or getter. The suffixes are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_ns</span></code> for handling periods in nanoseconds</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_hz</span></code> for handling frequencies in hertz</p></li>
+</ul>
+<p>The 0 period value is converted to 0 in hertz and vice versa. 0 always means
+that the clock is disabled.</p>
+</section>
+<section id="adding-a-new-clock">
+<h2>Adding a new clock<a class="headerlink" href="#adding-a-new-clock" title="Permalink to this heading"></a></h2>
+<p>Adding clocks to a device must be done during the init method of the Device
+instance.</p>
+<p>To add an input clock to a device, the function <code class="docutils literal notranslate"><span class="pre">qdev_init_clock_in()</span></code>
+must be used.  It takes the name, a callback, an opaque parameter
+for the callback and a mask of events when the callback should be
+called (this will be explained in a following section).
+Output is simpler; only the name is required. Typically:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qdev_init_clock_in</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">dev</span><span class="p">),</span> <span class="s2">&quot;clk_in&quot;</span><span class="p">,</span> <span class="n">clk_in_callback</span><span class="p">,</span> <span class="n">dev</span><span class="p">,</span> <span class="n">ClockUpdate</span><span class="p">);</span>
+<span class="n">qdev_init_clock_out</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">dev</span><span class="p">),</span> <span class="s2">&quot;clk_out&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Both functions return the created Clock pointer, which should be saved in the
+device’s state structure for further use.</p>
+<p>These objects will be automatically deleted by the QOM reference mechanism.</p>
+<p>Note that it is possible to create a static array describing clock inputs and
+outputs. The function <code class="docutils literal notranslate"><span class="pre">qdev_init_clocks()</span></code> must be called with the array as
+parameter to initialize the clocks: it has the same behaviour as calling the
+<code class="docutils literal notranslate"><span class="pre">qdev_init_clock_in/out()</span></code> for each clock in the array. To ease the array
+construction, some macros are defined in <code class="docutils literal notranslate"><span class="pre">include/hw/qdev-clock.h</span></code>.
+As an example, the following creates 2 clocks to a device: one input and one
+output.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* device structure containing pointers to the clock objects */</span><span class="w"></span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">MyDeviceState</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeviceState</span><span class="w"> </span><span class="n">parent_obj</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">Clock</span><span class="w"> </span><span class="o">*</span><span class="n">clk_in</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">Clock</span><span class="w"> </span><span class="o">*</span><span class="n">clk_out</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">MyDeviceState</span><span class="p">;</span><span class="w"></span>
+
+<span class="cm">/*</span>
+<span class="cm"> * callback for the input clock (see &quot;Callback on input clock</span>
+<span class="cm"> * change&quot; section below for more information).</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">clk_in_callback</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">opaque</span><span class="p">,</span><span class="w"> </span><span class="n">ClockEvent</span><span class="w"> </span><span class="n">event</span><span class="p">);</span><span class="w"></span>
+
+<span class="cm">/*</span>
+<span class="cm"> * static array describing clocks:</span>
+<span class="cm"> * + a clock input named &quot;clk_in&quot;, whose pointer is stored in</span>
+<span class="cm"> *   the clk_in field of a MyDeviceState structure with callback</span>
+<span class="cm"> *   clk_in_callback.</span>
+<span class="cm"> * + a clock output named &quot;clk_out&quot; whose pointer is stored in</span>
+<span class="cm"> *   the clk_out field of a MyDeviceState structure.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ClockPortInitArray</span><span class="w"> </span><span class="n">mydev_clocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">QDEV_CLOCK_IN</span><span class="p">(</span><span class="n">MyDeviceState</span><span class="p">,</span><span class="w"> </span><span class="n">clk_in</span><span class="p">,</span><span class="w"> </span><span class="n">clk_in_callback</span><span class="p">,</span><span class="w"> </span><span class="n">ClockUpdate</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">QDEV_CLOCK_OUT</span><span class="p">(</span><span class="n">MyDeviceState</span><span class="p">,</span><span class="w"> </span><span class="n">clk_out</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">QDEV_CLOCK_END</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/* device initialization function */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">mydev_init</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* cast to MyDeviceState */</span><span class="w"></span>
+<span class="w">    </span><span class="n">MyDeviceState</span><span class="w"> </span><span class="o">*</span><span class="n">mydev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MYDEVICE</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* create and fill the pointer fields in the MyDeviceState */</span><span class="w"></span>
+<span class="w">    </span><span class="n">qdev_init_clocks</span><span class="p">(</span><span class="n">mydev</span><span class="p">,</span><span class="w"> </span><span class="n">mydev_clocks</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>An alternative way to create a clock is to simply call
+<code class="docutils literal notranslate"><span class="pre">object_new(TYPE_CLOCK)</span></code>. In that case the clock will neither be an
+input nor an output of a device. After the whole QOM hierarchy of the
+clock has been set <code class="docutils literal notranslate"><span class="pre">clock_setup_canonical_path()</span></code> should be called.</p>
+<p>At creation, the period of the clock is 0: the clock is disabled. You can
+change it using <code class="docutils literal notranslate"><span class="pre">clock_set_ns()</span></code> or <code class="docutils literal notranslate"><span class="pre">clock_set_hz()</span></code>.</p>
+<p>Note that if you are creating a clock with a fixed period which will never
+change (for example the main clock source of a board), then you’ll have
+nothing else to do. This value will be propagated to other clocks when
+connecting the clocks together and devices will fetch the right value during
+the first reset.</p>
+</section>
+<section id="clock-callbacks">
+<h2>Clock callbacks<a class="headerlink" href="#clock-callbacks" title="Permalink to this heading"></a></h2>
+<p>You can give a clock a callback function in several ways:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>by passing it as an argument to <code class="docutils literal notranslate"><span class="pre">qdev_init_clock_in()</span></code></p></li>
+<li><p>as an argument to the <code class="docutils literal notranslate"><span class="pre">QDEV_CLOCK_IN()</span></code> macro initializing an
+array to be passed to <code class="docutils literal notranslate"><span class="pre">qdev_init_clocks()</span></code></p></li>
+<li><p>by directly calling the <code class="docutils literal notranslate"><span class="pre">clock_set_callback()</span></code> function</p></li>
+</ul>
+</div></blockquote>
+<p>The callback function must be of this type:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ClockCallback</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">opaque</span><span class="p">,</span><span class="w"> </span><span class="n">ClockEvent</span><span class="w"> </span><span class="n">event</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">opaque</span></code> argument is the pointer passed to <code class="docutils literal notranslate"><span class="pre">qdev_init_clock_in()</span></code>
+or <code class="docutils literal notranslate"><span class="pre">clock_set_callback()</span></code>; for <code class="docutils literal notranslate"><span class="pre">qdev_init_clocks()</span></code> it is the
+<code class="docutils literal notranslate"><span class="pre">dev</span></code> device pointer.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">event</span></code> argument specifies why the callback has been called.
+When you register the callback you specify a mask of ClockEvent values
+that you are interested in. The callback will only be called for those
+events.</p>
+<p>The events currently supported are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ClockPreUpdate</span></code> : called when the input clock’s period is about to
+update. This is useful if the device needs to do some action for
+which it needs to know the old value of the clock period. During
+this callback, Clock API functions like <code class="docutils literal notranslate"><span class="pre">clock_get()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code> will use the old period.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ClockUpdate</span></code> : called after the input clock’s period has changed.
+During this callback, Clock API functions like <code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code>
+will use the new period.</p></li>
+</ul>
+</div></blockquote>
+<p>Note that a clock only has one callback: it is not possible to register
+different functions for different events. You must register a single
+callback which listens for all of the events you are interested in,
+and use the <code class="docutils literal notranslate"><span class="pre">event</span></code> argument to identify which event has happened.</p>
+</section>
+<section id="retrieving-clocks-from-a-device">
+<h2>Retrieving clocks from a device<a class="headerlink" href="#retrieving-clocks-from-a-device" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">qdev_get_clock_in()</span></code> and <code class="docutils literal notranslate"><span class="pre">dev_get_clock_out()</span></code> are available to
+get the clock inputs or outputs of a device. For example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Clock</span><span class="w"> </span><span class="o">*</span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qdev_get_clock_in</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">mydev</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;clk_in&quot;</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Clock</span><span class="w"> </span><span class="o">*</span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qdev_get_clock_out</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">mydev</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;clk_out&quot;</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="connecting-two-clocks-together">
+<h2>Connecting two clocks together<a class="headerlink" href="#connecting-two-clocks-together" title="Permalink to this heading"></a></h2>
+<p>To connect two clocks together, use the <code class="docutils literal notranslate"><span class="pre">clock_set_source()</span></code> function.
+Given two clocks <code class="docutils literal notranslate"><span class="pre">clk1</span></code>, and <code class="docutils literal notranslate"><span class="pre">clk2</span></code>, <code class="docutils literal notranslate"><span class="pre">clock_set_source(clk2,</span> <span class="pre">clk1);</span></code>
+configures <code class="docutils literal notranslate"><span class="pre">clk2</span></code> to follow the <code class="docutils literal notranslate"><span class="pre">clk1</span></code> period changes. Every time <code class="docutils literal notranslate"><span class="pre">clk1</span></code>
+is updated, <code class="docutils literal notranslate"><span class="pre">clk2</span></code> will be updated too.</p>
+<p>When connecting clock between devices, prefer using the
+<code class="docutils literal notranslate"><span class="pre">qdev_connect_clock_in()</span></code> function to set the source of an input
+device clock.  For example, to connect the input clock <code class="docutils literal notranslate"><span class="pre">clk2</span></code> of
+<code class="docutils literal notranslate"><span class="pre">devB</span></code> to the output clock <code class="docutils literal notranslate"><span class="pre">clk1</span></code> of <code class="docutils literal notranslate"><span class="pre">devA</span></code>, do:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">qdev_connect_clock_in</span><span class="p">(</span><span class="n">devB</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;clk2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">qdev_get_clock_out</span><span class="p">(</span><span class="n">devA</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;clk1&quot;</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>We used <code class="docutils literal notranslate"><span class="pre">qdev_get_clock_out()</span></code> above, but any clock can drive an
+input clock, even another input clock. The following diagram shows
+some examples of connections. Note also that a clock can drive several
+other clocks.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+------------+</span>  <span class="o">+--------------------------------------------------+</span>
+<span class="o">|</span>  <span class="n">Device</span> <span class="n">A</span>  <span class="o">|</span>  <span class="o">|</span>                   <span class="n">Device</span> <span class="n">B</span>                       <span class="o">|</span>
+<span class="o">|</span>            <span class="o">|</span>  <span class="o">|</span>               <span class="o">+---------------------+</span>            <span class="o">|</span>
+<span class="o">|</span>            <span class="o">|</span>  <span class="o">|</span>               <span class="o">|</span>       <span class="n">Device</span> <span class="n">C</span>      <span class="o">|</span>            <span class="o">|</span>
+<span class="o">|</span>  <span class="o">+-------+</span> <span class="o">|</span>  <span class="o">|</span> <span class="o">+-------+</span>     <span class="o">|</span> <span class="o">+-------+</span> <span class="o">+-------+</span> <span class="o">|</span>  <span class="o">+-------+</span> <span class="o">|</span>
+<span class="o">|</span>  <span class="o">|</span><span class="n">Clock</span> <span class="mi">1</span><span class="o">|&gt;&gt;--&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">2</span><span class="o">|&gt;&gt;+--&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">3</span><span class="o">|</span> <span class="o">|</span><span class="n">Clock</span> <span class="mi">5</span><span class="o">|&gt;&gt;&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">6</span><span class="o">|&gt;&gt;</span>
+<span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>  <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>  <span class="o">|</span>  <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span>  <span class="o">+-------+</span> <span class="o">|</span>  <span class="o">|</span> <span class="o">+-------+</span>  <span class="o">|</span>  <span class="o">|</span> <span class="o">+-------+</span> <span class="o">+-------+</span> <span class="o">|</span>  <span class="o">+-------+</span> <span class="o">|</span>
+<span class="o">+------------+</span>  <span class="o">|</span>            <span class="o">|</span>  <span class="o">+---------------------+</span>            <span class="o">|</span>
+                <span class="o">|</span>            <span class="o">|</span>                                     <span class="o">|</span>
+                <span class="o">|</span>            <span class="o">|</span>  <span class="o">+--------------+</span>                   <span class="o">|</span>
+                <span class="o">|</span>            <span class="o">|</span>  <span class="o">|</span>   <span class="n">Device</span> <span class="n">D</span>   <span class="o">|</span>                   <span class="o">|</span>
+                <span class="o">|</span>            <span class="o">|</span>  <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>                   <span class="o">|</span>
+                <span class="o">|</span>            <span class="o">+--&gt;&gt;|</span><span class="n">Clock</span> <span class="mi">4</span><span class="o">|</span>    <span class="o">|</span>                   <span class="o">|</span>
+                <span class="o">|</span>               <span class="o">|</span> <span class="o">|</span> <span class="p">(</span><span class="ow">in</span><span class="p">)</span>  <span class="o">|</span>    <span class="o">|</span>                   <span class="o">|</span>
+                <span class="o">|</span>               <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span>                   <span class="o">|</span>
+                <span class="o">|</span>               <span class="o">+--------------+</span>                   <span class="o">|</span>
+                <span class="o">+--------------------------------------------------+</span>
+</pre></div>
+</div>
+<p>In the above example, when <em>Clock 1</em> is updated by <em>Device A</em>, three
+clocks get the new clock period value: <em>Clock 2</em>, <em>Clock 3</em> and <em>Clock 4</em>.</p>
+<p>It is not possible to disconnect a clock or to change the clock connection
+after it is connected.</p>
+</section>
+<section id="clock-multiplier-and-divider-settings">
+<h2>Clock multiplier and divider settings<a class="headerlink" href="#clock-multiplier-and-divider-settings" title="Permalink to this heading"></a></h2>
+<p>By default, when clocks are connected together, the child
+clocks run with the same period as their source (parent) clock.
+The Clock API supports a built-in period multiplier/divider
+mechanism so you can configure a clock to make its children
+run at a different period from its own. If you call the
+<code class="docutils literal notranslate"><span class="pre">clock_set_mul_div()</span></code> function you can specify the clock’s
+multiplier and divider values. The children of that clock
+will all run with a period of <code class="docutils literal notranslate"><span class="pre">parent_period</span> <span class="pre">*</span> <span class="pre">multiplier</span> <span class="pre">/</span> <span class="pre">divider</span></code>.
+For instance, if the clock has a frequency of 8MHz and you set its
+multiplier to 2 and its divider to 3, the child clocks will run
+at 12MHz.</p>
+<p>You can change the multiplier and divider of a clock at runtime,
+so you can use this to model clock controller devices which
+have guest-programmable frequency multipliers or dividers.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">clock_set_mul_div()</span></code> does not automatically call
+<code class="docutils literal notranslate"><span class="pre">clock_propagate()</span></code>. If you make a runtime change to the
+multiplier or divider you must call clock_propagate() yourself.</p>
+</section>
+<section id="unconnected-input-clocks">
+<h2>Unconnected input clocks<a class="headerlink" href="#unconnected-input-clocks" title="Permalink to this heading"></a></h2>
+<p>A newly created input clock is disabled (period of 0). This means the
+clock will be considered as disabled until the period is updated. If
+the clock remains unconnected it will always keep its initial value
+of 0. If this is not the desired behaviour, <code class="docutils literal notranslate"><span class="pre">clock_set()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">clock_set_ns()</span></code> or <code class="docutils literal notranslate"><span class="pre">clock_set_hz()</span></code> should be called on the Clock
+object during device instance init. For example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qdev_init_clock_in</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">dev</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;clk-in&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">clk_in_callback</span><span class="p">,</span><span class="w"></span>
+<span class="w">                         </span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">ClockUpdate</span><span class="p">);</span><span class="w"></span>
+<span class="cm">/* set initial value to 10ns / 100MHz */</span><span class="w"></span>
+<span class="n">clock_set_ns</span><span class="p">(</span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To enforce that the clock is wired up by the board code, you can
+call <code class="docutils literal notranslate"><span class="pre">clock_has_source()</span></code> in your device’s realize method:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">clock_has_source</span><span class="p">(</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">error_setg</span><span class="p">(</span><span class="n">errp</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MyDevice: clk input must be connected&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that this only checks that the clock has been wired up; it is
+still possible that the output clock connected to it is disabled
+or has not yet been configured, in which case the period will be
+zero. You should use the clock callback to find out when the clock
+period changes.</p>
+</section>
+<section id="fetching-clock-frequency-period">
+<h2>Fetching clock frequency/period<a class="headerlink" href="#fetching-clock-frequency-period" title="Permalink to this heading"></a></h2>
+<p>To get the current state of a clock, use the functions <code class="docutils literal notranslate"><span class="pre">clock_get()</span></code>
+or <code class="docutils literal notranslate"><span class="pre">clock_get_hz()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clock_get()</span></code> returns the period of the clock in its fully precise
+internal representation, as an unsigned 64-bit integer in units of
+2^-32 nanoseconds. (For many purposes <code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code> will
+be more convenient; see the section below on expiry deadlines.)</p>
+<p><code class="docutils literal notranslate"><span class="pre">clock_get_hz()</span></code> returns the frequency of the clock, rounded to the
+next lowest integer. This implies some inaccuracy due to the rounding,
+so be cautious about using it in calculations.</p>
+<p>It is also possible to register a callback on clock frequency changes.
+Here is an example, which assumes that <code class="docutils literal notranslate"><span class="pre">clock_callback</span></code> has been
+specified as the callback for the <code class="docutils literal notranslate"><span class="pre">ClockUpdate</span></code> event:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">clock_callback</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">opaque</span><span class="p">,</span><span class="w"> </span><span class="n">ClockEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">MyDeviceState</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">MyDeviceState</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">opaque</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * &#39;opaque&#39; is the argument passed to qdev_init_clock_in();</span>
+<span class="cm">     * usually this will be the device state pointer.</span>
+<span class="cm">     */</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* do something with the new period */</span><span class="w"></span>
+<span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device new period is %&quot;</span><span class="w"> </span><span class="n">PRIu64</span><span class="w"> </span><span class="s">&quot;* 2^-32 ns</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">clock_get</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">my_clk_input</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>If you are only interested in the frequency for displaying it to
+humans (for instance in debugging), use <code class="docutils literal notranslate"><span class="pre">clock_display_freq()</span></code>,
+which returns a prettified string-representation, e.g. “33.3 MHz”.
+The caller must free the string with g_free() after use.</p>
+</section>
+<section id="calculating-expiry-deadlines">
+<h2>Calculating expiry deadlines<a class="headerlink" href="#calculating-expiry-deadlines" title="Permalink to this heading"></a></h2>
+<p>A commonly required operation for a clock is to calculate how long
+it will take for the clock to tick N times; this can then be used
+to set a timer expiry deadline. Use the function <code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code>,
+which takes an unsigned 64-bit count of ticks and returns the length
+of time in nanoseconds required for the clock to tick that many times.</p>
+<p>It is important not to try to calculate expiry deadlines using a
+shortcut like multiplying a “period of clock in nanoseconds” value
+by the tick count, because clocks can have periods which are not a
+whole number of nanoseconds, and the accumulated error in the
+multiplication can be significant.</p>
+<p>For a clock with a very long period and a large number of ticks,
+the result of this function could in theory be too large to fit in
+a 64-bit value. To avoid overflow in this case, <code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code>
+saturates the result to INT64_MAX (because this is the largest valid
+input to the QEMUTimer APIs). Since INT64_MAX nanoseconds is almost
+300 years, anything with an expiry later than that is in the “will
+never happen” category. Callers of <code class="docutils literal notranslate"><span class="pre">clock_ticks_to_ns()</span></code> should
+therefore generally not special-case the possibility of a saturated
+result but just allow the timer to be set to that far-future value.
+(If you are performing further calculations on the returned value
+rather than simply passing it to a QEMUTimer function like
+<code class="docutils literal notranslate"><span class="pre">timer_mod_ns()</span></code> then you should be careful to avoid overflow
+in those calculations, of course.)</p>
+</section>
+<section id="obtaining-tick-counts">
+<h2>Obtaining tick counts<a class="headerlink" href="#obtaining-tick-counts" title="Permalink to this heading"></a></h2>
+<p>For calculations where you need to know the number of ticks in
+a given duration, use <code class="docutils literal notranslate"><span class="pre">clock_ns_to_ticks()</span></code>. This function handles
+possible non-whole-number-of-nanoseconds periods and avoids
+potential rounding errors. It will return ‘0’ if the clock is stopped
+(i.e. it has period zero). If the inputs imply a tick count that
+overflows a 64-bit value (a very long duration for a clock with a
+very short period) the output value is truncated, so effectively
+the 64-bit output wraps around.</p>
+</section>
+<section id="changing-a-clock-period">
+<h2>Changing a clock period<a class="headerlink" href="#changing-a-clock-period" title="Permalink to this heading"></a></h2>
+<p>A device can change its outputs using the <code class="docutils literal notranslate"><span class="pre">clock_update()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">clock_update_ns()</span></code> or <code class="docutils literal notranslate"><span class="pre">clock_update_hz()</span></code> function. It will trigger
+updates on every connected input.</p>
+<p>For example, let’s say that we have an output clock <em>clkout</em> and we
+have a pointer to it in the device state because we did the following
+in init phase:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">clkout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qdev_init_clock_out</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="n">dev</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;clkout&quot;</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Then at any time (apart from the cases listed below), it is possible to
+change the clock value by doing:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">clock_update_hz</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">clkout</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"> </span><span class="cm">/* 1GHz */</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Because updating a clock may trigger any side effects through
+connected clocks and their callbacks, this operation must be done
+while holding the qemu io lock.</p>
+<p>For the same reason, one can update clocks only when it is allowed to have
+side effects on other objects. In consequence, it is forbidden:</p>
+<ul class="simple">
+<li><p>during migration,</p></li>
+<li><p>and in the enter phase of reset.</p></li>
+</ul>
+<p>Note that calling <code class="docutils literal notranslate"><span class="pre">clock_update[_ns|_hz]()</span></code> is equivalent to calling
+<code class="docutils literal notranslate"><span class="pre">clock_set[_ns|_hz]()</span></code> (with the same arguments) then
+<code class="docutils literal notranslate"><span class="pre">clock_propagate()</span></code> on the clock. Thus, setting the clock value can
+be separated from triggering the side-effects. This is often required
+to factorize code to handle reset and migration in devices.</p>
+</section>
+<section id="aliasing-clocks">
+<h2>Aliasing clocks<a class="headerlink" href="#aliasing-clocks" title="Permalink to this heading"></a></h2>
+<p>Sometimes, one needs to forward, or inherit, a clock from another
+device.  Typically, when doing device composition, a device might
+expose a sub-device’s clock without interfering with it.  The function
+<code class="docutils literal notranslate"><span class="pre">qdev_alias_clock()</span></code> can be used to achieve this behaviour. Note
+that it is possible to expose the clock under a different name.
+<code class="docutils literal notranslate"><span class="pre">qdev_alias_clock()</span></code> works for both input and output clocks.</p>
+<p>For example, if device B is a child of device A,
+<code class="docutils literal notranslate"><span class="pre">device_a_instance_init()</span></code> may do something like this:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">device_a_instance_init</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">AState</span><span class="w"> </span><span class="o">*</span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEVICE_A</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">BState</span><span class="w"> </span><span class="o">*</span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* create object B as child of A */</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...]</span><span class="w"></span>
+<span class="w">    </span><span class="n">qdev_alias_clock</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;clk&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b_clk&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * Now A has a clock &quot;b_clk&quot; which is an alias to</span>
+<span class="cm">     * the clock &quot;clk&quot; of its child B.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This function does not return any clock object. The new clock has the
+same direction (input or output) as the original one. This function
+only adds a link to the existing clock. In the above example, object B
+remains the only object allowed to use the clock and device A must not
+try to change the clock period or set a callback to the clock. This
+diagram describes the example with an input clock:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------------+</span>
+<span class="o">|</span>        <span class="n">Device</span> <span class="n">A</span>          <span class="o">|</span>
+<span class="o">|</span>         <span class="o">+--------------+</span> <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span>   <span class="n">Device</span> <span class="n">B</span>   <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span> <span class="o">|</span>
+<span class="o">&gt;&gt;</span><span class="s2">&quot;b_clk&quot;</span><span class="o">&gt;&gt;&gt;|</span> <span class="s2">&quot;clk&quot;</span> <span class="o">|</span>    <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span>  <span class="p">(</span><span class="ow">in</span><span class="p">)</span>   <span class="o">|</span> <span class="o">|</span>  <span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="o">|</span>    <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span> <span class="o">+-------+</span>    <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span>         <span class="o">+--------------+</span> <span class="o">|</span>
+<span class="o">+--------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="migration">
+<h2>Migration<a class="headerlink" href="#migration" title="Permalink to this heading"></a></h2>
+<p>Clock state is not migrated automatically. Every device must handle its
+clock migration. Alias clocks must not be migrated.</p>
+<p>To ensure clock states are restored correctly during migration, there
+are two solutions.</p>
+<p>Clock states can be migrated by adding an entry into the device
+vmstate description. You should use the <code class="docutils literal notranslate"><span class="pre">VMSTATE_CLOCK</span></code> macro for this.
+This is typically used to migrate an input clock state. For example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">MyDeviceState</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeviceState</span><span class="w"> </span><span class="n">parent_obj</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...]</span><span class="w"> </span><span class="cm">/* some fields */</span><span class="w"></span>
+<span class="w">    </span><span class="n">Clock</span><span class="w"> </span><span class="o">*</span><span class="n">clk</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="n">VMStateDescription</span><span class="w"> </span><span class="n">my_device_vmstate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my_device&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">fields</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">VMStateField</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">[...],</span><span class="w"> </span><span class="cm">/* other migrated fields */</span><span class="w"></span>
+<span class="w">        </span><span class="n">VMSTATE_CLOCK</span><span class="p">(</span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">MyDeviceState</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="n">VMSTATE_END_OF_LIST</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The second solution is to restore the clock state using information already
+at our disposal. This can be used to restore output clock states using the
+device state. The functions <code class="docutils literal notranslate"><span class="pre">clock_set[_ns|_hz]()</span></code> can be used during the
+<code class="docutils literal notranslate"><span class="pre">post_load()</span></code> migration callback.</p>
+<p>When adding clock support to an existing device, if you care about
+migration compatibility you will need to be careful, as simply adding
+a <code class="docutils literal notranslate"><span class="pre">VMSTATE_CLOCK()</span></code> line will break compatibility. Instead, you can
+put the <code class="docutils literal notranslate"><span class="pre">VMSTATE_CLOCK()</span></code> line into a vmstate subsection with a
+suitable <code class="docutils literal notranslate"><span class="pre">needed</span></code> function, and use <code class="docutils literal notranslate"><span class="pre">clock_set()</span></code> in a
+<code class="docutils literal notranslate"><span class="pre">pre_load()</span></code> function to set the default value that will be used if
+the source virtual machine in the migration does not send the clock
+state.</p>
+<p>Care should be taken not to use <code class="docutils literal notranslate"><span class="pre">clock_update[_ns|_hz]()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">clock_propagate()</span></code> during the whole migration procedure because it
+will trigger side effects to other devices in an unknown state.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="block-coroutine-wrapper.html" class="btn btn-neutral float-left" title="block-coroutine-wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ebpf_rss.html" class="btn btn-neutral float-right" title="eBPF RSS virtio-net support" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

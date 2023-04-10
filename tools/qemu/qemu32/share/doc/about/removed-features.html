@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Removed features &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="Deprecated features" href="deprecated.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">About QEMU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="build-platforms.html">Supported build platforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deprecated.html">Deprecated features</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Removed features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#system-emulator-command-line-arguments">System emulator command line arguments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hdachs-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">-hdachs</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#net-channel-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">channel</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#net-dump-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">dump</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-kvm-pit-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">-no-kvm-pit</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tdf-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">-tdf</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#drive-secs-s-drive-heads-h-drive-cyls-c-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">secs=s</span></code>, <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">heads=h</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">cyls=c</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#drive-serial-drive-trans-drive-addr-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">serial=</span></code>, <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">trans=</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">addr=</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#net-vlan-x-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">...,vlan=x</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-kvm-irqchip-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">-no-kvm-irqchip</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-kvm-pit-reinjection-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">-no-kvm-pit-reinjection</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#balloon-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-balloon</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bootp-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-bootp</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#redir-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-redir</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#smb-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-smb</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tftp-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-tftp</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#localtime-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-localtime</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nodefconfig-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-nodefconfig</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rtc-td-hack-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-rtc-td-hack</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#startdate-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-startdate</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vnc-tls-vnc-x509-vnc-x509verify-removed-in-3-1"><code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,tls=...</span></code>, <code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,x509=...</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,x509verify=...</span></code> (removed in 3.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mem-path-fallback-to-ram-removed-in-5-0"><code class="docutils literal notranslate"><span class="pre">-mem-path</span></code> fallback to RAM (removed in 5.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#net-name-removed-in-5-1"><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">...,name=...</span></code> (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#numa-node-mem-removed-in-5-1"><code class="docutils literal notranslate"><span class="pre">-numa</span> <span class="pre">node,mem=...</span></code> (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#numa-node-without-memory-specified-removed-in-5-2"><code class="docutils literal notranslate"><span class="pre">-numa</span></code> node (without memory specified) (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#smp-invalid-topologies-removed-in-5-2"><code class="docutils literal notranslate"><span class="pre">-smp</span></code> (invalid topologies) (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine-enforce-config-section-on-off-removed-in-5-2"><code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">enforce-config-section=on|off</span></code> (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-kvm-removed-in-5-2"><code class="docutils literal notranslate"><span class="pre">-no-kvm</span></code> (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#realtime-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-realtime</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#show-cursor-option-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-show-cursor</span></code> option (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tb-size-option-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-tb-size</span></code> option (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usbdevice-audio-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-usbdevice</span> <span class="pre">audio</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vnc-acl-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">acl</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mon-control-readline-pretty-on-off-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-mon</span> <span class="pre">...,control=readline,pretty=on|off</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#drive-file-json-driver-file-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">file=json:{...{'driver':'file'}}</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#floppy-controllers-drive-properties-removed-in-6-0">Floppy controllers’ drive properties (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#drive-with-bogus-interface-type-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-drive</span></code> with bogus interface type (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usbdevice-ccid-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">-usbdevice</span> <span class="pre">ccid</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#risc-v-firmware-not-booted-by-default-removed-in-5-1">RISC-V firmware not booted by default (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-quit-removed-in-7-0"><code class="docutils literal notranslate"><span class="pre">-no-quit</span></code> (removed in 7.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enable-fips-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">--enable-fips</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writeconfig-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-writeconfig</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loaded-property-of-secret-and-secret-keyring-objects-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">loaded</span></code> property of <code class="docutils literal notranslate"><span class="pre">secret</span></code> and <code class="docutils literal notranslate"><span class="pre">secret_keyring</span></code> objects (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#opened-property-of-rng-objects-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">opened</span></code> property of <code class="docutils literal notranslate"><span class="pre">rng-*</span></code> objects (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#display-sdl-window-close-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,window_close=...</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alt-grab-and-display-sdl-alt-grab-on-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-alt-grab</span></code> and <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,alt_grab=on</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ctrl-grab-and-display-sdl-ctrl-grab-on-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-ctrl-grab</span></code> and <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,ctrl_grab=on</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sdl-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-sdl</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#curses-removed-in-7-1"><code class="docutils literal notranslate"><span class="pre">-curses</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-sound-card-devices-using-soundhw-removed-in-7-1">Creating sound card devices using <code class="docutils literal notranslate"><span class="pre">-soundhw</span></code> (removed in 7.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#watchdog-since-7-2"><code class="docutils literal notranslate"><span class="pre">-watchdog</span></code> (since 7.2)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qemu-machine-protocol-qmp-commands">QEMU Machine Protocol (QMP) commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#block-dirty-bitmap-add-autoload-parameter-removed-in-4-2"><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-add</span></code> “autoload” parameter (removed in 4.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cpu-add-removed-in-5-2"><code class="docutils literal notranslate"><span class="pre">cpu-add</span></code> (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">change</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-events-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-events</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migrate-set-cache-size-and-query-migrate-cache-size-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">migrate_set_cache_size</span></code> and <code class="docutils literal notranslate"><span class="pre">query-migrate-cache-size</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migrate-set-downtime-and-migrate-set-speed-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">migrate_set_downtime</span></code> and <code class="docutils literal notranslate"><span class="pre">migrate_set_speed</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-cpus-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-cpus</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-cpus-fast-arch-output-member-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-cpus-fast</span></code> <code class="docutils literal notranslate"><span class="pre">arch</span></code> output member (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#chardev-client-socket-with-wait-option-removed-in-6-0">chardev client socket with <code class="docutils literal notranslate"><span class="pre">wait</span></code> option (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-named-block-nodes-result-encryption-key-missing-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-named-block-nodes</span></code> result <code class="docutils literal notranslate"><span class="pre">encryption_key_missing</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-block-result-inserted-encryption-key-missing-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-block</span></code> result <code class="docutils literal notranslate"><span class="pre">inserted.encryption_key_missing</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-named-block-nodes-and-query-block-result-dirty-bitmaps-i-status-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-named-block-nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">query-block</span></code> result dirty-bitmaps[i].status (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-block-result-field-dirty-bitmaps-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">query-block</span></code> result field <code class="docutils literal notranslate"><span class="pre">dirty-bitmaps</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#object-add-option-props-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">object-add</span></code> option <code class="docutils literal notranslate"><span class="pre">props</span></code> (removed in 6.0)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#human-monitor-protocol-hmp-commands">Human Monitor Protocol (HMP) commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#usb-add-and-usb-remove-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">usb_add</span></code> and <code class="docutils literal notranslate"><span class="pre">usb_remove</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host-net-add-and-host-net-remove-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">host_net_add</span></code> and <code class="docutils literal notranslate"><span class="pre">host_net_remove</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-hub-id-parameter-of-hostfwd-add-hostfwd-remove-removed-in-5-0">The <code class="docutils literal notranslate"><span class="pre">hub_id</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">hostfwd_add</span></code> / <code class="docutils literal notranslate"><span class="pre">hostfwd_remove</span></code> (removed in 5.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">cpu-add</span></code> (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-vnc-target-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">change</span> <span class="pre">vnc</span> <span class="pre">TARGET</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#acl-show-acl-reset-acl-policy-acl-add-acl-remove-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">acl_show</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_reset</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_policy</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_add</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_remove</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migrate-set-cache-size-and-info-migrate-cache-size-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">migrate-set-cache-size</span></code> and <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">migrate-cache-size</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">migrate_set_downtime</span></code> and <code class="docutils literal notranslate"><span class="pre">migrate_set_speed</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#info-cpustats-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">cpustats</span></code> (removed in 6.1)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#guest-emulator-isas">Guest Emulator ISAs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#risc-v-isa-privilege-specification-version-1-09-1-removed-in-5-1">RISC-V ISA privilege specification version 1.09.1 (removed in 5.1)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#system-emulator-cpus">System emulator CPUS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kvm-guest-support-on-32-bit-arm-hosts-removed-in-5-2">KVM guest support on 32-bit Arm hosts (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#risc-v-isa-specific-cpus-removed-in-5-1">RISC-V ISA Specific CPUs (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#risc-v-no-mmu-cpus-removed-in-5-1">RISC-V no MMU CPUs (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compat-property-of-server-class-power-cpus-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">compat</span></code> property of server class POWER CPUs (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#moxie-cpu-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">moxie</span></code> CPU (removed in 6.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lm32-cpus-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">lm32</span></code> CPUs (removed in 6.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unicore32-cpus-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">unicore32</span></code> CPUs (removed in 6.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#x86-icelake-client-cpu-removed-in-7-1">x86 <code class="docutils literal notranslate"><span class="pre">Icelake-Client</span></code> CPU (removed in 7.1)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#system-emulator-machines">System emulator machines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#s390-virtio-removed-in-2-6"><code class="docutils literal notranslate"><span class="pre">s390-virtio</span></code> (removed in 2.6)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-m68k-dummy-machine-removed-in-2-9">The m68k <code class="docutils literal notranslate"><span class="pre">dummy</span></code> machine (removed in 2.9)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xlnx-ep108-removed-in-3-0"><code class="docutils literal notranslate"><span class="pre">xlnx-ep108</span></code> (removed in 3.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spike-v1-9-1-and-spike-v1-10-removed-in-5-1"><code class="docutils literal notranslate"><span class="pre">spike_v1.9.1</span></code> and <code class="docutils literal notranslate"><span class="pre">spike_v1.10</span></code> (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mips-r4k-platform-removed-in-5-2">mips <code class="docutils literal notranslate"><span class="pre">r4k</span></code> platform (removed in 5.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mips-fulong2e-machine-alias-removed-in-6-0">mips <code class="docutils literal notranslate"><span class="pre">fulong2e</span></code> machine alias (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pc-0-10-up-to-pc-1-3-removed-in-4-0-up-to-6-0"><code class="docutils literal notranslate"><span class="pre">pc-0.10</span></code> up to <code class="docutils literal notranslate"><span class="pre">pc-1.3</span></code> (removed in 4.0 up to 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#raspberry-pi-raspi2-and-raspi3-machines-removed-in-6-2">Raspberry Pi <code class="docutils literal notranslate"><span class="pre">raspi2</span></code> and <code class="docutils literal notranslate"><span class="pre">raspi3</span></code> machines (removed in 6.2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aspeed-swift-bmc-machine-removed-in-7-0">Aspeed <code class="docutils literal notranslate"><span class="pre">swift-bmc</span></code> machine (removed in 7.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ppc-taihu-machine-removed-in-7-2">ppc <code class="docutils literal notranslate"><span class="pre">taihu</span></code> machine (removed in 7.2)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#linux-user-mode-cpus">linux-user mode CPUs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tilegx-cpus-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">tilegx</span></code> CPUs (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ppc64abi32-cpus-removed-in-7-0"><code class="docutils literal notranslate"><span class="pre">ppc64abi32</span></code> CPUs (removed in 7.0)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tcg-introspection-features">TCG introspection features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tcg-trace-events-since-6-2">TCG trace-events (since 6.2)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#system-emulator-devices">System emulator devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#spapr-pci-vfio-host-bridge-removed-in-2-12"><code class="docutils literal notranslate"><span class="pre">spapr-pci-vfio-host-bridge</span></code> (removed in 2.12)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ivshmem-removed-in-4-0"><code class="docutils literal notranslate"><span class="pre">ivshmem</span></code> (removed in 4.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ide-drive-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">ide-drive</span></code> (removed in 6.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scsi-disk-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">scsi-disk</span></code> (removed in 6.0)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#related-binaries">Related binaries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-nbd-partition-removed-in-5-0"><code class="docutils literal notranslate"><span class="pre">qemu-nbd</span> <span class="pre">--partition</span></code> (removed in 5.0)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-img-convert-n-o-removed-in-5-1"><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">convert</span> <span class="pre">-n</span> <span class="pre">-o</span></code> (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-img-create-b-bad-file-size-removed-in-5-1"><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">create</span> <span class="pre">-b</span> <span class="pre">bad</span> <span class="pre">file</span> <span class="pre">$size</span></code> (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-img-amend-to-adjust-backing-file-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">amend</span></code> to adjust backing file (removed in 6.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemu-img-backing-file-without-format-removed-in-6-1"><code class="docutils literal notranslate"><span class="pre">qemu-img</span></code> backing file without format (removed in 6.1)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#block-devices">Block devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#vxhs-backend-removed-in-5-1">VXHS backend (removed in 5.1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sheepdog-driver-removed-in-6-0"><code class="docutils literal notranslate"><span class="pre">sheepdog</span></code> driver (removed in 6.0)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">About QEMU</a></li>
+      <li class="breadcrumb-item active">Removed features</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/about/removed-features.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="removed-features">
+<h1>Removed features<a class="headerlink" href="#removed-features" title="Permalink to this heading"></a></h1>
+<p>What follows is a record of recently removed, formerly deprecated
+features that serves as a record for users who have encountered
+trouble after a recent upgrade.</p>
+<section id="system-emulator-command-line-arguments">
+<h2>System emulator command line arguments<a class="headerlink" href="#system-emulator-command-line-arguments" title="Permalink to this heading"></a></h2>
+<section id="hdachs-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">-hdachs</span></code> (removed in 2.12)<a class="headerlink" href="#hdachs-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>The geometry defined by <code class="docutils literal notranslate"><span class="pre">-hdachs</span> <span class="pre">c,h,s,t</span></code> should now be specified via
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">ide-hd,drive=dr,cyls=c,heads=h,secs=s,bios-chs-trans=t</span></code>
+(together with <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=none,id=dr,...</span></code>).</p>
+</section>
+<section id="net-channel-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">channel</span></code> (removed in 2.12)<a class="headerlink" href="#net-channel-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>This option has been replaced by <code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">user,guestfwd=...</span></code>.</p>
+</section>
+<section id="net-dump-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">dump</span></code> (removed in 2.12)<a class="headerlink" href="#net-dump-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">dump[,vlan=n][,file=filename][,len=maxlen]</span></code> has been replaced by
+<code class="docutils literal notranslate"><span class="pre">-object</span> <span class="pre">filter-dump,id=id,netdev=dev[,file=filename][,maxlen=maxlen]</span></code>.
+Note that the new syntax works with netdev IDs instead of the old “vlan” hubs.</p>
+</section>
+<section id="no-kvm-pit-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">-no-kvm-pit</span></code> (removed in 2.12)<a class="headerlink" href="#no-kvm-pit-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>This was just a dummy option that has been ignored, since the in-kernel PIT
+cannot be disabled separately from the irqchip anymore. A similar effect
+(which also disables the KVM IOAPIC) can be obtained with
+<code class="docutils literal notranslate"><span class="pre">-M</span> <span class="pre">kernel_irqchip=split</span></code>.</p>
+</section>
+<section id="tdf-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">-tdf</span></code> (removed in 2.12)<a class="headerlink" href="#tdf-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>There is no replacement, the <code class="docutils literal notranslate"><span class="pre">-tdf</span></code> option has just been ignored since the
+behaviour that could be changed by this option in qemu-kvm is now the default
+when using the KVM PIT. It still can be requested explicitly using
+<code class="docutils literal notranslate"><span class="pre">-global</span> <span class="pre">kvm-pit.lost_tick_policy=delay</span></code>.</p>
+</section>
+<section id="drive-secs-s-drive-heads-h-drive-cyls-c-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">secs=s</span></code>, <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">heads=h</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">cyls=c</span></code> (removed in 3.0)<a class="headerlink" href="#drive-secs-s-drive-heads-h-drive-cyls-c-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>The drive geometry should now be specified via
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,drive=dr,cyls=c,heads=h,secs=s</span></code> (together with
+<code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=none,id=dr,...</span></code>).</p>
+</section>
+<section id="drive-serial-drive-trans-drive-addr-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">serial=</span></code>, <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">trans=</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">addr=</span></code> (removed in 3.0)<a class="headerlink" href="#drive-serial-drive-trans-drive-addr-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,drive=dr,serial=r,bios-chs-trans=t,addr=a</span></code> instead
+(together with <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=none,id=dr,...</span></code>).</p>
+</section>
+<section id="net-vlan-x-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">...,vlan=x</span></code> (removed in 3.0)<a class="headerlink" href="#net-vlan-x-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>The term “vlan” was very confusing for most users in this context (it’s about
+specifying a hub ID, not about IEEE 802.1Q or something similar), so this
+has been removed. To connect one NIC frontend with a network backend, either
+use <code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">...</span></code> (e.g. for on-board NICs) or use <code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">...,id=n</span></code> together
+with <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=n</span></code> (for full control over pluggable NICs). To
+connect multiple NICs or network backends via a hub device (which is what
+vlan did), use <code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">hubport,hubid=x,...</span></code> or
+<code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">hubport,id=n,hubid=x,...</span></code> (with <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=n</span></code>) instead.</p>
+</section>
+<section id="no-kvm-irqchip-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-no-kvm-irqchip</span></code> (removed in 3.0)<a class="headerlink" href="#no-kvm-irqchip-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">kernel_irqchip=off</span></code> instead.</p>
+</section>
+<section id="no-kvm-pit-reinjection-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-no-kvm-pit-reinjection</span></code> (removed in 3.0)<a class="headerlink" href="#no-kvm-pit-reinjection-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-global</span> <span class="pre">kvm-pit.lost_tick_policy=discard</span></code> instead.</p>
+</section>
+<section id="balloon-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-balloon</span></code> (removed in 3.1)<a class="headerlink" href="#balloon-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-balloon</span> <span class="pre">virtio</span></code> option has been replaced by <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">virtio-balloon</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">-balloon</span> <span class="pre">none</span></code> option was a no-op and has no replacement.</p>
+</section>
+<section id="bootp-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-bootp</span></code> (removed in 3.1)<a class="headerlink" href="#bootp-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-bootp</span> <span class="pre">/some/file</span></code> argument is replaced by either
+<code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">user,id=x,bootp=/some/file</span></code> (for pluggable NICs, accompanied with
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=x</span></code>), or <code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">user,bootp=/some/file</span></code> (for on-board NICs).
+The new syntax allows different settings to be provided per NIC.</p>
+</section>
+<section id="redir-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-redir</span></code> (removed in 3.1)<a class="headerlink" href="#redir-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-redir</span> <span class="pre">[tcp|udp]:hostport:[guestaddr]:guestport</span></code> option is replaced
+by either <code class="docutils literal notranslate"><span class="pre">-netdev</span>
+<span class="pre">user,id=x,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport</span></code>
+(for pluggable NICs, accompanied with <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=x</span></code>) or by the option
+<code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">user,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport</span></code>
+(for on-board NICs). The new syntax allows different settings to be provided
+per NIC.</p>
+</section>
+<section id="smb-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-smb</span></code> (removed in 3.1)<a class="headerlink" href="#smb-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-smb</span> <span class="pre">/some/dir</span></code> argument is replaced by either
+<code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">user,id=x,smb=/some/dir</span></code> (for pluggable NICs, accompanied with
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=x</span></code>), or <code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">user,smb=/some/dir</span></code> (for on-board NICs).
+The new syntax allows different settings to be provided per NIC.</p>
+</section>
+<section id="tftp-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-tftp</span></code> (removed in 3.1)<a class="headerlink" href="#tftp-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-tftp</span> <span class="pre">/some/dir</span></code> argument is replaced by either
+<code class="docutils literal notranslate"><span class="pre">-netdev</span> <span class="pre">user,id=x,tftp=/some/dir</span></code> (for pluggable NICs, accompanied with
+<code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">...,netdev=x</span></code>), or <code class="docutils literal notranslate"><span class="pre">-nic</span> <span class="pre">user,tftp=/some/dir</span></code> (for embedded NICs).
+The new syntax allows different settings to be provided per NIC.</p>
+</section>
+<section id="localtime-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-localtime</span></code> (removed in 3.1)<a class="headerlink" href="#localtime-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>Replaced by <code class="docutils literal notranslate"><span class="pre">-rtc</span> <span class="pre">base=localtime</span></code>.</p>
+</section>
+<section id="nodefconfig-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-nodefconfig</span></code> (removed in 3.1)<a class="headerlink" href="#nodefconfig-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-no-user-config</span></code> instead.</p>
+</section>
+<section id="rtc-td-hack-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-rtc-td-hack</span></code> (removed in 3.1)<a class="headerlink" href="#rtc-td-hack-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-rtc</span> <span class="pre">driftfix=slew</span></code> instead.</p>
+</section>
+<section id="startdate-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-startdate</span></code> (removed in 3.1)<a class="headerlink" href="#startdate-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>Replaced by <code class="docutils literal notranslate"><span class="pre">-rtc</span> <span class="pre">base=date</span></code>.</p>
+</section>
+<section id="vnc-tls-vnc-x509-vnc-x509verify-removed-in-3-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,tls=...</span></code>, <code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,x509=...</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">...,x509verify=...</span></code> (removed in 3.1)<a class="headerlink" href="#vnc-tls-vnc-x509-vnc-x509verify-removed-in-3-1" title="Permalink to this heading"></a></h3>
+<p>The “tls-creds” option should be used instead to point to a “tls-creds-x509”
+object created using “-object”.</p>
+</section>
+<section id="mem-path-fallback-to-ram-removed-in-5-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-mem-path</span></code> fallback to RAM (removed in 5.0)<a class="headerlink" href="#mem-path-fallback-to-ram-removed-in-5-0" title="Permalink to this heading"></a></h3>
+<p>If guest RAM allocation from file pointed by <code class="docutils literal notranslate"><span class="pre">mem-path</span></code> failed,
+QEMU was falling back to allocating from RAM, which might have resulted
+in unpredictable behavior since the backing file specified by the user
+as ignored. Currently, users are responsible for making sure the backing storage
+specified with <code class="docutils literal notranslate"><span class="pre">-mem-path</span></code> can actually provide the guest RAM configured with
+<code class="docutils literal notranslate"><span class="pre">-m</span></code> and QEMU fails to start up if RAM allocation is unsuccessful.</p>
+</section>
+<section id="net-name-removed-in-5-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">...,name=...</span></code> (removed in 5.1)<a class="headerlink" href="#net-name-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">-net</span></code> option was a synonym
+for the <code class="docutils literal notranslate"><span class="pre">id</span></code> parameter, which should now be used instead.</p>
+</section>
+<section id="numa-node-mem-removed-in-5-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-numa</span> <span class="pre">node,mem=...</span></code> (removed in 5.1)<a class="headerlink" href="#numa-node-mem-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">mem</span></code> of <code class="docutils literal notranslate"><span class="pre">-numa</span> <span class="pre">node</span></code> was used to assign a part of guest RAM
+to a NUMA node. But when using it, it’s impossible to manage a specified RAM
+chunk on the host side (like bind it to a host node, setting bind policy, …),
+so the guest ends up with the fake NUMA configuration with suboptiomal
+performance.
+However since 2014 there is an alternative way to assign RAM to a NUMA node
+using parameter <code class="docutils literal notranslate"><span class="pre">memdev</span></code>, which does the same as <code class="docutils literal notranslate"><span class="pre">mem</span></code> and adds
+means to actually manage node RAM on the host side. Use parameter <code class="docutils literal notranslate"><span class="pre">memdev</span></code>
+with <em>memory-backend-ram</em> backend as replacement for parameter <code class="docutils literal notranslate"><span class="pre">mem</span></code>
+to achieve the same fake NUMA effect or a properly configured
+<em>memory-backend-file</em> backend to actually benefit from NUMA configuration.
+New machine versions (since 5.1) will not accept the option but it will still
+work with old machine types. User can check the QAPI schema to see if the legacy
+option is supported by looking at MachineInfo::numa-mem-supported property.</p>
+</section>
+<section id="numa-node-without-memory-specified-removed-in-5-2">
+<h3><code class="docutils literal notranslate"><span class="pre">-numa</span></code> node (without memory specified) (removed in 5.2)<a class="headerlink" href="#numa-node-without-memory-specified-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>Splitting RAM by default between NUMA nodes had the same issues as <code class="docutils literal notranslate"><span class="pre">mem</span></code>
+parameter with the difference that the role of the user plays QEMU using
+implicit generic or board specific splitting rule.
+Use <code class="docutils literal notranslate"><span class="pre">memdev</span></code> with <em>memory-backend-ram</em> backend or <code class="docutils literal notranslate"><span class="pre">mem</span></code> (if
+it’s supported by used machine type) to define mapping explicitly instead.
+Users of existing VMs, wishing to preserve the same RAM distribution, should
+configure it explicitly using <code class="docutils literal notranslate"><span class="pre">-numa</span> <span class="pre">node,memdev</span></code> options. Current RAM
+distribution can be retrieved using HMP command <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">numa</span></code> and if separate
+memory devices (pc|nv-dimm) are present use <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">memory-device</span></code> and subtract
+device memory from output of <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">numa</span></code>.</p>
+</section>
+<section id="smp-invalid-topologies-removed-in-5-2">
+<h3><code class="docutils literal notranslate"><span class="pre">-smp</span></code> (invalid topologies) (removed in 5.2)<a class="headerlink" href="#smp-invalid-topologies-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>CPU topology properties should describe whole machine topology including
+possible CPUs.</p>
+<p>However, historically it was possible to start QEMU with an incorrect topology
+where <em>n</em> &lt;= <em>sockets</em> * <em>cores</em> * <em>threads</em> &lt; <em>maxcpus</em>,
+which could lead to an incorrect topology enumeration by the guest.
+Support for invalid topologies is removed, the user must ensure
+topologies described with -smp include all possible cpus, i.e.
+<em>sockets</em> * <em>cores</em> * <em>threads</em> = <em>maxcpus</em>.</p>
+</section>
+<section id="machine-enforce-config-section-on-off-removed-in-5-2">
+<h3><code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">enforce-config-section=on|off</span></code> (removed in 5.2)<a class="headerlink" href="#machine-enforce-config-section-on-off-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">enforce-config-section</span></code> property was replaced by the
+<code class="docutils literal notranslate"><span class="pre">-global</span> <span class="pre">migration.send-configuration={on|off}</span></code> option.</p>
+</section>
+<section id="no-kvm-removed-in-5-2">
+<h3><code class="docutils literal notranslate"><span class="pre">-no-kvm</span></code> (removed in 5.2)<a class="headerlink" href="#no-kvm-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-no-kvm</span></code> argument was a synonym for setting <code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">accel=tcg</span></code>.</p>
+</section>
+<section id="realtime-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-realtime</span></code> (removed in 6.0)<a class="headerlink" href="#realtime-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-realtime</span> <span class="pre">mlock=on|off</span></code> argument has been replaced by the
+<code class="docutils literal notranslate"><span class="pre">-overcommit</span> <span class="pre">mem-lock=on|off</span></code> argument.</p>
+</section>
+<section id="show-cursor-option-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-show-cursor</span></code> option (removed in 6.0)<a class="headerlink" href="#show-cursor-option-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,show-cursor=on</span></code>, <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">gtk,show-cursor=on</span></code>
+or <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">default,show-cursor=on</span></code> instead.</p>
+</section>
+<section id="tb-size-option-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-tb-size</span></code> option (removed in 6.0)<a class="headerlink" href="#tb-size-option-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>QEMU 5.0 introduced an alternative syntax to specify the size of the translation
+block cache, <code class="docutils literal notranslate"><span class="pre">-accel</span> <span class="pre">tcg,tb-size=</span></code>.</p>
+</section>
+<section id="usbdevice-audio-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-usbdevice</span> <span class="pre">audio</span></code> (removed in 6.0)<a class="headerlink" href="#usbdevice-audio-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>This option lacked the possibility to specify an audio backend device.
+Use <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-audio</span></code> now instead (and specify a corresponding USB
+host controller or <code class="docutils literal notranslate"><span class="pre">-usb</span></code> if necessary).</p>
+</section>
+<section id="vnc-acl-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-vnc</span> <span class="pre">acl</span></code> (removed in 6.0)<a class="headerlink" href="#vnc-acl-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">acl</span></code> option to the <code class="docutils literal notranslate"><span class="pre">-vnc</span></code> argument has been replaced
+by the <code class="docutils literal notranslate"><span class="pre">tls-authz</span></code> and <code class="docutils literal notranslate"><span class="pre">sasl-authz</span></code> options.</p>
+</section>
+<section id="mon-control-readline-pretty-on-off-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-mon</span> <span class="pre">...,control=readline,pretty=on|off</span></code> (removed in 6.0)<a class="headerlink" href="#mon-control-readline-pretty-on-off-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pretty=on|off</span></code> switch has no effect for HMP monitors and
+its use is rejected.</p>
+</section>
+<section id="drive-file-json-driver-file-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">file=json:{...{'driver':'file'}}</span></code> (removed in 6.0)<a class="headerlink" href="#drive-file-json-driver-file-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The ‘file’ driver for drives is no longer appropriate for character or host
+devices and will only accept regular files (S_IFREG). The correct driver
+for these file types is ‘host_cdrom’ or ‘host_device’ as appropriate.</p>
+</section>
+<section id="floppy-controllers-drive-properties-removed-in-6-0">
+<h3>Floppy controllers’ drive properties (removed in 6.0)<a class="headerlink" href="#floppy-controllers-drive-properties-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">floppy,...</span></code> instead.  When configuring onboard floppy
+controllers</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="k">global</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="o">.</span><span class="n">driveA</span><span class="o">=...</span>
+<span class="o">-</span><span class="k">global</span> <span class="n">sysbus</span><span class="o">-</span><span class="n">fdc</span><span class="o">.</span><span class="n">driveA</span><span class="o">=...</span>
+<span class="o">-</span><span class="k">global</span> <span class="n">SUNW</span><span class="p">,</span><span class="n">fdtwo</span><span class="o">.</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>become</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">floppy</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="k">global</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="o">.</span><span class="n">driveB</span><span class="o">=...</span>
+<span class="o">-</span><span class="k">global</span> <span class="n">sysbus</span><span class="o">-</span><span class="n">fdc</span><span class="o">.</span><span class="n">driveB</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>become</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">floppy</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>When plugging in a floppy controller</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">driveA</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>becomes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="p">,</span><span class="o">...</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">floppy</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">driveB</span><span class="o">=...</span>
+</pre></div>
+</div>
+<p>becomes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">isa</span><span class="o">-</span><span class="n">fdc</span><span class="p">,</span><span class="o">...</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">floppy</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">drive</span><span class="o">=...</span>
+</pre></div>
+</div>
+</section>
+<section id="drive-with-bogus-interface-type-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-drive</span></code> with bogus interface type (removed in 6.0)<a class="headerlink" href="#drive-with-bogus-interface-type-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Drives with interface types other than <code class="docutils literal notranslate"><span class="pre">if=none</span></code> are for onboard
+devices.  Drives the board doesn’t pick up can no longer be used with
+-device.  Use <code class="docutils literal notranslate"><span class="pre">if=none</span></code> instead.</p>
+</section>
+<section id="usbdevice-ccid-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-usbdevice</span> <span class="pre">ccid</span></code> (removed in 6.0)<a class="headerlink" href="#usbdevice-ccid-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>This option was undocumented and not used in the field.
+Use <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">usb-ccid</span></code> instead.</p>
+</section>
+<section id="risc-v-firmware-not-booted-by-default-removed-in-5-1">
+<h3>RISC-V firmware not booted by default (removed in 5.1)<a class="headerlink" href="#risc-v-firmware-not-booted-by-default-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>QEMU 5.1 changes the default behaviour from <code class="docutils literal notranslate"><span class="pre">-bios</span> <span class="pre">none</span></code> to <code class="docutils literal notranslate"><span class="pre">-bios</span> <span class="pre">default</span></code>
+for the RISC-V <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine and <code class="docutils literal notranslate"><span class="pre">sifive_u</span></code> machine.</p>
+</section>
+<section id="no-quit-removed-in-7-0">
+<h3><code class="docutils literal notranslate"><span class="pre">-no-quit</span></code> (removed in 7.0)<a class="headerlink" href="#no-quit-removed-in-7-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-no-quit</span></code> was a synonym for <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">...,window-close=off</span></code> which
+should be used instead.</p>
+</section>
+<section id="enable-fips-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">--enable-fips</span></code> (removed in 7.1)<a class="headerlink" href="#enable-fips-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>This option restricted usage of certain cryptographic algorithms when
+the host is operating in FIPS mode.</p>
+<p>If FIPS compliance is required, QEMU should be built with the <code class="docutils literal notranslate"><span class="pre">libgcrypt</span></code>
+or <code class="docutils literal notranslate"><span class="pre">gnutls</span></code> library enabled as a cryptography provider.</p>
+<p>Neither the <code class="docutils literal notranslate"><span class="pre">nettle</span></code> library, or the built-in cryptography provider are
+supported on FIPS enabled hosts.</p>
+</section>
+<section id="writeconfig-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-writeconfig</span></code> (removed in 7.1)<a class="headerlink" href="#writeconfig-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">-writeconfig</span></code> option was not able to serialize the entire contents
+of the QEMU command line.  It is thus considered a failed experiment
+and removed without a replacement.</p>
+</section>
+<section id="loaded-property-of-secret-and-secret-keyring-objects-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">loaded</span></code> property of <code class="docutils literal notranslate"><span class="pre">secret</span></code> and <code class="docutils literal notranslate"><span class="pre">secret_keyring</span></code> objects (removed in 7.1)<a class="headerlink" href="#loaded-property-of-secret-and-secret-keyring-objects-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">loaded=on</span></code> option in the command line or QMP <code class="docutils literal notranslate"><span class="pre">object-add</span></code> either had
+no effect (if <code class="docutils literal notranslate"><span class="pre">loaded</span></code> was the last option) or caused options to be
+effectively ignored as if they were not given.  The property is therefore
+useless and should simply be removed.</p>
+</section>
+<section id="opened-property-of-rng-objects-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">opened</span></code> property of <code class="docutils literal notranslate"><span class="pre">rng-*</span></code> objects (removed in 7.1)<a class="headerlink" href="#opened-property-of-rng-objects-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">opened=on</span></code> option in the command line or QMP <code class="docutils literal notranslate"><span class="pre">object-add</span></code> either had
+no effect (if <code class="docutils literal notranslate"><span class="pre">opened</span></code> was the last option) or caused errors.  The property
+is therefore useless and should simply be removed.</p>
+</section>
+<section id="display-sdl-window-close-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,window_close=...</span></code> (removed in 7.1)<a class="headerlink" href="#display-sdl-window-close-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,window-close=...</span></code> instead (i.e. with a minus instead of
+an underscore between “window” and “close”).</p>
+</section>
+<section id="alt-grab-and-display-sdl-alt-grab-on-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-alt-grab</span></code> and <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,alt_grab=on</span></code> (removed in 7.1)<a class="headerlink" href="#alt-grab-and-display-sdl-alt-grab-on-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,grab-mod=lshift-lctrl-lalt</span></code> instead.</p>
+</section>
+<section id="ctrl-grab-and-display-sdl-ctrl-grab-on-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-ctrl-grab</span></code> and <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,ctrl_grab=on</span></code> (removed in 7.1)<a class="headerlink" href="#ctrl-grab-and-display-sdl-ctrl-grab-on-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl,grab-mod=rctrl</span></code> instead.</p>
+</section>
+<section id="sdl-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-sdl</span></code> (removed in 7.1)<a class="headerlink" href="#sdl-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">sdl</span></code> instead.</p>
+</section>
+<section id="curses-removed-in-7-1">
+<h3><code class="docutils literal notranslate"><span class="pre">-curses</span></code> (removed in 7.1)<a class="headerlink" href="#curses-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-display</span> <span class="pre">curses</span></code> instead.</p>
+</section>
+<section id="creating-sound-card-devices-using-soundhw-removed-in-7-1">
+<h3>Creating sound card devices using <code class="docutils literal notranslate"><span class="pre">-soundhw</span></code> (removed in 7.1)<a class="headerlink" href="#creating-sound-card-devices-using-soundhw-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>Sound card devices should be created using <code class="docutils literal notranslate"><span class="pre">-device</span></code> or <code class="docutils literal notranslate"><span class="pre">-audio</span></code>.
+The exception is <code class="docutils literal notranslate"><span class="pre">pcspk</span></code> which can be activated using <code class="docutils literal notranslate"><span class="pre">-machine</span>
+<span class="pre">pcspk-audiodev=&lt;name&gt;</span></code>.</p>
+</section>
+<section id="watchdog-since-7-2">
+<h3><code class="docutils literal notranslate"><span class="pre">-watchdog</span></code> (since 7.2)<a class="headerlink" href="#watchdog-since-7-2" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-device</span></code> instead.</p>
+</section>
+</section>
+<section id="qemu-machine-protocol-qmp-commands">
+<h2>QEMU Machine Protocol (QMP) commands<a class="headerlink" href="#qemu-machine-protocol-qmp-commands" title="Permalink to this heading"></a></h2>
+<section id="block-dirty-bitmap-add-autoload-parameter-removed-in-4-2">
+<h3><code class="docutils literal notranslate"><span class="pre">block-dirty-bitmap-add</span></code> “autoload” parameter (removed in 4.2)<a class="headerlink" href="#block-dirty-bitmap-add-autoload-parameter-removed-in-4-2" title="Permalink to this heading"></a></h3>
+<p>The “autoload” parameter has been ignored since 2.12.0. All bitmaps
+are automatically loaded from qcow2 images.</p>
+</section>
+<section id="cpu-add-removed-in-5-2">
+<h3><code class="docutils literal notranslate"><span class="pre">cpu-add</span></code> (removed in 5.2)<a class="headerlink" href="#cpu-add-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">device_add</span></code> for hotplugging vCPUs instead of <code class="docutils literal notranslate"><span class="pre">cpu-add</span></code>.  See
+documentation of <code class="docutils literal notranslate"><span class="pre">query-hotpluggable-cpus</span></code> for additional details.</p>
+</section>
+<section id="change-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">change</span></code> (removed in 6.0)<a class="headerlink" href="#change-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">blockdev-change-medium</span></code> or <code class="docutils literal notranslate"><span class="pre">change-vnc-password</span></code> or
+<code class="docutils literal notranslate"><span class="pre">display-update</span></code> instead.</p>
+</section>
+<section id="query-events-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-events</span></code> (removed in 6.0)<a class="headerlink" href="#query-events-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">query-events</span></code> command has been superseded by the more powerful
+and accurate <code class="docutils literal notranslate"><span class="pre">query-qmp-schema</span></code> command.</p>
+</section>
+<section id="migrate-set-cache-size-and-query-migrate-cache-size-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">migrate_set_cache_size</span></code> and <code class="docutils literal notranslate"><span class="pre">query-migrate-cache-size</span></code> (removed in 6.0)<a class="headerlink" href="#migrate-set-cache-size-and-query-migrate-cache-size-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">migrate_parameters</span></code> instead.</p>
+</section>
+<section id="migrate-set-downtime-and-migrate-set-speed-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">migrate_set_downtime</span></code> and <code class="docutils literal notranslate"><span class="pre">migrate_set_speed</span></code> (removed in 6.0)<a class="headerlink" href="#migrate-set-downtime-and-migrate-set-speed-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span></code> instead.</p>
+</section>
+<section id="query-cpus-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-cpus</span></code> (removed in 6.0)<a class="headerlink" href="#query-cpus-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">query-cpus</span></code> command is replaced by the <code class="docutils literal notranslate"><span class="pre">query-cpus-fast</span></code> command.</p>
+</section>
+<section id="query-cpus-fast-arch-output-member-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-cpus-fast</span></code> <code class="docutils literal notranslate"><span class="pre">arch</span></code> output member (removed in 6.0)<a class="headerlink" href="#query-cpus-fast-arch-output-member-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">arch</span></code> output member of the <code class="docutils literal notranslate"><span class="pre">query-cpus-fast</span></code> command is
+replaced by the <code class="docutils literal notranslate"><span class="pre">target</span></code> output member.</p>
+</section>
+<section id="chardev-client-socket-with-wait-option-removed-in-6-0">
+<h3>chardev client socket with <code class="docutils literal notranslate"><span class="pre">wait</span></code> option (removed in 6.0)<a class="headerlink" href="#chardev-client-socket-with-wait-option-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Character devices creating sockets in client mode should not specify
+the ‘wait’ field, which is only applicable to sockets in server mode</p>
+</section>
+<section id="query-named-block-nodes-result-encryption-key-missing-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-named-block-nodes</span></code> result <code class="docutils literal notranslate"><span class="pre">encryption_key_missing</span></code> (removed in 6.0)<a class="headerlink" href="#query-named-block-nodes-result-encryption-key-missing-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Removed with no replacement.</p>
+</section>
+<section id="query-block-result-inserted-encryption-key-missing-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-block</span></code> result <code class="docutils literal notranslate"><span class="pre">inserted.encryption_key_missing</span></code> (removed in 6.0)<a class="headerlink" href="#query-block-result-inserted-encryption-key-missing-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Removed with no replacement.</p>
+</section>
+<section id="query-named-block-nodes-and-query-block-result-dirty-bitmaps-i-status-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-named-block-nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">query-block</span></code> result dirty-bitmaps[i].status (removed in 6.0)<a class="headerlink" href="#query-named-block-nodes-and-query-block-result-dirty-bitmaps-i-status-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">status</span></code> field of the <code class="docutils literal notranslate"><span class="pre">BlockDirtyInfo</span></code> structure, returned by
+these commands is removed. Two new boolean fields, <code class="docutils literal notranslate"><span class="pre">recording</span></code> and
+<code class="docutils literal notranslate"><span class="pre">busy</span></code> effectively replace it.</p>
+</section>
+<section id="query-block-result-field-dirty-bitmaps-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">query-block</span></code> result field <code class="docutils literal notranslate"><span class="pre">dirty-bitmaps</span></code> (removed in 6.0)<a class="headerlink" href="#query-block-result-field-dirty-bitmaps-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">dirty-bitmaps</span></code> field of the <code class="docutils literal notranslate"><span class="pre">BlockInfo</span></code> structure, returned by
+the query-block command is itself now removed. The <code class="docutils literal notranslate"><span class="pre">dirty-bitmaps</span></code>
+field of the <code class="docutils literal notranslate"><span class="pre">BlockDeviceInfo</span></code> struct should be used instead, which is the
+type of the <code class="docutils literal notranslate"><span class="pre">inserted</span></code> field in query-block replies, as well as the
+type of array items in query-named-block-nodes.</p>
+</section>
+<section id="object-add-option-props-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">object-add</span></code> option <code class="docutils literal notranslate"><span class="pre">props</span></code> (removed in 6.0)<a class="headerlink" href="#object-add-option-props-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Specify the properties for the object as top-level arguments instead.</p>
+</section>
+</section>
+<section id="human-monitor-protocol-hmp-commands">
+<h2>Human Monitor Protocol (HMP) commands<a class="headerlink" href="#human-monitor-protocol-hmp-commands" title="Permalink to this heading"></a></h2>
+<section id="usb-add-and-usb-remove-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">usb_add</span></code> and <code class="docutils literal notranslate"><span class="pre">usb_remove</span></code> (removed in 2.12)<a class="headerlink" href="#usb-add-and-usb-remove-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>Replaced by <code class="docutils literal notranslate"><span class="pre">device_add</span></code> and <code class="docutils literal notranslate"><span class="pre">device_del</span></code> (use <code class="docutils literal notranslate"><span class="pre">device_add</span> <span class="pre">help</span></code> for a
+list of available devices).</p>
+</section>
+<section id="host-net-add-and-host-net-remove-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">host_net_add</span></code> and <code class="docutils literal notranslate"><span class="pre">host_net_remove</span></code> (removed in 2.12)<a class="headerlink" href="#host-net-add-and-host-net-remove-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>Replaced by <code class="docutils literal notranslate"><span class="pre">netdev_add</span></code> and <code class="docutils literal notranslate"><span class="pre">netdev_del</span></code>.</p>
+</section>
+<section id="the-hub-id-parameter-of-hostfwd-add-hostfwd-remove-removed-in-5-0">
+<h3>The <code class="docutils literal notranslate"><span class="pre">hub_id</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">hostfwd_add</span></code> / <code class="docutils literal notranslate"><span class="pre">hostfwd_remove</span></code> (removed in 5.0)<a class="headerlink" href="#the-hub-id-parameter-of-hostfwd-add-hostfwd-remove-removed-in-5-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">[hub_id</span> <span class="pre">name]</span></code> parameter tuple of the ‘hostfwd_add’ and
+‘hostfwd_remove’ HMP commands has been replaced by <code class="docutils literal notranslate"><span class="pre">netdev_id</span></code>.</p>
+</section>
+<section id="id1">
+<h3><code class="docutils literal notranslate"><span class="pre">cpu-add</span></code> (removed in 5.2)<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">device_add</span></code> for hotplugging vCPUs instead of <code class="docutils literal notranslate"><span class="pre">cpu-add</span></code>.  See
+documentation of <code class="docutils literal notranslate"><span class="pre">query-hotpluggable-cpus</span></code> for additional details.</p>
+</section>
+<section id="change-vnc-target-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">change</span> <span class="pre">vnc</span> <span class="pre">TARGET</span></code> (removed in 6.0)<a class="headerlink" href="#change-vnc-target-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>No replacement.  The <code class="docutils literal notranslate"><span class="pre">change</span> <span class="pre">vnc</span> <span class="pre">password</span></code> and <code class="docutils literal notranslate"><span class="pre">change</span> <span class="pre">DEVICE</span> <span class="pre">MEDIUM</span></code>
+commands are not affected.</p>
+</section>
+<section id="acl-show-acl-reset-acl-policy-acl-add-acl-remove-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">acl_show</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_reset</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_policy</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_add</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_remove</span></code> (removed in 6.0)<a class="headerlink" href="#acl-show-acl-reset-acl-policy-acl-add-acl-remove-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">acl_show</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_reset</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_policy</span></code>, <code class="docutils literal notranslate"><span class="pre">acl_add</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">acl_remove</span></code> commands were removed with no replacement. Authorization
+for VNC should be performed using the pluggable QAuthZ objects.</p>
+</section>
+<section id="migrate-set-cache-size-and-info-migrate-cache-size-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">migrate-set-cache-size</span></code> and <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">migrate-cache-size</span></code> (removed in 6.0)<a class="headerlink" href="#migrate-set-cache-size-and-info-migrate-cache-size-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">migrate-set-parameters</span></code> and <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">migrate-parameters</span></code> instead.</p>
+</section>
+<section id="id2">
+<h3><code class="docutils literal notranslate"><span class="pre">migrate_set_downtime</span></code> and <code class="docutils literal notranslate"><span class="pre">migrate_set_speed</span></code> (removed in 6.0)<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">migrate-set-parameters</span></code> instead.</p>
+</section>
+<section id="info-cpustats-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">cpustats</span></code> (removed in 6.1)<a class="headerlink" href="#info-cpustats-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>This command didn’t produce any output already. Removed with no replacement.</p>
+</section>
+</section>
+<section id="guest-emulator-isas">
+<h2>Guest Emulator ISAs<a class="headerlink" href="#guest-emulator-isas" title="Permalink to this heading"></a></h2>
+<section id="risc-v-isa-privilege-specification-version-1-09-1-removed-in-5-1">
+<h3>RISC-V ISA privilege specification version 1.09.1 (removed in 5.1)<a class="headerlink" href="#risc-v-isa-privilege-specification-version-1-09-1-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The RISC-V ISA privilege specification version 1.09.1 has been removed.
+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
+should be used instead of the 1.09.1 version.</p>
+</section>
+</section>
+<section id="system-emulator-cpus">
+<h2>System emulator CPUS<a class="headerlink" href="#system-emulator-cpus" title="Permalink to this heading"></a></h2>
+<section id="kvm-guest-support-on-32-bit-arm-hosts-removed-in-5-2">
+<h3>KVM guest support on 32-bit Arm hosts (removed in 5.2)<a class="headerlink" href="#kvm-guest-support-on-32-bit-arm-hosts-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>The Linux kernel has dropped support for allowing 32-bit Arm systems
+to host KVM guests as of the 5.7 kernel. Accordingly, QEMU is deprecating
+its support for this configuration and will remove it in a future version.
+Running 32-bit guests on a 64-bit Arm host remains supported.</p>
+</section>
+<section id="risc-v-isa-specific-cpus-removed-in-5-1">
+<h3>RISC-V ISA Specific CPUs (removed in 5.1)<a class="headerlink" href="#risc-v-isa-specific-cpus-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The RISC-V cpus with the ISA version in the CPU name have been removed. The
+four CPUs are: <code class="docutils literal notranslate"><span class="pre">rv32gcsu-v1.9.1</span></code>, <code class="docutils literal notranslate"><span class="pre">rv32gcsu-v1.10.0</span></code>, <code class="docutils literal notranslate"><span class="pre">rv64gcsu-v1.9.1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rv64gcsu-v1.10.0</span></code>. Instead the version can be specified via the CPU <code class="docutils literal notranslate"><span class="pre">priv_spec</span></code>
+option when using the <code class="docutils literal notranslate"><span class="pre">rv32</span></code> or <code class="docutils literal notranslate"><span class="pre">rv64</span></code> CPUs.</p>
+</section>
+<section id="risc-v-no-mmu-cpus-removed-in-5-1">
+<h3>RISC-V no MMU CPUs (removed in 5.1)<a class="headerlink" href="#risc-v-no-mmu-cpus-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The RISC-V no MMU cpus have been removed. The two CPUs: <code class="docutils literal notranslate"><span class="pre">rv32imacu-nommu</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rv64imacu-nommu</span></code> can no longer be used. Instead the MMU status can be specified
+via the CPU <code class="docutils literal notranslate"><span class="pre">mmu</span></code> option when using the <code class="docutils literal notranslate"><span class="pre">rv32</span></code> or <code class="docutils literal notranslate"><span class="pre">rv64</span></code> CPUs.</p>
+</section>
+<section id="compat-property-of-server-class-power-cpus-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">compat</span></code> property of server class POWER CPUs (removed in 6.0)<a class="headerlink" href="#compat-property-of-server-class-power-cpus-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">max-cpu-compat</span></code> property of the <code class="docutils literal notranslate"><span class="pre">pseries</span></code> machine type should be used
+instead.</p>
+</section>
+<section id="moxie-cpu-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">moxie</span></code> CPU (removed in 6.1)<a class="headerlink" href="#moxie-cpu-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>Nobody was using this CPU emulation in QEMU, and there were no test images
+available to make sure that the code is still working, so it has been removed
+without replacement.</p>
+</section>
+<section id="lm32-cpus-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">lm32</span></code> CPUs (removed in 6.1)<a class="headerlink" href="#lm32-cpus-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>The only public user of this architecture was the milkymist project,
+which has been dead for years; there was never an upstream Linux
+port.  Removed without replacement.</p>
+</section>
+<section id="unicore32-cpus-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">unicore32</span></code> CPUs (removed in 6.1)<a class="headerlink" href="#unicore32-cpus-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>Support for this CPU was removed from the upstream Linux kernel, and
+there is no available upstream toolchain to build binaries for it.
+Removed without replacement.</p>
+</section>
+<section id="x86-icelake-client-cpu-removed-in-7-1">
+<h3>x86 <code class="docutils literal notranslate"><span class="pre">Icelake-Client</span></code> CPU (removed in 7.1)<a class="headerlink" href="#x86-icelake-client-cpu-removed-in-7-1" title="Permalink to this heading"></a></h3>
+<p>There isn’t ever Icelake Client CPU, it is some wrong and imaginary one.
+Use <code class="docutils literal notranslate"><span class="pre">Icelake-Server</span></code> instead.</p>
+</section>
+</section>
+<section id="system-emulator-machines">
+<h2>System emulator machines<a class="headerlink" href="#system-emulator-machines" title="Permalink to this heading"></a></h2>
+<section id="s390-virtio-removed-in-2-6">
+<h3><code class="docutils literal notranslate"><span class="pre">s390-virtio</span></code> (removed in 2.6)<a class="headerlink" href="#s390-virtio-removed-in-2-6" title="Permalink to this heading"></a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">s390-ccw-virtio</span></code> machine instead.</p>
+</section>
+<section id="the-m68k-dummy-machine-removed-in-2-9">
+<h3>The m68k <code class="docutils literal notranslate"><span class="pre">dummy</span></code> machine (removed in 2.9)<a class="headerlink" href="#the-m68k-dummy-machine-removed-in-2-9" title="Permalink to this heading"></a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">none</span></code> machine with the <code class="docutils literal notranslate"><span class="pre">loader</span></code> device instead.</p>
+</section>
+<section id="xlnx-ep108-removed-in-3-0">
+<h3><code class="docutils literal notranslate"><span class="pre">xlnx-ep108</span></code> (removed in 3.0)<a class="headerlink" href="#xlnx-ep108-removed-in-3-0" title="Permalink to this heading"></a></h3>
+<p>The EP108 was an early access development board that is no longer used.
+Use the <code class="docutils literal notranslate"><span class="pre">xlnx-zcu102</span></code> machine instead.</p>
+</section>
+<section id="spike-v1-9-1-and-spike-v1-10-removed-in-5-1">
+<h3><code class="docutils literal notranslate"><span class="pre">spike_v1.9.1</span></code> and <code class="docutils literal notranslate"><span class="pre">spike_v1.10</span></code> (removed in 5.1)<a class="headerlink" href="#spike-v1-9-1-and-spike-v1-10-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The version specific Spike machines have been removed in favour of the
+generic <code class="docutils literal notranslate"><span class="pre">spike</span></code> machine. If you need to specify an older version of the RISC-V
+spec you can use the <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">rv64gcsu,priv_spec=v1.10.0</span></code> command line argument.</p>
+</section>
+<section id="mips-r4k-platform-removed-in-5-2">
+<h3>mips <code class="docutils literal notranslate"><span class="pre">r4k</span></code> platform (removed in 5.2)<a class="headerlink" href="#mips-r4k-platform-removed-in-5-2" title="Permalink to this heading"></a></h3>
+<p>This machine type was very old and unmaintained. Users should use the <code class="docutils literal notranslate"><span class="pre">malta</span></code>
+machine type instead.</p>
+</section>
+<section id="mips-fulong2e-machine-alias-removed-in-6-0">
+<h3>mips <code class="docutils literal notranslate"><span class="pre">fulong2e</span></code> machine alias (removed in 6.0)<a class="headerlink" href="#mips-fulong2e-machine-alias-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>This machine has been renamed <code class="docutils literal notranslate"><span class="pre">fuloong2e</span></code>.</p>
+</section>
+<section id="pc-0-10-up-to-pc-1-3-removed-in-4-0-up-to-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">pc-0.10</span></code> up to <code class="docutils literal notranslate"><span class="pre">pc-1.3</span></code> (removed in 4.0 up to 6.0)<a class="headerlink" href="#pc-0-10-up-to-pc-1-3-removed-in-4-0-up-to-6-0" title="Permalink to this heading"></a></h3>
+<p>These machine types were very old and likely could not be used for live
+migration from old QEMU versions anymore. Use a newer machine type instead.</p>
+</section>
+<section id="raspberry-pi-raspi2-and-raspi3-machines-removed-in-6-2">
+<h3>Raspberry Pi <code class="docutils literal notranslate"><span class="pre">raspi2</span></code> and <code class="docutils literal notranslate"><span class="pre">raspi3</span></code> machines (removed in 6.2)<a class="headerlink" href="#raspberry-pi-raspi2-and-raspi3-machines-removed-in-6-2" title="Permalink to this heading"></a></h3>
+<p>The Raspberry Pi machines come in various models (A, A+, B, B+). To be able
+to distinguish which model QEMU is implementing, the <code class="docutils literal notranslate"><span class="pre">raspi2</span></code> and <code class="docutils literal notranslate"><span class="pre">raspi3</span></code>
+machines have been renamed <code class="docutils literal notranslate"><span class="pre">raspi2b</span></code> and <code class="docutils literal notranslate"><span class="pre">raspi3b</span></code>.</p>
+</section>
+<section id="aspeed-swift-bmc-machine-removed-in-7-0">
+<h3>Aspeed <code class="docutils literal notranslate"><span class="pre">swift-bmc</span></code> machine (removed in 7.0)<a class="headerlink" href="#aspeed-swift-bmc-machine-removed-in-7-0" title="Permalink to this heading"></a></h3>
+<p>This machine was removed because it was unused. Alternative AST2500 based
+OpenPOWER machines are <code class="docutils literal notranslate"><span class="pre">witherspoon-bmc</span></code> and <code class="docutils literal notranslate"><span class="pre">romulus-bmc</span></code>.</p>
+</section>
+<section id="ppc-taihu-machine-removed-in-7-2">
+<h3>ppc <code class="docutils literal notranslate"><span class="pre">taihu</span></code> machine (removed in 7.2)<a class="headerlink" href="#ppc-taihu-machine-removed-in-7-2" title="Permalink to this heading"></a></h3>
+<p>This machine was removed because it was partially emulated and 405
+machines are very similar. Use the <code class="docutils literal notranslate"><span class="pre">ref405ep</span></code> machine instead.</p>
+</section>
+</section>
+<section id="linux-user-mode-cpus">
+<h2>linux-user mode CPUs<a class="headerlink" href="#linux-user-mode-cpus" title="Permalink to this heading"></a></h2>
+<section id="tilegx-cpus-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">tilegx</span></code> CPUs (removed in 6.0)<a class="headerlink" href="#tilegx-cpus-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">tilegx</span></code> guest CPU support has been removed without replacement. It was
+only implemented in linux-user mode, but support for this CPU was removed from
+the upstream Linux kernel in 2018, and it has also been dropped from glibc, so
+there is no new Linux development taking place with this architecture. For
+running the old binaries, you can use older versions of QEMU.</p>
+</section>
+<section id="ppc64abi32-cpus-removed-in-7-0">
+<h3><code class="docutils literal notranslate"><span class="pre">ppc64abi32</span></code> CPUs (removed in 7.0)<a class="headerlink" href="#ppc64abi32-cpus-removed-in-7-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ppc64abi32</span></code> architecture has a number of issues which regularly
+tripped up the CI testing and was suspected to be quite broken. For that
+reason the maintainers strongly suspected no one actually used it.</p>
+</section>
+</section>
+<section id="tcg-introspection-features">
+<h2>TCG introspection features<a class="headerlink" href="#tcg-introspection-features" title="Permalink to this heading"></a></h2>
+<section id="tcg-trace-events-since-6-2">
+<h3>TCG trace-events (since 6.2)<a class="headerlink" href="#tcg-trace-events-since-6-2" title="Permalink to this heading"></a></h3>
+<p>The ability to add new TCG trace points had bit rotted and as the
+feature can be replicated with TCG plugins it was removed. If
+any user is currently using this feature and needs help with
+converting to using TCG plugins they should contact the qemu-devel
+mailing list.</p>
+</section>
+</section>
+<section id="system-emulator-devices">
+<h2>System emulator devices<a class="headerlink" href="#system-emulator-devices" title="Permalink to this heading"></a></h2>
+<section id="spapr-pci-vfio-host-bridge-removed-in-2-12">
+<h3><code class="docutils literal notranslate"><span class="pre">spapr-pci-vfio-host-bridge</span></code> (removed in 2.12)<a class="headerlink" href="#spapr-pci-vfio-host-bridge-removed-in-2-12" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">spapr-pci-vfio-host-bridge</span></code> device type has been replaced by the
+<code class="docutils literal notranslate"><span class="pre">spapr-pci-host-bridge</span></code> device type.</p>
+</section>
+<section id="ivshmem-removed-in-4-0">
+<h3><code class="docutils literal notranslate"><span class="pre">ivshmem</span></code> (removed in 4.0)<a class="headerlink" href="#ivshmem-removed-in-4-0" title="Permalink to this heading"></a></h3>
+<p>Replaced by either the <code class="docutils literal notranslate"><span class="pre">ivshmem-plain</span></code> or <code class="docutils literal notranslate"><span class="pre">ivshmem-doorbell</span></code>.</p>
+</section>
+<section id="ide-drive-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">ide-drive</span></code> (removed in 6.0)<a class="headerlink" href="#ide-drive-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The ‘ide-drive’ device has been removed. Users should use ‘ide-hd’ or
+‘ide-cd’ as appropriate to get an IDE hard disk or CD-ROM as needed.</p>
+</section>
+<section id="scsi-disk-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">scsi-disk</span></code> (removed in 6.0)<a class="headerlink" href="#scsi-disk-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The ‘scsi-disk’ device has been removed. Users should use ‘scsi-hd’ or
+‘scsi-cd’ as appropriate to get a SCSI hard disk or CD-ROM as needed.</p>
+</section>
+</section>
+<section id="related-binaries">
+<h2>Related binaries<a class="headerlink" href="#related-binaries" title="Permalink to this heading"></a></h2>
+<section id="qemu-nbd-partition-removed-in-5-0">
+<h3><code class="docutils literal notranslate"><span class="pre">qemu-nbd</span> <span class="pre">--partition</span></code> (removed in 5.0)<a class="headerlink" href="#qemu-nbd-partition-removed-in-5-0" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">qemu-nbd</span> <span class="pre">--partition</span> <span class="pre">$digit</span></code> code (also spelled <code class="docutils literal notranslate"><span class="pre">-P</span></code>)
+could only handle MBR partitions, and never correctly handled logical
+partitions beyond partition 5.  Exporting a partition can still be
+done by utilizing the <code class="docutils literal notranslate"><span class="pre">--image-opts</span></code> option with a raw blockdev
+using the <code class="docutils literal notranslate"><span class="pre">offset</span></code> and <code class="docutils literal notranslate"><span class="pre">size</span></code> parameters layered on top of
+any other existing blockdev. For example, if partition 1 is 100MiB
+long starting at 1MiB, the old command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">nbd</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">P</span> <span class="mi">1</span> <span class="o">-</span><span class="n">f</span> <span class="n">qcow2</span> <span class="n">file</span><span class="o">.</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+<p>can be rewritten as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">nbd</span> <span class="o">-</span><span class="n">t</span> <span class="o">--</span><span class="n">image</span><span class="o">-</span><span class="n">opts</span> <span class="n">driver</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span><span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="n">M</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="n">M</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">driver</span><span class="o">=</span><span class="n">qcow2</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">driver</span><span class="o">=</span><span class="n">file</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">qcow2</span>
+</pre></div>
+</div>
+</section>
+<section id="qemu-img-convert-n-o-removed-in-5-1">
+<h3><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">convert</span> <span class="pre">-n</span> <span class="pre">-o</span></code> (removed in 5.1)<a class="headerlink" href="#qemu-img-convert-n-o-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>All options specified in <code class="docutils literal notranslate"><span class="pre">-o</span></code> are image creation options, so
+they are now rejected when used with <code class="docutils literal notranslate"><span class="pre">-n</span></code> to skip image creation.</p>
+</section>
+<section id="qemu-img-create-b-bad-file-size-removed-in-5-1">
+<h3><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">create</span> <span class="pre">-b</span> <span class="pre">bad</span> <span class="pre">file</span> <span class="pre">$size</span></code> (removed in 5.1)<a class="headerlink" href="#qemu-img-create-b-bad-file-size-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>When creating an image with a backing file that could not be opened,
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">create</span></code> used to issue a warning about the failure but
+proceed with the image creation if an explicit size was provided.
+However, as the <code class="docutils literal notranslate"><span class="pre">-u</span></code> option exists for this purpose, it is safer to
+enforce that any failure to open the backing image (including if the
+backing file is missing or an incorrect format was specified) is an
+error when <code class="docutils literal notranslate"><span class="pre">-u</span></code> is not used.</p>
+</section>
+<section id="qemu-img-amend-to-adjust-backing-file-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">amend</span></code> to adjust backing file (removed in 6.1)<a class="headerlink" href="#qemu-img-amend-to-adjust-backing-file-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">amend</span></code> to modify the name or format of a qcow2
+backing image was never fully documented or tested, and interferes
+with other amend operations that need access to the original backing
+image (such as deciding whether a v3 zero cluster may be left
+unallocated when converting to a v2 image).  Any changes to the
+backing chain should be performed with <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">rebase</span> <span class="pre">-u</span></code> either
+before or after the remaining changes being performed by amend, as
+appropriate.</p>
+</section>
+<section id="qemu-img-backing-file-without-format-removed-in-6-1">
+<h3><code class="docutils literal notranslate"><span class="pre">qemu-img</span></code> backing file without format (removed in 6.1)<a class="headerlink" href="#qemu-img-backing-file-without-format-removed-in-6-1" title="Permalink to this heading"></a></h3>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">create</span></code>, <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">rebase</span></code>, or <code class="docutils literal notranslate"><span class="pre">qemu-img</span>
+<span class="pre">convert</span></code> to create or modify an image that depends on a backing file
+now requires that an explicit backing format be provided.  This is
+for safety: if QEMU probes a different format than what you thought,
+the data presented to the guest will be corrupt; similarly, presenting
+a raw image to a guest allows a potential security exploit if a future
+probe sees a non-raw image based on guest writes.</p>
+<p>To avoid creating unsafe backing chains, you must pass <code class="docutils literal notranslate"><span class="pre">-o</span>
+<span class="pre">backing_fmt=</span></code> (or the shorthand <code class="docutils literal notranslate"><span class="pre">-F</span></code> during create) to specify the
+intended backing format.  You may use <code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">rebase</span> <span class="pre">-u</span></code> to
+retroactively add a backing format to an existing image.  However, be
+aware that there are already potential security risks to blindly using
+<code class="docutils literal notranslate"><span class="pre">qemu-img</span> <span class="pre">info</span></code> to probe the format of an untrusted backing image,
+when deciding what format to add into an existing image.</p>
+</section>
+</section>
+<section id="block-devices">
+<h2>Block devices<a class="headerlink" href="#block-devices" title="Permalink to this heading"></a></h2>
+<section id="vxhs-backend-removed-in-5-1">
+<h3>VXHS backend (removed in 5.1)<a class="headerlink" href="#vxhs-backend-removed-in-5-1" title="Permalink to this heading"></a></h3>
+<p>The VXHS code did not compile since v2.12.0. It was removed in 5.1.</p>
+</section>
+<section id="sheepdog-driver-removed-in-6-0">
+<h3><code class="docutils literal notranslate"><span class="pre">sheepdog</span></code> driver (removed in 6.0)<a class="headerlink" href="#sheepdog-driver-removed-in-6-0" title="Permalink to this heading"></a></h3>
+<p>The corresponding upstream server project is no longer maintained.
+Users are recommended to switch to an alternative distributed block
+device driver such as RBD.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="deprecated.html" class="btn btn-neutral float-left" title="Deprecated features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

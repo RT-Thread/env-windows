@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Record/replay &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Managed start up options" href="managed-startup.html" />
+    <link rel="prev" title="GDB usage" href="gdb.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html">GDB usage</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Record/replay</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core-idea">Core idea</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instruction-counting">Instruction counting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#block-devices">Block devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snapshotting">Snapshotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#network-devices">Network devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audio-devices">Audio devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#serial-ports">Serial ports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reverse-debugging">Reverse debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Emulation</a></li>
+      <li class="breadcrumb-item active">Record/replay</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/replay.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="replay"></span><section id="record-replay">
+<h1>Record/replay<a class="headerlink" href="#record-replay" title="Permalink to this heading"></a></h1>
+<p>Record/replay functions are used for the deterministic replay of qemu execution.
+Execution recording writes a non-deterministic events log, which can be later
+used for replaying the execution anywhere and for unlimited number of times.
+It also supports checkpointing for faster rewind to the specific replay moment.
+Execution replaying reads the log and replays all non-deterministic events
+including external input, hardware clocks, and interrupts.</p>
+<p>Deterministic replay has the following features:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Deterministically replays whole system execution and all contents of
+the memory, state of the hardware devices, clocks, and screen of the VM.</p></li>
+<li><p>Writes execution log into the file for later replaying for multiple times
+on different machines.</p></li>
+<li><p>Supports i386, x86_64, ARM, AArch64, Risc-V, MIPS, MIPS64, S390X, Alpha,
+PowerPC, PowerPC64, M68000, Microblaze, OpenRISC, Nios II, SPARC,
+and Xtensa hardware platforms.</p></li>
+<li><p>Performs deterministic replay of all operations with keyboard and mouse
+input devices, serial ports, and network.</p></li>
+</ul>
+</div></blockquote>
+<p>Usage of the record/replay:</p>
+<blockquote>
+<div><ul>
+<li><p>First, record the execution with the following command line:</p>
+<blockquote>
+<div><pre class="literal-block">qemu-system-x86_64 \
+-icount shift=auto,rr=record,rrfile=replay.bin \
+-drive file=disk.qcow2,if=none,snapshot,id=img-direct \
+-drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+-device ide-hd,drive=img-blkreplay \
+-netdev user,id=net1 -device rtl8139,netdev=net1 \
+-object filter-replay,id=replay,netdev=net1</pre>
+</div></blockquote>
+</li>
+<li><p>After recording, you can replay it by using another command line:</p>
+<blockquote>
+<div><pre class="literal-block">qemu-system-x86_64 \
+-icount shift=auto,rr=replay,rrfile=replay.bin \
+-drive file=disk.qcow2,if=none,snapshot,id=img-direct \
+-drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+-device ide-hd,drive=img-blkreplay \
+-netdev user,id=net1 -device rtl8139,netdev=net1 \
+-object filter-replay,id=replay,netdev=net1</pre>
+</div></blockquote>
+<p>The only difference with recording is changing the rr option
+from record to replay.</p>
+</li>
+<li><p>Block device images are not actually changed in the recording mode,
+because all of the changes are written to the temporary overlay file.
+This behavior is enabled by using blkreplay driver. It should be used
+for every enabled block device, as described in <a class="reference internal" href="#block-label"><span class="std std-ref">Block devices</span></a> section.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-net</span> <span class="pre">none</span></code> option should be specified when network is not used,
+because QEMU adds network card by default. When network is needed,
+it should be configured explicitly with replay filter, as described
+in <a class="reference internal" href="#network-label"><span class="std std-ref">Network devices</span></a> section.</p></li>
+<li><p>Interaction with audio devices and serial ports are recorded and replayed
+automatically when such devices are enabled.</p></li>
+</ul>
+</div></blockquote>
+<section id="core-idea">
+<h2>Core idea<a class="headerlink" href="#core-idea" title="Permalink to this heading"></a></h2>
+<p>Record/replay system is based on saving and replaying non-deterministic
+events (e.g. keyboard input) and simulating deterministic ones (e.g. reading
+from HDD or memory of the VM). Saving only non-deterministic events makes
+log file smaller and simulation faster.</p>
+<p>The following non-deterministic data from peripheral devices is saved into
+the log: mouse and keyboard input, network packets, audio controller input,
+serial port input, and hardware clocks (they are non-deterministic
+too, because their values are taken from the host machine). Inputs from
+simulated hardware, memory of VM, software interrupts, and execution of
+instructions are not saved into the log, because they are deterministic and
+can be replayed by simulating the behavior of virtual machine starting from
+initial state.</p>
+</section>
+<section id="instruction-counting">
+<h2>Instruction counting<a class="headerlink" href="#instruction-counting" title="Permalink to this heading"></a></h2>
+<p>QEMU should work in icount mode to use record/replay feature. icount was
+designed to allow deterministic execution in absence of external inputs
+of the virtual machine. Record/replay feature is enabled through <code class="docutils literal notranslate"><span class="pre">-icount</span></code>
+command-line option, making possible deterministic execution of the machine,
+interacting with user or network.</p>
+</section>
+<section id="block-devices">
+<span id="block-label"></span><h2>Block devices<a class="headerlink" href="#block-devices" title="Permalink to this heading"></a></h2>
+<p>Block devices record/replay module intercepts calls of
+bdrv coroutine functions at the top of block drivers stack.
+To record and replay block operations the drive must be configured
+as following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">drive</span> <span class="n">file</span><span class="o">=</span><span class="n">disk</span><span class="o">.</span><span class="n">qcow2</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">snapshot</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">direct</span>
+<span class="o">-</span><span class="n">drive</span> <span class="n">driver</span><span class="o">=</span><span class="n">blkreplay</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">direct</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">blkreplay</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">ide</span><span class="o">-</span><span class="n">hd</span><span class="p">,</span><span class="n">drive</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">blkreplay</span>
+</pre></div>
+</div>
+<p>blkreplay driver should be inserted between disk image and virtual driver
+controller. Therefore all disk requests may be recorded and replayed.</p>
+</section>
+<section id="snapshotting">
+<span id="snapshotting-label"></span><h2>Snapshotting<a class="headerlink" href="#snapshotting" title="Permalink to this heading"></a></h2>
+<p>New VM snapshots may be created in replay mode. They can be used later
+to recover the desired VM state. All VM states created in replay mode
+are associated with the moment of time in the replay scenario.
+After recovering the VM state replay will start from that position.</p>
+<p>Default starting snapshot name may be specified with icount field
+rrsnapshot as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">icount</span> <span class="n">shift</span><span class="o">=</span><span class="n">auto</span><span class="p">,</span><span class="n">rr</span><span class="o">=</span><span class="n">record</span><span class="p">,</span><span class="n">rrfile</span><span class="o">=</span><span class="n">replay</span><span class="o">.</span><span class="n">bin</span><span class="p">,</span><span class="n">rrsnapshot</span><span class="o">=</span><span class="n">snapshot_name</span>
+</pre></div>
+</div>
+<p>This snapshot is created at start of recording and restored at start
+of replaying. It also can be loaded while replaying to roll back
+the execution.</p>
+<p><code class="docutils literal notranslate"><span class="pre">snapshot</span></code> flag of the disk image must be removed to save the snapshots
+in the overlay (or original image) instead of using the temporary overlay.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">drive</span> <span class="n">file</span><span class="o">=</span><span class="n">disk</span><span class="o">.</span><span class="n">ovl</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">direct</span>
+<span class="o">-</span><span class="n">drive</span> <span class="n">driver</span><span class="o">=</span><span class="n">blkreplay</span><span class="p">,</span><span class="k">if</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">direct</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">blkreplay</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">ide</span><span class="o">-</span><span class="n">hd</span><span class="p">,</span><span class="n">drive</span><span class="o">=</span><span class="n">img</span><span class="o">-</span><span class="n">blkreplay</span>
+</pre></div>
+</div>
+<p>Use QEMU monitor to create additional snapshots. <code class="docutils literal notranslate"><span class="pre">savevm</span> <span class="pre">&lt;name&gt;</span></code> command
+created the snapshot and <code class="docutils literal notranslate"><span class="pre">loadvm</span> <span class="pre">&lt;name&gt;</span></code> restores it. To prevent corruption
+of the original disk image, use overlay files linked to the original images.
+Therefore all new snapshots (including the starting one) will be saved in
+overlays and the original image remains unchanged.</p>
+<p>When you need to use snapshots with diskless virtual machine,
+it must be started with “orphan” qcow2 image. This image will be used
+for storing VM snapshots. Here is the example of the command line for this:</p>
+<pre class="literal-block">qemu-system-x86_64 \
+  -icount shift=auto,rr=replay,rrfile=record.bin,rrsnapshot=init \
+  -net none -drive file=empty.qcow2,if=none,id=rr</pre>
+<p><code class="docutils literal notranslate"><span class="pre">empty.qcow2</span></code> drive does not connected to any virtual block device and used
+for VM snapshots only.</p>
+</section>
+<section id="network-devices">
+<span id="network-label"></span><h2>Network devices<a class="headerlink" href="#network-devices" title="Permalink to this heading"></a></h2>
+<p>Record and replay for network interactions is performed with the network filter.
+Each backend must have its own instance of the replay filter as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">netdev</span> <span class="n">user</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">net1</span> <span class="o">-</span><span class="n">device</span> <span class="n">rtl8139</span><span class="p">,</span><span class="n">netdev</span><span class="o">=</span><span class="n">net1</span>
+<span class="o">-</span><span class="nb">object</span> <span class="nb">filter</span><span class="o">-</span><span class="n">replay</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">replay</span><span class="p">,</span><span class="n">netdev</span><span class="o">=</span><span class="n">net1</span>
+</pre></div>
+</div>
+<p>Replay network filter is used to record and replay network packets. While
+recording the virtual machine this filter puts all packets coming from
+the outer world into the log. In replay mode packets from the log are
+injected into the network device. All interactions with network backend
+in replay mode are disabled.</p>
+</section>
+<section id="audio-devices">
+<h2>Audio devices<a class="headerlink" href="#audio-devices" title="Permalink to this heading"></a></h2>
+<p>Audio data is recorded and replay automatically. The command line for recording
+and replaying must contain identical specifications of audio hardware, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">soundhw</span> <span class="n">ac97</span>
+</pre></div>
+</div>
+</section>
+<section id="serial-ports">
+<h2>Serial ports<a class="headerlink" href="#serial-ports" title="Permalink to this heading"></a></h2>
+<p>Serial ports input is recorded and replay automatically. The command lines
+for recording and replaying must contain identical number of ports in record
+and replay modes, but their backends may differ.
+E.g., <code class="docutils literal notranslate"><span class="pre">-serial</span> <span class="pre">stdio</span></code> in record mode, and <code class="docutils literal notranslate"><span class="pre">-serial</span> <span class="pre">null</span></code> in replay mode.</p>
+</section>
+<section id="reverse-debugging">
+<h2>Reverse debugging<a class="headerlink" href="#reverse-debugging" title="Permalink to this heading"></a></h2>
+<p>Reverse debugging allows “executing” the program in reverse direction.
+GDB remote protocol supports “reverse step” and “reverse continue”
+commands. The first one steps single instruction backwards in time,
+and the second one finds the last breakpoint in the past.</p>
+<p>Recorded executions may be used to enable reverse debugging. QEMU can’t
+execute the code in backwards direction, but can load a snapshot and
+replay forward to find the desired position or breakpoint.</p>
+<p>The following GDB commands are supported:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reverse-stepi</span></code> (or <code class="docutils literal notranslate"><span class="pre">rsi</span></code>) - step one instruction backwards</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reverse-continue</span></code> (or <code class="docutils literal notranslate"><span class="pre">rc</span></code>) - find last breakpoint in the past</p></li>
+</ul>
+</div></blockquote>
+<p>Reverse step loads the nearest snapshot and replays the execution until
+the required instruction is met.</p>
+<p>Reverse continue may include several passes of examining the execution
+between the snapshots. Each of the passes include the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>loading the snapshot</p></li>
+<li><p>replaying to examine the breakpoints</p></li>
+<li><p>if breakpoint or watchpoint was met</p>
+<ul class="simple">
+<li><p>loading the snapshot again</p></li>
+<li><p>replaying to the required breakpoint</p></li>
+</ul>
+</li>
+<li><p>else</p>
+<ul class="simple">
+<li><p>proceeding to the p.1 with the earlier snapshot</p></li>
+</ul>
+</li>
+</ol>
+</div></blockquote>
+<p>Therefore usage of the reverse debugging requires at least one snapshot
+created. This can be done by omitting <code class="docutils literal notranslate"><span class="pre">snapshot</span></code> option
+for the block drives and adding <code class="docutils literal notranslate"><span class="pre">rrsnapshot</span></code> for both record and replay
+command lines.
+See the <a class="reference internal" href="#snapshotting-label"><span class="std std-ref">Snapshotting</span></a> section to learn more about running record/replay
+and creating the snapshot in these modes.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">rrsnapshot</span></code> is not used, then snapshot named <code class="docutils literal notranslate"><span class="pre">start_debugging</span></code>
+created in temporary overlay. This allows using reverse debugging, but with
+temporary snapshots (existing within the session).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gdb.html" class="btn btn-neutral float-left" title="GDB usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="managed-startup.html" class="btn btn-neutral float-right" title="Managed start up options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

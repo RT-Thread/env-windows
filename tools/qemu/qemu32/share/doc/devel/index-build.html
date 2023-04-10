@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU Build and Test System &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The QEMU build system architecture" href="build-system.html" />
+    <link rel="prev" title="Secure Coding Practices" href="secure-coding-practices.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU Build and Test System</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+      <li class="breadcrumb-item active">QEMU Build and Test System</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/index-build.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-build-and-test-system">
+<h1>QEMU Build and Test System<a class="headerlink" href="#qemu-build-and-test-system" title="Permalink to this heading"></a></h1>
+<p>Details about how QEMU’s build system works and how it is integrated
+into our testing infrastructure. You will need to understand some of
+the basics if you are adding new files and targets to the build.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html#stage-1-configure">Stage 1: configure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#helper-functions">Helper functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html#stage-2-meson">Stage 2: Meson</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#adding-checks">Adding checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#support-scripts">Support scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html#stage-3-makefiles">Stage 3: makefiles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#useful-make-targets">Useful make targets</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html#important-files-for-the-build-system">Important files for the build system</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#statically-defined-files">Statically defined files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build-system.html#dynamically-created-files">Dynamically created files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kconfig.html#the-kconfig-language">The Kconfig language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kconfig.html#guidelines-for-writing-kconfig-files">Guidelines for writing Kconfig files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kconfig.html#writing-and-modifying-default-configurations">Writing and modifying default configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kconfig.html#kconfig-host"><code class="docutils literal notranslate"><span class="pre">Kconfig.host</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing in QEMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#testing-with-make-check">Testing with “make check”</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#unit-tests">Unit tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#qtest">QTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#writing-portable-test-cases">Writing portable test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#qapi-schema-tests">QAPI schema tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#check-block">check-block</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#qemu-iotests">QEMU iotests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#writing-a-new-test-case">Writing a new test case</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#debugging-a-test-case">Debugging a test case</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#test-case-groups">Test case groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#container-based-tests">Container based tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#docker-prerequisites">Docker Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#podman-prerequisites">Podman Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#quickstart">Quickstart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#registry">Registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#images">Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#tests">Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#debugging-a-docker-test-failure">Debugging a Docker test failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#options">Options</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#thread-sanitizer">Thread Sanitizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#thread-sanitizer-in-docker">Thread Sanitizer in Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#building-and-testing-with-tsan">Building and Testing with TSan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#tsan-suppressions">TSan Suppressions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#tsan-annotations">TSan Annotations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#docker-binfmt-image-debian-targets">docker-binfmt-image-debian-% targets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#setting-up-binfmt-misc">Setting up <code class="docutils literal notranslate"><span class="pre">binfmt_misc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#example-invocation">Example invocation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#vm-testing">VM testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#id1">Quickstart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#qemu-binaries">QEMU binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#make-jobs">Make jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#debugging">Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#manual-invocation">Manual invocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#adding-new-guests">Adding new guests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#image-fuzzer-testing">Image fuzzer testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#integration-tests-using-the-avocado-framework">Integration tests using the Avocado Framework</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-tests">Running tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#manual-installation">Manual Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#qemumachine">QEMUMachine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#attribute-reference">Attribute reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#parameter-reference">Parameter reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#skipping-tests">Skipping tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#uninstalling-avocado">Uninstalling Avocado</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#testing-with-make-check-tcg">Testing with “make check-tcg”</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-subset-of-tests">Running subset of tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#tcg-test-dependencies">TCG test dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#other-tcg-tests">Other TCG Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#kvm-unit-tests">KVM Unit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#linux-test-project">Linux Test Project</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#gcc-gcov-support">GCC gcov support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS avocado tests using biosbits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acpi-bits.html#references">References:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qgraph.html">Qtest Driver Framework</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qgraph.html#qgraph-concepts">QGraph concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qgraph.html#creating-a-new-driver-and-its-interface">Creating a new driver and its interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qgraph.html#adding-a-new-test">Adding a new test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qgraph.html#qgraph-api-reference">Qgraph API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qtest.html#qtest-protocol">QTest Protocol</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html#valid-requests">Valid requests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qtest.html#libqtest-api-reference">libqtest API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ci.html#definition-of-terms">Definition of terms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#automated-tests">Automated tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#unit-testing">Unit testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#functional-testing">Functional testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#system-testing">System testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#flaky-tests">Flaky tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#gating">Gating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html#custom-ci-cd-variables">Custom CI/CD variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#set-variable-globally-in-the-user-s-ci-namespace">Set variable globally in the user’s CI namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#set-variable-manually-when-pushing-a-branch-or-tag-to-the-user-s-repository">Set variable manually when pushing a branch or tag to the user’s repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#setting-aliases-in-your-git-config">Setting aliases in your git config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#variable-naming-and-grouping">Variable naming and grouping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#maintainer-controlled-job-variables">Maintainer controlled job variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#contributor-controlled-runtime-variables">Contributor controlled runtime variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#other-misc-variables">Other misc variables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html#jobs-on-custom-runners">Jobs on Custom Runners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#machine-setup-howto">Machine Setup Howto</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qapi-code-gen.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qapi-code-gen.html#the-qapi-schema-language">The QAPI schema language</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#schema-syntax">Schema syntax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#built-in-types">Built-in Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#include-directives">Include directives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#pragma-directives">Pragma directives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#enumeration-types">Enumeration types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#type-references-and-array-types">Type references and array types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#struct-types">Struct types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#union-types">Union types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#alternate-types">Alternate types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#commands">Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#events">Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#naming-rules-and-reserved-names">Naming rules and reserved names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#downstream-extensions">Downstream extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#configuring-the-schema">Configuring the schema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#documentation-comments">Documentation comments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qapi-code-gen.html#client-json-protocol-introspection">Client JSON Protocol introspection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qapi-code-gen.html#compatibility-considerations">Compatibility considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qapi-code-gen.html#code-generation">Code generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#code-generated-for-qapi-types">Code generated for QAPI types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#code-generated-for-visiting-qapi-types">Code generated for visiting QAPI types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#code-generated-for-commands">Code generated for commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#code-generated-for-events">Code generated for events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html#code-generated-for-introspection">Code generated for introspection</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#building-the-fuzzers">Building the fuzzers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#useful-libfuzzer-flags">Useful libFuzzer flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#generating-coverage-reports">Generating Coverage Reports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#adding-a-new-fuzzer">Adding a new fuzzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#the-generic-fuzzer">The Generic Fuzzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#oss-fuzz">OSS-Fuzz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#building-crash-reproducers">Building Crash Reproducers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#implementation-details-fuzzer-lifecycle">Implementation Details / Fuzzer Lifecycle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#building-with-cfi">Building with CFI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#using-qemu-built-with-cfi">Using QEMU built with CFI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#incompatible-code-with-cfi">Incompatible code with CFI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#disabling-cfi-for-a-specific-function">Disabling CFI for a specific function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-flow-integrity.html#cfi-and-fuzzing">CFI and fuzzing</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="secure-coding-practices.html" class="btn btn-neutral float-left" title="Secure Coding Practices" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build-system.html" class="btn btn-neutral float-right" title="The QEMU build system architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

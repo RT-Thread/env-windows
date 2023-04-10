@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submitting a Patch &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Trivial Patches" href="trivial-patches.html" />
+    <link rel="prev" title="QEMU Coding Style" href="style.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index-process.html">QEMU Community Processes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="code-of-conduct.html">Code of Conduct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="conflict-resolution.html">Conflict Resolution Policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maintainers.html">The Role of Maintainers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="style.html">QEMU Coding Style</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Submitting a Patch</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#writing-your-patches">Writing your Patches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submitting-your-patches">Submitting your Patches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#participating-in-code-review">Participating in Code Review</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tips-and-tricks">Tips and Tricks</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="trivial-patches.html">Trivial Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stable-process.html">QEMU and the stable process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="submitting-a-pull-request.html">Submitting a Pull Request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secure-coding-practices.html">Secure Coding Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build and Test System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Information</a></li>
+          <li class="breadcrumb-item"><a href="index-process.html">QEMU Community Processes</a></li>
+      <li class="breadcrumb-item active">Submitting a Patch</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/devel/submitting-a-patch.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="submitting-a-patch">
+<span id="id1"></span><h1><a class="toc-backref" href="#id30">Submitting a Patch</a><a class="headerlink" href="#submitting-a-patch" title="Permalink to this heading"></a></h1>
+<p>QEMU welcomes contributions to fix bugs, add functionality or improve
+the documentation. However, we get a lot of patches, and so we have
+some guidelines about submitting them. If you follow these, you’ll
+help make our task of contribution review easier and your change is
+likely to be accepted and committed faster.</p>
+<p>This page seems very long, so if you are only trying to post a quick
+one-shot fix, the bare minimum we ask is that:</p>
+<table class="colwidths-given docutils align-default" id="id29">
+<caption><span class="caption-text">Minimal Checklist for Patches</span><a class="headerlink" href="#id29" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Reason</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Patches contain Signed-off-by: Real Name &lt;<a class="reference external" href="mailto:author&#37;&#52;&#48;email">author<span>&#64;</span>email</a>&gt;</p></td>
+<td><p>States you are legally able to contribute the code. See <a class="reference internal" href="#patch-emails-must-include-a-signed-off-by-line"><span class="std std-ref">Patch emails must include a Signed-off-by: line</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Sent as patch emails to <code class="docutils literal notranslate"><span class="pre">qemu-devel&#64;nongnu.org</span></code></p></td>
+<td><p>The project uses an email list based workflow. See <a class="reference internal" href="#submitting-your-patches"><span class="std std-ref">Submitting your Patches</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Be prepared to respond to review comments</p></td>
+<td><p>Code that doesn’t pass review will not get merged. See <a class="reference internal" href="#participating-in-code-review"><span class="std std-ref">Participating in Code Review</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<p>You do not have to subscribe to post (list policy is to reply-to-all to
+preserve CCs and keep non-subscribers in the loop on the threads they
+start), although you may find it easier as a subscriber to pick up good
+ideas from other posts. If you do subscribe, be prepared for a high
+volume of email, often over one thousand messages in a week. The list is
+moderated; first-time posts from an email address (whether or not you
+subscribed) may be subject to some delay while waiting for a moderator
+to allow your address.</p>
+<p>The larger your contribution is, or if you plan on becoming a long-term
+contributor, then the more important the rest of this page becomes.
+Reading the table of contents below should already give you an idea of
+the basic requirements. Use the table of contents as a reference, and
+read the parts that you have doubts about.</p>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#submitting-a-patch" id="id30">Submitting a Patch</a></p>
+<ul>
+<li><p><a class="reference internal" href="#writing-your-patches" id="id31">Writing your Patches</a></p>
+<ul>
+<li><p><a class="reference internal" href="#use-the-qemu-coding-style" id="id32">Use the QEMU coding style</a></p></li>
+<li><p><a class="reference internal" href="#base-patches-against-current-git-master" id="id33">Base patches against current git master</a></p></li>
+<li><p><a class="reference internal" href="#split-up-long-patches" id="id34">Split up long patches</a></p></li>
+<li><p><a class="reference internal" href="#make-code-motion-patches-easy-to-review" id="id35">Make code motion patches easy to review</a></p></li>
+<li><p><a class="reference internal" href="#don-t-include-irrelevant-changes" id="id36">Don’t include irrelevant changes</a></p></li>
+<li><p><a class="reference internal" href="#write-a-meaningful-commit-message" id="id37">Write a meaningful commit message</a></p></li>
+<li><p><a class="reference internal" href="#test-your-patches" id="id38">Test your patches</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#submitting-your-patches" id="id39">Submitting your Patches</a></p>
+<ul>
+<li><p><a class="reference internal" href="#if-you-cannot-send-patch-emails" id="id40">If you cannot send patch emails</a></p></li>
+<li><p><a class="reference internal" href="#cc-the-relevant-maintainer" id="id41">CC the relevant maintainer</a></p></li>
+<li><p><a class="reference internal" href="#do-not-send-as-an-attachment" id="id42">Do not send as an attachment</a></p></li>
+<li><p><a class="reference internal" href="#use-git-format-patch" id="id43">Use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span></code></a></p></li>
+<li><p><a class="reference internal" href="#avoid-posting-large-binary-blob" id="id44">Avoid posting large binary blob</a></p></li>
+<li><p><a class="reference internal" href="#patch-emails-must-include-a-signed-off-by-line" id="id45">Patch emails must include a <code class="docutils literal notranslate"><span class="pre">Signed-off-by:</span></code> line</a></p></li>
+<li><p><a class="reference internal" href="#include-a-meaningful-cover-letter" id="id46">Include a meaningful cover letter</a></p></li>
+<li><p><a class="reference internal" href="#use-the-rfc-tag-if-needed" id="id47">Use the RFC tag if needed</a></p></li>
+<li><p><a class="reference internal" href="#consider-whether-your-patch-is-applicable-for-stable" id="id48">Consider whether your patch is applicable for stable</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#participating-in-code-review" id="id49">Participating in Code Review</a></p>
+<ul>
+<li><p><a class="reference internal" href="#stay-around-to-fix-problems-raised-in-code-review" id="id50">Stay around to fix problems raised in code review</a></p></li>
+<li><p><a class="reference internal" href="#pay-attention-to-review-comments" id="id51">Pay attention to review comments</a></p></li>
+<li><p><a class="reference internal" href="#when-resending-patches-add-a-version-tag" id="id52">When resending patches add a version tag</a></p></li>
+<li><p><a class="reference internal" href="#include-version-history-in-patchset-revisions" id="id53">Include version history in patchset revisions</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#tips-and-tricks" id="id54">Tips and Tricks</a></p>
+<ul>
+<li><p><a class="reference internal" href="#proper-use-of-reviewed-by-tags-can-aid-review" id="id55">Proper use of Reviewed-by: tags can aid review</a></p></li>
+<li><p><a class="reference internal" href="#if-your-patch-seems-to-have-been-ignored" id="id56">If your patch seems to have been ignored</a></p></li>
+<li><p><a class="reference internal" href="#is-my-patch-in" id="id57">Is my patch in?</a></p></li>
+<li><p><a class="reference internal" href="#return-the-favor" id="id58">Return the favor</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="writing-your-patches">
+<span id="id2"></span><h2><a class="toc-backref" href="#id31">Writing your Patches</a><a class="headerlink" href="#writing-your-patches" title="Permalink to this heading"></a></h2>
+<section id="use-the-qemu-coding-style">
+<span id="id3"></span><h3><a class="toc-backref" href="#id32">Use the QEMU coding style</a><a class="headerlink" href="#use-the-qemu-coding-style" title="Permalink to this heading"></a></h3>
+<p>You can run run <em>scripts/checkpatch.pl &lt;patchfile&gt;</em> before submitting to
+check that you are in compliance with our coding standards. Be aware
+that <code class="docutils literal notranslate"><span class="pre">checkpatch.pl</span></code> is not infallible, though, especially where C
+preprocessor macros are involved; use some common sense too. See also:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="style.html#coding-style"><span class="std std-ref">QEMU Coding Style</span></a></p></li>
+<li><p><a class="reference external" href="https://blog.vmsplice.net/2011/03/how-to-automatically-run-checkpatchpl.html">Automate a checkpatch run on
+commit</a></p></li>
+</ul>
+</section>
+<section id="base-patches-against-current-git-master">
+<span id="id4"></span><h3><a class="toc-backref" href="#id33">Base patches against current git master</a><a class="headerlink" href="#base-patches-against-current-git-master" title="Permalink to this heading"></a></h3>
+<p>There’s no point submitting a patch which is based on a released version
+of QEMU because development will have moved on from then and it probably
+won’t even apply to master. We only apply selected bugfixes to release
+branches and then only as backports once the code has gone into master.</p>
+<p>It is also okay to base patches on top of other on-going work that is
+not yet part of the git master branch. To aid continuous integration
+tools, such as <a class="reference external" href="http://patchew.org/QEMU/">patchew</a>, you should <a class="reference external" href="https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01288.html">add a
+tag</a>
+line <code class="docutils literal notranslate"><span class="pre">Based-on:</span> <span class="pre">$MESSAGE_ID</span></code> to your cover letter to make the series
+dependency obvious.</p>
+</section>
+<section id="split-up-long-patches">
+<span id="id5"></span><h3><a class="toc-backref" href="#id34">Split up long patches</a><a class="headerlink" href="#split-up-long-patches" title="Permalink to this heading"></a></h3>
+<p>Split up longer patches into a patch series of logical code changes.
+Each change should compile and execute successfully. For instance, don’t
+add a file to the makefile in patch one and then add the file itself in
+patch two. (This rule is here so that people can later use tools like
+<a class="reference external" href="http://git-scm.com/docs/git-bisect">git bisect</a> without hitting
+points in the commit history where QEMU doesn’t work for reasons
+unrelated to the bug they’re chasing.) Put documentation first, not
+last, so that someone reading the series can do a clean-room evaluation
+of the documentation, then validate that the code matched the
+documentation. A commit message that mentions “Also, …” is often a
+good candidate for splitting into multiple patches. For more thoughts on
+properly splitting patches and writing good commit messages, see <a class="reference external" href="https://wiki.openstack.org/wiki/GitCommitMessages">this
+advice from
+OpenStack</a>.</p>
+</section>
+<section id="make-code-motion-patches-easy-to-review">
+<span id="id6"></span><h3><a class="toc-backref" href="#id35">Make code motion patches easy to review</a><a class="headerlink" href="#make-code-motion-patches-easy-to-review" title="Permalink to this heading"></a></h3>
+<p>If a series requires large blocks of code motion, there are tricks for
+making the refactoring easier to review. Split up the series so that
+semantic changes (or even function renames) are done in a separate patch
+from the raw code motion. Use a one-time setup of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span>
+<span class="pre">diff.renames</span> <span class="pre">true;</span></code> <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">diff.algorithm</span> <span class="pre">patience</span></code> (refer to
+<a class="reference external" href="http://git-scm.com/docs/git-config">git-config</a>). The ‘diff.renames’
+property ensures file rename patches will be given in a more compact
+representation that focuses only on the differences across the file
+rename, instead of showing the entire old file as a deletion and the new
+file as an insertion. Meanwhile, the ‘diff.algorithm’ property ensures
+that extracting a non-contiguous subset of one file into a new file, but
+where all extracted parts occur in the same order both before and after
+the patch, will reduce churn in trying to treat unrelated <code class="docutils literal notranslate"><span class="pre">}</span></code> lines in
+the original file as separating hunks of changes.</p>
+<p>Ideally, a code motion patch can be reviewed by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="nb">format</span><span class="o">-</span><span class="n">patch</span> <span class="o">--</span><span class="n">stdout</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&gt;</span> <span class="n">patch</span><span class="p">;</span>
+<span class="n">diff</span> <span class="o">-</span><span class="n">u</span> <span class="o">&lt;</span><span class="p">(</span><span class="n">sed</span> <span class="o">-</span><span class="n">n</span> <span class="s1">&#39;s/^-//p&#39;</span> <span class="n">patch</span><span class="p">)</span> <span class="o">&lt;</span><span class="p">(</span><span class="n">sed</span> <span class="o">-</span><span class="n">n</span> <span class="s1">&#39;s/^\+//p&#39;</span> <span class="n">patch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to focus on the few changes that weren’t wholesale code motion.</p>
+</section>
+<section id="don-t-include-irrelevant-changes">
+<span id="dont-include-irrelevant-changes"></span><h3><a class="toc-backref" href="#id36">Don’t include irrelevant changes</a><a class="headerlink" href="#don-t-include-irrelevant-changes" title="Permalink to this heading"></a></h3>
+<p>In particular, don’t include formatting, coding style or whitespace
+changes to bits of code that would otherwise not be touched by the
+patch. (It’s OK to fix coding style issues in the immediate area (few
+lines) of the lines you’re changing.) If you think a section of code
+really does need a reindent or other large-scale style fix, submit this
+as a separate patch which makes no semantic changes; don’t put it in the
+same patch as your bug fix.</p>
+<p>For smaller patches in less frequently changed areas of QEMU, consider
+using the <a class="reference internal" href="trivial-patches.html#trivial-patches"><span class="std std-ref">Trivial Patches</span></a> process.</p>
+</section>
+<section id="write-a-meaningful-commit-message">
+<span id="id7"></span><h3><a class="toc-backref" href="#id37">Write a meaningful commit message</a><a class="headerlink" href="#write-a-meaningful-commit-message" title="Permalink to this heading"></a></h3>
+<p>Commit messages should be meaningful and should stand on their own as a
+historical record of why the changes you applied were necessary or
+useful.</p>
+<p>QEMU follows the usual standard for git commit messages: the first line
+(which becomes the email subject line) is “subsystem: single line
+summary of change”. Whether the “single line summary of change” starts
+with a capital is a matter of taste, but we prefer that the summary does
+not end in a dot. Look at <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">shortlog</span> <span class="pre">-30</span></code> for an idea of sample
+subject lines. Then there is a blank line and a more detailed
+description of the patch, another blank and your Signed-off-by: line.
+Please do not use lines that are longer than 76 characters in your
+commit message (so that the text still shows up nicely with “git show”
+in a 80-columns terminal window).</p>
+<p>The body of the commit message is a good place to document why your
+change is important. Don’t include comments like “This is a suggestion
+for fixing this bug” (they can go below the <code class="docutils literal notranslate"><span class="pre">---</span></code> line in the email so
+they don’t go into the final commit message). Make sure the body of the
+commit message can be read in isolation even if the reader’s mailer
+displays the subject line some distance apart (that is, a body that
+starts with “… so that” as a continuation of the subject line is
+harder to follow).</p>
+<p>If your patch fixes a commit that is already in the repository, please
+add an additional line with “Fixes: &lt;at-least-12-digits-of-SHA-commit-id&gt;
+(“Fixed commit subject”)” below the patch description / before your
+“Signed-off-by:” line in the commit message.</p>
+<p>If your patch fixes a bug in the gitlab bug tracker, please add a line
+with “Resolves: &lt;URL-of-the-bug&gt;” to the commit message, too. Gitlab can
+close bugs automatically once commits with the “Resolved:” keyword get
+merged into the master branch of the project. And if your patch addresses
+a bug in another public bug tracker, you can also use a line with
+“Buglink: &lt;URL-of-the-bug&gt;” for reference here, too.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Fixes: 14055ce53c2d (&quot;s390x/tcg: avoid overflows in time2tod/tod2time&quot;)
+Resolves: https://gitlab.com/qemu-project/qemu/-/issues/42
+Buglink: https://bugs.launchpad.net/qemu/+bug/1804323``
+</pre></div>
+</div>
+<p>Some other tags that are used in commit messages include “Message-Id:”
+“Tested-by:”, “Acked-by:”, “Reported-by:”, “Suggested-by:”.  See <code class="docutils literal notranslate"><span class="pre">git</span>
+<span class="pre">log</span></code> for these keywords for example usage.</p>
+</section>
+<section id="test-your-patches">
+<span id="id8"></span><h3><a class="toc-backref" href="#id38">Test your patches</a><a class="headerlink" href="#test-your-patches" title="Permalink to this heading"></a></h3>
+<p>Although QEMU uses various <a class="reference internal" href="ci.html#ci"><span class="std std-ref">CI</span></a> services that attempt to test
+patches submitted to the list, it still saves everyone time if you
+have already tested that your patch compiles and works. Because QEMU
+is such a large project the default configuration won’t create a
+testing pipeline on GitLab when a branch is pushed. See the <a class="reference internal" href="ci.html#ci-var"><span class="std std-ref">CI
+variable documentation</span></a> for details on how to control the
+running of tests; but it is still wise to also check that your patches
+work with a full build before submitting a series, especially if your
+changes might have an unintended effect on other areas of the code you
+don’t normally experiment with. See <a class="reference internal" href="testing.html#testing"><span class="std std-ref">Testing in QEMU</span></a> for more details on
+what tests are available.</p>
+<p>Also, it is a wise idea to include a testsuite addition as part of
+your patches - either to ensure that future changes won’t regress your
+new feature, or to add a test which exposes the bug that the rest of
+your series fixes. Keeping separate commits for the test and the fix
+allows reviewers to rebase the test to occur first to prove it catches
+the problem, then again to place it last in the series so that
+bisection doesn’t land on a known-broken state.</p>
+</section>
+</section>
+<section id="submitting-your-patches">
+<span id="id9"></span><h2><a class="toc-backref" href="#id39">Submitting your Patches</a><a class="headerlink" href="#submitting-your-patches" title="Permalink to this heading"></a></h2>
+<p>The QEMU project uses a public email based workflow for reviewing and
+merging patches. As a result all contributions to QEMU must be <strong>sent
+as patches</strong> to the qemu-devel <a class="reference external" href="https://wiki.qemu.org/Contribute/MailingLists">mailing list</a>. Patch
+contributions should not be posted on the bug tracker, posted on
+forums, or externally hosted and linked to. (We have other mailing
+lists too, but all patches must go to qemu-devel, possibly with a Cc:
+to another list.) <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">send-email</span></code> (<a class="reference external" href="https://git-send-email.io/">step-by-step setup guide</a> and <a class="reference external" href="https://elixir.bootlin.com/linux/latest/source/Documentation/process/email-clients.rst">hints and tips</a>)
+works best for delivering the patch without mangling it, but
+attachments can be used as a last resort on a first-time submission.</p>
+<section id="if-you-cannot-send-patch-emails">
+<span id="id10"></span><h3><a class="toc-backref" href="#id40">If you cannot send patch emails</a><a class="headerlink" href="#if-you-cannot-send-patch-emails" title="Permalink to this heading"></a></h3>
+<p>In rare cases it may not be possible to send properly formatted patch
+emails. You can use <a class="reference external" href="https://sourcehut.org/">sourcehut</a> to send your
+patches to the QEMU mailing list by following these steps:</p>
+<ol class="arabic simple">
+<li><p>Register or sign in to your account</p></li>
+<li><p>Add your SSH public key in <a class="reference external" href="https://meta.sr.ht/keys">meta |
+keys</a>.</p></li>
+<li><p>Publish your git branch using <strong>git push git&#64;git.sr.ht:~USERNAME/qemu
+HEAD</strong></p></li>
+<li><p>Send your patches to the QEMU mailing list using the web-based
+<code class="docutils literal notranslate"><span class="pre">git-send-email</span></code> UI at <a class="reference external" href="https://git.sr.ht/~USERNAME/qemu/send-email">https://git.sr.ht/~USERNAME/qemu/send-email</a></p></li>
+</ol>
+<p><a class="reference external" href="https://spacepub.space/videos/watch/ad258d23-0ac6-488c-83fc-2bacf578de3a">This video</a>
+shows the web-based <code class="docutils literal notranslate"><span class="pre">git-send-email</span></code> workflow. Documentation is
+available <a class="reference external" href="https://man.sr.ht/git.sr.ht/#sending-patches-upstream">here</a>.</p>
+</section>
+<section id="cc-the-relevant-maintainer">
+<span id="id11"></span><h3><a class="toc-backref" href="#id41">CC the relevant maintainer</a><a class="headerlink" href="#cc-the-relevant-maintainer" title="Permalink to this heading"></a></h3>
+<p>Send patches both to the mailing list and CC the maintainer(s) of the
+files you are modifying. look in the MAINTAINERS file to find out who
+that is. Also try using scripts/get_maintainer.pl from the repository
+for learning the most common committers for the files you touched.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~/</span><span class="n">src</span><span class="o">/</span><span class="n">qemu</span><span class="o">/</span><span class="n">scripts</span><span class="o">/</span><span class="n">get_maintainer</span><span class="o">.</span><span class="n">pl</span> <span class="o">-</span><span class="n">f</span> <span class="n">hw</span><span class="o">/</span><span class="n">ide</span><span class="o">/</span><span class="n">core</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+<p>In fact, you can automate this, via a one-time setup of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span>
+<span class="pre">sendemail.cccmd</span> <span class="pre">'scripts/get_maintainer.pl</span> <span class="pre">--nogit-fallback'</span></code> (Refer to
+<a class="reference external" href="http://git-scm.com/docs/git-config">git-config</a>.)</p>
+</section>
+<section id="do-not-send-as-an-attachment">
+<span id="id12"></span><h3><a class="toc-backref" href="#id42">Do not send as an attachment</a><a class="headerlink" href="#do-not-send-as-an-attachment" title="Permalink to this heading"></a></h3>
+<p>Send patches inline so they are easy to reply to with review comments.
+Do not put patches in attachments.</p>
+</section>
+<section id="use-git-format-patch">
+<span id="id13"></span><h3><a class="toc-backref" href="#id43">Use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span></code></a><a class="headerlink" href="#use-git-format-patch" title="Permalink to this heading"></a></h3>
+<p>Use the right diff format.
+<a class="reference external" href="http://git-scm.com/docs/git-format-patch">git format-patch</a> will
+produce patch emails in the right format (check the documentation to
+find out how to drive it). You can then edit the cover letter before
+using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">send-email</span></code> to mail the files to the mailing list. (We
+recommend <a class="reference external" href="http://git-scm.com/docs/git-send-email">git send-email</a>
+because mail clients often mangle patches by wrapping long lines or
+messing up whitespace. Some distributions do not include send-email in a
+default install of git; you may need to download additional packages,
+such as ‘git-email’ on Fedora-based systems.) Patch series need a cover
+letter, with shallow threading (all patches in the series are
+in-reply-to the cover letter, but not to each other); single unrelated
+patches do not need a cover letter (but if you do send a cover letter,
+use <code class="docutils literal notranslate"><span class="pre">--numbered</span></code> so the cover and the patch have distinct subject lines).
+Patches are easier to find if they start a new top-level thread, rather
+than being buried in-reply-to another existing thread.</p>
+</section>
+<section id="avoid-posting-large-binary-blob">
+<span id="id14"></span><h3><a class="toc-backref" href="#id44">Avoid posting large binary blob</a><a class="headerlink" href="#avoid-posting-large-binary-blob" title="Permalink to this heading"></a></h3>
+<p>If you added binaries to the repository, consider producing the patch
+emails using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span> <span class="pre">--no-binary</span></code> and include a link to a
+git repository to fetch the original commit.</p>
+</section>
+<section id="patch-emails-must-include-a-signed-off-by-line">
+<span id="id15"></span><h3><a class="toc-backref" href="#id45">Patch emails must include a <code class="docutils literal notranslate"><span class="pre">Signed-off-by:</span></code> line</a><a class="headerlink" href="#patch-emails-must-include-a-signed-off-by-line" title="Permalink to this heading"></a></h3>
+<p>Your patches <strong>must</strong> include a Signed-off-by: line. This is a hard
+requirement because it’s how you say “I’m legally okay to contribute
+this and happy for it to go into QEMU”. The process is modelled after
+the <a class="reference external" href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/SubmittingPatches?id=f6f94e2ab1b33f0082ac22d71f66385a60d8157f#n297">Linux kernel</a>
+policy.</p>
+<p>If you wrote the patch, make sure your “From:” and “Signed-off-by:”
+lines use the same spelling. It’s okay if you subscribe or contribute to
+the list via more than one address, but using multiple addresses in one
+commit just confuses things. If someone else wrote the patch, git will
+include a “From:” line in the body of the email (different from your
+envelope From:) that will give credit to the correct author; but again,
+that author’s Signed-off-by: line is mandatory, with the same spelling.</p>
+<p>There are various tooling options for automatically adding these tags
+include using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-s</span></code> or <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span> <span class="pre">-s</span></code>. For more
+information see <a class="reference external" href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/SubmittingPatches?id=f6f94e2ab1b33f0082ac22d71f66385a60d8157f#n297">SubmittingPatches 1.12</a>.</p>
+</section>
+<section id="include-a-meaningful-cover-letter">
+<span id="id16"></span><h3><a class="toc-backref" href="#id46">Include a meaningful cover letter</a><a class="headerlink" href="#include-a-meaningful-cover-letter" title="Permalink to this heading"></a></h3>
+<p>This is a requirement for any series with multiple patches (as it aids
+continuous integration), but optional for an isolated patch. The cover
+letter explains the overall goal of such a series, and also provides a
+convenient 0/N email for others to reply to the series as a whole. A
+one-time setup of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">format.coverletter</span> <span class="pre">auto</span></code> (refer to
+<a class="reference external" href="http://git-scm.com/docs/git-config">git-config</a>) will generate the
+cover letter as needed.</p>
+<p>When reviewers don’t know your goal at the start of their review, they
+may object to early changes that don’t make sense until the end of the
+series, because they do not have enough context yet at that point of
+their review. A series where the goal is unclear also risks a higher
+number of review-fix cycles because the reviewers haven’t bought into
+the idea yet. If the cover letter can explain these points to the
+reviewer, the process will be smoother patches will get merged faster.
+Make sure your cover letter includes a diffstat of changes made over the
+entire series; potential reviewers know what files they are interested
+in, and they need an easy way determine if your series touches them.</p>
+</section>
+<section id="use-the-rfc-tag-if-needed">
+<span id="id17"></span><h3><a class="toc-backref" href="#id47">Use the RFC tag if needed</a><a class="headerlink" href="#use-the-rfc-tag-if-needed" title="Permalink to this heading"></a></h3>
+<p>For example, “[PATCH RFC v2]”. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">format-patch</span> <span class="pre">--subject-prefix=RFC</span></code>
+can help.</p>
+<p>“RFC” means “Request For Comments” and is a statement that you don’t
+intend for your patchset to be applied to master, but would like some
+review on it anyway. Reasons for doing this include:</p>
+<ul class="simple">
+<li><p>the patch depends on some pending kernel changes which haven’t yet
+been accepted, so the QEMU patch series is blocked until that
+dependency has been dealt with, but is worth reviewing anyway</p></li>
+<li><p>the patch set is not finished yet (perhaps it doesn’t cover all use
+cases or work with all targets) but you want early review of a major
+API change or design structure before continuing</p></li>
+</ul>
+<p>In general, since it’s asking other people to do review work on a
+patchset that the submitter themselves is saying shouldn’t be applied,
+it’s best to:</p>
+<ul class="simple">
+<li><p>use it sparingly</p></li>
+<li><p>in the cover letter, be clear about why a patch is an RFC, what areas
+of the patchset you’re looking for review on, and why reviewers
+should care</p></li>
+</ul>
+</section>
+<section id="consider-whether-your-patch-is-applicable-for-stable">
+<span id="id18"></span><h3><a class="toc-backref" href="#id48">Consider whether your patch is applicable for stable</a><a class="headerlink" href="#consider-whether-your-patch-is-applicable-for-stable" title="Permalink to this heading"></a></h3>
+<p>If your patch fixes a severe issue or a regression, it may be applicable
+for stable. In that case, consider adding <code class="docutils literal notranslate"><span class="pre">Cc:</span> <span class="pre">qemu-stable&#64;nongnu.org</span></code>
+to your patch to notify the stable maintainers.</p>
+<p>For more details on how QEMU’s stable process works, refer to the
+<a class="reference internal" href="stable-process.html#stable-process"><span class="std std-ref">QEMU and the stable process</span></a> page.</p>
+</section>
+</section>
+<section id="participating-in-code-review">
+<span id="id19"></span><h2><a class="toc-backref" href="#id49">Participating in Code Review</a><a class="headerlink" href="#participating-in-code-review" title="Permalink to this heading"></a></h2>
+<p>All patches submitted to the QEMU project go through a code review
+process before they are accepted. This will often mean a series will
+go through a number of iterations before being picked up by
+<a class="reference internal" href="maintainers.html#maintainers"><span class="std std-ref">maintainers</span></a>. You therefore should be prepared to
+read replies to your messages and be willing to act on them.</p>
+<p>Maintainers are often willing to manually fix up first-time
+contributions, since there is a learning curve involved in making an
+ideal patch submission. However for the best results you should
+proactively respond to suggestions with changes or justifications for
+your current approach.</p>
+<p>Some areas of code that are well maintained may review patches
+quickly, lesser-loved areas of code may have a longer delay.</p>
+<section id="stay-around-to-fix-problems-raised-in-code-review">
+<span id="id20"></span><h3><a class="toc-backref" href="#id50">Stay around to fix problems raised in code review</a><a class="headerlink" href="#stay-around-to-fix-problems-raised-in-code-review" title="Permalink to this heading"></a></h3>
+<p>Not many patches get into QEMU straight away – it is quite common that
+developers will identify bugs, or suggest a cleaner approach, or even
+just point out code style issues or commit message typos. You’ll need to
+respond to these, and then send a second version of your patches with
+the issues fixed. This takes a little time and effort on your part, but
+if you don’t do it then your changes will never get into QEMU.</p>
+<p>Remember that a maintainer is under no obligation to take your
+patches. If someone has spent the time reviewing your code and
+suggesting improvements and you simply re-post without either
+addressing the comment directly or providing additional justification
+for the change then it becomes wasted effort. You cannot demand others
+merge and then fix up your code after the fact.</p>
+<p>When replying to comments on your patches <strong>reply to all and not just
+the sender</strong> – keeping discussion on the mailing list means everybody
+can follow it. Remember the spirit of the <a class="reference internal" href="code-of-conduct.html#code-of-conduct"><span class="std std-ref">Code of Conduct</span></a> and
+keep discussions respectful and collaborative and avoid making
+personal comments.</p>
+</section>
+<section id="pay-attention-to-review-comments">
+<span id="id21"></span><h3><a class="toc-backref" href="#id51">Pay attention to review comments</a><a class="headerlink" href="#pay-attention-to-review-comments" title="Permalink to this heading"></a></h3>
+<p>Someone took their time to review your work, and it pays to respect that
+effort; repeatedly submitting a series without addressing all comments
+from the previous round tends to alienate reviewers and stall your
+patch. Reviewers aren’t always perfect, so it is okay if you want to
+argue that your code was correct in the first place instead of blindly
+doing everything the reviewer asked. On the other hand, if someone
+pointed out a potential issue during review, then even if your code
+turns out to be correct, it’s probably a sign that you should improve
+your commit message and/or comments in the code explaining why the code
+is correct.</p>
+<p>If you fix issues that are raised during review <strong>resend the entire
+patch series</strong> not just the one patch that was changed. This allows
+maintainers to easily apply the fixed series without having to manually
+identify which patches are relevant. Send the new version as a complete
+fresh email or series of emails – don’t try to make it a followup to
+version 1. (This helps automatic patch email handling tools distinguish
+between v1 and v2 emails.)</p>
+</section>
+<section id="when-resending-patches-add-a-version-tag">
+<span id="id22"></span><h3><a class="toc-backref" href="#id52">When resending patches add a version tag</a><a class="headerlink" href="#when-resending-patches-add-a-version-tag" title="Permalink to this heading"></a></h3>
+<p>All patches beyond the first version should include a version tag – for
+example, “[PATCH v2]”. This means people can easily identify whether
+they’re looking at the most recent version. (The first version of a
+patch need not say “v1”, just [PATCH] is sufficient.) For patch series,
+the version applies to the whole series – even if you only change one
+patch, you resend the entire series and mark it as “v2”. Don’t try to
+track versions of different patches in the series separately.  <a class="reference external" href="http://git-scm.com/docs/git-format-patch">git
+format-patch</a> and <a class="reference external" href="http://git-scm.com/docs/git-send-email">git
+send-email</a> both understand
+the <code class="docutils literal notranslate"><span class="pre">-v2</span></code> option to make this easier. Send each new revision as a new
+top-level thread, rather than burying it in-reply-to an earlier
+revision, as many reviewers are not looking inside deep threads for new
+patches.</p>
+</section>
+<section id="include-version-history-in-patchset-revisions">
+<span id="id23"></span><h3><a class="toc-backref" href="#id53">Include version history in patchset revisions</a><a class="headerlink" href="#include-version-history-in-patchset-revisions" title="Permalink to this heading"></a></h3>
+<p>For later versions of patches, include a summary of changes from
+previous versions, but not in the commit message itself. In an email
+formatted as a git patch, the commit message is the part above the <code class="docutils literal notranslate"><span class="pre">---</span></code>
+line, and this will go into the git changelog when the patch is
+committed. This part should be a self-contained description of what this
+version of the patch does, written to make sense to anybody who comes
+back to look at this commit in git in six months’ time. The part below
+the <code class="docutils literal notranslate"><span class="pre">---</span></code> line and above the patch proper (git format-patch puts the
+diffstat here) is a good place to put remarks for people reading the
+patch email, and this is where the “changes since previous version”
+summary belongs. The <a class="reference external" href="https://github.com/stefanha/git-publish">git-publish</a> script can help with
+tracking a good summary across versions. Also, the <a class="reference external" href="https://github.com/codyprime/git-scripts">git-backport-diff</a> script can help focus
+reviewers on what changed between revisions.</p>
+</section>
+</section>
+<section id="tips-and-tricks">
+<span id="id24"></span><h2><a class="toc-backref" href="#id54">Tips and Tricks</a><a class="headerlink" href="#tips-and-tricks" title="Permalink to this heading"></a></h2>
+<section id="proper-use-of-reviewed-by-tags-can-aid-review">
+<span id="id25"></span><h3><a class="toc-backref" href="#id55">Proper use of Reviewed-by: tags can aid review</a><a class="headerlink" href="#proper-use-of-reviewed-by-tags-can-aid-review" title="Permalink to this heading"></a></h3>
+<p>When reviewing a large series, a reviewer can reply to some of the
+patches with a Reviewed-by tag, stating that they are happy with that
+patch in isolation (sometimes conditional on minor cleanup, like fixing
+whitespace, that doesn’t affect code content). You should then update
+those commit messages by hand to include the Reviewed-by tag, so that in
+the next revision, reviewers can spot which patches were already clean
+from the previous round. Conversely, if you significantly modify a patch
+that was previously reviewed, remove the reviewed-by tag out of the
+commit message, as well as listing the changes from the previous
+version, to make it easier to focus a reviewer’s attention to your
+changes.</p>
+</section>
+<section id="if-your-patch-seems-to-have-been-ignored">
+<span id="id26"></span><h3><a class="toc-backref" href="#id56">If your patch seems to have been ignored</a><a class="headerlink" href="#if-your-patch-seems-to-have-been-ignored" title="Permalink to this heading"></a></h3>
+<p>If your patchset has received no replies you should “ping” it after a
+week or two, by sending an email as a reply-to-all to the patch mail,
+including the word “ping” and ideally also a link to the page for the
+patch on <a class="reference external" href="https://patchew.org/QEMU/">patchew</a> or
+<a class="reference external" href="https://lore.kernel.org/qemu-devel/">lore.kernel.org</a>. It’s worth
+double-checking for reasons why your patch might have been ignored
+(forgot to CC the maintainer? annoyed people by failing to respond to
+review comments on an earlier version?), but often for less-maintained
+areas of QEMU patches do just slip through the cracks. If your ping is
+also ignored, ping again after another week or so. As the submitter, you
+are the person with the most motivation to get your patch applied, so
+you have to be persistent.</p>
+</section>
+<section id="is-my-patch-in">
+<span id="id27"></span><h3><a class="toc-backref" href="#id57">Is my patch in?</a><a class="headerlink" href="#is-my-patch-in" title="Permalink to this heading"></a></h3>
+<p>QEMU has some Continuous Integration machines that try to catch patch
+submission problems as soon as possible.  <a class="reference external" href="http://patchew.org/QEMU/">patchew</a> includes a web interface for tracking the
+status of various threads that have been posted to the list, and may
+send you an automated mail if it detected a problem with your patch.</p>
+<p>Once your patch has had enough review on list, the maintainer for that
+area of code will send notification to the list that they are including
+your patch in a particular staging branch. Periodically, the maintainer
+then takes care of <a class="reference internal" href="submitting-a-pull-request.html#submitting-a-pull-request"><span class="std std-ref">Submitting a Pull Request</span></a>
+for aggregating topic branches into mainline QEMU. Generally, you do not
+need to send a pull request unless you have contributed enough patches
+to become a maintainer over a particular section of code. Maintainers
+may further modify your commit, by resolving simple merge conflicts or
+fixing minor typos pointed out during review, but will always add a
+Signed-off-by line in addition to yours, indicating that it went through
+their tree. Occasionally, the maintainer’s pull request may hit more
+difficult merge conflicts, where you may be requested to help rebase and
+resolve the problems. It may take a couple of weeks between when your
+patch first had a positive review to when it finally lands in qemu.git;
+release cycle freezes may extend that time even longer.</p>
+</section>
+<section id="return-the-favor">
+<span id="id28"></span><h3><a class="toc-backref" href="#id58">Return the favor</a><a class="headerlink" href="#return-the-favor" title="Permalink to this heading"></a></h3>
+<p>Peer review only works if everyone chips in a bit of review time. If
+everyone submitted more patches than they reviewed, we would have a
+patch backlog. A good goal is to try to review at least as many patches
+from others as what you submit. Don’t worry if you don’t know the code
+base as well as a maintainer; it’s perfectly fine to admit when your
+review is weak because you are unfamiliar with the code.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="style.html" class="btn btn-neutral float-left" title="QEMU Coding Style" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="trivial-patches.html" class="btn btn-neutral float-right" title="Trivial Patches" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

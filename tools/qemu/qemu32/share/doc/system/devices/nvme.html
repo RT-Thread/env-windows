@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NVMe Emulation &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="USB emulation" href="usb.html" />
+    <link rel="prev" title="Network emulation" href="net.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../device-emulation.html">Device Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../device-emulation.html#common-terms">Common Terms</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../device-emulation.html#emulated-devices">Emulated Devices</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="can.html">CAN Bus Emulation Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ccid.html">Chip Card Interface Device (CCID)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cxl.html">Compute Express Link (CXL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ivshmem.html">Inter-VM Shared Memory device</a></li>
+<li class="toctree-l4"><a class="reference internal" href="net.html">Network emulation</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">NVMe Emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usb.html">USB emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user.html">vhost-user back ends</a></li>
+<li class="toctree-l4"><a class="reference internal" href="virtio-pmem.html">virtio pmem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vhost-user-rng.html">QEMU vhost-user-rng - RNG emulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="canokey.html">CanoKey QEMU</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../device-emulation.html">Device Emulation</a></li>
+      <li class="breadcrumb-item active">NVMe Emulation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/devices/nvme.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nvme-emulation">
+<h1>NVMe Emulation<a class="headerlink" href="#nvme-emulation" title="Permalink to this heading"></a></h1>
+<p>QEMU provides NVMe emulation through the <code class="docutils literal notranslate"><span class="pre">nvme</span></code>, <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> and
+<code class="docutils literal notranslate"><span class="pre">nvme-subsys</span></code> devices.</p>
+<p>See the following sections for specific information on</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#adding-nvme-devices">Adding NVMe Devices</a>, <a class="reference internal" href="#additional-namespaces">additional namespaces</a> and <a class="reference internal" href="#nvm-subsystems">NVM subsystems</a>.</p></li>
+<li><p>Configuration of <a class="reference internal" href="#optional-features">Optional Features</a> such as <a class="reference internal" href="#controller-memory-buffer">Controller Memory Buffer</a>,
+<a class="reference internal" href="#simple-copy">Simple Copy</a>, <a class="reference internal" href="#zoned-namespaces">Zoned Namespaces</a>, <a class="reference internal" href="#metadata">metadata</a> and <a class="reference internal" href="#end-to-end-data-protection">End-to-End Data
+Protection</a>,</p></li>
+</ul>
+</div></blockquote>
+<section id="adding-nvme-devices">
+<h2>Adding NVMe Devices<a class="headerlink" href="#adding-nvme-devices" title="Permalink to this heading"></a></h2>
+<section id="controller-emulation">
+<h3>Controller Emulation<a class="headerlink" href="#controller-emulation" title="Permalink to this heading"></a></h3>
+<p>The QEMU emulated NVMe controller implements version 1.4 of the NVM Express
+specification. All mandatory features are implement with a couple of exceptions
+and limitations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Accounting numbers in the SMART/Health log page are reset when the device
+is power cycled.</p></li>
+<li><p>Interrupt Coalescing is not supported and is disabled by default.</p></li>
+</ul>
+</div></blockquote>
+<p>The simplest way to attach an NVMe controller on the QEMU PCI bus is to add the
+following parameters:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-drive file=nvm.img,if=none,id=nvm</span>
+<span class="go">-device nvme,serial=deadbeef,drive=nvm</span>
+</pre></div>
+</div>
+<p>There are a number of optional general parameters for the <code class="docutils literal notranslate"><span class="pre">nvme</span></code> device. Some
+are mentioned here, but see <code class="docutils literal notranslate"><span class="pre">-device</span> <span class="pre">nvme,help</span></code> to list all possible
+parameters.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">max_ioqpairs=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">64</span></code>)</dt><dd><p>Set the maximum number of allowed I/O queue pairs. This replaces the
+deprecated <code class="docutils literal notranslate"><span class="pre">num_queues</span></code> parameter.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">msix_qsize=UINT16</span></code> (default: <code class="docutils literal notranslate"><span class="pre">65</span></code>)</dt><dd><p>The number of MSI-X vectors that the device should support.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mdts=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">7</span></code>)</dt><dd><p>Set the Maximum Data Transfer Size of the device.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">use-intel-id</span></code> (default: <code class="docutils literal notranslate"><span class="pre">off</span></code>)</dt><dd><p>Since QEMU 5.2, the device uses a QEMU allocated “Red Hat” PCI Device and
+Vendor ID. Set this to <code class="docutils literal notranslate"><span class="pre">on</span></code> to revert to the unallocated Intel ID
+previously used.</p>
+</dd>
+</dl>
+</section>
+<section id="additional-namespaces">
+<h3>Additional Namespaces<a class="headerlink" href="#additional-namespaces" title="Permalink to this heading"></a></h3>
+<p>In the simplest possible invocation sketched above, the device only support a
+single namespace with the namespace identifier <code class="docutils literal notranslate"><span class="pre">1</span></code>. To support multiple
+namespaces and additional features, the <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> device must be used.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-device nvme,id=nvme-ctrl-0,serial=deadbeef</span>
+<span class="go">-drive file=nvm-1.img,if=none,id=nvm-1</span>
+<span class="go">-device nvme-ns,drive=nvm-1</span>
+<span class="go">-drive file=nvm-2.img,if=none,id=nvm-2</span>
+<span class="go">-device nvme-ns,drive=nvm-2</span>
+</pre></div>
+</div>
+<p>The namespaces defined by the <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> device will attach to the most
+recently defined <code class="docutils literal notranslate"><span class="pre">nvme-bus</span></code> that is created by the <code class="docutils literal notranslate"><span class="pre">nvme</span></code> device. Namespace
+identifiers are allocated automatically, starting from <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>There are a number of parameters available:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">nsid</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Explicitly set the namespace identifier.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">uuid</span></code> (default: <em>autogenerated</em>)</dt><dd><p>Set the UUID of the namespace. This will be reported as a “Namespace UUID”
+descriptor in the Namespace Identification Descriptor List.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">eui64</span></code></dt><dd><p>Set the EUI-64 of the namespace. This will be reported as a “IEEE Extended
+Unique Identifier” descriptor in the Namespace Identification Descriptor List.
+Since machine type 6.1 a non-zero default value is used if the parameter
+is not provided. For earlier machine types the field defaults to 0.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">bus</span></code></dt><dd><p>If there are more <code class="docutils literal notranslate"><span class="pre">nvme</span></code> devices defined, this parameter may be used to
+attach the namespace to a specific <code class="docutils literal notranslate"><span class="pre">nvme</span></code> device (identified by an <code class="docutils literal notranslate"><span class="pre">id</span></code>
+parameter on the controller device).</p>
+</dd>
+</dl>
+</section>
+<section id="nvm-subsystems">
+<h3>NVM Subsystems<a class="headerlink" href="#nvm-subsystems" title="Permalink to this heading"></a></h3>
+<p>Additional features becomes available if the controller device (<code class="docutils literal notranslate"><span class="pre">nvme</span></code>) is
+linked to an NVM Subsystem device (<code class="docutils literal notranslate"><span class="pre">nvme-subsys</span></code>).</p>
+<p>The NVM Subsystem emulation allows features such as shared namespaces and
+multipath I/O.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-device nvme-subsys,id=nvme-subsys-0,nqn=subsys0</span>
+<span class="go">-device nvme,serial=deadbeef,subsys=nvme-subsys-0</span>
+<span class="go">-device nvme,serial=deadbeef,subsys=nvme-subsys-0</span>
+</pre></div>
+</div>
+<p>This will create an NVM subsystem with two controllers. Having controllers
+linked to an <code class="docutils literal notranslate"><span class="pre">nvme-subsys</span></code> device allows additional <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> parameters:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">shared</span></code> (default: <code class="docutils literal notranslate"><span class="pre">on</span></code> since 6.2)</dt><dd><p>Specifies that the namespace will be attached to all controllers in the
+subsystem. If set to <code class="docutils literal notranslate"><span class="pre">off</span></code>, the namespace will remain a private namespace
+and may only be attached to a single controller at a time. Shared namespaces
+are always automatically attached to all controllers (also when controllers
+are hotplugged).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">detached</span></code> (default: <code class="docutils literal notranslate"><span class="pre">off</span></code>)</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">on</span></code>, the namespace will be be available in the subsystem, but
+not attached to any controllers initially. A shared namespace with this set
+to <code class="docutils literal notranslate"><span class="pre">on</span></code> will never be automatically attached to controllers.</p>
+</dd>
+</dl>
+<p>Thus, adding</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-drive file=nvm-1.img,if=none,id=nvm-1</span>
+<span class="go">-device nvme-ns,drive=nvm-1,nsid=1</span>
+<span class="go">-drive file=nvm-2.img,if=none,id=nvm-2</span>
+<span class="go">-device nvme-ns,drive=nvm-2,nsid=3,shared=off,detached=on</span>
+</pre></div>
+</div>
+<p>will cause NSID 1 will be a shared namespace that is initially attached to both
+controllers. NSID 3 will be a private namespace due to <code class="docutils literal notranslate"><span class="pre">shared=off</span></code> and only
+attachable to a single controller at a time. Additionally it will not be
+attached to any controller initially (due to <code class="docutils literal notranslate"><span class="pre">detached=on</span></code>) or to hotplugged
+controllers.</p>
+</section>
+</section>
+<section id="optional-features">
+<h2>Optional Features<a class="headerlink" href="#optional-features" title="Permalink to this heading"></a></h2>
+<section id="controller-memory-buffer">
+<h3>Controller Memory Buffer<a class="headerlink" href="#controller-memory-buffer" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">nvme</span></code> device parameters related to the Controller Memory Buffer support:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">cmb_size_mb=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>This adds a Controller Memory Buffer of the given size at offset zero in BAR
+2.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">legacy-cmb</span></code> (default: <code class="docutils literal notranslate"><span class="pre">off</span></code>)</dt><dd><p>By default, the device uses the “v1.4 scheme” for the Controller Memory
+Buffer support (i.e, the CMB is initially disabled and must be explicitly
+enabled by the host). Set this to <code class="docutils literal notranslate"><span class="pre">on</span></code> to behave as a v1.3 device wrt. the
+CMB.</p>
+</dd>
+</dl>
+</section>
+<section id="simple-copy">
+<h3>Simple Copy<a class="headerlink" href="#simple-copy" title="Permalink to this heading"></a></h3>
+<p>The device includes support for TP 4065 (“Simple Copy Command”). A number of
+additional <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> device parameters may be used to control the Copy
+command limits:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">mssrl=UINT16</span></code> (default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</dt><dd><p>Set the Maximum Single Source Range Length (<code class="docutils literal notranslate"><span class="pre">MSSRL</span></code>). This is the maximum
+number of logical blocks that may be specified in each source range.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mcl=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</dt><dd><p>Set the Maximum Copy Length (<code class="docutils literal notranslate"><span class="pre">MCL</span></code>). This is the maximum number of logical
+blocks that may be specified in a Copy command (the total for all source
+ranges).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">msrc=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">127</span></code>)</dt><dd><p>Set the Maximum Source Range Count (<code class="docutils literal notranslate"><span class="pre">MSRC</span></code>). This is the maximum number of
+source ranges that may be used in a Copy command. This is a 0’s based value.</p>
+</dd>
+</dl>
+</section>
+<section id="zoned-namespaces">
+<h3>Zoned Namespaces<a class="headerlink" href="#zoned-namespaces" title="Permalink to this heading"></a></h3>
+<p>A namespaces may be “Zoned” as defined by TP 4053 (“Zoned Namespaces”). Set
+<code class="docutils literal notranslate"><span class="pre">zoned=on</span></code> on an <code class="docutils literal notranslate"><span class="pre">nvme-ns</span></code> device to configure it as a zoned namespace.</p>
+<p>The namespace may be configured with additional parameters</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.zone_size=SIZE</span></code> (default: <code class="docutils literal notranslate"><span class="pre">128MiB</span></code>)</dt><dd><p>Define the zone size (<code class="docutils literal notranslate"><span class="pre">ZSZE</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.zone_capacity=SIZE</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Define the zone capacity (<code class="docutils literal notranslate"><span class="pre">ZCAP</span></code>). If left at the default (<code class="docutils literal notranslate"><span class="pre">0</span></code>), the zone
+capacity will equal the zone size.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.descr_ext_size=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Set the Zone Descriptor Extension Size (<code class="docutils literal notranslate"><span class="pre">ZDES</span></code>). Must be a multiple of 64
+bytes.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.cross_read=BOOL</span></code> (default: <code class="docutils literal notranslate"><span class="pre">off</span></code>)</dt><dd><p>Set to <code class="docutils literal notranslate"><span class="pre">on</span></code> to allow reads to cross zone boundaries.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.max_active=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Set the maximum number of active resources (<code class="docutils literal notranslate"><span class="pre">MAR</span></code>). The default (<code class="docutils literal notranslate"><span class="pre">0</span></code>)
+allows all zones to be active.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.max_open=UINT32</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Set the maximum number of open resources (<code class="docutils literal notranslate"><span class="pre">MOR</span></code>). The default (<code class="docutils literal notranslate"><span class="pre">0</span></code>)
+allows all zones to be open. If <code class="docutils literal notranslate"><span class="pre">zoned.max_active</span></code> is specified, this value
+must be less than or equal to that.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">zoned.zasl=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Set the maximum data transfer size for the Zone Append command. Like
+<code class="docutils literal notranslate"><span class="pre">mdts</span></code>, the value is specified as a power of two (2^n) and is in units of
+the minimum memory page size (CAP.MPSMIN). The default value (<code class="docutils literal notranslate"><span class="pre">0</span></code>)
+has this property inherit the <code class="docutils literal notranslate"><span class="pre">mdts</span></code> value.</p>
+</dd>
+</dl>
+</section>
+<section id="metadata">
+<h3>Metadata<a class="headerlink" href="#metadata" title="Permalink to this heading"></a></h3>
+<p>The virtual namespace device supports LBA metadata in the form separate
+metadata (<code class="docutils literal notranslate"><span class="pre">MPTR</span></code>-based) and extended LBAs.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">ms=UINT16</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Defines the number of metadata bytes per LBA.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mset=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Set to <code class="docutils literal notranslate"><span class="pre">1</span></code> to enable extended LBAs.</p>
+</dd>
+</dl>
+</section>
+<section id="end-to-end-data-protection">
+<h3>End-to-End Data Protection<a class="headerlink" href="#end-to-end-data-protection" title="Permalink to this heading"></a></h3>
+<p>The virtual namespace device supports DIF- and DIX-based protection information
+(depending on <code class="docutils literal notranslate"><span class="pre">mset</span></code>).</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">pi=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Enable protection information of the specified type (type <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code> or
+<code class="docutils literal notranslate"><span class="pre">3</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pil=UINT8</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Controls the location of the protection information within the metadata. Set
+to <code class="docutils literal notranslate"><span class="pre">1</span></code> to transfer protection information as the first eight bytes of
+metadata. Otherwise, the protection information is transferred as the last
+eight bytes.</p>
+</dd>
+</dl>
+</section>
+<section id="virtualization-enhancements-and-sr-iov-experimental-support">
+<h3>Virtualization Enhancements and SR-IOV (Experimental Support)<a class="headerlink" href="#virtualization-enhancements-and-sr-iov-experimental-support" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">nvme</span></code> device supports Single Root I/O Virtualization and Sharing
+along with Virtualization Enhancements. The controller has to be linked to
+an NVM Subsystem device (<code class="docutils literal notranslate"><span class="pre">nvme-subsys</span></code>) for use with SR-IOV.</p>
+<p>A number of parameters are present (<strong>please note, that they may be
+subject to change</strong>):</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sriov_max_vfs</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Indicates the maximum number of PCIe virtual functions supported
+by the controller. Specifying a non-zero value enables reporting of both
+SR-IOV and ARI (Alternative Routing-ID Interpretation) capabilities
+by the NVMe device. Virtual function controllers will not report SR-IOV.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sriov_vq_flexible</span></code></dt><dd><p>Indicates the total number of flexible queue resources assignable to all
+the secondary controllers. Implicitly sets the number of primary
+controller’s private resources to <code class="docutils literal notranslate"><span class="pre">(max_ioqpairs</span> <span class="pre">-</span> <span class="pre">sriov_vq_flexible)</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sriov_vi_flexible</span></code></dt><dd><p>Indicates the total number of flexible interrupt resources assignable to
+all the secondary controllers. Implicitly sets the number of primary
+controller’s private resources to <code class="docutils literal notranslate"><span class="pre">(msix_qsize</span> <span class="pre">-</span> <span class="pre">sriov_vi_flexible)</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sriov_max_vi_per_vf</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Indicates the maximum number of virtual interrupt resources assignable
+to a secondary controller. The default <code class="docutils literal notranslate"><span class="pre">0</span></code> resolves to
+<code class="docutils literal notranslate"><span class="pre">(sriov_vi_flexible</span> <span class="pre">/</span> <span class="pre">sriov_max_vfs)</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sriov_max_vq_per_vf</span></code> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Indicates the maximum number of virtual queue resources assignable to
+a secondary controller. The default <code class="docutils literal notranslate"><span class="pre">0</span></code> resolves to
+<code class="docutils literal notranslate"><span class="pre">(sriov_vq_flexible</span> <span class="pre">/</span> <span class="pre">sriov_max_vfs)</span></code></p>
+</dd>
+</dl>
+<p>The simplest possible invocation enables the capability to set up one VF
+controller and assign an admin queue, an IO queue, and a MSI-X interrupt.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-device nvme-subsys,id=subsys0</span>
+<span class="go">-device nvme,serial=deadbeef,subsys=subsys0,sriov_max_vfs=1,</span>
+<span class="go"> sriov_vq_flexible=2,sriov_vi_flexible=1</span>
+</pre></div>
+</div>
+<p>The minimum steps required to configure a functional NVMe secondary
+controller are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>unbind flexible resources from the primary controller</p></li>
+</ul>
+</div></blockquote>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> nvme virt-mgmt /dev/nvme0 -c 0 -r 1 -a 1 -n 0</span>
+<span class="go"> nvme virt-mgmt /dev/nvme0 -c 0 -r 0 -a 1 -n 0</span>
+
+<span class="go">* perform a Function Level Reset on the primary controller to actually</span>
+<span class="go">  release the resources</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> echo 1 &gt; /sys/bus/pci/devices/0000:01:00.0/reset</span>
+
+<span class="go">* enable VF</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> echo 1 &gt; /sys/bus/pci/devices/0000:01:00.0/sriov_numvfs</span>
+
+<span class="go">* assign the flexible resources to the VF and set it ONLINE</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go"> nvme virt-mgmt /dev/nvme0 -c 1 -r 1 -a 8 -n 1</span>
+<span class="go"> nvme virt-mgmt /dev/nvme0 -c 1 -r 0 -a 8 -n 2</span>
+<span class="go"> nvme virt-mgmt /dev/nvme0 -c 1 -r 0 -a 9 -n 0</span>
+
+<span class="go">* bind the NVMe driver to the VF</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">echo 0000:01:00.1 &gt; /sys/bus/pci/drivers/nvme/bind</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="net.html" class="btn btn-neutral float-left" title="Network emulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usb.html" class="btn btn-neutral float-right" title="USB emulation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

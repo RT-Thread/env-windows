@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orange Pi PC (orangepi-pc) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Palm Tungsten|E PDA (cheetah)" href="palm.html" />
+    <link rel="prev" title="NXP i.MX25 PDK board (imx25-pdk)" href="imx25-pdk.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                7.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">System Emulation</a></li>
+          <li class="breadcrumb-item"><a href="../targets.html">QEMU System Emulator Targets</a></li>
+          <li class="breadcrumb-item"><a href="../target-arm.html">Arm System emulator</a></li>
+      <li class="breadcrumb-item active">Orange Pi PC (<code class="docutils literal notranslate"><span class="pre">orangepi-pc</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.com/qemu-project/qemu/blob/master/docs/system/arm/orangepi.rst" class="fa fa-gitlab"> Edit on GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="orange-pi-pc-orangepi-pc">
+<h1>Orange Pi PC (<code class="docutils literal notranslate"><span class="pre">orangepi-pc</span></code>)<a class="headerlink" href="#orange-pi-pc-orangepi-pc" title="Permalink to this heading"></a></h1>
+<p>The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
+based embedded computer with mainline support in both U-Boot
+and Linux. The board comes with a Quad Core Cortex-A7 &#64; 1.3GHz,
+1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
+various other I/O.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this heading"></a></h2>
+<p>The Orange Pi PC machine supports the following devices:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>SMP (Quad Core Cortex-A7)</p></li>
+<li><p>Generic Interrupt Controller configuration</p></li>
+<li><p>SRAM mappings</p></li>
+<li><p>SDRAM controller</p></li>
+<li><p>Real Time Clock</p></li>
+<li><p>Timer device (re-used from Allwinner A10)</p></li>
+<li><p>UART</p></li>
+<li><p>SD/MMC storage controller</p></li>
+<li><p>EMAC ethernet</p></li>
+<li><p>USB 2.0 interfaces</p></li>
+<li><p>Clock Control Unit</p></li>
+<li><p>System Control module</p></li>
+<li><p>Security Identifier device</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this heading"></a></h2>
+<p>Currently, Orange Pi PC does <em>not</em> support the following features:</p>
+<ul class="simple">
+<li><p>Graphical output via HDMI, GPU and/or the Display Engine</p></li>
+<li><p>Audio output</p></li>
+<li><p>Hardware Watchdog</p></li>
+</ul>
+<p>Also see the ‘unimplemented’ array in the Allwinner H3 SoC module
+for a complete list of unimplemented I/O devices: <code class="docutils literal notranslate"><span class="pre">./hw/arm/allwinner-h3.c</span></code></p>
+</section>
+<section id="boot-options">
+<h2>Boot options<a class="headerlink" href="#boot-options" title="Permalink to this heading"></a></h2>
+<p>The Orange Pi PC machine can start using the standard -kernel functionality
+for loading a Linux kernel or ELF executable. Additionally, the Orange Pi PC
+machine can also emulate the BootROM which is present on an actual Allwinner H3
+based SoC, which loads the bootloader from a SD card, specified via the -sd argument
+to qemu-system-arm.</p>
+</section>
+<section id="machine-specific-options">
+<h2>Machine-specific options<a class="headerlink" href="#machine-specific-options" title="Permalink to this heading"></a></h2>
+<p>The following machine-specific options are supported:</p>
+<ul>
+<li><p>allwinner-rtc.base-year=YYYY</p>
+<p>The Allwinner RTC device is automatically created by the Orange Pi PC machine
+and uses a default base year value which can be overridden using the ‘base-year’ property.
+The base year is the actual represented year when the RTC year value is zero.
+This option can be used in case the target operating system driver uses a different
+base year value. The minimum value for the base year is 1900.</p>
+</li>
+<li><p>allwinner-sid.identifier=abcd1122-a000-b000-c000-12345678ffff</p>
+<p>The Security Identifier value can be read by the guest.
+For example, U-Boot uses it to determine a unique MAC address.</p>
+</li>
+</ul>
+<p>The above machine-specific options can be specified in qemu-system-arm
+via the ‘-global’ argument, for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -sd mycard.img <span class="se">\</span>
+     -global allwinner-rtc.base-year<span class="o">=</span><span class="m">2000</span>
+</pre></div>
+</div>
+</section>
+<section id="running-mainline-linux">
+<h2>Running mainline Linux<a class="headerlink" href="#running-mainline-linux" title="Permalink to this heading"></a></h2>
+<p>Mainline Linux kernels from 4.19 up to latest master are known to work.
+To build a Linux mainline kernel that can be booted by the Orange Pi PC machine,
+simply configure the kernel using the sunxi_defconfig configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabi- make mrproper
+$ <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabi- make sunxi_defconfig
+</pre></div>
+</div>
+<p>To be able to use USB storage, you need to manually enable the corresponding
+configuration item. Start the kconfig configuration tool:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabi- make menuconfig
+</pre></div>
+</div>
+<p>Navigate to the following item, enable it and save your configuration:</p>
+<blockquote>
+<div><p>Device Drivers &gt; USB support &gt; USB Mass Storage support</p>
+</div></blockquote>
+<p>Build the Linux kernel with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabi- make
+</pre></div>
+</div>
+<p>To boot the newly build linux kernel in QEMU with the Orange Pi PC machine, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -nic user -nographic <span class="se">\</span>
+    -kernel /path/to/linux/arch/arm/boot/zImage <span class="se">\</span>
+    -append <span class="s1">&#39;console=ttyS0,115200&#39;</span> <span class="se">\</span>
+    -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb
+</pre></div>
+</div>
+</section>
+<section id="orange-pi-pc-images">
+<h2>Orange Pi PC images<a class="headerlink" href="#orange-pi-pc-images" title="Permalink to this heading"></a></h2>
+<p>Note that the mainline kernel does not have a root filesystem. You may provide it
+with an official Orange Pi PC image from the official website:</p>
+<blockquote>
+<div><p><a class="reference external" href="http://www.orangepi.org/downloadresources/">http://www.orangepi.org/downloadresources/</a></p>
+</div></blockquote>
+<p>Another possibility is to run an Armbian image for Orange Pi PC which
+can be downloaded from:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://www.armbian.com/orange-pi-pc/">https://www.armbian.com/orange-pi-pc/</a></p>
+</div></blockquote>
+<p>Alternatively, you can also choose to build you own image with buildroot
+using the orangepi_pc_defconfig. Also see <a class="reference external" href="https://buildroot.org">https://buildroot.org</a> for more information.</p>
+<p>When using an image as an SD card, it must be resized to a power of two. This can be
+done with the <code class="docutils literal notranslate"><span class="pre">qemu-img</span></code> command. It is recommended to only increase the image size
+instead of shrinking it to a power of two, to avoid loss of data. For example,
+to prepare a downloaded Armbian image, first extract it and then increase
+its size to one gigabyte as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img resize Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img 1G
+</pre></div>
+</div>
+<p>You can choose to attach the selected image either as an SD card or as USB mass storage.
+For example, to boot using the Orange Pi PC Debian image on SD card, simply add the -sd
+argument and provide the proper root= kernel parameter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -nic user -nographic <span class="se">\</span>
+    -kernel /path/to/linux/arch/arm/boot/zImage <span class="se">\</span>
+    -append <span class="s1">&#39;console=ttyS0,115200 root=/dev/mmcblk0p2&#39;</span> <span class="se">\</span>
+    -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb <span class="se">\</span>
+    -sd OrangePi_pc_debian_stretch_server_linux5.3.5_v1.0.img
+</pre></div>
+</div>
+<p>To attach the image as an USB mass storage device to the machine,
+simply append to the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-drive <span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>stick,file<span class="o">=</span>myimage.img <span class="se">\</span>
+-device usb-storage,bus<span class="o">=</span>usb-bus.0,drive<span class="o">=</span>stick
+</pre></div>
+</div>
+<p>Instead of providing a custom Linux kernel via the -kernel command you may also
+choose to let the Orange Pi PC machine load the bootloader from SD card, just like
+a real board would do using the BootROM. Simply pass the selected image via the -sd
+argument and remove the -kernel, -append, -dbt and -initrd arguments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -nic user -nographic <span class="se">\</span>
+     -sd Armbian_19.11.3_Orangepipc_buster_current_5.3.9.img
+</pre></div>
+</div>
+<p>Note that both the official Orange Pi PC images and Armbian images start
+a lot of userland programs via systemd. Depending on the host hardware and OS,
+they may be slow to emulate, especially due to emulating the 4 cores.
+To help reduce the performance slow down due to emulating the 4 cores, you can
+give the following kernel parameters via U-Boot (or via -append):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">=</span>&gt; setenv extraargs <span class="s1">&#39;systemd.default_timeout_start_sec=9000 loglevel=7 nosmp console=ttyS0,115200&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="running-u-boot">
+<h2>Running U-Boot<a class="headerlink" href="#running-u-boot" title="Permalink to this heading"></a></h2>
+<p>U-Boot mainline can be build and configured using the orangepi_pc_defconfig
+using similar commands as describe above for Linux. Note that it is recommended
+for development/testing to select the following configuration setting in U-Boot:</p>
+<blockquote>
+<div><p>Device Tree Control &gt; Provider for DTB for DT Control &gt; Embedded DTB</p>
+</div></blockquote>
+<p>To start U-Boot using the Orange Pi PC machine, provide the
+u-boot binary to the -kernel argument:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -nic user -nographic <span class="se">\</span>
+    -kernel /path/to/uboot/u-boot -sd disk.img
+</pre></div>
+</div>
+<p>Use the following U-boot commands to load and boot a Linux kernel from SD card:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">=</span>&gt; setenv bootargs <span class="nv">console</span><span class="o">=</span>ttyS0,115200
+<span class="o">=</span>&gt; ext2load mmc <span class="m">0</span> 0x42000000 <span class="nv">zImage</span>
+<span class="o">=</span>&gt; ext2load mmc <span class="m">0</span> 0x43000000 sun8i-h3-orangepi-pc.dtb
+<span class="o">=</span>&gt; bootz 0x42000000 - 0x43000000
+</pre></div>
+</div>
+</section>
+<section id="running-netbsd">
+<h2>Running NetBSD<a class="headerlink" href="#running-netbsd" title="Permalink to this heading"></a></h2>
+<p>The NetBSD operating system also includes support for Allwinner H3 based boards,
+including the Orange Pi PC. NetBSD 9.0 is known to work best for the Orange Pi PC
+board and provides a fully working system with serial console, networking and storage.
+For the Orange Pi PC machine, get the ‘evbarm-earmv7hf’ based image from:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/evbarm-earmv7hf/binary/gzimg/armv7.img.gz">https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/evbarm-earmv7hf/binary/gzimg/armv7.img.gz</a></p>
+</div></blockquote>
+<p>The image requires manually installing U-Boot in the image. Build U-Boot with
+the orangepi_pc_defconfig configuration as described in the previous section.
+Next, unzip the NetBSD image and write the U-Boot binary including SPL using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ gunzip armv7.img.gz
+$ dd <span class="k">if</span><span class="o">=</span>/path/to/u-boot-sunxi-with-spl.bin <span class="nv">of</span><span class="o">=</span>armv7.img <span class="nv">bs</span><span class="o">=</span><span class="m">1024</span> <span class="nv">seek</span><span class="o">=</span><span class="m">8</span> <span class="nv">conv</span><span class="o">=</span>notrunc
+</pre></div>
+</div>
+<p>Finally, before starting the machine the SD image must be extended such
+that the size of the SD image is a power of two and that the NetBSD kernel
+will not conclude the NetBSD partition is larger than the emulated SD card:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-img resize armv7.img 2G
+</pre></div>
+</div>
+<p>Start the machine using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm -M orangepi-pc -nic user -nographic <span class="se">\</span>
+      -sd armv7.img -global allwinner-rtc.base-year<span class="o">=</span><span class="m">2000</span>
+</pre></div>
+</div>
+<p>At the U-Boot stage, interrupt the automatic boot process by pressing a key
+and set the following environment variables before booting:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">=</span>&gt; setenv bootargs <span class="nv">root</span><span class="o">=</span><span class="nv">ld0a</span>
+<span class="o">=</span>&gt; setenv kernel netbsd-GENERIC.ub
+<span class="o">=</span>&gt; setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
+<span class="o">=</span>&gt; setenv bootcmd <span class="s1">&#39;fatload mmc 0:1 ${kernel_addr_r} ${kernel}; fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; fdt addr ${fdt_addr_r}; bootm ${kernel_addr_r} - ${fdt_addr_r}&#39;</span>
+</pre></div>
+</div>
+<p>Optionally you may save the environment variables to SD card with ‘saveenv’.
+To continue booting simply give the ‘boot’ command and NetBSD boots.</p>
+</section>
+<section id="orange-pi-pc-integration-tests">
+<h2>Orange Pi PC integration tests<a class="headerlink" href="#orange-pi-pc-integration-tests" title="Permalink to this heading"></a></h2>
+<p>The Orange Pi PC machine has several integration tests included.
+To run the whole set of tests, build QEMU from source and simply
+provide the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">AVOCADO_ALLOW_LARGE_STORAGE</span><span class="o">=</span>yes avocado --show<span class="o">=</span>app,console run <span class="se">\</span>
+   -t machine:orangepi-pc tests/avocado/boot_linux_console.py
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="imx25-pdk.html" class="btn btn-neutral float-left" title="NXP i.MX25 PDK board (imx25-pdk)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="palm.html" class="btn btn-neutral float-right" title="Palm Tungsten|E PDA (cheetah)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 7.2.0.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
