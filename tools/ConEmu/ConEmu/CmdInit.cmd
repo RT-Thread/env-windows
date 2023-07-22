@@ -41,8 +41,8 @@ set ENV_ROOT=%~dp0..\..\..
 
 :: set PYTHONPATH and PYTHONHOME 
 if /i "%processor_architecture%"=="x86" (
-        set PYTHONPATH=%ENV_ROOT%\tools\Python27_32
-        set PYTHONHOME=%ENV_ROOT%\tools\Python27_32
+    set PYTHONPATH=%ENV_ROOT%\tools\Python27_32
+    set PYTHONHOME=%ENV_ROOT%\tools\Python27_32
 ) else if /i "%processor_architecture%"=="amd64" (
     if defined processor_architew6432 (
         set PYTHONPATH=%ENV_ROOT%\tools\Python27_32
@@ -64,8 +64,6 @@ set PATH=%PYTHONHOME%;%PATH%
 set PATH=%PYTHONPATH%;%PATH%
 set PATH=%SCONS%;%PATH%
 set PATH=%ENV_ROOT%\tools\qemu\qemu32;%PATH%
-
-::start /b python %~dp0..\..\scripts\init_env.py
 
 :: ====== RT-Thread ENV Change Code Page ================
 
