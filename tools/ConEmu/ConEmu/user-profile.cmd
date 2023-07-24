@@ -26,6 +26,6 @@ set PATH=%ENV_ROOT%\tools\Python27;%PATH%
 set PATH=%ENV_ROOT%\tools\Python27\Scripts;%PATH%
 set PATH=%ENV_ROOT%\tools\bin;%PATH%
 set PATH=%RTT_EXEC_PATH%;%PATH%
-set PATH=%ENV_ROOT%\tools\qemu\qemu32;%PATH%
+set PATH=%ENV_ROOT%\tools\qemu\qemu64;%PATH%
 set PYTHONPATH=%ENV_ROOT%\tools\Python27;
 chcp 437
