@@ -4,7 +4,7 @@ import sys
 path = os.environ["PATH"]
 #print "now:",path  
 
-path = os.getcwd()+ "/tools/git/Git/bin" + ';' + os.getcwd()+ "/tools/bin" + ';'+ os.getcwd() + "/tools/Python27"+ ';' + os.getcwd() + "/tools/Python27/Scripts"+';'+ os.getcwd() + "/tools/qemu" +';' + os.getcwd()+ "/tools/qemu/qemu32" + ';' + os.environ["PATH"]
+path = os.getcwd()+ "/tools/git/Git/bin" + ';' + os.getcwd()+ "/tools/bin" + ';'+ os.getcwd() + "/tools/Python27"+ ';' + os.getcwd() + "/tools/Python27/Scripts"+';'+ os.getcwd() + "/tools/qemu" +';' + os.getcwd()+ "/tools/qemu/qemu64" + ';' + os.environ["PATH"]
 
 os.environ["PATH"] = path
 

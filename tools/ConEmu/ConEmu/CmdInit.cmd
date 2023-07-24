@@ -63,7 +63,7 @@ set PATH=%RTT_EXEC_PATH%;%PATH%
 set PATH=%PYTHONHOME%;%PATH%
 set PATH=%PYTHONPATH%;%PATH%
 set PATH=%SCONS%;%PATH%
-set PATH=%ENV_ROOT%\tools\qemu\qemu32;%PATH%
+set PATH=%ENV_ROOT%\tools\qemu\qemu64;%PATH%
 
 :: ====== RT-Thread ENV Change Code Page ================
 
