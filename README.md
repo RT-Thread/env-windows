@@ -12,6 +12,9 @@ git clone --recursive --depth 1 https://github.com/RT-Thread/env-windows.git
 - [How to use QEMU simulator with Env tool in Windows (document)](https://github.com/RT-Thread/rt-thread/blob/master/documentation/quick-start/quick_start_qemu/quick_start_qemu_windows.md)
 - [Development Tools Selection (video)](https://www.youtube.com/watch?v=F_kU1CMjLKw)
 
-## Upstream and dependencies
+## Upstream and dependencies repository
+
+These repositories will be covered as submodles in this project.
+
 - [RT-Thread Env Script](https://github.com/RT-Thread/env)
 - [RT-Thread software packages index](https://github.com/RT-Thread/packages)
