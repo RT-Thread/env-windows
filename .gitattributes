@@ -23,3 +23,8 @@
 *.t64 binary
 *.pyd binary
 *.pyc binary
+*.dll binary
+*.fd binary
+*.rom binary
+*.img binary
+trace-events-all binary
