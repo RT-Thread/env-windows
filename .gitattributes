@@ -9,6 +9,8 @@
 *.h text diff
 *.sh text diff
 *.txt text diff
+*.md text diff
+*.rst text diff
 *.html text diff
 *.gitattributes text diff
 CHANGES text diff
