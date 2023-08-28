@@ -2,6 +2,31 @@
 
 ### Releases from [chrisant996/clink](https://github.com/chrisant996/clink) fork
 
+#### v1.5.4
+- Further contrast improvements for default colors to be readable in both Dark and Light terminal themes.
+- Added `arginfo` field in `builder:addmatches()` and in match display filtering.
+- Auto-suggestions are no longer shown while searching history; it was too distracting and confusing.
+- Fixed updating the input line display after using `clink-popup-history` or `win-popup-history` (regression introduced in v1.5.3).
+- Fixed `old-menu-complete` and `menu-complete` when there's only one match.  The first time it should insert the match, and subsequent times should ding instead of cycling through the same match over and over and requiring an equal number of `undo` to undo.
+- Fixed match display filtering to support the `match.substring` setting.
+- Fixed match display filtering to support the `files.system` setting.
+- Fixed the cursor position if match display filtering happens the first time `clink-select-complete` is used in a session.
+- Fixed a case where two `undo` were required to fully undo what `menu-complete` inserted.
+- Fixed <kbd>Esc</kbd> during incremental history search mode so it cancels the search.
+- Fixed input line coloring after `non-incremental-reverse-search-history` or `non-incremental-forward-search-history` finds an exact match for the search text (since v1.1.5).
+- Internal changes and optimizations.
+
+#### v1.5.3
+- Added `builder:setfullyqualified()` to force completions to be inserted as fully qualified path names.
+- Completions for <code>clink set <span class="arg">setting_name</span> <span class="arg">input</span></code> use fully qualified path names for <span class="arg">input</span>.  This helps avoid accidentally setting relative paths in global settings; since the current directory changes frequently, setting relative paths usually leads to unintended consequences.
+- Only load a script from a `completions\` directory if the associated command exists in the file system.  Also, pass the fully qualified file name as input to the script (in Lua, use `...` to get script arguments, e.g. `local command = ...`).
+- `clink info` now reports whether Clink is injected.
+- Improve efficiency of updating the input line display.  This eliminates some redundant processing in the Readline library and in Clink.
+- Fixed input line parsing and coloring when the `doskey.enhanced` setting is off or when doskey macro expansion is suppressed.
+- Fixed `line_state:getwordinfo()` to accurately set the `.alias` field when the `doskey.enhanced` setting is off or when doskey macro expansion is suppressed.
+- Fixed coloring the command word in the command line when queued keys select and accept a command line from history instantly (it could accidentally continue without applying the appropriate coloring).
+- Fixed script error in `clink.filematches(nil)` and `clink.dirmatches(nil)`; they were meant to behave the same as passing an empty string.
+
 #### v1.5.2
 - Adjusted the colors in "Use enhanced defaults" to have sufficient contrast to be readable in both Dark and Light terminal themes.
 - More reliably detect whether hosted in Windows Terminal, and even when Windows Terminal is set as the default terminal application.
