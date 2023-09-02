@@ -36,23 +36,9 @@ rem Finally reset color and add space
 set ConEmuPrompt3=$E[m$S$E]9;12$E\
 
 :: ============= RT-Thread ENV Path ==================
-
 set ENV_ROOT=%~dp0..\..\..
-
-:: set PYTHONPATH and PYTHONHOME 
-if /i "%processor_architecture%"=="x86" (
-    set PYTHONPATH=%ENV_ROOT%\tools\Python27_32
-    set PYTHONHOME=%ENV_ROOT%\tools\Python27_32
-) else if /i "%processor_architecture%"=="amd64" (
-    if defined processor_architew6432 (
-        set PYTHONPATH=%ENV_ROOT%\tools\Python27_32
-        set PYTHONHOME=%ENV_ROOT%\tools\Python27_32
-    ) else (
-        set PYTHONPATH=%ENV_ROOT%\tools\Python27
-        set PYTHONHOME=%ENV_ROOT%\tools\Python27
-    )
-)
-
+set PYTHONPATH=%ENV_ROOT%\tools\Python27
+set PYTHONHOME=%ENV_ROOT%\tools\Python27
 set RTT_EXEC_PATH=%ENV_ROOT%\tools\gnu_gcc\arm_gcc\mingw\bin
 set RTT_CC=gcc
 set PKGS_ROOT=%ENV_ROOT%\packages
