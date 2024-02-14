@@ -5,7 +5,10 @@ Please use git command and clone recursively, then follow the tutorials and docu
 ```shell
 git clone --recursive --depth 1 https://github.com/RT-Thread/env-windows.git
 ```
-
+对于中国大陆用户，请使用以下命令:
+```shell
+git clone --recursive --depth 1 https://gitee.com/mirrors_RT-Thread/env-windows.git
+```
 ## Tutorials and documents
 - [How to install and use Env tool (document)](https://github.com/RT-Thread/rt-thread/blob/master/documentation/env/env.md)
 - [Get Started with RT-Thread Env Tool (video)](https://www.youtube.com/watch?v=dEK94o_YoSo)
