@@ -53,9 +53,6 @@ echo - RT -     Thread Operating System
 echo  / ^| ^\
 echo 2006 - 2024 Copyright by RT-Thread team
 
-if "%ConEmuBaseDir%" == "" (
-    %ENV_ROOT%\tools\ConEmu\ConEmu\clink\clink.bat inject
-)
 
 Setlocal ENABLEDELAYEDEXPANSION
 :: 启用命令扩展，参加setlocal /?命令
@@ -120,3 +117,6 @@ endlocal & set "PATH=%PATH%"
 goto:eof
 
 :end
+if "%ConEmuBaseDir%" == "" (
+    %ENV_ROOT%\tools\ConEmu\ConEmu\clink\clink.bat inject
+)
