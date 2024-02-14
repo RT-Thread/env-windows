@@ -1,17 +1,30 @@
 * binary
 
-*.cmd text eol=crlf diff
-*.xml text eol=crlf diff
-*.reg text eol=crlf diff
-*.bat text eol=crlf diff
-*.py text diff
-*.c text diff
-*.h text diff
-*.sh text diff
-*.txt text diff
-*.md text diff
-*.rst text diff
-*.html text diff
-*.gitattributes text diff
-CHANGES text diff
+*.cmd   text eol=crlf diff
+*.xml   text eol=crlf diff
+*.reg   text eol=crlf diff
+*.bat   text eol=crlf diff
+*.ps1   text eol=crlf diff
+*.py    text eol=crlf diff
+*.lua   text eol=crlf diff
+*.c     text eol=crlf diff
+*.h     text eol=crlf diff
+*.sh    text eol=crlf diff
+*.txt   text eol=crlf diff
+*.md    text eol=crlf diff
+*.rst   text eol=crlf diff
+*.html  text eol=crlf diff
+*.fml   text eol=crlf diff
+*.xml   text eol=crlf diff
+*.info  text eol=crlf diff
+*.I10n  text eol=crlf diff
+*.map   text eol=crlf diff
+*.ans   text eol=crlf diff
+*.lng   text eol=crlf diff
+*.conf  text eol=crlf diff
 
+*.farconfig      text eol=crlf diff
+*.gitattributes  text eol=crlf diff
+CHANGES          text eol=crlf diff
+_default_inputrc text eol=crlf diff
+FarHere.dat      text eol=crlf diff
