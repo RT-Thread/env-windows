@@ -13,9 +13,9 @@ if not exist "%USERPROFILE%\.conemu\CmdInit.cmd" (
     (
         echo rem !!! Sample user specific settings that will persist in upgrade !!!
         echo rem !!! Save as "%%USERPROFILE%%\.conemu\CmdInit.cmd" to activate    !!!
-        echo. 
+        echo.
         echo rem echo Loading ConEmu user settings...
-        echo. 
+        echo.
         echo rem Loading RT-Thread Env
         echo if exist "%%ConEmuBaseDir%%\..\..\..\env.bat" (
         echo    if exist "%%ConEmuBaseDir%%\..\..\bin\env-init.bat" (
@@ -27,27 +27,27 @@ if not exist "%USERPROFILE%\.conemu\CmdInit.cmd" (
 )
 
 :env
-:: ============= RT-Thread ENV Path ==================
+:: ============= Add ENV Tools Path =============
 set ENV_ROOT=%~dp0..\..
-set PYTHONPATH=%ENV_ROOT%\tools\Python27
-set PYTHONHOME=%ENV_ROOT%\tools\Python27
+@REM set PYTHONPATH=%ENV_ROOT%\tools\Python27
+@REM set PYTHONHOME=%ENV_ROOT%\tools\Python27
 set RTT_EXEC_PATH=%ENV_ROOT%\tools\gnu_gcc\arm_gcc\mingw\bin
 set RTT_CC=gcc
 set PKGS_ROOT=%ENV_ROOT%\packages
-set SCONS=%PYTHONPATH%\Scripts
+@REM set SCONS=%PYTHONPATH%\Scripts
 :: Add to %PATH%
 call :AddPath "%ENV_ROOT%\tools\git-2.41.0-32-bit\cmd"
 call :AddPath "%ENV_ROOT%\tools\bin"
 call :AddPath "%RTT_EXEC_PATH%"
-call :AddPath "%PYTHONHOME%"
-call :AddPath "%PYTHONPATH%"
-call :AddPath "%SCONS%"
+@REM call :AddPath "%PYTHONHOME%"
+@REM call :AddPath "%PYTHONPATH%"
+@REM call :AddPath "%SCONS%"
 call :AddPath "%ENV_ROOT%\tools\qemu\qemu64"
 
-:: ====== RT-Thread ENV Change Code Page ================
+:: ============= Change Code Page =============
 
 chcp 65001 > nul
-python %~dp0..\scripts\env.py -v
+@REM python %~dp0..\scripts\env.py -v
 echo RT-Thread Env Tool (ConEmu) Version 1.5.2
 echo  ^\ ^| /
 echo - RT -     Thread Operating System
@@ -94,6 +94,27 @@ echo *******************************************************************
 :break_str
 set str=
 chcp 437 > nul
+
+
+:: ============= Activate or Create Python VENV =============
+set RTT_ENV_URL=https://github.com/rt-thread/env
+set VENV=%ENV_ROOT%\.venv
+set PYTHON=%ENV_ROOT%\tools\python-3.11.9-amd64\python.exe
+echo.
+if not exist %VENV% (
+    echo Create Python venv for RT-Thread
+    %PYTHON% -m pip uninstall pip -y
+    %PYTHON% -m ensurepip
+    %PYTHON% -m venv %VENV%
+    echo Activate Python VENV in %VENV%
+    call %VENV%\Scripts\activate.bat
+    echo Install RT-Thread ENV from %RTT_ENV_URL%
+    pip install git+%RTT_ENV_URL%
+) else (
+    echo Activate Python VENV in %VENV%
+    call %VENV%\Scripts\activate.bat
+)
+
 goto end
 :: ======================================================
 
