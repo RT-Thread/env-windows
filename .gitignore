@@ -1,4 +1,6 @@
 *.pyc
 *.pickle
+.venv
+__pycache__
 /env_log_std
 /env_log_err
