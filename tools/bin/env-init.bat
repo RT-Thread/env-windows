@@ -97,7 +97,7 @@ chcp 437 > nul
 
 
 :: ============= Activate or Create Python VENV =============
-set RTT_ENV_URL=https://github.com/rt-thread/env
+set RTT_ENV_URL=%~dp0..\scripts
 set VENV=%ENV_ROOT%\.venv
 set PYTHON=%ENV_ROOT%\tools\python-3.11.9-amd64\python.exe
 echo.
@@ -109,7 +109,7 @@ if not exist %VENV% (
     echo Activate Python VENV in %VENV%
     call %VENV%\Scripts\activate.bat
     echo Install RT-Thread ENV from %RTT_ENV_URL%
-    pip install git+%RTT_ENV_URL%
+    pip install %RTT_ENV_URL%
 ) else (
     echo Activate Python VENV in %VENV%
     call %VENV%\Scripts\activate.bat
