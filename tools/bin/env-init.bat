@@ -38,6 +38,7 @@ set PKGS_ROOT=%ENV_ROOT%\packages
 :: Add to %PATH%
 call :AddPath "%ENV_ROOT%\tools\git-2.41.0-32-bit\cmd"
 call :AddPath "%ENV_ROOT%\tools\bin"
+call :AddPath "%ENV_ROOT%\tools\dtc-1.4.7-mingw64"
 call :AddPath "%RTT_EXEC_PATH%"
 @REM call :AddPath "%PYTHONHOME%"
 @REM call :AddPath "%PYTHONPATH%"
