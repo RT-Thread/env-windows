@@ -49,7 +49,7 @@ call :AddPath "%ENV_ROOT%\tools\qemu\qemu64"
 
 chcp 65001 > nul
 @REM python %~dp0..\scripts\env.py -v
-echo RT-Thread Env Tool (ConEmu) Version 2.0.0
+echo RT-Thread Env Tool (ConEmu) Version 2.1.0
 echo  ^\ ^| /
 echo - RT -     Thread Operating System
 echo  / ^| ^\
