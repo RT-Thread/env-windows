@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Changing One RTL SSA Instruction (GNU Compiler Collection (GCC) Internals)</title>
+
+<meta name="description" content="Changing One RTL SSA Instruction (GNU Compiler Collection (GCC) Internals)">
+<meta name="keywords" content="Changing One RTL SSA Instruction (GNU Compiler Collection (GCC) Internals)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Changing-RTL-Instructions.html" rel="up" title="Changing RTL Instructions">
+<link href="Changing-Multiple-RTL-SSA-Instructions.html" rel="next" title="Changing Multiple RTL SSA Instructions">
+<link href="Changing-RTL-Instructions.html" rel="prev" title="Changing RTL Instructions">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Changing-One-RTL-SSA-Instruction"></span><div class="header">
+<p>
+Next: <a href="Changing-Multiple-RTL-SSA-Instructions.html" accesskey="n" rel="next">Changing Multiple RTL SSA Instructions</a>, Up: <a href="Changing-RTL-Instructions.html" accesskey="u" rel="up">Changing RTL Instructions</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Changing-One-RTL-SSA-Instruction-1"></span><h4 class="subsubsection">14.21.8.1 Changing One RTL SSA Instruction</h4>
+
+<p>Before making a change, passes should first use a statement like the
+following:
+</p>
+<div class="example">
+<pre class="example">auto attempt = crtl-&gt;ssa-&gt;new_change_attempt ();
+</pre></div>
+
+<p>Here, <code>attempt</code> is an RAII object that should remain in scope
+for the entire change attempt.  It automatically frees temporary
+memory related to the changes when it goes out of scope.
+</p>
+<p>Next, the pass should create an <code>rtl_ssa::insn_change</code> object
+for the instruction that it wants to change.  This object specifies
+several things:
+</p>
+<ul>
+<li> what the instruction&rsquo;s new list of uses should be (<code>new_uses</code>).
+By default this is the same as the instruction&rsquo;s current list of uses.
+
+</li><li> what the instruction&rsquo;s new list of definitions should be (<code>new_defs</code>).
+By default this is the same as the instruction&rsquo;s current list of
+definitions.
+
+</li><li> where the instruction should be located (<code>move_range</code>).
+This is a range of instructions after which the instruction could
+be placed, represented as an <code>rtl_ssa::insn_range</code>.
+By default the instruction must remain at its current position.
+</li></ul>
+
+<p>If a pass was attempting to change all these properties of an instruction
+<code>insn</code>, it might do something like this:
+</p>
+<div class="example">
+<pre class="example">rtl_ssa::insn_change change (insn);
+change.new_defs = &hellip;;
+change.new_uses = &hellip;;
+change.move_range = &hellip;;
+</pre></div>
+
+<p>This <code>rtl_ssa::insn_change</code> only describes something that the
+pass <em>might</em> do; at this stage, nothing has actually changed.
+</p>
+<p>As noted above, the default <code>move_range</code> requires the instruction
+to remain where it is.  At the other extreme, it is possible to allow
+the instruction to move anywhere within its extended basic block,
+provided that all the new uses and definitions can be performed
+at the new location.  The way to do this is:
+</p>
+<div class="example">
+<pre class="example">change.move_range = insn-&gt;ebb ()-&gt;insn_range ();
+</pre></div>
+
+<p>In either case, the next step is to make sure that move range is
+consistent with the new uses and definitions.  The way to do this is:
+</p>
+<div class="example">
+<pre class="example">if (!rtl_ssa::restrict_movement (change))
+  return false;
+</pre></div>
+
+<p>This function tries to limit <code>move_range</code> to a range of instructions
+at which <code>new_uses</code> and <code>new_defs</code> can be correctly performed.
+It returns true on success or false if no suitable location exists.
+</p>
+<p>The pass should also tentatively change the pattern of the instruction
+to whatever form the pass wants the instruction to have.  This should use
+the facilities provided by <samp>recog.cc</samp>.  For example:
+</p>
+<div class="example">
+<pre class="example">rtl_insn *rtl = insn-&gt;rtl ();
+insn_change_watermark watermark;
+validate_change (rtl, &amp;PATTERN (rtl), new_pat, 1);
+</pre></div>
+
+<p>will tentatively replace <code>insn</code>&rsquo;s pattern with <code>new_pat</code>.
+</p>
+<p>These changes and the construction of the <code>rtl_ssa::insn_change</code>
+can happen in either order or be interleaved.
+</p>
+<p>After the tentative changes to the instruction are complete,
+the pass should check whether the new pattern matches a target
+instruction or satisfies the requirements of an inline asm:
+</p>
+<div class="example">
+<pre class="example">if (!rtl_ssa::recog (change))
+  return false;
+</pre></div>
+
+<p>This step might change the instruction pattern further in order to
+make it match.  It might also add new definitions or restrict the range
+of the move.  For example, if the new pattern did not match in its original
+form, but could be made to match by adding a clobber of the flags
+register, <code>rtl_ssa::recog</code> will check whether the flags register
+is free at an appropriate point.  If so, it will add a clobber of the
+flags register to <code>new_defs</code> and restrict <code>move_range</code> to
+the locations at which the flags register can be safely clobbered.
+</p>
+<p>Even if the proposed new instruction is valid according to
+<code>rtl_ssa::recog</code>, the change might not be worthwhile.
+For example, when optimizing for speed, the new instruction might
+turn out to be slower than the original one.  When optimizing for
+size, the new instruction might turn out to be bigger than the
+original one.
+</p>
+<p>Passes should check for this case using <code>change_is_worthwhile</code>.
+For example:
+</p>
+<div class="example">
+<pre class="example">if (!rtl_ssa::change_is_worthwhile (change))
+  return false;
+</pre></div>
+
+<p>If the change passes this test too then the pass can perform the change using:
+</p>
+<div class="example">
+<pre class="example">confirm_change_group ();
+crtl-&gt;ssa-&gt;change_insn (change);
+</pre></div>
+
+<p>Putting all this together, the change has the following form:
+</p>
+<div class="example">
+<pre class="example">auto attempt = crtl-&gt;ssa-&gt;new_change_attempt ();
+
+rtl_ssa::insn_change change (insn);
+change.new_defs = &hellip;;
+change.new_uses = &hellip;;
+change.move_range = &hellip;;
+
+if (!rtl_ssa::restrict_movement (change))
+  return false;
+
+insn_change_watermark watermark;
+// Use validate_change etc. to change INSN's pattern.
+&hellip;
+if (!rtl_ssa::recog (change)
+    || !rtl_ssa::change_is_worthwhile (change))
+  return false;
+
+confirm_change_group ();
+crtl-&gt;ssa-&gt;change_insn (change);
+</pre></div>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Changing-Multiple-RTL-SSA-Instructions.html" accesskey="n" rel="next">Changing Multiple RTL SSA Instructions</a>, Up: <a href="Changing-RTL-Instructions.html" accesskey="u" rel="up">Changing RTL Instructions</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

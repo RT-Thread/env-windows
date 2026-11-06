@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>RISC-V Options (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="RISC-V Options (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="RISC-V Options (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Submodel-Options.html" rel="up" title="Submodel Options">
+<link href="RL78-Options.html" rel="next" title="RL78 Options">
+<link href="PRU-Options.html" rel="prev" title="PRU Options">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="RISC_002dV-Options"></span><div class="header">
+<p>
+Next: <a href="RL78-Options.html" accesskey="n" rel="next">RL78 Options</a>, Previous: <a href="PRU-Options.html" accesskey="p" rel="prev">PRU Options</a>, Up: <a href="Submodel-Options.html" accesskey="u" rel="up">Submodel Options</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="RISC_002dV-Options-1"></span><h4 class="subsection">3.19.40 RISC-V Options</h4>
+<span id="index-RISC_002dV-Options"></span>
+
+<p>These command-line options are defined for RISC-V targets:
+</p>
+<dl compact="compact">
+<dd><span id="index-mbranch_002dcost-4"></span>
+</dd>
+<dt><code>-mbranch-cost=<var>n</var></code></dt>
+<dd><p>Set the cost of branches to roughly <var>n</var> instructions.
+</p>
+<span id="index-plt"></span>
+</dd>
+<dt><code>-mplt</code></dt>
+<dt><code>-mno-plt</code></dt>
+<dd><p>When generating PIC code, do or don&rsquo;t allow the use of PLTs. Ignored for
+non-PIC.  The default is <samp>-mplt</samp>.
+</p>
+<span id="index-mabi-4"></span>
+</dd>
+<dt><code>-mabi=<var>ABI-string</var></code></dt>
+<dd><p>Specify integer and floating-point calling convention.  <var>ABI-string</var>
+contains two parts: the size of integer types and the registers used for
+floating-point types.  For example &lsquo;<samp>-march=rv64ifd -mabi=lp64d</samp>&rsquo; means that
+&lsquo;<samp>long</samp>&rsquo; and pointers are 64-bit (implicitly defining &lsquo;<samp>int</samp>&rsquo; to be
+32-bit), and that floating-point values up to 64 bits wide are passed in F
+registers.  Contrast this with &lsquo;<samp>-march=rv64ifd -mabi=lp64f</samp>&rsquo;, which still
+allows the compiler to generate code that uses the F and D extensions but only
+allows floating-point values up to 32 bits long to be passed in registers; or
+&lsquo;<samp>-march=rv64ifd -mabi=lp64</samp>&rsquo;, in which no floating-point arguments will be
+passed in registers.
+</p>
+<p>The default for this argument is system dependent, users who want a specific
+calling convention should specify one explicitly.  The valid calling
+conventions are: &lsquo;<samp>ilp32</samp>&rsquo;, &lsquo;<samp>ilp32f</samp>&rsquo;, &lsquo;<samp>ilp32d</samp>&rsquo;, &lsquo;<samp>lp64</samp>&rsquo;,
+&lsquo;<samp>lp64f</samp>&rsquo;, and &lsquo;<samp>lp64d</samp>&rsquo;.  Some calling conventions are impossible to
+implement on some ISAs: for example, &lsquo;<samp>-march=rv32if -mabi=ilp32d</samp>&rsquo; is
+invalid because the ABI requires 64-bit values be passed in F registers, but F
+registers are only 32 bits wide.  There is also the &lsquo;<samp>ilp32e</samp>&rsquo; ABI that can
+only be used with the &lsquo;<samp>rv32e</samp>&rsquo; architecture.  This ABI is not well
+specified at present, and is subject to change.
+</p>
+<span id="index-mfdiv"></span>
+</dd>
+<dt><code>-mfdiv</code></dt>
+<dt><code>-mno-fdiv</code></dt>
+<dd><p>Do or don&rsquo;t use hardware floating-point divide and square root instructions.
+This requires the F or D extensions for floating-point registers.  The default
+is to use them if the specified architecture has these instructions.
+</p>
+<span id="index-mdiv-3"></span>
+</dd>
+<dt><code>-mdiv</code></dt>
+<dt><code>-mno-div</code></dt>
+<dd><p>Do or don&rsquo;t use hardware instructions for integer division.  This requires the
+M extension.  The default is to use them if the specified architecture has
+these instructions.
+</p>
+<span id="index-misa_002dspec"></span>
+</dd>
+<dt><code>-misa-spec=<var>ISA-spec-string</var></code></dt>
+<dd><p>Specify the version of the RISC-V Unprivileged (formerly User-Level)
+ISA specification to produce code conforming to.  The possibilities
+for <var>ISA-spec-string</var> are:
+</p><dl compact="compact">
+<dt><code>2.2</code></dt>
+<dd><p>Produce code conforming to version 2.2.
+</p></dd>
+<dt><code>20190608</code></dt>
+<dd><p>Produce code conforming to version 20190608.
+</p></dd>
+<dt><code>20191213</code></dt>
+<dd><p>Produce code conforming to version 20191213.
+</p></dd>
+</dl>
+<p>The default is <samp>-misa-spec=20191213</samp> unless GCC has been configured
+with <samp>--with-isa-spec=</samp> specifying a different default version.
+</p>
+<span id="index-march-14"></span>
+</dd>
+<dt><code>-march=<var>ISA-string</var></code></dt>
+<dd><p>Generate code for given RISC-V ISA (e.g. &lsquo;<samp>rv64im</samp>&rsquo;).  ISA strings must be
+lower-case.  Examples include &lsquo;<samp>rv64i</samp>&rsquo;, &lsquo;<samp>rv32g</samp>&rsquo;, &lsquo;<samp>rv32e</samp>&rsquo;, and
+&lsquo;<samp>rv32imaf</samp>&rsquo;.
+</p>
+<p>When <samp>-march=</samp> is not specified, use the setting from <samp>-mcpu</samp>.
+</p>
+<p>If both <samp>-march</samp> and <samp>-mcpu=</samp> are not specified, the default for
+this argument is system dependent, users who want a specific architecture
+extensions should specify one explicitly.
+</p>
+<span id="index-mcpu-8"></span>
+</dd>
+<dt><code>-mcpu=<var>processor-string</var></code></dt>
+<dd><p>Use architecture of and optimize the output for the given processor, specified
+by particular CPU name.
+Permissible values for this option are: &lsquo;<samp>sifive-e20</samp>&rsquo;, &lsquo;<samp>sifive-e21</samp>&rsquo;,
+&lsquo;<samp>sifive-e24</samp>&rsquo;, &lsquo;<samp>sifive-e31</samp>&rsquo;, &lsquo;<samp>sifive-e34</samp>&rsquo;, &lsquo;<samp>sifive-e76</samp>&rsquo;,
+&lsquo;<samp>sifive-s21</samp>&rsquo;, &lsquo;<samp>sifive-s51</samp>&rsquo;, &lsquo;<samp>sifive-s54</samp>&rsquo;, &lsquo;<samp>sifive-s76</samp>&rsquo;,
+&lsquo;<samp>sifive-u54</samp>&rsquo;, and &lsquo;<samp>sifive-u74</samp>&rsquo;.
+</p>
+<span id="index-mtune-12"></span>
+</dd>
+<dt><code>-mtune=<var>processor-string</var></code></dt>
+<dd><p>Optimize the output for the given processor, specified by microarchitecture or
+particular CPU name.  Permissible values for this option are: &lsquo;<samp>rocket</samp>&rsquo;,
+&lsquo;<samp>sifive-3-series</samp>&rsquo;, &lsquo;<samp>sifive-5-series</samp>&rsquo;, &lsquo;<samp>sifive-7-series</samp>&rsquo;,
+&lsquo;<samp>thead-c906</samp>&rsquo;, &lsquo;<samp>size</samp>&rsquo;, and all valid options for <samp>-mcpu=</samp>.
+</p>
+<p>When <samp>-mtune=</samp> is not specified, use the setting from <samp>-mcpu</samp>,
+the default is &lsquo;<samp>rocket</samp>&rsquo; if both are not specified.
+</p>
+<p>The &lsquo;<samp>size</samp>&rsquo; choice is not intended for use by end-users.  This is used
+when <samp>-Os</samp> is specified.  It overrides the instruction cost info
+provided by <samp>-mtune=</samp>, but does not override the pipeline info.  This
+helps reduce code size while still giving good performance.
+</p>
+<span id="index-mpreferred_002dstack_002dboundary"></span>
+</dd>
+<dt><code>-mpreferred-stack-boundary=<var>num</var></code></dt>
+<dd><p>Attempt to keep the stack boundary aligned to a 2 raised to <var>num</var>
+byte boundary.  If <samp>-mpreferred-stack-boundary</samp> is not specified,
+the default is 4 (16 bytes or 128-bits).
+</p>
+<p><strong>Warning:</strong> If you use this switch, then you must build all modules with
+the same value, including any libraries.  This includes the system libraries
+and startup modules.
+</p>
+<span id="index-msmall_002ddata_002dlimit-1"></span>
+</dd>
+<dt><code>-msmall-data-limit=<var>n</var></code></dt>
+<dd><p>Put global and static data smaller than <var>n</var> bytes into a special section
+(on some targets).
+</p>
+<span id="index-msave_002drestore"></span>
+</dd>
+<dt><code>-msave-restore</code></dt>
+<dt><code>-mno-save-restore</code></dt>
+<dd><p>Do or don&rsquo;t use smaller but slower prologue and epilogue code that uses
+library function calls.  The default is to use fast inline prologues and
+epilogues.
+</p>
+<span id="index-minline_002datomics"></span>
+</dd>
+<dt><code>-minline-atomics</code></dt>
+<dt><code>-mno-inline-atomics</code></dt>
+<dd><p>Do or don&rsquo;t use smaller but slower subword atomic emulation code that uses
+libatomic function calls.  The default is to use fast inline subword atomics
+that do not require libatomic.
+</p>
+<span id="index-mshorten_002dmemrefs"></span>
+</dd>
+<dt><code>-mshorten-memrefs</code></dt>
+<dt><code>-mno-shorten-memrefs</code></dt>
+<dd><p>Do or do not attempt to make more use of compressed load/store instructions by
+replacing a load/store of &rsquo;base register + large offset&rsquo; with a new load/store
+of &rsquo;new base + small offset&rsquo;.  If the new base gets stored in a compressed
+register, then the new load/store can be compressed.  Currently targets 32-bit
+integer load/stores only.
+</p>
+<span id="index-mstrict_002dalign-3"></span>
+</dd>
+<dt><code>-mstrict-align</code></dt>
+<dt><code>-mno-strict-align</code></dt>
+<dd><p>Do not or do generate unaligned memory accesses.  The default is set depending
+on whether the processor we are optimizing for supports fast unaligned access
+or not.
+</p>
+<span id="index-mcmodel_003dmedlow"></span>
+</dd>
+<dt><code>-mcmodel=medlow</code></dt>
+<dd><p>Generate code for the medium-low code model. The program and its statically
+defined symbols must lie within a single 2 GiB address range and must lie
+between absolute addresses -2 GiB and +2 GiB. Programs can be
+statically or dynamically linked. This is the default code model.
+</p>
+<span id="index-mcmodel_003dmedany"></span>
+</dd>
+<dt><code>-mcmodel=medany</code></dt>
+<dd><p>Generate code for the medium-any code model. The program and its statically
+defined symbols must be within any single 2 GiB address range. Programs can be
+statically or dynamically linked.
+</p>
+<p>The code generated by the medium-any code model is position-independent, but is
+not guaranteed to function correctly when linked into position-independent
+executables or libraries.
+</p>
+</dd>
+<dt><code>-mexplicit-relocs</code></dt>
+<dt><code>-mno-exlicit-relocs</code></dt>
+<dd><p>Use or do not use assembler relocation operators when dealing with symbolic
+addresses.  The alternative is to use assembler macros instead, which may
+limit optimization.
+</p>
+<span id="index-mrelax-5"></span>
+</dd>
+<dt><code>-mrelax</code></dt>
+<dt><code>-mno-relax</code></dt>
+<dd><p>Take advantage of linker relaxations to reduce the number of instructions
+required to materialize symbol addresses. The default is to take advantage of
+linker relaxations.
+</p>
+<span id="index-mriscv_002dattribute"></span>
+</dd>
+<dt><code>-mriscv-attribute</code></dt>
+<dt><code>-mno-riscv-attribute</code></dt>
+<dd><p>Emit (do not emit) RISC-V attribute to record extra information into ELF
+objects.  This feature requires at least binutils 2.32.
+</p>
+<span id="index-mcsr_002dcheck"></span>
+</dd>
+<dt><code>-mcsr-check</code></dt>
+<dt><code>-mno-csr-check</code></dt>
+<dd><p>Enables or disables the CSR checking.
+</p>
+<span id="index-malign_002ddata"></span>
+</dd>
+<dt><code>-malign-data=<var>type</var></code></dt>
+<dd><p>Control how GCC aligns variables and constants of array, structure, or union
+types.  Supported values for <var>type</var> are &lsquo;<samp>xlen</samp>&rsquo; which uses x register
+width as the alignment value, and &lsquo;<samp>natural</samp>&rsquo; which uses natural alignment.
+&lsquo;<samp>xlen</samp>&rsquo; is the default.
+</p>
+<span id="index-mbig_002dendian-10"></span>
+</dd>
+<dt><code>-mbig-endian</code></dt>
+<dd><p>Generate big-endian code.  This is the default when GCC is configured for a
+&lsquo;<samp>riscv64be-*-*</samp>&rsquo; or &lsquo;<samp>riscv32be-*-*</samp>&rsquo; target.
+</p>
+<span id="index-mlittle_002dendian-10"></span>
+</dd>
+<dt><code>-mlittle-endian</code></dt>
+<dd><p>Generate little-endian code.  This is the default when GCC is configured for a
+&lsquo;<samp>riscv64-*-*</samp>&rsquo; or &lsquo;<samp>riscv32-*-*</samp>&rsquo; but not a &lsquo;<samp>riscv64be-*-*</samp>&rsquo; or
+&lsquo;<samp>riscv32be-*-*</samp>&rsquo; target.
+</p>
+<span id="index-mstack_002dprotector_002dguard-2"></span>
+<span id="index-mstack_002dprotector_002dguard_002dreg-1"></span>
+<span id="index-mstack_002dprotector_002dguard_002doffset-2"></span>
+</dd>
+<dt><code>-mstack-protector-guard=<var>guard</var></code></dt>
+<dt><code>-mstack-protector-guard-reg=<var>reg</var></code></dt>
+<dt><code>-mstack-protector-guard-offset=<var>offset</var></code></dt>
+<dd><p>Generate stack protection code using canary at <var>guard</var>.  Supported
+locations are &lsquo;<samp>global</samp>&rsquo; for a global canary or &lsquo;<samp>tls</samp>&rsquo; for per-thread
+canary in the TLS block.
+</p>
+<p>With the latter choice the options
+<samp>-mstack-protector-guard-reg=<var>reg</var></samp> and
+<samp>-mstack-protector-guard-offset=<var>offset</var></samp> furthermore specify
+which register to use as base register for reading the canary,
+and from what offset from that base register. There is no default
+register or offset as this is entirely for use within the Linux
+kernel.
+</p></dd>
+</dl>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="RL78-Options.html" accesskey="n" rel="next">RL78 Options</a>, Previous: <a href="PRU-Options.html" accesskey="p" rel="prev">PRU Options</a>, Up: <a href="Submodel-Options.html" accesskey="u" rel="up">Submodel Options</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

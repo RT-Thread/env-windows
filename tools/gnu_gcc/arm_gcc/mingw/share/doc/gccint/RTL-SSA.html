@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>RTL SSA (GNU Compiler Collection (GCC) Internals)</title>
+
+<meta name="description" content="RTL SSA (GNU Compiler Collection (GCC) Internals)">
+<meta name="keywords" content="RTL SSA (GNU Compiler Collection (GCC) Internals)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="RTL.html" rel="up" title="RTL">
+<link href="Using-RTL-SSA.html" rel="next" title="Using RTL SSA">
+<link href="Calls.html" rel="prev" title="Calls">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="RTL-SSA"></span><div class="header">
+<p>
+Next: <a href="Sharing.html" accesskey="n" rel="next">Sharing</a>, Previous: <a href="Calls.html" accesskey="p" rel="prev">Calls</a>, Up: <a href="RTL.html" accesskey="u" rel="up">RTL</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="On_002dthe_002dSide-SSA-Form-for-RTL"></span><h3 class="section">14.21 On-the-Side SSA Form for RTL</h3>
+<span id="index-SSA_002c-RTL-form"></span>
+<span id="index-RTL-SSA"></span>
+
+<p>The patterns of an individual RTL instruction describe which registers
+are inputs to that instruction and which registers are outputs from
+that instruction.  However, it is often useful to know where the
+definition of a register input comes from and where the result of
+a register output is used.  One way of obtaining this information
+is to use the RTL SSA form, which provides a Static Single Assignment
+representation of the RTL instructions.
+</p>
+<p>The RTL SSA code is located in the <samp>rtl-ssa</samp> subdirectory of the GCC
+source tree.  This section only gives a brief overview of it; please
+see the comments in the source code for more details.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="Using-RTL-SSA.html" accesskey="1">Using RTL SSA</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">What a pass needs to do to use the RTL SSA form
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Instructions.html" accesskey="2">RTL SSA Instructions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How instructions are represented and organized
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Basic-Blocks.html" accesskey="3">RTL SSA Basic Blocks</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How instructions are grouped into blocks
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Resources.html" accesskey="4">RTL SSA Resources</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How registers and memory are represented
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Accesses.html" accesskey="5">RTL SSA Accesses</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How register and memory accesses are represented
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Phi-Nodes.html" accesskey="6">RTL SSA Phi Nodes</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How multiple sources are combined into one
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RTL-SSA-Access-Lists.html" accesskey="7">RTL SSA Access Lists</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How accesses are chained together
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Changing-RTL-Instructions.html" accesskey="8">Changing RTL Instructions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How to use the RTL SSA framework to change insns
+</td></tr>
+</table>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Sharing.html" accesskey="n" rel="next">Sharing</a>, Previous: <a href="Calls.html" accesskey="p" rel="prev">Calls</a>, Up: <a href="RTL.html" accesskey="u" rel="up">RTL</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

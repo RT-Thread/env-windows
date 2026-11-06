@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Free Software" and "Free Software Needs
+Free Documentation", with the Front-Cover Texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: "You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom." -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Inferior-Specific Breakpoints (Debugging with GDB)</title>
+
+<meta name="description" content="Inferior-Specific Breakpoints (Debugging with GDB)">
+<meta name="keywords" content="Inferior-Specific Breakpoints (Debugging with GDB)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Inferiors-Connections-and-Programs.html" rel="up" title="Inferiors Connections and Programs">
+<link href="Threads.html" rel="next" title="Threads">
+<link href="Inferiors-Connections-and-Programs.html" rel="prev" title="Inferiors Connections and Programs">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Inferior_002dSpecific-Breakpoints"></span><div class="header">
+<p>
+Up: <a href="Inferiors-Connections-and-Programs.html" accesskey="u" rel="up">Inferiors Connections and Programs</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Inferior_002dSpecific-Breakpoints-1"></span><h4 class="subsection">4.9.1 Inferior-Specific Breakpoints</h4>
+
+<p>When debugging multiple inferiors, you can choose whether to set
+breakpoints for all inferiors, or for a particular inferior.
+</p>
+<dl compact="compact">
+<dd><span id="index-breakpoints-and-inferiors"></span>
+<span id="index-inferior_002dspecific-breakpoints"></span>
+<span id="index-break-_2026-inferior-inferior_002did"></span>
+</dd>
+<dt><code>break <var>locspec</var> inferior <var>inferior-id</var></code></dt>
+<dt><code>break <var>locspec</var> inferior <var>inferior-id</var> if &hellip;</code></dt>
+<dd><p><var>locspec</var> specifies a code location or locations in your program.
+See <a href="Location-Specifications.html">Location Specifications</a>, for details.
+</p>
+<p>Use the qualifier &lsquo;<samp>inferior <var>inferior-id</var></samp>&rsquo; with a breakpoint
+command to specify that you only want <small>GDB</small> to stop when a
+particular inferior reaches this breakpoint.  The <var>inferior-id</var>
+specifier is one of the inferior identifiers assigned by <small>GDB</small>,
+shown in the first column of the &lsquo;<samp>info inferiors</samp>&rsquo; output.
+</p>
+<p>If you do not specify &lsquo;<samp>inferior <var>inferior-id</var></samp>&rsquo; when you set a
+breakpoint, the breakpoint applies to <em>all</em> inferiors of your
+program.
+</p>
+<p>You can use the <code>inferior</code> qualifier on conditional breakpoints as
+well; in this case, place &lsquo;<samp>inferior <var>inferior-id</var></samp>&rsquo; before or
+after the breakpoint condition, like this:
+</p>
+<div class="example">
+<pre class="example">(gdb) break frik.c:13 inferior 2 if bartab &gt; lim
+</pre></div>
+</dd>
+</dl>
+
+<p>Inferior-specific breakpoints are automatically deleted when the
+corresponding inferior is removed from <small>GDB</small>.  For example:
+</p>
+<div class="example">
+<pre class="example">(gdb) remove-inferiors 2
+Inferior-specific breakpoint 3 deleted - inferior 2 has been removed.
+</pre></div>
+
+<p>A breakpoint can&rsquo;t be both inferior-specific and thread-specific
+(see <a href="Thread_002dSpecific-Breakpoints.html">Thread-Specific Breakpoints</a>), or task-specific (see <a href="Ada-Tasks.html">Ada Tasks</a>); using more than one of the <code>inferior</code>, <code>thread</code>, or
+<code>task</code> keywords when creating a breakpoint will give an error.
+</p>
+
+
+
+</body>
+</html>
