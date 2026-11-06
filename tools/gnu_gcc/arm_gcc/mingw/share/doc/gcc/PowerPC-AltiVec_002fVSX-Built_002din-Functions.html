@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>PowerPC AltiVec/VSX Built-in Functions (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="PowerPC AltiVec/VSX Built-in Functions (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="PowerPC AltiVec/VSX Built-in Functions (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Target-Builtins.html" rel="up" title="Target Builtins">
+<link href="PowerPC-AltiVec-Built_002din-Functions-on-ISA-2_002e05.html" rel="next" title="PowerPC AltiVec Built-in Functions on ISA 2.05">
+<link href="Basic-PowerPC-Built_002din-Functions-Available-on-ISA-3_002e1.html" rel="prev" title="Basic PowerPC Built-in Functions Available on ISA 3.1">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="PowerPC-AltiVec_002fVSX-Built_002din-Functions"></span><div class="header">
+<p>
+Next: <a href="PowerPC-Hardware-Transactional-Memory-Built_002din-Functions.html" accesskey="n" rel="next">PowerPC Hardware Transactional Memory Built-in Functions</a>, Previous: <a href="Basic-PowerPC-Built_002din-Functions.html" accesskey="p" rel="prev">Basic PowerPC Built-in Functions</a>, Up: <a href="Target-Builtins.html" accesskey="u" rel="up">Target Builtins</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="PowerPC-AltiVec_002fVSX-Built_002din-Functions-1"></span><h4 class="subsection">6.60.23 PowerPC AltiVec/VSX Built-in Functions</h4>
+
+<p>GCC provides an interface for the PowerPC family of processors to access
+the AltiVec operations described in Motorola&rsquo;s AltiVec Programming
+Interface Manual.  The interface is made available by including
+<code>&lt;altivec.h&gt;</code> and using <samp>-maltivec</samp> and
+<samp>-mabi=altivec</samp>.  The interface supports the following vector
+types.
+</p>
+<div class="example">
+<pre class="example">vector unsigned char
+vector signed char
+vector bool char
+
+vector unsigned short
+vector signed short
+vector bool short
+vector pixel
+
+vector unsigned int
+vector signed int
+vector bool int
+vector float
+</pre></div>
+
+<p>GCC&rsquo;s implementation of the high-level language interface available from
+C and C++ code differs from Motorola&rsquo;s documentation in several ways.
+</p>
+<ul>
+<li> A vector constant is a list of constant expressions within curly braces.
+
+</li><li> A vector initializer requires no cast if the vector constant is of the
+same type as the variable it is initializing.
+
+</li><li> If <code>signed</code> or <code>unsigned</code> is omitted, the signedness of the
+vector type is the default signedness of the base type.  The default
+varies depending on the operating system, so a portable program should
+always specify the signedness.
+
+</li><li> Compiling with <samp>-maltivec</samp> adds keywords <code>__vector</code>,
+<code>vector</code>, <code>__pixel</code>, <code>pixel</code>, <code>__bool</code> and
+<code>bool</code>.  When compiling ISO C, the context-sensitive substitution
+of the keywords <code>vector</code>, <code>pixel</code> and <code>bool</code> is
+disabled.  To use them, you must include <code>&lt;altivec.h&gt;</code> instead.
+
+</li><li> GCC allows using a <code>typedef</code> name as the type specifier for a
+vector type, but only under the following circumstances:
+
+<ul>
+<li> When using <code>__vector</code> instead of <code>vector</code>; for example,
+
+<div class="example">
+<pre class="example">typedef signed short int16;
+__vector int16 data;
+</pre></div>
+
+</li><li> When using <code>vector</code> in keyword-and-predefine mode; for example,
+
+<div class="example">
+<pre class="example">typedef signed short int16;
+vector int16 data;
+</pre></div>
+
+<p>Note that keyword-and-predefine mode is enabled by disabling GNU
+extensions (e.g., by using <code>-std=c11</code>) and including
+<code>&lt;altivec.h&gt;</code>.
+</p></li></ul>
+
+</li><li> For C, overloaded functions are implemented with macros so the following
+does not work:
+
+<div class="example">
+<pre class="example">  vec_add ((vector signed int){1, 2, 3, 4}, foo);
+</pre></div>
+
+<p>Since <code>vec_add</code> is a macro, the vector constant in the example
+is treated as four separate arguments.  Wrap the entire argument in
+parentheses for this to work.
+</p></li></ul>
+
+<p><em>Note:</em> Only the <code>&lt;altivec.h&gt;</code> interface is supported.
+Internally, GCC uses built-in functions to achieve the functionality in
+the aforementioned header file, but they are not supported and are
+subject to change without notice.
+</p>
+<p>GCC complies with the Power Vector Intrinsic Programming Reference (PVIPR),
+which may be found at
+<a href="https://openpowerfoundation.org/?resource_lib=power-vector-intrinsic-programming-reference">https://openpowerfoundation.org/?resource_lib=power-vector-intrinsic-programming-reference</a>.
+Chapter 4 of this document fully documents the vector API interfaces
+that must be
+provided by compliant compilers.  Programmers should preferentially use
+the interfaces described therein.  However, historically GCC has provided
+additional interfaces for access to vector instructions.  These are
+briefly described below.  Where the PVIPR provides a portable interface,
+other functions in GCC that provide the same capabilities should be
+considered deprecated.
+</p>
+<p>The PVIPR documents the following overloaded functions:
+</p>
+<table>
+<tr><td width="33%"><code>vec_abs</code></td><td width="33%"><code>vec_absd</code></td><td width="33%"><code>vec_abss</code></td></tr>
+<tr><td width="33%"><code>vec_add</code></td><td width="33%"><code>vec_addc</code></td><td width="33%"><code>vec_adde</code></td></tr>
+<tr><td width="33%"><code>vec_addec</code></td><td width="33%"><code>vec_adds</code></td><td width="33%"><code>vec_all_eq</code></td></tr>
+<tr><td width="33%"><code>vec_all_ge</code></td><td width="33%"><code>vec_all_gt</code></td><td width="33%"><code>vec_all_in</code></td></tr>
+<tr><td width="33%"><code>vec_all_le</code></td><td width="33%"><code>vec_all_lt</code></td><td width="33%"><code>vec_all_nan</code></td></tr>
+<tr><td width="33%"><code>vec_all_ne</code></td><td width="33%"><code>vec_all_nge</code></td><td width="33%"><code>vec_all_ngt</code></td></tr>
+<tr><td width="33%"><code>vec_all_nle</code></td><td width="33%"><code>vec_all_nlt</code></td><td width="33%"><code>vec_all_numeric</code></td></tr>
+<tr><td width="33%"><code>vec_and</code></td><td width="33%"><code>vec_andc</code></td><td width="33%"><code>vec_any_eq</code></td></tr>
+<tr><td width="33%"><code>vec_any_ge</code></td><td width="33%"><code>vec_any_gt</code></td><td width="33%"><code>vec_any_le</code></td></tr>
+<tr><td width="33%"><code>vec_any_lt</code></td><td width="33%"><code>vec_any_nan</code></td><td width="33%"><code>vec_any_ne</code></td></tr>
+<tr><td width="33%"><code>vec_any_nge</code></td><td width="33%"><code>vec_any_ngt</code></td><td width="33%"><code>vec_any_nle</code></td></tr>
+<tr><td width="33%"><code>vec_any_nlt</code></td><td width="33%"><code>vec_any_numeric</code></td><td width="33%"><code>vec_any_out</code></td></tr>
+<tr><td width="33%"><code>vec_avg</code></td><td width="33%"><code>vec_bperm</code></td><td width="33%"><code>vec_ceil</code></td></tr>
+<tr><td width="33%"><code>vec_cipher_be</code></td><td width="33%"><code>vec_cipherlast_be</code></td><td width="33%"><code>vec_cmpb</code></td></tr>
+<tr><td width="33%"><code>vec_cmpeq</code></td><td width="33%"><code>vec_cmpge</code></td><td width="33%"><code>vec_cmpgt</code></td></tr>
+<tr><td width="33%"><code>vec_cmple</code></td><td width="33%"><code>vec_cmplt</code></td><td width="33%"><code>vec_cmpne</code></td></tr>
+<tr><td width="33%"><code>vec_cmpnez</code></td><td width="33%"><code>vec_cntlz</code></td><td width="33%"><code>vec_cntlz_lsbb</code></td></tr>
+<tr><td width="33%"><code>vec_cnttz</code></td><td width="33%"><code>vec_cnttz_lsbb</code></td><td width="33%"><code>vec_cpsgn</code></td></tr>
+<tr><td width="33%"><code>vec_ctf</code></td><td width="33%"><code>vec_cts</code></td><td width="33%"><code>vec_ctu</code></td></tr>
+<tr><td width="33%"><code>vec_div</code></td><td width="33%"><code>vec_double</code></td><td width="33%"><code>vec_doublee</code></td></tr>
+<tr><td width="33%"><code>vec_doubleh</code></td><td width="33%"><code>vec_doublel</code></td><td width="33%"><code>vec_doubleo</code></td></tr>
+<tr><td width="33%"><code>vec_eqv</code></td><td width="33%"><code>vec_expte</code></td><td width="33%"><code>vec_extract</code></td></tr>
+<tr><td width="33%"><code>vec_extract_exp</code></td><td width="33%"><code>vec_extract_fp32_from_shorth</code></td><td width="33%"><code>vec_extract_fp32_from_shortl</code></td></tr>
+<tr><td width="33%"><code>vec_extract_sig</code></td><td width="33%"><code>vec_extract_4b</code></td><td width="33%"><code>vec_first_match_index</code></td></tr>
+<tr><td width="33%"><code>vec_first_match_or_eos_index</code></td><td width="33%"><code>vec_first_mismatch_index</code></td><td width="33%"><code>vec_first_mismatch_or_eos_index</code></td></tr>
+<tr><td width="33%"><code>vec_float</code></td><td width="33%"><code>vec_float2</code></td><td width="33%"><code>vec_floate</code></td></tr>
+<tr><td width="33%"><code>vec_floato</code></td><td width="33%"><code>vec_floor</code></td><td width="33%"><code>vec_gb</code></td></tr>
+<tr><td width="33%"><code>vec_insert</code></td><td width="33%"><code>vec_insert_exp</code></td><td width="33%"><code>vec_insert4b</code></td></tr>
+<tr><td width="33%"><code>vec_ld</code></td><td width="33%"><code>vec_lde</code></td><td width="33%"><code>vec_ldl</code></td></tr>
+<tr><td width="33%"><code>vec_loge</code></td><td width="33%"><code>vec_madd</code></td><td width="33%"><code>vec_madds</code></td></tr>
+<tr><td width="33%"><code>vec_max</code></td><td width="33%"><code>vec_mergee</code></td><td width="33%"><code>vec_mergeh</code></td></tr>
+<tr><td width="33%"><code>vec_mergel</code></td><td width="33%"><code>vec_mergeo</code></td><td width="33%"><code>vec_mfvscr</code></td></tr>
+<tr><td width="33%"><code>vec_min</code></td><td width="33%"><code>vec_mradds</code></td><td width="33%"><code>vec_msub</code></td></tr>
+<tr><td width="33%"><code>vec_msum</code></td><td width="33%"><code>vec_msums</code></td><td width="33%"><code>vec_mtvscr</code></td></tr>
+<tr><td width="33%"><code>vec_mul</code></td><td width="33%"><code>vec_mule</code></td><td width="33%"><code>vec_mulo</code></td></tr>
+<tr><td width="33%"><code>vec_nabs</code></td><td width="33%"><code>vec_nand</code></td><td width="33%"><code>vec_ncipher_be</code></td></tr>
+<tr><td width="33%"><code>vec_ncipherlast_be</code></td><td width="33%"><code>vec_nearbyint</code></td><td width="33%"><code>vec_neg</code></td></tr>
+<tr><td width="33%"><code>vec_nmadd</code></td><td width="33%"><code>vec_nmsub</code></td><td width="33%"><code>vec_nor</code></td></tr>
+<tr><td width="33%"><code>vec_or</code></td><td width="33%"><code>vec_orc</code></td><td width="33%"><code>vec_pack</code></td></tr>
+<tr><td width="33%"><code>vec_pack_to_short_fp32</code></td><td width="33%"><code>vec_packpx</code></td><td width="33%"><code>vec_packs</code></td></tr>
+<tr><td width="33%"><code>vec_packsu</code></td><td width="33%"><code>vec_parity_lsbb</code></td><td width="33%"><code>vec_perm</code></td></tr>
+<tr><td width="33%"><code>vec_permxor</code></td><td width="33%"><code>vec_pmsum_be</code></td><td width="33%"><code>vec_popcnt</code></td></tr>
+<tr><td width="33%"><code>vec_re</code></td><td width="33%"><code>vec_recipdiv</code></td><td width="33%"><code>vec_revb</code></td></tr>
+<tr><td width="33%"><code>vec_reve</code></td><td width="33%"><code>vec_rint</code></td><td width="33%"><code>vec_rl</code></td></tr>
+<tr><td width="33%"><code>vec_rlmi</code></td><td width="33%"><code>vec_rlnm</code></td><td width="33%"><code>vec_round</code></td></tr>
+<tr><td width="33%"><code>vec_rsqrt</code></td><td width="33%"><code>vec_rsqrte</code></td><td width="33%"><code>vec_sbox_be</code></td></tr>
+<tr><td width="33%"><code>vec_sel</code></td><td width="33%"><code>vec_shasigma_be</code></td><td width="33%"><code>vec_signed</code></td></tr>
+<tr><td width="33%"><code>vec_signed2</code></td><td width="33%"><code>vec_signede</code></td><td width="33%"><code>vec_signedo</code></td></tr>
+<tr><td width="33%"><code>vec_sl</code></td><td width="33%"><code>vec_sld</code></td><td width="33%"><code>vec_sldw</code></td></tr>
+<tr><td width="33%"><code>vec_sll</code></td><td width="33%"><code>vec_slo</code></td><td width="33%"><code>vec_slv</code></td></tr>
+<tr><td width="33%"><code>vec_splat</code></td><td width="33%"><code>vec_splat_s8</code></td><td width="33%"><code>vec_splat_s16</code></td></tr>
+<tr><td width="33%"><code>vec_splat_s32</code></td><td width="33%"><code>vec_splat_u8</code></td><td width="33%"><code>vec_splat_u16</code></td></tr>
+<tr><td width="33%"><code>vec_splat_u32</code></td><td width="33%"><code>vec_splats</code></td><td width="33%"><code>vec_sqrt</code></td></tr>
+<tr><td width="33%"><code>vec_sr</code></td><td width="33%"><code>vec_sra</code></td><td width="33%"><code>vec_srl</code></td></tr>
+<tr><td width="33%"><code>vec_sro</code></td><td width="33%"><code>vec_srv</code></td><td width="33%"><code>vec_st</code></td></tr>
+<tr><td width="33%"><code>vec_ste</code></td><td width="33%"><code>vec_stl</code></td><td width="33%"><code>vec_sub</code></td></tr>
+<tr><td width="33%"><code>vec_subc</code></td><td width="33%"><code>vec_sube</code></td><td width="33%"><code>vec_subec</code></td></tr>
+<tr><td width="33%"><code>vec_subs</code></td><td width="33%"><code>vec_sum2s</code></td><td width="33%"><code>vec_sum4s</code></td></tr>
+<tr><td width="33%"><code>vec_sums</code></td><td width="33%"><code>vec_test_data_class</code></td><td width="33%"><code>vec_trunc</code></td></tr>
+<tr><td width="33%"><code>vec_unpackh</code></td><td width="33%"><code>vec_unpackl</code></td><td width="33%"><code>vec_unsigned</code></td></tr>
+<tr><td width="33%"><code>vec_unsigned2</code></td><td width="33%"><code>vec_unsignede</code></td><td width="33%"><code>vec_unsignedo</code></td></tr>
+<tr><td width="33%"><code>vec_xl</code></td><td width="33%"><code>vec_xl_be</code></td><td width="33%"><code>vec_xl_len</code></td></tr>
+<tr><td width="33%"><code>vec_xl_len_r</code></td><td width="33%"><code>vec_xor</code></td><td width="33%"><code>vec_xst</code></td></tr>
+<tr><td width="33%"><code>vec_xst_be</code></td><td width="33%"><code>vec_xst_len</code></td><td width="33%"><code>vec_xst_len_r</code></td></tr>
+</table>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="PowerPC-AltiVec-Built_002din-Functions-on-ISA-2_002e05.html" accesskey="1">PowerPC AltiVec Built-in Functions on ISA 2.05</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e06.html" accesskey="2">PowerPC AltiVec Built-in Functions Available on ISA 2.06</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e07.html" accesskey="3">PowerPC AltiVec Built-in Functions Available on ISA 2.07</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-3_002e0.html" accesskey="4">PowerPC AltiVec Built-in Functions Available on ISA 3.0</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-3_002e1.html" accesskey="5">PowerPC AltiVec Built-in Functions Available on ISA 3.1</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="PowerPC-Hardware-Transactional-Memory-Built_002din-Functions.html" accesskey="n" rel="next">PowerPC Hardware Transactional Memory Built-in Functions</a>, Previous: <a href="Basic-PowerPC-Built_002din-Functions.html" accesskey="p" rel="prev">Basic PowerPC Built-in Functions</a>, Up: <a href="Target-Builtins.html" accesskey="u" rel="up">Target Builtins</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Free Software" and "Free Software Needs
+Free Documentation", with the Front-Cover Texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: "You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom." -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>ARM Features (Debugging with GDB)</title>
+
+<meta name="description" content="ARM Features (Debugging with GDB)">
+<meta name="keywords" content="ARM Features (Debugging with GDB)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Standard-Target-Features.html" rel="up" title="Standard Target Features">
+<link href="i386-Features.html" rel="next" title="i386 Features">
+<link href="ARC-Features.html" rel="prev" title="ARC Features">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="ARM-Features"></span><div class="header">
+<p>
+Next: <a href="i386-Features.html" accesskey="n" rel="next">i386 Features</a>, Previous: <a href="ARC-Features.html" accesskey="p" rel="prev">ARC Features</a>, Up: <a href="Standard-Target-Features.html" accesskey="u" rel="up">Standard Target Features</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="ARM-Features-1"></span><h4 class="subsection">G.5.3 ARM Features</h4>
+<span id="index-target-descriptions_002c-ARM-features"></span>
+
+<span id="Core-register-set-for-non_002dM_002dprofile"></span><h4 class="subsubsection">G.5.3.1 Core register set for non-M-profile</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.core</samp>&rsquo; feature is required for non-M-profile
+ARM targets. It must contain the following registers:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>r0</samp>&rsquo; through &lsquo;<samp>r12</samp>&rsquo;.  The general purpose registers.  They are 32 bits
+in size and have a type of &lsquo;<samp>uint32</samp>&rsquo;.
+</li><li>- &lsquo;<samp>sp</samp>&rsquo;, the stack pointer register, also known as &lsquo;<samp>r13</samp>&rsquo;.  It is 32 bits
+in size and has a type of &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>lr</samp>&rsquo;, the link register.  It is 32 bits in size.
+</li><li>- &lsquo;<samp>pc</samp>&rsquo;, the program counter register.  It is 32 bit in size and of type
+&lsquo;<samp>code_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>cpsr</samp>&rsquo;, the current program status register containing all the status
+bits.  It is 32 bits in size.  Historically this register was hardwired to
+number 25, but debugging stubs that report XML do not need to use this number
+anymore.
+</li></ul>
+
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="Core-register-set-for-M_002dprofile"></span><h4 class="subsubsection">G.5.3.2 Core register set for M-profile</h4>
+
+<p>For M-profile targets (e.g. Cortex-M3), the &lsquo;<samp>org.gnu.gdb.arm.core</samp>&rsquo;
+feature is replaced by &lsquo;<samp>org.gnu.gdb.arm.m-profile</samp>&rsquo;, and it is a required
+feature.  It must contain the following registers:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>r0</samp>&rsquo; through &lsquo;<samp>r12</samp>&rsquo;, the general purpose registers.  They have a size
+of 32 bits and a type of &lsquo;<samp>uint32</samp>&rsquo;.
+</li><li>- &lsquo;<samp>sp</samp>&rsquo;, the stack pointer register, also known as &lsquo;<samp>r13</samp>&rsquo;.  It has a size
+of 32 bits and a type of &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>lr</samp>&rsquo;, the link register.  It has a size of 32 bits.
+</li><li>- &lsquo;<samp>pc</samp>&rsquo;, the program counter register.  It has a size of 32 bits and a type
+of &lsquo;<samp>code_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>xpsr</samp>&rsquo;, the program status register containing all the status
+bits.  It has a size of 32 bits.  Historically this register was hardwired to
+number 25, but debugging stubs that report XML do not need to use this number
+anymore.
+</li></ul>
+
+<p>Upon seeing this feature, <small>GDB</small> will acknowledge that it is dealing
+with an M-profile target.  This means <small>GDB</small> will use hooks and
+configurations that are meaningful to M-profiles.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="FPA-registers-feature-_0028obsolete_0029"></span><h4 class="subsubsection">G.5.3.3 FPA registers feature (obsolete)</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.fpa</samp>&rsquo; feature is obsolete and should not be
+advertised by debugging stubs anymore.  It used to advertise registers for
+the old FPA architecture that has long been discontinued in toolchains.
+</p>
+<p>It is kept in <small>GDB</small> for backward compatibility purposes so older
+debugging stubs that don&rsquo;t support XML target descriptions still work
+correctly.  One such example is the KGDB debugging stub from
+Linux or BSD kernels.
+</p>
+<p>The description below is for historical purposes only.  This feature
+used to contain the following registers:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>f0</samp>&rsquo; through &lsquo;<samp>f8</samp>&rsquo;.  The floating point registers.  They are 96 bits
+in size and of type &lsquo;<samp>arm_fpa_ext</samp>&rsquo;.  &lsquo;<samp>f0</samp>&rsquo; is pinned to register
+number 16.
+</li><li>- &lsquo;<samp>fps</samp>&rsquo;, the status register.  It has a size of 32 bits.
+</li></ul>
+
+<span id="M_002dprofile-Vector-Extension-_0028MVE_0029"></span><h4 class="subsubsection">G.5.3.4 M-profile Vector Extension (MVE)</h4>
+
+<p>Also known as Helium, the M-profile Vector Extension is advertised via the
+optional &lsquo;<samp>org.gnu.gdb.arm.m-profile-mve</samp>&rsquo; feature.
+</p>
+<p>It must contain the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>vpr</samp>&rsquo;, the vector predication status and control register.  It is 32 bits
+in size and has a custom flags type.  The flags type is laid out in a way that
+exposes the &lsquo;<samp>P0</samp>&rsquo; field from bits 0 to 15, the &lsquo;<samp>MASK01</samp>&rsquo; field from
+bits 16 to 19 and the &lsquo;<samp>MASK23</samp>&rsquo; field from bits 20 to 23.
+
+<p>Bits 24 through 31 are reserved.
+</p></li></ul>
+
+<p>When this feature is available, <small>GDB</small> will synthesize the &lsquo;<samp>p0</samp>&rsquo;
+pseudo-register from &lsquo;<samp>vpr</samp>&rsquo; contents.
+</p>
+<p>This feature must only be advertised if the target is M-profile.  Advertising
+this feature for targets that are not M-profile may cause <small>GDB</small> to
+assume the target is M-profile when it isn&rsquo;t.
+</p>
+<p>If the &lsquo;<samp>org.gnu.gdb.arm.vfp</samp>&rsquo; feature is available alongside the
+&lsquo;<samp>org.gnu.gdb.arm.m-profile-mve</samp>&rsquo; feature, <small>GDB</small> will
+synthesize the &lsquo;<samp>q</samp>&rsquo; pseudo-registers from &lsquo;<samp>d</samp>&rsquo; register
+contents.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="XScale-iwMMXt-feature"></span><h4 class="subsubsection">G.5.3.5 XScale iwMMXt feature</h4>
+
+<p>The XScale &lsquo;<samp>org.gnu.gdb.xscale.iwmmxt</samp>&rsquo; feature is optional.  If present,
+it must contain the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>wR0</samp>&rsquo; through &lsquo;<samp>wR15</samp>&rsquo;, registers with size 64 bits and a custom type
+&lsquo;<samp>iwmmxt_vec64i</samp>&rsquo;.  &lsquo;<samp>iwmmxt_vec64i</samp>&rsquo; is a union of four other
+types: &lsquo;<samp>uint64</samp>&rsquo;, a 2-element vector of &lsquo;<samp>uint32</samp>&rsquo;, a 4-element
+vector of &lsquo;<samp>uint16</samp>&rsquo; and a 8-element vector of &lsquo;<samp>uint8</samp>&rsquo;.
+</li><li>- &lsquo;<samp>wCGR0</samp>&rsquo; through &lsquo;<samp>wCGR3</samp>&rsquo;, registers with size 32 bits and
+type &lsquo;<samp>int</samp>&rsquo;.
+</li></ul>
+
+<p>The following registers are optional:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>wCID</samp>&rsquo;, register with size of 32 bits and type &lsquo;<samp>int</samp>&rsquo;.
+</li><li>- &lsquo;<samp>wCon</samp>&rsquo;, register with size 32 bits and type &lsquo;<samp>int</samp>&rsquo;.
+</li><li>- &lsquo;<samp>wCSSF</samp>&rsquo;, register with size 32 bits and type &lsquo;<samp>int</samp>&rsquo;.
+</li><li>- &lsquo;<samp>wCASF</samp>&rsquo;, register with size 32 bit and type &lsquo;<samp>int</samp>&rsquo;.
+</li></ul>
+
+<p>This feature should only be reported if the target is XScale.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="Vector-Floating_002dPoint-_0028VFP_0029-feature"></span><h4 class="subsubsection">G.5.3.6 Vector Floating-Point (VFP) feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.vfp</samp>&rsquo; feature is optional.  If present, it
+should contain one of two possible sets of values depending on whether
+VFP version 2 or VFP version 3 is in use.
+</p>
+<p>For VFP v2:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>d0</samp>&rsquo; through &lsquo;<samp>d15</samp>&rsquo;.  The double-precision registers.  They are
+64 bits in size and have type &lsquo;<samp>ieee_double</samp>&rsquo;.
+</li><li>- &lsquo;<samp>fpscr</samp>&rsquo;, the floating-point status and control register.  It has a size
+of 32 bits and a type of &lsquo;<samp>int</samp>&rsquo;.
+</li></ul>
+
+<p>For VFP v3:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>d0</samp>&rsquo; through &lsquo;<samp>d31</samp>&rsquo;.  The double-precision registers.  They are
+64 bits in size and have type &lsquo;<samp>ieee_double</samp>&rsquo;.
+</li><li>- &lsquo;<samp>fpscr</samp>&rsquo;, the floating-point status and control register.  It has a size
+of 32 bits and a type of &lsquo;<samp>int</samp>&rsquo;.
+</li></ul>
+
+<p>If this feature is available, <small>GDB</small> will synthesize the
+single-precision floating-point registers from halves of the double-precision
+registers as pseudo-registers.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="NEON-architecture-feature"></span><h4 class="subsubsection">G.5.3.7 NEON architecture feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.neon</samp>&rsquo; feature is optional.  It does not
+need to contain registers; it instructs <small>GDB</small> to display the
+VFP double-precision registers as vectors and to synthesize the
+quad-precision registers from pairs of double-precision registers.
+If this feature is present, &lsquo;<samp>org.gnu.gdb.arm.vfp</samp>&rsquo; must also
+be present and include 32 double-precision registers.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="M_002dprofile-Pointer-Authentication-and-Branch-Target-Identification-feature"></span><h4 class="subsubsection">G.5.3.8 M-profile Pointer Authentication and Branch Target Identification feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.m-profile-pacbti</samp>&rsquo; feature is optional, and
+acknowledges support for the ARMv8.1-m PACBTI extensions.
+</p>
+<p>This feature doesn&rsquo;t contain any required registers, and it only serves as a
+hint to <small>GDB</small> that the debugging stub supports the ARMv8.1-m PACBTI
+extensions.
+</p>
+<p>When <small>GDB</small> sees this feature, it will track return address signing
+states and will decorate backtraces using the [PAC] marker, similar to
+AArch64&rsquo;s PAC extension.
+See <a href="AArch64.html#AArch64-PAC">AArch64 PAC</a>.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="M_002dprofile-system-registers-feature"></span><h4 class="subsubsection">G.5.3.9 M-profile system registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.m-system</samp>&rsquo; optional feature was introduced as a way to
+inform <small>GDB</small> about additional system registers.
+</p>
+<p>At the moment this feature must contain the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>msp</samp>&rsquo;, the main stack pointer register.  It is 32 bits in size with
+type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>psp</samp>&rsquo;, the process stack pointer register.  It is 32 bits in size with
+type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li></ul>
+
+<p>This feature must only be advertised for M-profile targets.  When <small>GDB</small>
+sees this feature, it will attempt to track the values of &lsquo;<samp>msp</samp>&rsquo; and
+&lsquo;<samp>psp</samp>&rsquo; across frames.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="M_002dprofile-Security-Extensions-feature"></span><h4 class="subsubsection">G.5.3.10 M-profile Security Extensions feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.arm.secext</samp>&rsquo; optional feature was introduced so
+<small>GDB</small> could better support the switching of stack pointers and
+secure states in the Security Extensions.
+</p>
+<p>At the moment this feature must contain the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>msp_ns</samp>&rsquo;, the main stack pointer register (non-secure state).  It is
+32 bits in size with type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>psp_ns</samp>&rsquo;, the process stack pointer register (non-secure state).  It is
+32 bits in size with type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>msp_s</samp>&rsquo;, the main stack pointer register (secure state).  It is 32 bits
+in size with type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>psp_s</samp>&rsquo;, the process stack pointer register (secure state).  It is 32 bits
+in size with type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li></ul>
+
+<p>When <small>GDB</small> sees this feature, it will attempt to track the values of
+all 4 stack pointers across secure state transitions, potentially improving
+unwinding when applications switch between security states.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="TLS-registers-feature"></span><h4 class="subsubsection">G.5.3.11 TLS registers feature</h4>
+
+<p>The optional &lsquo;<samp>org.gnu.gdb.arm.tls</samp>&rsquo; feature contains TLS registers.
+</p>
+<p>Currently it contains the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>tpidruro</samp>&rsquo;, the user read-only thread id register.  It is 32 bits in size
+and has type &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li></ul>
+
+<p>At the moment <small>GDB</small> looks for this feature, but doesn&rsquo;t do anything
+with it other than displaying it.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="i386-Features.html" accesskey="n" rel="next">i386 Features</a>, Previous: <a href="ARC-Features.html" accesskey="p" rel="prev">ARC Features</a>, Up: <a href="Standard-Target-Features.html" accesskey="u" rel="up">Standard Target Features</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

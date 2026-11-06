@@ -146,7 +146,17 @@ extern int isnan (double);
   #define __TMP_FLT_EVAL_METHOD
 #endif /* FLT_EVAL_METHOD */
 #if defined FLT_EVAL_METHOD
-  #if FLT_EVAL_METHOD == 0
+/* FLT_EVAL_METHOD == 16 has meaning as defined in ISO/IEC TS 18661-3,
+ * which provides non-compliant extensions to C and POSIX (by adding
+ * additional positive values for FLT_EVAL_METHOD).  It effectively has
+ * same meaning as the C99 and C11 definitions for value 0, while also
+ * serving as a flag that the _Float16 (float16_t) type exists.
+ *
+ * FLT_EVAL_METHOD could be any number of bits of supported floating point
+ * format (e.g. 32, 64, 128), but currently only AArch64 and few other targets
+ * might define that as 16.  */
+  #if (FLT_EVAL_METHOD == 0) \
+      || (FLT_EVAL_METHOD == 16)
     typedef float  float_t;
     typedef double double_t;
    #elif FLT_EVAL_METHOD == 1
@@ -158,6 +168,15 @@ extern int isnan (double);
    #else
     /* Implementation-defined.  Assume float_t and double_t have been
      * defined previously for this configuration (e.g. config.h). */
+
+   /* If __DOUBLE_TYPE is defined (__FLOAT_TYPE is then supposed to be
+      defined as well) float_t and double_t definition is suggested by
+      an arch specific header.  */
+   #ifdef __DOUBLE_TYPE
+    typedef __DOUBLE_TYPE double_t;
+    typedef __FLOAT_TYPE float_t;
+   #endif
+   /* Assume config.h has provided these types.  */
   #endif
 #else
     /* Assume basic definitions.  */
@@ -426,7 +445,9 @@ extern float hypotf (float, float);
    simply call the double functions.  On Cygwin the long double functions
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || \
+	defined(__aarch64__) || defined(__i386__) || defined(__x86_64__) || \
+	defined(__riscv)
 /* Reentrant ANSI C functions.  */
 #ifndef __math_68881
 extern long double atanl (long double);
@@ -499,6 +520,7 @@ extern long double erfcl (long double);
 #else /* !_LDBL_EQ_DBL && !__CYGWIN__ */
 extern long double hypotl (long double, long double);
 extern long double sqrtl (long double);
+extern long double frexpl (long double, int *);
 #ifdef __i386__
 /* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl (_LONG_DOUBLE);

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>PowerPC AltiVec Built-in Functions Available on ISA 2.06 (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="PowerPC AltiVec Built-in Functions Available on ISA 2.06 (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="PowerPC AltiVec Built-in Functions Available on ISA 2.06 (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html" rel="up" title="PowerPC AltiVec/VSX Built-in Functions">
+<link href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e07.html" rel="next" title="PowerPC AltiVec Built-in Functions Available on ISA 2.07">
+<link href="PowerPC-AltiVec-Built_002din-Functions-on-ISA-2_002e05.html" rel="prev" title="PowerPC AltiVec Built-in Functions on ISA 2.05">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e06"></span><div class="header">
+<p>
+Next: <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e07.html" accesskey="n" rel="next">PowerPC AltiVec Built-in Functions Available on ISA 2.07</a>, Previous: <a href="PowerPC-AltiVec-Built_002din-Functions-on-ISA-2_002e05.html" accesskey="p" rel="prev">PowerPC AltiVec Built-in Functions on ISA 2.05</a>, Up: <a href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html" accesskey="u" rel="up">PowerPC AltiVec/VSX Built-in Functions</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e06-1"></span><h4 class="subsubsection">6.60.23.2 PowerPC AltiVec Built-in Functions Available on ISA 2.06</h4>
+
+<p>The AltiVec built-in functions described in this section are
+available on the PowerPC family of processors starting with ISA 2.06
+or later.  These are normally enabled by adding <samp>-mvsx</samp> to the
+command line.
+</p>
+<p>When <samp>-mvsx</samp> is used, the following additional vector types are
+implemented.
+</p>
+<div class="example">
+<pre class="example">vector unsigned __int128
+vector signed __int128
+vector unsigned long long int
+vector signed long long int
+vector double
+</pre></div>
+
+<p>The long long types are only implemented for 64-bit code generation.
+</p>
+<p>Only functions excluded from the PVIPR are listed here.
+</p>
+<div class="example">
+<pre class="example">void vec_dst (const unsigned long *, int, const int);
+void vec_dst (const long *, int, const int);
+
+void vec_dststt (const unsigned long *, int, const int);
+void vec_dststt (const long *, int, const int);
+
+void vec_dstt (const unsigned long *, int, const int);
+void vec_dstt (const long *, int, const int);
+
+vector unsigned char vec_lvsl (int, const unsigned long *);
+vector unsigned char vec_lvsl (int, const long *);
+
+vector unsigned char vec_lvsr (int, const unsigned long *);
+vector unsigned char vec_lvsr (int, const long *);
+
+vector unsigned char vec_lvsl (int, const double *);
+vector unsigned char vec_lvsr (int, const double *);
+
+vector double vec_vsx_ld (int, const vector double *);
+vector double vec_vsx_ld (int, const double *);
+vector float vec_vsx_ld (int, const vector float *);
+vector float vec_vsx_ld (int, const float *);
+vector bool int vec_vsx_ld (int, const vector bool int *);
+vector signed int vec_vsx_ld (int, const vector signed int *);
+vector signed int vec_vsx_ld (int, const int *);
+vector signed int vec_vsx_ld (int, const long *);
+vector unsigned int vec_vsx_ld (int, const vector unsigned int *);
+vector unsigned int vec_vsx_ld (int, const unsigned int *);
+vector unsigned int vec_vsx_ld (int, const unsigned long *);
+vector bool short vec_vsx_ld (int, const vector bool short *);
+vector pixel vec_vsx_ld (int, const vector pixel *);
+vector signed short vec_vsx_ld (int, const vector signed short *);
+vector signed short vec_vsx_ld (int, const short *);
+vector unsigned short vec_vsx_ld (int, const vector unsigned short *);
+vector unsigned short vec_vsx_ld (int, const unsigned short *);
+vector bool char vec_vsx_ld (int, const vector bool char *);
+vector signed char vec_vsx_ld (int, const vector signed char *);
+vector signed char vec_vsx_ld (int, const signed char *);
+vector unsigned char vec_vsx_ld (int, const vector unsigned char *);
+vector unsigned char vec_vsx_ld (int, const unsigned char *);
+
+void vec_vsx_st (vector double, int, vector double *);
+void vec_vsx_st (vector double, int, double *);
+void vec_vsx_st (vector float, int, vector float *);
+void vec_vsx_st (vector float, int, float *);
+void vec_vsx_st (vector signed int, int, vector signed int *);
+void vec_vsx_st (vector signed int, int, int *);
+void vec_vsx_st (vector unsigned int, int, vector unsigned int *);
+void vec_vsx_st (vector unsigned int, int, unsigned int *);
+void vec_vsx_st (vector bool int, int, vector bool int *);
+void vec_vsx_st (vector bool int, int, unsigned int *);
+void vec_vsx_st (vector bool int, int, int *);
+void vec_vsx_st (vector signed short, int, vector signed short *);
+void vec_vsx_st (vector signed short, int, short *);
+void vec_vsx_st (vector unsigned short, int, vector unsigned short *);
+void vec_vsx_st (vector unsigned short, int, unsigned short *);
+void vec_vsx_st (vector bool short, int, vector bool short *);
+void vec_vsx_st (vector bool short, int, unsigned short *);
+void vec_vsx_st (vector pixel, int, vector pixel *);
+void vec_vsx_st (vector pixel, int, unsigned short *);
+void vec_vsx_st (vector pixel, int, short *);
+void vec_vsx_st (vector bool short, int, short *);
+void vec_vsx_st (vector signed char, int, vector signed char *);
+void vec_vsx_st (vector signed char, int, signed char *);
+void vec_vsx_st (vector unsigned char, int, vector unsigned char *);
+void vec_vsx_st (vector unsigned char, int, unsigned char *);
+void vec_vsx_st (vector bool char, int, vector bool char *);
+void vec_vsx_st (vector bool char, int, unsigned char *);
+void vec_vsx_st (vector bool char, int, signed char *);
+
+vector double vec_xxpermdi (vector double, vector double, const int);
+vector float vec_xxpermdi (vector float, vector float, const int);
+vector long long vec_xxpermdi (vector long long, vector long long, const int);
+vector unsigned long long vec_xxpermdi (vector unsigned long long,
+                                        vector unsigned long long, const int);
+vector int vec_xxpermdi (vector int, vector int, const int);
+vector unsigned int vec_xxpermdi (vector unsigned int,
+                                  vector unsigned int, const int);
+vector short vec_xxpermdi (vector short, vector short, const int);
+vector unsigned short vec_xxpermdi (vector unsigned short,
+                                    vector unsigned short, const int);
+vector signed char vec_xxpermdi (vector signed char, vector signed char,
+                                 const int);
+vector unsigned char vec_xxpermdi (vector unsigned char,
+                                   vector unsigned char, const int);
+
+vector double vec_xxsldi (vector double, vector double, int);
+vector float vec_xxsldi (vector float, vector float, int);
+vector long long vec_xxsldi (vector long long, vector long long, int);
+vector unsigned long long vec_xxsldi (vector unsigned long long,
+                                      vector unsigned long long, int);
+vector int vec_xxsldi (vector int, vector int, int);
+vector unsigned int vec_xxsldi (vector unsigned int, vector unsigned int, int);
+vector short vec_xxsldi (vector short, vector short, int);
+vector unsigned short vec_xxsldi (vector unsigned short,
+                                  vector unsigned short, int);
+vector signed char vec_xxsldi (vector signed char, vector signed char, int);
+vector unsigned char vec_xxsldi (vector unsigned char,
+                                 vector unsigned char, int);
+</pre></div>
+
+<p>Note that the &lsquo;<samp>vec_ld</samp>&rsquo; and &lsquo;<samp>vec_st</samp>&rsquo; built-in functions always
+generate the AltiVec &lsquo;<samp>LVX</samp>&rsquo; and &lsquo;<samp>STVX</samp>&rsquo; instructions even
+if the VSX instruction set is available.  The &lsquo;<samp>vec_vsx_ld</samp>&rsquo; and
+&lsquo;<samp>vec_vsx_st</samp>&rsquo; built-in functions always generate the VSX &lsquo;<samp>LXVD2X</samp>&rsquo;,
+&lsquo;<samp>LXVW4X</samp>&rsquo;, &lsquo;<samp>STXVD2X</samp>&rsquo;, and &lsquo;<samp>STXVW4X</samp>&rsquo; instructions.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="PowerPC-AltiVec-Built_002din-Functions-Available-on-ISA-2_002e07.html" accesskey="n" rel="next">PowerPC AltiVec Built-in Functions Available on ISA 2.07</a>, Previous: <a href="PowerPC-AltiVec-Built_002din-Functions-on-ISA-2_002e05.html" accesskey="p" rel="prev">PowerPC AltiVec Built-in Functions on ISA 2.05</a>, Up: <a href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html" accesskey="u" rel="up">PowerPC AltiVec/VSX Built-in Functions</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

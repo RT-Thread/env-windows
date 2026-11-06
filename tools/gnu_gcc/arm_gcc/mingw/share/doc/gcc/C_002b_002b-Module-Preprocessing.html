@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>C++ Module Preprocessing (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="C++ Module Preprocessing (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="C++ Module Preprocessing (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="C_002b_002b-Modules.html" rel="up" title="C++ Modules">
+<link href="C_002b_002b-Compiled-Module-Interface.html" rel="next" title="C++ Compiled Module Interface">
+<link href="C_002b_002b-Module-Mapper.html" rel="prev" title="C++ Module Mapper">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="C_002b_002b-Module-Preprocessing"></span><div class="header">
+<p>
+Next: <a href="C_002b_002b-Compiled-Module-Interface.html" accesskey="n" rel="next">C++ Compiled Module Interface</a>, Previous: <a href="C_002b_002b-Module-Mapper.html" accesskey="p" rel="prev">C++ Module Mapper</a>, Up: <a href="C_002b_002b-Modules.html" accesskey="u" rel="up">C++ Modules</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Module-Preprocessing"></span><h4 class="subsection">3.23.2 Module Preprocessing</h4>
+<span id="index-C_002b_002b-Module-Preprocessing"></span>
+
+<p>Modules affect preprocessing because of header units and include
+translation.  Some uses of the preprocessor as a separate step either
+do not produce a correct output, or require CMIs to be available.
+</p>
+<p>Header units import macros.  These macros can affect later conditional
+inclusion, which therefore can cascade to differing import sets.  When
+preprocessing, it is necessary to load the CMI.  If a header unit is
+unavailable, the preprocessor issues a warning and continue (when
+not just preprocessing, an error is emitted).  Detecting such imports
+requires preprocessor tokenization of the input stream to phase 4
+(macro expansion).
+</p>
+<p>Include translation converts <code>#include</code>, <code>#include_next</code> and
+<code>#import</code> directives to internal <code>import</code> declarations.
+Whether a particular directive is translated is controlled by the
+module mapper.  Header unit names are canonicalized during
+preprocessing.
+</p>
+<p>Dependency information can be emitted for macro import, extending the
+functionality of <samp>-MD</samp> and <samp>-MMD</samp> options.  Detection of
+import declarations also requires phase 4 preprocessing, and thus
+requires full preprocessing (or compilation).
+</p>
+<p>The <samp>-M</samp>, <samp>-MM</samp> and <samp>-E -fdirectives-only</samp> options halt
+preprocessing before phase 4.
+</p>
+<p>The <samp>-save-temps</samp> option uses <samp>-fdirectives-only</samp> for
+preprocessing, and preserve the macro definitions in the preprocessed
+output.  Usually you also want to use this option when explicitly
+preprocessing a header-unit, or consuming such preprocessed output:
+</p>
+<div class="example">
+<pre class="example">g++ -fmodules-ts -E -fdirectives-only my-header.hh -o my-header.ii
+g++ -x c++-header -fmodules-ts -fpreprocessed -fdirectives-only my-header.ii
+</pre></div>
+
+
+
+
+</body>
+</html>

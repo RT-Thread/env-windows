@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>CEILING (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="CEILING (The GNU Fortran Compiler)">
+<meta name="keywords" content="CEILING (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Intrinsic-Procedures.html" rel="up" title="Intrinsic Procedures">
+<link href="CHAR.html" rel="next" title="CHAR">
+<link href="C_005fSIZEOF.html" rel="prev" title="C_SIZEOF">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="CEILING"></span><div class="header">
+<p>
+Next: <a href="CHAR.html" accesskey="n" rel="next">CHAR</a>, Previous: <a href="C_005fSIZEOF.html" accesskey="p" rel="prev">C_SIZEOF</a>, Up: <a href="Intrinsic-Procedures.html" accesskey="u" rel="up">Intrinsic Procedures</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="CEILING-_002d_002d_002d-Integer-ceiling-function"></span><h3 class="section">8.58 <code>CEILING</code> &mdash; Integer ceiling function</h3>
+<span id="index-CEILING"></span>
+<span id="index-ceiling-1"></span>
+<span id="index-rounding_002c-ceiling-1"></span>
+
+<dl compact="compact">
+<dt><em>Description</em>:</dt>
+<dd><p><code>CEILING(A)</code> returns the least integer greater than or equal to <var>A</var>.
+</p>
+</dd>
+<dt><em>Standard</em>:</dt>
+<dd><p>Fortran 95 and later
+</p>
+</dd>
+<dt><em>Class</em>:</dt>
+<dd><p>Elemental function
+</p>
+</dd>
+<dt><em>Syntax</em>:</dt>
+<dd><p><code>RESULT = CEILING(A [, KIND])</code>
+</p>
+</dd>
+<dt><em>Arguments</em>:</dt>
+<dd><table>
+<tr><td width="15%"><var>A</var></td><td width="70%">The type shall be <code>REAL</code>.</td></tr>
+<tr><td width="15%"><var>KIND</var></td><td width="70%">(Optional) A scalar <code>INTEGER</code> constant
+expression indicating the kind parameter of the result.</td></tr>
+</table>
+
+</dd>
+<dt><em>Return value</em>:</dt>
+<dd><p>The return value is of type <code>INTEGER(KIND)</code> if <var>KIND</var> is present
+and a default-kind <code>INTEGER</code> otherwise.
+</p>
+</dd>
+<dt><em>Example</em>:</dt>
+<dd><div class="example">
+<pre class="example">program test_ceiling
+    real :: x = 63.29
+    real :: y = -63.59
+    print *, ceiling(x) ! returns 64
+    print *, ceiling(y) ! returns -63
+end program test_ceiling
+</pre></div>
+
+</dd>
+<dt><em>See also</em>:</dt>
+<dd><p><a href="FLOOR.html">FLOOR</a>, <br>
+<a href="NINT.html">NINT</a>
+</p></dd>
+</dl>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SQRT (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="SQRT (The GNU Fortran Compiler)">
+<meta name="keywords" content="SQRT (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Intrinsic-Procedures.html" rel="up" title="Intrinsic Procedures">
+<link href="SRAND.html" rel="next" title="SRAND">
+<link href="SPREAD.html" rel="prev" title="SPREAD">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="SQRT"></span><div class="header">
+<p>
+Next: <a href="SRAND.html" accesskey="n" rel="next">SRAND</a>, Previous: <a href="SPREAD.html" accesskey="p" rel="prev">SPREAD</a>, Up: <a href="Intrinsic-Procedures.html" accesskey="u" rel="up">Intrinsic Procedures</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="SQRT-_002d_002d_002d-Square_002droot-function"></span><h3 class="section">8.257 <code>SQRT</code> &mdash; Square-root function</h3>
+<span id="index-SQRT"></span>
+<span id="index-DSQRT"></span>
+<span id="index-CSQRT"></span>
+<span id="index-ZSQRT"></span>
+<span id="index-CDSQRT"></span>
+<span id="index-root"></span>
+<span id="index-square_002droot"></span>
+
+<dl compact="compact">
+<dt><em>Description</em>:</dt>
+<dd><p><code>SQRT(X)</code> computes the square root of <var>X</var>.
+</p>
+</dd>
+<dt><em>Standard</em>:</dt>
+<dd><p>Fortran 77 and later
+</p>
+</dd>
+<dt><em>Class</em>:</dt>
+<dd><p>Elemental function
+</p>
+</dd>
+<dt><em>Syntax</em>:</dt>
+<dd><p><code>RESULT = SQRT(X)</code>
+</p>
+</dd>
+<dt><em>Arguments</em>:</dt>
+<dd><table>
+<tr><td width="15%"><var>X</var></td><td width="70%">The type shall be <code>REAL</code> or
+<code>COMPLEX</code>.</td></tr>
+</table>
+
+</dd>
+<dt><em>Return value</em>:</dt>
+<dd><p>The return value is of type <code>REAL</code> or <code>COMPLEX</code>.
+The kind type parameter is the same as <var>X</var>.
+</p>
+</dd>
+<dt><em>Example</em>:</dt>
+<dd><div class="example">
+<pre class="example">program test_sqrt
+  real(8) :: x = 2.0_8
+  complex :: z = (1.0, 2.0)
+  x = sqrt(x)
+  z = sqrt(z)
+end program test_sqrt
+</pre></div>
+
+</dd>
+<dt><em>Specific names</em>:</dt>
+<dd><table>
+<thead><tr><th width="20%">Name</th><th width="23%">Argument</th><th width="20%">Return type</th><th width="33%">Standard</th></tr></thead>
+<tr><td width="20%"><code>SQRT(X)</code></td><td width="23%"><code>REAL(4) X</code></td><td width="20%"><code>REAL(4)</code></td><td width="33%">Fortran 77 and later</td></tr>
+<tr><td width="20%"><code>DSQRT(X)</code></td><td width="23%"><code>REAL(8) X</code></td><td width="20%"><code>REAL(8)</code></td><td width="33%">Fortran 77 and later</td></tr>
+<tr><td width="20%"><code>CSQRT(X)</code></td><td width="23%"><code>COMPLEX(4) X</code></td><td width="20%"><code>COMPLEX(4)</code></td><td width="33%">Fortran 77 and later</td></tr>
+<tr><td width="20%"><code>ZSQRT(X)</code></td><td width="23%"><code>COMPLEX(8) X</code></td><td width="20%"><code>COMPLEX(8)</code></td><td width="33%">GNU extension</td></tr>
+<tr><td width="20%"><code>CDSQRT(X)</code></td><td width="23%"><code>COMPLEX(8) X</code></td><td width="20%"><code>COMPLEX(8)</code></td><td width="33%">GNU extension</td></tr>
+</table>
+</dd>
+</dl>
+
+
+
+
+
+
+</body>
+</html>

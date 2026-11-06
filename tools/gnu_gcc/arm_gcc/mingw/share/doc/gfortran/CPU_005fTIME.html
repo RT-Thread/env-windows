@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>CPU_TIME (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="CPU_TIME (The GNU Fortran Compiler)">
+<meta name="keywords" content="CPU_TIME (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Intrinsic-Procedures.html" rel="up" title="Intrinsic Procedures">
+<link href="CSHIFT.html" rel="next" title="CSHIFT">
+<link href="COUNT.html" rel="prev" title="COUNT">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="CPU_005fTIME"></span><div class="header">
+<p>
+Next: <a href="CSHIFT.html" accesskey="n" rel="next">CSHIFT</a>, Previous: <a href="COUNT.html" accesskey="p" rel="prev">COUNT</a>, Up: <a href="Intrinsic-Procedures.html" accesskey="u" rel="up">Intrinsic Procedures</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="CPU_005fTIME-_002d_002d_002d-CPU-elapsed-time-in-seconds"></span><h3 class="section">8.79 <code>CPU_TIME</code> &mdash; CPU elapsed time in seconds</h3>
+<span id="index-CPU_005fTIME"></span>
+<span id="index-time_002c-elapsed"></span>
+
+<dl compact="compact">
+<dt><em>Description</em>:</dt>
+<dd><p>Returns a <code>REAL</code> value representing the elapsed CPU time in
+seconds.  This is useful for testing segments of code to determine
+execution time.
+</p>
+<p>If a time source is available, time will be reported with microsecond
+resolution. If no time source is available, <var>TIME</var> is set to
+<code>-1.0</code>.
+</p>
+<p>Note that <var>TIME</var> may contain a, system dependent, arbitrary offset
+and may not start with <code>0.0</code>. For <code>CPU_TIME</code>, the absolute
+value is meaningless, only differences between subsequent calls to
+this subroutine, as shown in the example below, should be used.
+</p>
+
+</dd>
+<dt><em>Standard</em>:</dt>
+<dd><p>Fortran 95 and later
+</p>
+</dd>
+<dt><em>Class</em>:</dt>
+<dd><p>Subroutine
+</p>
+</dd>
+<dt><em>Syntax</em>:</dt>
+<dd><p><code>CALL CPU_TIME(TIME)</code>
+</p>
+</dd>
+<dt><em>Arguments</em>:</dt>
+<dd><table>
+<tr><td width="15%"><var>TIME</var></td><td width="70%">The type shall be <code>REAL</code> with <code>INTENT(OUT)</code>.</td></tr>
+</table>
+
+</dd>
+<dt><em>Return value</em>:</dt>
+<dd><p>None
+</p>
+</dd>
+<dt><em>Example</em>:</dt>
+<dd><div class="example">
+<pre class="example">program test_cpu_time
+    real :: start, finish
+    call cpu_time(start)
+        ! put code to test here
+    call cpu_time(finish)
+    print '(&quot;Time = &quot;,f6.3,&quot; seconds.&quot;)',finish-start
+end program test_cpu_time
+</pre></div>
+
+</dd>
+<dt><em>See also</em>:</dt>
+<dd><p><a href="SYSTEM_005fCLOCK.html">SYSTEM_CLOCK</a>, <br>
+<a href="DATE_005fAND_005fTIME.html">DATE_AND_TIME</a>
+</p></dd>
+</dl>
+
+
+
+
+
+
+</body>
+</html>
