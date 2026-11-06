@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>C++ Compiled Module Interface (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="C++ Compiled Module Interface (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="C++ Compiled Module Interface (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="C_002b_002b-Modules.html" rel="up" title="C++ Modules">
+<link href="C-Implementation.html" rel="next" title="C Implementation">
+<link href="C_002b_002b-Module-Preprocessing.html" rel="prev" title="C++ Module Preprocessing">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="C_002b_002b-Compiled-Module-Interface"></span><div class="header">
+<p>
+Previous: <a href="C_002b_002b-Module-Preprocessing.html" accesskey="p" rel="prev">C++ Module Preprocessing</a>, Up: <a href="C_002b_002b-Modules.html" accesskey="u" rel="up">C++ Modules</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Compiled-Module-Interface"></span><h4 class="subsection">3.23.3 Compiled Module Interface</h4>
+<span id="index-C_002b_002b-Compiled-Module-Interface"></span>
+
+<p>CMIs are an additional artifact when compiling named module
+interfaces, partitions or header units.  These are read when
+importing.  CMI contents are implementation-specific, and in GCC&rsquo;s
+case tied to the compiler version.  Consider them a rebuildable cache
+artifact, not a distributable object.
+</p>
+<p>When creating an output CMI, any missing directory components are
+created in a manner that is safe for concurrent builds creating
+multiple, different, CMIs within a common subdirectory tree.
+</p>
+<p>CMI contents are written to a temporary file, which is then atomically
+renamed.  Observers either see old contents (if there is an
+existing file), or complete new contents.  They do not observe the
+CMI during its creation.  This is unlike object file writing, which
+may be observed by an external process.
+</p>
+<p>CMIs are read in lazily, if the host OS provides <code>mmap</code>
+functionality.  Generally blocks are read when name lookup or template
+instantiation occurs.  To inhibit this, the <samp>-fno-module-lazy</samp>
+option may be used.
+</p>
+<p>The <samp>--param lazy-modules=<var>n</var></samp> parameter controls the limit
+on the number of concurrently open module files during lazy loading.
+Should more modules be imported, an LRU algorithm is used to determine
+which files to close&mdash;until that file is needed again.  This limit
+may be exceeded with deep module dependency hierarchies.  With large
+code bases there may be more imports than the process limit of file
+descriptors.  By default, the limit is a few less than the per-process
+file descriptor hard limit, if that is determinable.<a id="DOCF3" href="#FOOT3"><sup>3</sup></a>
+</p>
+<p>GCC CMIs use ELF32 as an architecture-neutral encapsulation mechanism.
+You may use <code>readelf</code> to inspect them, although section
+contents are largely undecipherable.  There is a section named
+<code>.gnu.c++.README</code>, which contains human-readable text.  Other
+than the first line, each line consists of <code><var>tag</var>: <code>value</code></code>
+tuples.
+</p>
+<div class="example">
+<pre class="example">&gt; <code>readelf -p.gnu.c++.README gcm.cache/foo.gcm</code>
+
+String dump of section '.gnu.c++.README':
+  [     0]  GNU C++ primary module interface
+  [    21]  compiler: 11.0.0 20201116 (experimental) [c++-modules revision 20201116-0454]
+  [    6f]  version: 2020/11/16-04:54
+  [    89]  module: foo
+  [    95]  source: c_b.ii
+  [    a4]  dialect: C++20/coroutines
+  [    be]  cwd: /data/users/nathans/modules/obj/x86_64/gcc
+  [    ee]  repository: gcm.cache
+  [   104]  buildtime: 2020/11/16 15:03:21 UTC
+  [   127]  localtime: 2020/11/16 07:03:21 PST
+  [   14a]  export: foo:part1 foo-part1.gcm
+</pre></div>
+
+<p>Amongst other things, this lists the source that was built, C++
+dialect used and imports of the module.<a id="DOCF4" href="#FOOT4"><sup>4</sup></a> The timestamp is the same value as that
+provided by the <code>__DATE__</code> &amp; <code>__TIME__</code> macros, and may be
+explicitly specified with the environment variable
+<code>SOURCE_DATE_EPOCH</code>.  For further details
+see <a href="Environment-Variables.html">Environment Variables</a>.
+</p>
+<p>A set of related CMIs may be copied, provided the relative pathnames
+are preserved.
+</p>
+<p>The <code>.gnu.c++.README</code> contents do not affect CMI integrity, and
+it may be removed or altered.  The section numbering of the sections
+whose names do not begin with <code>.gnu.c++.</code>, or are not the string
+section is significant and must not be altered.
+</p>
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT3" href="#DOCF3">(3)</a></h3>
+<p>Where
+applicable the soft limit is incremented as needed towards the hard limit.</p>
+<h5><a id="FOOT4" href="#DOCF4">(4)</a></h3>
+<p>The precise contents
+of this output may change.</p>
+</div>
+<hr>
+<div class="header">
+<p>
+Previous: <a href="C_002b_002b-Module-Preprocessing.html" accesskey="p" rel="prev">C++ Module Preprocessing</a>, Up: <a href="C_002b_002b-Modules.html" accesskey="u" rel="up">C++ Modules</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

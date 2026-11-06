@@ -1,0 +1,646 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Intrinsic Procedures (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="Intrinsic Procedures (The GNU Fortran Compiler)">
+<meta name="keywords" content="Intrinsic Procedures (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="index.html" rel="up" title="Top">
+<link href="Introduction-to-Intrinsics.html" rel="next" title="Introduction to Intrinsics">
+<link href="_005fgfortran_005fcaf_005fco_005freduce.html" rel="prev" title="_gfortran_caf_co_reduce">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Intrinsic-Procedures"></span><div class="header">
+<p>
+Next: <a href="Intrinsic-Modules.html" accesskey="n" rel="next">Intrinsic Modules</a>, Previous: <a href="Coarray-Programming.html" accesskey="p" rel="prev">Coarray Programming</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Intrinsic-Procedures-1"></span><h2 class="chapter">8 Intrinsic Procedures</h2>
+<span id="index-intrinsic-procedures"></span>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="Introduction-to-Intrinsics.html" accesskey="1">Introduction</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"></td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ABORT.html" accesskey="2"><code>ABORT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Abort the program     
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ABS.html" accesskey="3"><code>ABS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Absolute value     
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ACCESS.html" accesskey="4"><code>ACCESS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Checks file access modes
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ACHAR.html" accesskey="5"><code>ACHAR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Character in <acronym>ASCII</acronym> collating sequence
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ACOS.html" accesskey="6"><code>ACOS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arccosine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ACOSD.html" accesskey="7"><code>ACOSD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arccosine function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ACOSH.html" accesskey="8"><code>ACOSH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Inverse hyperbolic cosine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ADJUSTL.html" accesskey="9"><code>ADJUSTL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Left adjust a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ADJUSTR.html"><code>ADJUSTR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Right adjust a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="AIMAG.html"><code>AIMAG</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Imaginary part of complex number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="AINT.html"><code>AINT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Truncate to a whole number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ALARM.html"><code>ALARM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Set an alarm clock
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ALL.html"><code>ALL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Determine if all values are true
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ALLOCATED.html"><code>ALLOCATED</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Status of allocatable entity
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="AND.html"><code>AND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical AND
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ANINT.html"><code>ANINT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Nearest whole number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ANY.html"><code>ANY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Determine if any values are true
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ASIN.html"><code>ASIN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arcsine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ASIND.html"><code>ASIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arcsine function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ASINH.html"><code>ASINH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Inverse hyperbolic sine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ASSOCIATED.html"><code>ASSOCIATED</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Status of a pointer or pointer/target pair
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATAN.html"><code>ATAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arctangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATAND.html"><code>ATAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arctangent function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATAN2.html"><code>ATAN2</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arctangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATAN2D.html"><code>ATAN2D</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Arctangent function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATANH.html"><code>ATANH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Inverse hyperbolic tangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fADD.html"><code>ATOMIC_ADD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic ADD operation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fAND.html"><code>ATOMIC_AND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise AND operation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fCAS.html"><code>ATOMIC_CAS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic compare and swap
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fDEFINE.html"><code>ATOMIC_DEFINE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Setting a variable atomically
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fFETCH_005fADD.html"><code>ATOMIC_FETCH_ADD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic ADD operation with prior fetch
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fFETCH_005fAND.html"><code>ATOMIC_FETCH_AND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise AND operation with prior fetch
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fFETCH_005fOR.html"><code>ATOMIC_FETCH_OR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise OR operation with prior fetch
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fFETCH_005fXOR.html"><code>ATOMIC_FETCH_XOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise XOR operation with prior fetch
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fOR.html"><code>ATOMIC_OR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise OR operation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fREF.html"><code>ATOMIC_REF</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Obtaining the value of a variable atomically
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ATOMIC_005fXOR.html"><code>ATOMIC_XOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Atomic bitwise OR operation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BACKTRACE.html"><code>BACKTRACE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Show a backtrace
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fJ0.html"><code>BESSEL_J0</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the first kind of order 0
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fJ1.html"><code>BESSEL_J1</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the first kind of order 1
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fJN.html"><code>BESSEL_JN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the first kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fY0.html"><code>BESSEL_Y0</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the second kind of order 0
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fY1.html"><code>BESSEL_Y1</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the second kind of order 1
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BESSEL_005fYN.html"><code>BESSEL_YN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bessel function of the second kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BGE.html"><code>BGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise greater than or equal to
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BGT.html"><code>BGT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise greater than
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BIT_005fSIZE.html"><code>BIT_SIZE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bit size inquiry function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BLE.html"><code>BLE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise less than or equal to
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BLT.html"><code>BLT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise less than
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="BTEST.html"><code>BTEST</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bit test function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fASSOCIATED.html"><code>C_ASSOCIATED</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Status of a C pointer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fF_005fPOINTER.html"><code>C_F_POINTER</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert C into Fortran pointer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fF_005fPROCPOINTER.html"><code>C_F_PROCPOINTER</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert C into Fortran procedure pointer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fFUNLOC.html"><code>C_FUNLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Obtain the C address of a procedure
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fLOC.html"><code>C_LOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Obtain the C address of an object
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_005fSIZEOF.html"><code>C_SIZEOF</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Size in bytes of an expression
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CEILING.html"><code>CEILING</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Integer ceiling function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CHAR.html"><code>CHAR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Integer-to-character conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CHDIR.html"><code>CHDIR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Change working directory
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CHMOD.html"><code>CHMOD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Change access permissions of files
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CMPLX.html"><code>CMPLX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Complex conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CO_005fBROADCAST.html"><code>CO_BROADCAST</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Copy a value to all images the current set of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CO_005fMAX.html"><code>CO_MAX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Maximal value on the current set of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CO_005fMIN.html"><code>CO_MIN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Minimal value on the current set of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CO_005fREDUCE.html"><code>CO_REDUCE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Reduction of values on the current set of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CO_005fSUM.html"><code>CO_SUM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sum of values on the current set of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COMMAND_005fARGUMENT_005fCOUNT.html"><code>COMMAND_ARGUMENT_COUNT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get number of command line arguments
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COMPILER_005fOPTIONS.html"><code>COMPILER_OPTIONS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Options passed to the compiler
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COMPILER_005fVERSION.html"><code>COMPILER_VERSION</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Compiler version string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COMPLEX.html"><code>COMPLEX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Complex conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CONJG.html"><code>CONJG</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Complex conjugate function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COS.html"><code>COS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cosine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COSD.html"><code>COSD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cosine function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COSH.html"><code>COSH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Hyperbolic cosine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COTAN.html"><code>COTAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cotangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COTAND.html"><code>COTAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cotangent function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="COUNT.html"><code>COUNT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Count occurrences of TRUE in an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CPU_005fTIME.html"><code>CPU_TIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">CPU time subroutine
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CSHIFT.html"><code>CSHIFT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Circular shift elements of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="CTIME.html"><code>CTIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Subroutine (or function) to convert a time into a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DATE_005fAND_005fTIME.html"><code>DATE_AND_TIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Date and time subroutine
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DBLE.html"><code>DBLE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Double precision conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DCMPLX.html"><code>DCMPLX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Double complex conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DIGITS.html"><code>DIGITS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Significant digits function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DIM.html"><code>DIM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Positive difference
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DOT_005fPRODUCT.html"><code>DOT_PRODUCT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Dot product function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DPROD.html"><code>DPROD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Double product function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DREAL.html"><code>DREAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Double real part function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DSHIFTL.html"><code>DSHIFTL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Combined left shift
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DSHIFTR.html"><code>DSHIFTR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Combined right shift
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="DTIME.html"><code>DTIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Execution time subroutine (or function)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EOSHIFT.html"><code>EOSHIFT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">End-off shift elements of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EPSILON.html"><code>EPSILON</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Epsilon function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ERF.html"><code>ERF</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Error function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ERFC.html"><code>ERFC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Complementary error function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ERFC_005fSCALED.html"><code>ERFC_SCALED</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Exponentially-scaled complementary error function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ETIME.html"><code>ETIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Execution time subroutine (or function)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EVENT_005fQUERY.html"><code>EVENT_QUERY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Query whether a coarray event has occurred
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EXECUTE_005fCOMMAND_005fLINE.html"><code>EXECUTE_COMMAND_LINE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Execute a shell command
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EXIT.html"><code>EXIT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Exit the program with status.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EXP.html"><code>EXP</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Exponential function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EXPONENT.html"><code>EXPONENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Exponent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="EXTENDS_005fTYPE_005fOF.html"><code>EXTENDS_TYPE_OF</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Query dynamic type for extension
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FDATE.html"><code>FDATE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Subroutine (or function) to get the current time as a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FGET.html"><code>FGET</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Read a single character in stream mode from stdin
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FGETC.html"><code>FGETC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Read a single character in stream mode
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FINDLOC.html"><code>FINDLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Search an array for a value
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FLOOR.html"><code>FLOOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Integer floor function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FLUSH.html"><code>FLUSH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Flush I/O unit(s)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FNUM.html"><code>FNUM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">File number function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FPUT.html"><code>FPUT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Write a single character in stream mode to stdout
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FPUTC.html"><code>FPUTC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Write a single character in stream mode
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FRACTION.html"><code>FRACTION</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Fractional part of the model representation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FREE.html"><code>FREE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Memory de-allocation subroutine
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FSEEK.html"><code>FSEEK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Low level file positioning subroutine
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FSTAT.html"><code>FSTAT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get file status
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="FTELL.html"><code>FTELL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Current stream position
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GAMMA.html"><code>GAMMA</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Gamma function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GERROR.html"><code>GERROR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get last system error message
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETARG.html"><code>GETARG</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get command line arguments
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GET_005fCOMMAND.html"><code>GET_COMMAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get the entire command line
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GET_005fCOMMAND_005fARGUMENT.html"><code>GET_COMMAND_ARGUMENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get command line arguments
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETCWD.html"><code>GETCWD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get current working directory
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETENV.html"><code>GETENV</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get an environmental variable
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GET_005fENVIRONMENT_005fVARIABLE.html"><code>GET_ENVIRONMENT_VARIABLE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get an environmental variable
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETGID.html"><code>GETGID</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Group ID function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETLOG.html"><code>GETLOG</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get login name
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETPID.html"><code>GETPID</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Process ID function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GETUID.html"><code>GETUID</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">User ID function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="GMTIME.html"><code>GMTIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert time to GMT info
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="HOSTNM.html"><code>HOSTNM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get system host name
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="HUGE.html"><code>HUGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Largest number of a kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="HYPOT.html"><code>HYPOT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Euclidean distance function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IACHAR.html"><code>IACHAR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Code in <acronym>ASCII</acronym> collating sequence
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IALL.html"><code>IALL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise AND of array elements
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IAND.html"><code>IAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical and
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IANY.html"><code>IANY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise OR of array elements
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IARGC.html"><code>IARGC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get the number of command line arguments
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IBCLR.html"><code>IBCLR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Clear bit
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IBITS.html"><code>IBITS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bit extraction
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IBSET.html"><code>IBSET</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Set bit
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ICHAR.html"><code>ICHAR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Character-to-integer conversion function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IDATE.html"><code>IDATE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Current local time (day/month/year)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IEOR.html"><code>IEOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical exclusive or
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IERRNO.html"><code>IERRNO</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Function to get the last system error number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IMAGE_005fINDEX.html"><code>IMAGE_INDEX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cosubscript to image index conversion
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="INDEX-intrinsic.html"><code>INDEX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Position of a substring within a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="INT.html"><code>INT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert to integer type
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="INT2.html"><code>INT2</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert to 16-bit integer type
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="INT8.html"><code>INT8</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert to 64-bit integer type
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IOR.html"><code>IOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical or
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IPARITY.html"><code>IPARITY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise XOR of array elements
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IRAND.html"><code>IRAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Integer pseudo-random number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IS_005fCONTIGUOUS.html"><code>IS_CONTIGUOUS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Test whether an array is contiguous
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IS_005fIOSTAT_005fEND.html"><code>IS_IOSTAT_END</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Test for end-of-file value
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="IS_005fIOSTAT_005fEOR.html"><code>IS_IOSTAT_EOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Test for end-of-record value
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ISATTY.html"><code>ISATTY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Whether a unit is a terminal device
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ISHFT.html"><code>ISHFT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Shift bits
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ISHFTC.html"><code>ISHFTC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Shift bits circularly
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ISNAN.html"><code>ISNAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Tests for a NaN
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="ITIME.html"><code>ITIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Current local time (hour/minutes/seconds)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="KILL.html"><code>KILL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Send a signal to a process
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="KIND.html"><code>KIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Kind of an entity
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LBOUND.html"><code>LBOUND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lower dimension bounds of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LCOBOUND.html"><code>LCOBOUND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lower codimension bounds of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LEADZ.html"><code>LEADZ</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Number of leading zero bits of an integer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LEN.html"><code>LEN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Length of a character entity
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LEN_005fTRIM.html"><code>LEN_TRIM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Length of a character entity without trailing blank characters
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LGE.html"><code>LGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lexical greater than or equal
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LGT.html"><code>LGT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lexical greater than
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LINK.html"><code>LINK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Create a hard link
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LLE.html"><code>LLE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lexical less than or equal
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LLT.html"><code>LLT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Lexical less than
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LNBLNK.html"><code>LNBLNK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Index of the last non-blank character in a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LOC.html"><code>LOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Returns the address of a variable
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LOG.html"><code>LOG</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Logarithm function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LOG10.html"><code>LOG10</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Base 10 logarithm function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LOG_005fGAMMA.html"><code>LOG_GAMMA</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Logarithm of the Gamma function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LOGICAL.html"><code>LOGICAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert to logical type
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LSHIFT.html"><code>LSHIFT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Left shift bits
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LSTAT.html"><code>LSTAT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get file status
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="LTIME.html"><code>LTIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert time to local time info
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MALLOC.html"><code>MALLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Dynamic memory allocation function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MASKL.html"><code>MASKL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Left justified mask
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MASKR.html"><code>MASKR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Right justified mask
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MATMUL.html"><code>MATMUL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">matrix multiplication
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MAX.html"><code>MAX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Maximum value of an argument list
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MAXEXPONENT.html"><code>MAXEXPONENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Maximum exponent of a real kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MAXLOC.html"><code>MAXLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Location of the maximum value within an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MAXVAL.html"><code>MAXVAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Maximum value of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MCLOCK.html"><code>MCLOCK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MCLOCK8.html"><code>MCLOCK8</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function (64-bit)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MERGE.html"><code>MERGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Merge arrays
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MERGE_005fBITS.html"><code>MERGE_BITS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Merge of bits under mask
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MIN.html"><code>MIN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Minimum value of an argument list
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MINEXPONENT.html"><code>MINEXPONENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Minimum exponent of a real kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MINLOC.html"><code>MINLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Location of the minimum value within an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MINVAL.html"><code>MINVAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Minimum value of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MOD.html"><code>MOD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Remainder function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MODULO.html"><code>MODULO</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Modulo function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MOVE_005fALLOC.html"><code>MOVE_ALLOC</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Move allocation from one object to another
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="MVBITS.html"><code>MVBITS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Move bits from one integer to another
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NEAREST.html"><code>NEAREST</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Nearest representable number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NEW_005fLINE.html"><code>NEW_LINE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">New line character
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NINT.html"><code>NINT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Nearest whole number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NORM2.html"><code>NORM2</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Euclidean vector norm
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NOT.html"><code>NOT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Logical negation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NULL.html"><code>NULL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Function that returns an disassociated pointer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="NUM_005fIMAGES.html"><code>NUM_IMAGES</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Number of images
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="OR.html"><code>OR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical OR
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PACK.html"><code>PACK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Pack an array into an array of rank one
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PARITY.html"><code>PARITY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Reduction with exclusive OR
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PERROR.html"><code>PERROR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Print system error message
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="POPCNT.html"><code>POPCNT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Number of bits set
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="POPPAR.html"><code>POPPAR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Parity of the number of bits set
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PRECISION.html"><code>PRECISION</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Decimal precision of a real kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PRESENT.html"><code>PRESENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Determine whether an optional dummy argument is specified
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="PRODUCT.html"><code>PRODUCT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Product of array elements
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RADIX.html"><code>RADIX</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Base of a data model
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RAN.html"><code>RAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Real pseudo-random number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RAND.html"><code>RAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Real pseudo-random number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RANDOM_005fINIT.html"><code>RANDOM_INIT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Initialize pseudo-random number generator
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RANDOM_005fNUMBER.html"><code>RANDOM_NUMBER</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Pseudo-random number
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RANDOM_005fSEED.html"><code>RANDOM_SEED</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Initialize a pseudo-random number sequence
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RANGE.html"><code>RANGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Decimal exponent range
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RANK.html"><code>RANK</code> </a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Rank of a data object
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="REAL.html"><code>REAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Convert to real type 
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RENAME.html"><code>RENAME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Rename a file
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="REPEAT.html"><code>REPEAT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Repeated string concatenation
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RESHAPE.html"><code>RESHAPE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Function to reshape an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RRSPACING.html"><code>RRSPACING</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Reciprocal of the relative spacing
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="RSHIFT.html"><code>RSHIFT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Right shift bits
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SAME_005fTYPE_005fAS.html"><code>SAME_TYPE_AS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Query dynamic types for equality
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SCALE.html"><code>SCALE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Scale a real value
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SCAN.html"><code>SCAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Scan a string for the presence of a set of characters
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SECNDS.html"><code>SECNDS</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SECOND.html"><code>SECOND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">CPU time function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SELECTED_005fCHAR_005fKIND.html"><code>SELECTED_CHAR_KIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Choose character kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SELECTED_005fINT_005fKIND.html"><code>SELECTED_INT_KIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Choose integer kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SELECTED_005fREAL_005fKIND.html"><code>SELECTED_REAL_KIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Choose real kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SET_005fEXPONENT.html"><code>SET_EXPONENT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Set the exponent of the model
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SHAPE.html"><code>SHAPE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Determine the shape of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SHIFTA.html"><code>SHIFTA</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Right shift with fill
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SHIFTL.html"><code>SHIFTL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Left shift
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SHIFTR.html"><code>SHIFTR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Right shift
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIGN.html"><code>SIGN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sign copying function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIGNAL.html"><code>SIGNAL</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Signal handling subroutine (or function)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIN.html"><code>SIN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIND.html"><code>SIND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sine function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SINH.html"><code>SINH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Hyperbolic sine function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIZE.html"><code>SIZE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Function to determine the size of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SIZEOF.html"><code>SIZEOF</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Determine the size in bytes of an expression
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SLEEP.html"><code>SLEEP</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sleep for the specified number of seconds
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SPACING.html"><code>SPACING</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Smallest distance between two numbers of a given type
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SPREAD.html"><code>SPREAD</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Add a dimension to an array 
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SQRT.html"><code>SQRT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Square-root function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SRAND.html"><code>SRAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Reinitialize the random number generator
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="STAT.html"><code>STAT</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get file status
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="STORAGE_005fSIZE.html"><code>STORAGE_SIZE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Storage size in bits
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SUM.html"><code>SUM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Sum of array elements
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SYMLNK.html"><code>SYMLNK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Create a symbolic link
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SYSTEM.html"><code>SYSTEM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Execute a shell command
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="SYSTEM_005fCLOCK.html"><code>SYSTEM_CLOCK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TAN.html"><code>TAN</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Tangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TAND.html"><code>TAND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Tangent function, degrees
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TANH.html"><code>TANH</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Hyperbolic tangent function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="THIS_005fIMAGE.html"><code>THIS_IMAGE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Cosubscript index of this image
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TIME.html"><code>TIME</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TIME8.html"><code>TIME8</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Time function (64-bit)
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TINY.html"><code>TINY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Smallest positive number of a real kind
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TRAILZ.html"><code>TRAILZ</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Number of trailing zero bits of an integer
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TRANSFER.html"><code>TRANSFER</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Transfer bit patterns
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TRANSPOSE.html"><code>TRANSPOSE</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Transpose an array of rank two
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TRIM.html"><code>TRIM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Remove trailing blank characters of a string
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="TTYNAM.html"><code>TTYNAM</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Get the name of a terminal device
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="UBOUND.html"><code>UBOUND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Upper dimension bounds of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="UCOBOUND.html"><code>UCOBOUND</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Upper codimension bounds of an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="UMASK.html"><code>UMASK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Set the file creation mask
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="UNLINK.html"><code>UNLINK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Remove a file from the file system
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="UNPACK.html"><code>UNPACK</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Unpack an array of rank one into an array
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="VERIFY.html"><code>VERIFY</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Scan a string for the absence of a set of characters
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="XOR.html"><code>XOR</code></a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Bitwise logical exclusive or
+</td></tr>
+</table>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Intrinsic-Modules.html" accesskey="n" rel="next">Intrinsic Modules</a>, Previous: <a href="Coarray-Programming.html" accesskey="p" rel="prev">Coarray Programming</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

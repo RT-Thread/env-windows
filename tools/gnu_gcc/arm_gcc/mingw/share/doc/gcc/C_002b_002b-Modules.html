@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>C++ Modules (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="C++ Modules (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="C++ Modules (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Invoking-GCC.html" rel="up" title="Invoking GCC">
+<link href="C_002b_002b-Module-Mapper.html" rel="next" title="C++ Module Mapper">
+<link href="Precompiled-Headers.html" rel="prev" title="Precompiled Headers">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="C_002b_002b-Modules"></span><div class="header">
+<p>
+Previous: <a href="Precompiled-Headers.html" accesskey="p" rel="prev">Precompiled Headers</a>, Up: <a href="Invoking-GCC.html" accesskey="u" rel="up">Invoking GCC</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="C_002b_002b-Modules-1"></span><h3 class="section">3.23 C++ Modules</h3>
+<span id="index-speed-of-compilation-1"></span>
+
+<p>Modules are a C++20 language feature.  As the name suggests, they
+provides a modular compilation system, intending to provide both
+faster builds and better library isolation.  The &ldquo;Merging Modules&rdquo;
+paper <a href="https://wg21.link/p1103">https://wg21.link/p1103</a>, provides the easiest to read set
+of changes to the standard, although it does not capture later
+changes.
+</p>
+<p><em>G++&rsquo;s modules support is not complete.</em>  Other than bugs, the
+known missing pieces are:
+</p>
+<dl compact="compact">
+<dt><em>Private Module Fragment</em></dt>
+<dd><p>The Private Module Fragment is recognized, but an error is emitted.
+</p>
+</dd>
+<dt><em>Partition definition visibility rules</em></dt>
+<dd><p>Entities may be defined in implementation partitions, and those
+definitions are not available outside of the module.  This is not
+implemented, and the definitions are available to extra-module use.
+</p>
+</dd>
+<dt><em>Textual merging of reachable GM entities</em></dt>
+<dd><p>Entities may be multiply defined across different header-units.
+These must be de-duplicated, and this is implemented across imports,
+or when an import redefines a textually-defined entity.  However the
+reverse is not implemented&mdash;textually redefining an entity that has
+been defined in an imported header-unit.  A redefinition error is
+emitted.
+</p>
+</dd>
+<dt><em>Translation-Unit local referencing rules</em></dt>
+<dd><p>Papers p1815 (<a href="https://wg21.link/p1815">https://wg21.link/p1815</a>) and p2003
+(<a href="https://wg21.link/p2003">https://wg21.link/p2003</a>) add limitations on which entities an
+exported region may reference (for instance, the entities an exported
+template definition may reference).  These are not fully implemented.
+</p>
+</dd>
+<dt><em>Standard Library Header Units</em></dt>
+<dd><p>The Standard Library is not provided as importable header units.  If
+you want to import such units, you must explicitly build them first.
+If you do not do this with care, you may have multiple declarations,
+which the module machinery must merge&mdash;compiler resource usage can be
+affected by how you partition header files into header units.
+</p>
+</dd>
+</dl>
+
+<p>Modular compilation is <em>not</em> enabled with just the
+<samp>-std=c++20</samp> option.  You must explicitly enable it with the
+<samp>-fmodules-ts</samp> option.  It is independent of the language
+version selected, although in pre-C++20 versions, it is of course an
+extension.
+</p>
+<p>No new source file suffixes are required or supported.  If you wish to
+use a non-standard suffix (see <a href="Overall-Options.html">Overall Options</a>), you also need
+to provide a <samp>-x c++</samp> option too.<a id="DOCF2" href="#FOOT2"><sup>2</sup></a>
+</p>
+<p>Compiling a module interface unit produces an additional output (to
+the assembly or object file), called a Compiled Module Interface
+(CMI).  This encodes the exported declarations of the module.
+Importing a module reads in the CMI.  The import graph is a Directed
+Acyclic Graph (DAG).  You must build imports before the importer.
+</p>
+<p>Header files may themselves be compiled to header units, which are a
+transitional ability aiming at faster compilation.  The
+<samp>-fmodule-header</samp> option is used to enable this, and implies
+the <samp>-fmodules-ts</samp> option.  These CMIs are named by the fully
+resolved underlying header file, and thus may be a complete pathname
+containing subdirectories.  If the header file is found at an absolute
+pathname, the CMI location is still relative to a CMI root directory.
+</p>
+<p>As header files often have no suffix, you commonly have to specify a
+<samp>-x</samp> option to tell the compiler the source is a header file.
+You may use <samp>-x c++-header</samp>, <samp>-x c++-user-header</samp> or
+<samp>-x c++-system-header</samp>.  When used in conjunction with
+<samp>-fmodules-ts</samp>, these all imply an appropriate
+<samp>-fmodule-header</samp> option.  The latter two variants use the
+user or system include path to search for the file specified.  This
+allows you to, for instance, compile standard library header files as
+header units, without needing to know exactly where they are
+installed.  Specifying the language as one of these variants also
+inhibits output of the object file, as header files have no associated
+object file.
+</p>
+<p>The <samp>-fmodule-only</samp> option disables generation of the
+associated object file for compiling a module interface.  Only the CMI
+is generated.  This option is implied when using the
+<samp>-fmodule-header</samp> option.
+</p>
+<p>The <samp>-flang-info-include-translate</samp> and
+<samp>-flang-info-include-translate-not</samp> options notes whether
+include translation occurs or not.  With no argument, the first will
+note all include translation.  The second will note all
+non-translations of include files not known to intentionally be
+textual.  With an argument, queries about include translation of a
+header files with that particular trailing pathname are noted.  You
+may repeat this form to cover several different header files.  This
+option may be helpful in determining whether include translation is
+happening&mdash;if it is working correctly, it behaves as if it isn&rsquo;t
+there at all.
+</p>
+<p>The <samp>-flang-info-module-cmi</samp> option can be used to determine
+where the compiler is reading a CMI from.  Without the option, the
+compiler is silent when such a read is successful.  This option has an
+optional argument, which will restrict the notification to just the
+set of named modules or header units specified.
+</p>
+<p>The <samp>-Winvalid-imported-macros</samp> option causes all imported macros
+to be resolved at the end of compilation.  Without this, imported
+macros are only resolved when expanded or (re)defined.  This option
+detects conflicting import definitions for all macros.
+</p>
+<p>For details of the <samp>-fmodule-mapper</samp> family of options,
+see <a href="C_002b_002b-Module-Mapper.html">C++ Module Mapper</a>.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="C_002b_002b-Module-Mapper.html" accesskey="1">C++ Module Mapper</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Module Mapper
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_002b_002b-Module-Preprocessing.html" accesskey="2">C++ Module Preprocessing</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Module Preprocessing
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="C_002b_002b-Compiled-Module-Interface.html" accesskey="3">C++ Compiled Module Interface</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Compiled Module Interface
+</td></tr>
+</table>
+
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT2" href="#DOCF2">(2)</a></h3>
+<p>Some users like to
+distinguish module interface files with a new suffix, such as naming
+the source <code>module.cppm</code>, which involves
+teaching all tools about the new suffix.  A different scheme, such as
+naming <code>module-m.cpp</code> would be less invasive.</p>
+</div>
+<hr>
+<div class="header">
+<p>
+Previous: <a href="Precompiled-Headers.html" accesskey="p" rel="prev">Precompiled Headers</a>, Up: <a href="Invoking-GCC.html" accesskey="u" rel="up">Invoking GCC</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

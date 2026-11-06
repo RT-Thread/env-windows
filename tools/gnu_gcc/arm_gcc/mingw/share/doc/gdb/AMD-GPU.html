@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Free Software" and "Free Software Needs
+Free Documentation", with the Front-Cover Texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: "You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom." -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>AMD GPU (Debugging with GDB)</title>
+
+<meta name="description" content="AMD GPU (Debugging with GDB)">
+<meta name="keywords" content="AMD GPU (Debugging with GDB)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Architectures.html" rel="up" title="Architectures">
+<link href="Controlling-GDB.html" rel="next" title="Controlling GDB">
+<link href="S12Z.html" rel="prev" title="S12Z">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="AMD-GPU"></span><div class="header">
+<p>
+Previous: <a href="S12Z.html" accesskey="p" rel="prev">S12Z</a>, Up: <a href="Architectures.html" accesskey="u" rel="up">Architectures</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="AMD-GPU-1"></span><h4 class="subsection">21.4.10 <acronym>AMD GPU</acronym></h4>
+<span id="index-AMD-GPU-support"></span>
+
+<p><small>GDB</small> supports debugging programs offloaded to <acronym>AMD GPU</acronym> devices
+using the <a href="https://docs.amd.com/"><acronym>AMD ROCm</acronym></a> platform.
+<small>GDB</small> presents host threads alongside GPU wavefronts, allowing debugging
+both the host and device parts of the program simultaneously.
+</p>
+<span id="AMD-GPU-Architectures"></span><h4 class="subsubsection">21.4.10.1 <acronym>AMD GPU</acronym> Architectures</h4>
+
+<p>The list of <acronym>AMD GPU</acronym> architectures supported by <small>GDB</small> depends
+on the version of the AMD Debugger API library used.  See its
+<a href="https://docs.amd.com/bundle/ROCDebugger_User_and_API">documentation</a> for
+more details.
+</p>
+<span id="AMD-GPU-Device-Driver-and-AMD-ROCm-Runtime"></span><h4 class="subsubsection">21.4.10.2 <acronym>AMD GPU</acronym> Device Driver and <acronym>AMD ROCm</acronym> Runtime</h4>
+
+<p><small>GDB</small> requires a compatible <acronym>AMD GPU</acronym> device driver to
+be installed.  A warning message is displayed if either the device
+driver version or the version of the debug support it implements is
+unsupported.  <small>GDB</small> will continue to function except no
+<acronym>AMD GPU</acronym> debugging will be possible.
+</p>
+<p><small>GDB</small> requires each agent to have compatible firmware installed
+by the device driver.  A warning message is displayed if unsupported
+firmware is detected.  <small>GDB</small> will continue to function except
+no <acronym>AMD GPU</acronym> debugging will be possible on the agent.
+</p>
+<p><small>GDB</small> requires a compatible <acronym>AMD ROCm</acronym> runtime to be
+loaded in order to detect <acronym>AMD GPU</acronym> code objects and
+wavefronts.  A warning message is displayed if an unsupported
+<acronym>AMD ROCm</acronym> runtime is detected, or there is an error or
+restriction that prevents debugging.  <small>GDB</small> will continue to
+function except no <acronym>AMD GPU</acronym> debugging will be possible.
+</p>
+<span id="AMD-GPU-Wavefronts"></span><h4 class="subsubsection">21.4.10.3 <acronym>AMD GPU</acronym> Wavefronts</h4>
+<span id="index-wavefronts"></span>
+
+<p>An <acronym>AMD GPU</acronym> wavefront is represented in <small>GDB</small> as a
+thread.
+</p>
+<p>Note that some <acronym>AMD GPU</acronym> architectures may have restrictions
+on providing information about <acronym>AMD GPU</acronym> wavefronts created
+when <small>GDB</small> is not attached (see <a href="#AMD-GPU-Attaching-Restrictions"><acronym>AMD GPU</acronym> Attaching Restrictions</a>).
+</p>
+<p>When scheduler-locking is in effect (see <a href="All_002dStop-Mode.html#set-scheduler_002dlocking">set scheduler-locking</a>),
+new wavefronts created by the resumed thread (either CPU thread or GPU
+wavefront) are held in the halt state.
+</p>
+<span id="AMD-GPU-Code-Objects"></span><h4 class="subsubsection">21.4.10.4 <acronym>AMD GPU</acronym> Code Objects</h4>
+
+<p>The &lsquo;<samp>info sharedlibrary</samp>&rsquo; command will show the <acronym>AMD GPU</acronym>
+code objects as file or memory URIs, together with the host&rsquo;s shared
+libraries.  For example:
+</p>
+<div class="example">
+<pre class="example">(gdb) info sharedlibrary
+From    To      Syms Read   Shared Object Library
+0x1111  0x2222  Yes (*)     /lib64/ld-linux-x86-64.so.2
+...
+0x3333  0x4444  Yes (*)     /opt/rocm-4.5.0/.../libamd_comgr.so
+0x5555  0x6666  Yes (*)     /lib/x86_64-linux-gnu/libtinfo.so.5
+0x7777  0x8888  Yes         file:///tmp/a.out#offset=6477&amp;size=10832
+0x9999  0xaaaa  Yes (*)     memory://95557/mem#offset=0x1234&amp;size=100
+(*): Shared library is missing debugging information.
+(gdb)
+</pre></div>
+
+<p>For a &lsquo;<samp>file</samp>&rsquo; URI, the path portion is the file on disk containing
+the code object.  The <var>offset</var> parameter is a 0-based offset in
+this file, to the start of the code object.  If omitted, it defaults to
+0.  The <var>size</var> parameter is the size of the code object in bytes.
+If omitted, it defaults to the size of the file.
+</p>
+<p>For a &lsquo;<samp>memory</samp>&rsquo; URI, the path portion is the process id of the
+process owning the memory containing the code object.  The <var>offset</var>
+parameter is the memory address where the code object is found, and
+the <var>size</var> parameter is its size in bytes.
+</p>
+<p><acronym>AMD GPU</acronym> code objects are loaded into each <acronym>AMD GPU</acronym>
+device separately.  The &lsquo;<samp>info sharedlibrary</samp>&rsquo; command may
+therefore show the same code object loaded multiple times.  As a
+consequence, setting a breakpoint in <acronym>AMD GPU</acronym> code will
+result in multiple breakpoint locations if there are multiple
+<acronym>AMD GPU</acronym> devices.
+</p>
+<span id="AMD-GPU-Entity-Target-Identifiers-and-Convenience-Variables"></span><h4 class="subsubsection">21.4.10.5 <acronym>AMD GPU</acronym> Entity Target Identifiers and Convenience Variables</h4>
+
+<p>The <acronym>AMD GPU</acronym> entities have the following target identifier formats:
+</p>
+<dl compact="compact">
+<dt>Thread Target ID</dt>
+<dd><p>The <acronym>AMD GPU</acronym> thread target identifier (<var>systag</var>) string has the
+following format:
+</p>
+<div class="example">
+<pre class="example">AMDGPU Wave <var>agent-id</var>:<var>queue-id</var>:<var>dispatch-id</var>:<var>wave-id</var> (<var>work-group-x</var>,<var>work-group-y</var>,<var>work-group-z</var>)/<var>work-group-thread-index</var>
+</pre></div>
+
+</dd>
+</dl>
+
+<span id="AMD-GPU-Signals"></span><span id="AMD-GPU-Signals-1"></span><h4 class="subsubsection">21.4.10.6 <acronym>AMD GPU</acronym> Signals</h4>
+
+<p>For <acronym>AMD GPU</acronym> wavefronts, <small>GDB</small> maps target conditions to stop
+signals in the following way:
+</p>
+<dl compact="compact">
+<dt><code>SIGILL</code></dt>
+<dd><p>Execution of an illegal instruction.
+</p>
+</dd>
+<dt><code>SIGTRAP</code></dt>
+<dd><p>Execution of a <code>S_TRAP</code> instruction other than:
+</p>
+<ul>
+<li> <code>S_TRAP 1</code> which is used by <small>GDB</small> to insert breakpoints.
+
+</li><li> <code>S_TRAP 2</code> which raises <code>SIGABRT</code>.
+
+</li></ul>
+
+</dd>
+<dt><code>SIGABRT</code></dt>
+<dd><p>Execution of a <code>S_TRAP 2</code> instruction.
+</p>
+</dd>
+<dt><code>SIGFPE</code></dt>
+<dd><p>Execution of a floating point or integer instruction detects a
+condition that is enabled to raise a signal.  The conditions include:
+</p>
+<ul>
+<li> Floating point operation is invalid.
+
+</li><li> Floating point operation had subnormal input that was rounded to zero.
+
+</li><li> Floating point operation performed a division by zero.
+
+</li><li> Floating point operation produced an overflow result.  The result was
+rounded to infinity.
+
+</li><li> Floating point operation produced an underflow result.  A subnormal
+result was rounded to zero.
+
+</li><li> Floating point operation produced an inexact result.
+
+</li><li> Integer operation performed a division by zero.
+
+</li></ul>
+
+<p>By default, these conditions are not enabled to raise signals.  The
+&lsquo;<samp>set $mode</samp>&rsquo; command can be used to change the <acronym>AMD GPU</acronym>
+wavefront&rsquo;s register that has bits controlling which conditions are
+enabled to raise signals.  The &lsquo;<samp>print $trapsts</samp>&rsquo; command can be
+used to inspect which conditions have been detected even if they are
+not enabled to raise a signal.
+</p>
+</dd>
+<dt><code>SIGBUS</code></dt>
+<dd><p>Execution of an instruction that accessed global memory using an
+address that is outside the virtual address range.
+</p>
+</dd>
+<dt><code>SIGSEGV</code></dt>
+<dd><p>Execution of an instruction that accessed a global memory page that is
+either not mapped or accessed with incompatible permissions.
+</p>
+</dd>
+</dl>
+
+<p>If a single instruction raises more than one signal, they will be
+reported one at a time each time the wavefront is continued.
+</p>
+<span id="AMD-GPU-Memory-Violation-Reporting"></span><h4 class="subsubsection">21.4.10.7 <acronym>AMD GPU</acronym> Memory Violation Reporting</h4>
+
+<p>A wavefront can report memory violation events.  However, the program
+location at which they are reported may be after the machine instruction
+that caused them.  This can result in the reported source statement
+being incorrect.  The following commands can be used to control this
+behavior:
+</p>
+<dl compact="compact">
+<dd>
+<span id="index-set-amdgpu-precise_002dmemory"></span>
+<span id="index-AMD-GPU-precise-memory-event-reporting"></span>
+</dd>
+<dt><code>set amdgpu precise-memory <var>mode</var></code></dt>
+<dd><p>Controls how <acronym>AMD GPU</acronym> devices detect memory violations, where
+<var>mode</var> can be:
+</p>
+<dl compact="compact">
+<dt><code>off</code></dt>
+<dd><p>The program location may not be immediately after the instruction that
+caused the memory violation.  This is the default.
+</p>
+</dd>
+<dt><code>on</code></dt>
+<dd><p>Requests that the program location will be immediately after the
+instruction that caused a memory violation.  Enabling this mode may make
+the <acronym>AMD GPU</acronym> device execution significantly slower as it has to
+wait for each memory operation to complete before executing the next
+instruction.
+</p>
+</dd>
+</dl>
+
+<p>The <code>amdgpu precise-memory</code> parameter is per-inferior.  When an
+inferior forks or execs, or the user uses the <code>clone-inferior</code> command,
+and an inferior is created as a result, the newly created inferior inherits
+the parameter value of the original inferior.
+</p>
+<span id="index-show-amdgpu-precise_002dmemory"></span>
+<span id="index-AMD-GPU-precise-memory-event-reporting-1"></span>
+</dd>
+<dt><code>show amdgpu precise-memory</code></dt>
+<dd><p>Displays the currently requested AMD GPU precise memory setting.
+</p>
+</dd>
+</dl>
+
+<span id="AMD-GPU-Logging"></span><h4 class="subsubsection">21.4.10.8 <acronym>AMD GPU</acronym> Logging</h4>
+
+<p>The &lsquo;<samp>set debug amd-dbgapi</samp>&rsquo; command can be used
+to enable diagnostic messages in the &lsquo;<samp>amd-dbgapi</samp>&rsquo; target.  The
+&lsquo;<samp>show debug amd-dbgapi</samp>&rsquo; command displays the current setting.
+See <a href="Debugging-Output.html#set-debug-amd_002ddbgapi">set debug amd-dbgapi</a>.
+</p>
+<p>The &lsquo;<samp>set debug amd-dbgapi-lib log-level <var>level</var></samp>&rsquo; command can be used
+to enable diagnostic messages from the &lsquo;<samp>amd-dbgapi</samp>&rsquo; library (which
+<small>GDB</small> uses under the hood).  The &lsquo;<samp>show debug amd-dbgapi-lib
+log-level</samp>&rsquo; command displays the current &lsquo;<samp>amd-dbgapi</samp>&rsquo; library log level.
+See <a href="Debugging-Output.html#set-debug-amd_002ddbgapi_002dlib">set debug amd-dbgapi-lib</a>.
+</p>
+<span id="AMD-GPU-Restrictions"></span><h4 class="subsubsection">21.4.10.9 <acronym>AMD GPU</acronym> Restrictions</h4>
+
+<ol>
+<li> When in non-stop mode, wavefronts may not hit breakpoints inserted
+while not stopped, nor see memory updates made while not stopped,
+until the wavefront is next stopped.  Memory updated by non-stopped
+wavefronts may not be visible until the wavefront is next stopped.
+
+</li><li> The HIP runtime performs deferred code object loading by default.
+<acronym>AMD GPU</acronym> code objects are not loaded until the first kernel is
+launched.  Before then, all breakpoints have to be set as pending breakpoints.
+
+<p>If source line positions are used that only correspond to source lines in
+unloaded code objects, then <small>GDB</small> may not set pending breakpoints, and
+instead set breakpoints on the next following source line that maps to host
+code.  This can result in unexpected breakpoint hits being reported.  When the
+code object containing the source lines is loaded, the incorrect breakpoints
+will be removed and replaced by the correct ones.  This problem can be avoided
+by only setting breakpoints in unloaded code objects using symbol or function
+names.
+</p>
+<p>Setting the <code>HIP_ENABLE_DEFERRED_LOADING</code> environment variable to <code>0</code>
+can be used to disable deferred code object loading by the HIP runtime.  This
+ensures all code objects will be loaded when the inferior reaches the beginning
+of the <code>main</code> function.
+</p>
+</li><li> If no CPU thread is running, then &lsquo;<samp>Ctrl-C</samp>&rsquo; is not able to stop
+<acronym>AMD GPU</acronym> threads.  This can happen for example if you enable
+<code>scheduler-locking</code> after the whole program stopped, and then resume an
+<acronym>AMD GPU</acronym> thread.  The only way to unblock the situation is to kill the
+<small>GDB</small> process.
+
+<span id="AMD-GPU-Attaching-Restrictions"></span></li><li> 
+By default, for some architectures, the <acronym>AMD GPU</acronym> device driver causes
+all <acronym>AMD GPU</acronym> wavefronts created when <small>GDB</small> is not attached to
+be unable to report the dispatch associated with the wavefront, or the
+wavefront&rsquo;s work-group position.  The &lsquo;<samp>info threads</samp>&rsquo; command will display
+this missing information with a &lsquo;<samp>?</samp>&rsquo;.
+
+<p>This does not affect wavefronts created while <small>GDB</small> is attached which
+are always capable of reporting this information.
+</p>
+<p>If the <code>HSA_ENABLE_DEBUG</code> environment variable is set to &lsquo;<samp>1</samp>&rsquo; when the
+<acronym>AMD ROCm</acronym> runtime is initialized, then this information will be
+available for all architectures even for wavefronts created when <small>GDB</small>
+was not attached.
+</p>
+</li></ol>
+
+<hr>
+<div class="header">
+<p>
+Previous: <a href="S12Z.html" accesskey="p" rel="prev">S12Z</a>, Up: <a href="Architectures.html" accesskey="u" rel="up">Architectures</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

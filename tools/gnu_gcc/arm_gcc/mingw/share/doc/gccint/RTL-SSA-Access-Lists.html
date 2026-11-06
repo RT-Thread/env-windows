@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>RTL SSA Access Lists (GNU Compiler Collection (GCC) Internals)</title>
+
+<meta name="description" content="RTL SSA Access Lists (GNU Compiler Collection (GCC) Internals)">
+<meta name="keywords" content="RTL SSA Access Lists (GNU Compiler Collection (GCC) Internals)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="RTL-SSA.html" rel="up" title="RTL SSA">
+<link href="Changing-RTL-Instructions.html" rel="next" title="Changing RTL Instructions">
+<link href="RTL-SSA-Phi-Nodes.html" rel="prev" title="RTL SSA Phi Nodes">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="RTL-SSA-Access-Lists"></span><div class="header">
+<p>
+Next: <a href="Changing-RTL-Instructions.html" accesskey="n" rel="next">Changing RTL Instructions</a>, Previous: <a href="RTL-SSA-Phi-Nodes.html" accesskey="p" rel="prev">RTL SSA Phi Nodes</a>, Up: <a href="RTL-SSA.html" accesskey="u" rel="up">RTL SSA</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="RTL-SSA-Access-Lists-1"></span><h4 class="subsection">14.21.7 RTL SSA Access Lists</h4>
+
+<p>All the definitions of a resource are chained together in reverse postorder.
+In general, this list can contain an arbitrary mix of both sets
+(<code>rtl_ssa::set_info</code>) and clobbers (<code>rtl_ssa::clobber_info</code>).
+However, it is often useful to skip over all intervening clobbers
+of a resource in order to find the next set.  The list is constructed
+in such a way that this can be done in amortized constant time.
+</p>
+<p>All uses (<code>rtl_ssa::use_info</code>) of a given set are also chained
+together into a list.  This list of uses is divided into three parts:
+</p>
+<ol>
+<li> uses by &ldquo;real&rdquo; nondebug instructions (see <a href="RTL-SSA-Basic-Blocks.html#real-RTL-SSA-insns">real RTL SSA insns</a>)
+
+</li><li> uses by real debug instructions
+
+</li><li> uses by phi nodes (see <a href="RTL-SSA-Phi-Nodes.html">RTL SSA Phi Nodes</a>)
+</li></ol>
+
+<p>The first and second parts individually follow reverse postorder.
+The third part has no particular order.
+</p>
+<span id="index-degenerate-phi-node_002c-RTL-SSA"></span>
+<p>The last use by a real nondebug instruction always comes earlier in
+the reverse postorder than the next definition of the resource (if any).
+This means that the accesses follow a linear sequence of the form:
+</p>
+<ul>
+<li> first definition of resource R
+
+<ul>
+<li> first use by a real nondebug instruction of the first definition of resource R
+
+</li><li> &hellip;
+
+</li><li> last use by a real nondebug instruction of the first definition of resource R
+</li></ul>
+
+</li><li> second definition of resource R
+
+<ul>
+<li> first use by a real nondebug instruction of the second definition of resource R
+
+</li><li> &hellip;
+
+</li><li> last use by a real nondebug instruction of the second definition of resource R
+</li></ul>
+
+</li><li> &hellip;
+
+</li><li> last definition of resource R
+
+<ul>
+<li> first use by a real nondebug instruction of the last definition of resource R
+
+</li><li> &hellip;
+
+</li><li> last use by a real nondebug instruction of the last definition of resource R
+</li></ul>
+</li></ul>
+
+<p>(Note that clobbers never have uses; only sets do.)
+</p>
+<p>This linear view is easy to achieve when there is only a single definition
+of a resource, which is commonly true for pseudo registers.  However,
+things are more complex  if code has a structure like the following:
+</p>
+<div class="example">
+<pre class="example">// ebb2, bb2
+R = <var>va</var>;        // A
+if (&hellip;)
+  {
+    // ebb2, bb3
+    use1 (R);  // B
+    &hellip;
+    R = <var>vc</var>;    // C
+  }
+else
+  {
+    // ebb4, bb4
+    use2 (R);  // D
+  }
+</pre></div>
+
+<p>The list of accesses would begin as follows:
+</p>
+<ul>
+<li> definition of R by A
+
+<ul>
+<li> use of A&rsquo;s definition of R by B
+</li></ul>
+
+</li><li> definition of R by C
+</li></ul>
+
+<p>The next access to R is in D, but the value of R that D uses comes from
+A rather than C.
+</p>
+<p>This is resolved by adding a phi node for <code>ebb4</code>.  All inputs to this
+phi node have the same value, which in the example above is A&rsquo;s definition
+of R.  In other circumstances, it would not be necessary to create a phi
+node when all inputs are equal, so these phi nodes are referred to as
+&ldquo;degenerate&rdquo; phi nodes.
+</p>
+<p>The full list of accesses to R is therefore:
+</p>
+<ul>
+<li> definition of R by A
+
+<ul>
+<li> use of A&rsquo;s definition of R by B
+</li></ul>
+
+</li><li> definition of R by C
+
+</li><li> definition of R by ebb4&rsquo;s phi instruction, with the input coming from A
+
+<ul>
+<li> use of the ebb4&rsquo;s R phi definition of R by B
+</li></ul>
+</li></ul>
+
+<p>Note that A&rsquo;s definition is also used by ebb4&rsquo;s phi node, but this
+use belongs to the third part of the use list described above and
+so does not form part of the linear sequence.
+</p>
+<p>It is possible to &ldquo;look through&rdquo; any degenerate phi to the ultimate
+definition using the function <code>look_through_degenerate_phi</code>.
+Note that the input to a degenerate phi is never itself provided
+by a degenerate phi.
+</p>
+<p>At present, the SSA form takes this principle one step further
+and guarantees that, for any given resource <var>res</var>, one of the
+following is true:
+</p>
+<ul>
+<li> The resource has a single definition <var>def</var>, which is not a phi node.
+Excluding uses of undefined registers, all uses of <var>res</var> by real
+nondebug instructions use the value provided by <var>def</var>.
+
+</li><li> Excluding uses of undefined registers, all uses of <var>res</var> use
+values provided by definitions that occur earlier in the same
+extended basic block.  These definitions might come from phi nodes
+or from real instructions.
+</li></ul>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Changing-RTL-Instructions.html" accesskey="n" rel="next">Changing RTL Instructions</a>, Previous: <a href="RTL-SSA-Phi-Nodes.html" accesskey="p" rel="prev">RTL SSA Phi Nodes</a>, Up: <a href="RTL-SSA.html" accesskey="u" rel="up">RTL SSA</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

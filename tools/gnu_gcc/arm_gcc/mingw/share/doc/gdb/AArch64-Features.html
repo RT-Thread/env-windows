@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Free Software" and "Free Software Needs
+Free Documentation", with the Front-Cover Texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: "You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom." -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>AArch64 Features (Debugging with GDB)</title>
+
+<meta name="description" content="AArch64 Features (Debugging with GDB)">
+<meta name="keywords" content="AArch64 Features (Debugging with GDB)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Standard-Target-Features.html" rel="up" title="Standard Target Features">
+<link href="ARC-Features.html" rel="next" title="ARC Features">
+<link href="Standard-Target-Features.html" rel="prev" title="Standard Target Features">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="AArch64-Features"></span><div class="header">
+<p>
+Next: <a href="ARC-Features.html" accesskey="n" rel="next">ARC Features</a>, Up: <a href="Standard-Target-Features.html" accesskey="u" rel="up">Standard Target Features</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="AArch64-Features-1"></span><h4 class="subsection">G.5.1 AArch64 Features</h4>
+<span id="index-target-descriptions_002c-AArch64-features"></span>
+
+<span id="AArch64-core-registers-feature"></span><h4 class="subsubsection">G.5.1.1 AArch64 core registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.core</samp>&rsquo; feature is required for AArch64
+targets.  It must contain the following:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>x0</samp>&rsquo; through &lsquo;<samp>x30</samp>&rsquo;, the general purpose registers, with size of
+64 bits.  Register &lsquo;<samp>x30</samp>&rsquo; is also known as the <em>link register</em>,
+or &lsquo;<samp>lr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>sp</samp>&rsquo;, the stack pointer register or &lsquo;<samp>x31</samp>&rsquo;.  It is 64 bits in size and
+has a type of &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>pc</samp>&rsquo;, the program counter register.  It is 64 bits in size and has a type
+of &lsquo;<samp>code_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>cpsr</samp>&rsquo;, the current program status register.  It is 32 bits in size
+and has a custom flags type.
+</li></ul>
+
+<p>The semantics of the individual flags and fields in &lsquo;<samp>cpsr</samp>&rsquo; can change as
+new architectural features are added.  The current layout can be found in the
+aarch64-core.xml file.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="AArch64-floating_002dpoint-registers-feature"></span><h4 class="subsubsection">G.5.1.2 AArch64 floating-point registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.fpu</samp>&rsquo; feature is optional.  If present,
+it must contain the following registers:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>v0</samp>&rsquo; through &lsquo;<samp>v31</samp>&rsquo;, the vector registers with size of 128 bits.  The
+type is a custom vector type.
+</li><li>- &lsquo;<samp>fpsr</samp>&rsquo;, the floating-point status register.  It is 32 bits in size and has
+a custom flags type.
+</li><li>- &lsquo;<samp>fpcr</samp>&rsquo;, the floating-point control register.  It is 32 bits in size and has
+a custom flags type.
+</li></ul>
+
+<p>The semantics of the individual flags and fields in &lsquo;<samp>fpsr</samp>&rsquo; and &lsquo;<samp>fpcr</samp>&rsquo;
+can change as new architectural features are added.
+</p>
+<p>The types for the vector registers, &lsquo;<samp>fpsr</samp>&rsquo; and &lsquo;<samp>fpcr</samp>&rsquo; registers can
+be found in the aarch64-fpu.xml file.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="AArch64-SVE-registers-feature"></span><h4 class="subsubsection">G.5.1.3 AArch64 SVE registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.sve</samp>&rsquo; feature is optional.  If present,
+it means the target supports the Scalable Vector Extension and must contain
+the following registers:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>z0</samp>&rsquo; through &lsquo;<samp>z31</samp>&rsquo;, the scalable vector registers.  Their sizes are
+variable and a multiple of 128 bits up to a maximum of 2048 bit.  Their type is
+a custom union type that helps visualize different sizes of sub-vectors.
+</li><li>- &lsquo;<samp>fpsr</samp>&rsquo;, the floating-point status register.  It is 32 bits in size and has
+a custom flags type.
+</li><li>- &lsquo;<samp>fpcr</samp>&rsquo;, the floating-point control register.  It is 32 bits in size and has
+a custom flags type.
+</li><li>- &lsquo;<samp>p0</samp>&rsquo; through &lsquo;<samp>p15</samp>&rsquo;, the predicate registers.  Their sizes are
+variable, based on the current vector length, and a multiple of
+16 bits.  Their types are a custom union to help visualize sub-elements.
+</li><li>- &lsquo;<samp>ffr</samp>&rsquo;, the First Fault register.  It has a variable size based on the
+current vector length and is a multiple of 16 bits.  The type is the same as
+the predicate registers.
+</li><li>- &lsquo;<samp>vg</samp>&rsquo;, the vector granule.  It represents the number of 64 bits chunks in
+a &lsquo;<samp>z</samp>&rsquo; register.  It is closely associated with the current vector
+length.  It has a type of &lsquo;<samp>int</samp>&rsquo;.
+</li></ul>
+
+<p>When <small>GDB</small> sees the SVE feature, it will assume the Scalable Vector
+Extension is supported, and will adjust the sizes of the &lsquo;<samp>z</samp>&rsquo;, &lsquo;<samp>p</samp>&rsquo;
+and &lsquo;<samp>ffr</samp>&rsquo; registers accordingly, based on the value of &lsquo;<samp>vg</samp>&rsquo;.
+</p>
+<p><small>GDB</small> will also create pseudo-registers equivalent to the &lsquo;<samp>v</samp>&rsquo;
+vector registers from the &lsquo;<samp>org.gnu.gdb.aarch64.fpu</samp>&rsquo; feature.
+</p>
+<p>The first 128 bits of the &lsquo;<samp>z</samp>&rsquo; registers overlap the 128 bits of the
+&lsquo;<samp>v</samp>&rsquo; registers, so changing one will trigger a change to the other.
+</p>
+<p>For the types of the &lsquo;<samp>z</samp>&rsquo;, &lsquo;<samp>p</samp>&rsquo; and &lsquo;<samp>ffr</samp>&rsquo; registers, please
+check the aarch64-sve.c file.  No XML file is available for this feature
+because it is dynamically generated based on the current vector length.
+</p>
+<p>The semantics of the individual flags and fields in &lsquo;<samp>fpsr</samp>&rsquo; and &lsquo;<samp>fpcr</samp>&rsquo;
+can change as new architectural features are added.
+</p>
+<p>The types for the &lsquo;<samp>fpsr</samp>&rsquo; and &lsquo;<samp>fpcr</samp>&rsquo; registers can be found in the
+aarch64-sve.c file, and should match what is described in aarch64-fpu.xml.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="AArch64-Pointer-Authentication-registers-feature"></span><h4 class="subsubsection">G.5.1.4 AArch64 Pointer Authentication registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.pauth</samp>&rsquo; optional feature was introduced so
+<small>GDB</small> could detect support for the Pointer Authentication
+extension.  If present, it must contain one of two possible register sets.
+</p>
+<p>Pointer Authentication masks for user-mode:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>pauth_dmask</samp>&rsquo;, the user-mode pointer authentication mask for data
+pointers.  It is 64 bits in size.
+</li><li>- &lsquo;<samp>pauth_cmask</samp>&rsquo;, the user-mode pointer authentication mask for code
+pointers.  It is 64 bits in size.
+</li></ul>
+
+<p>Pointer Authentication masks for user-mode and kernel-mode:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>pauth_dmask</samp>&rsquo;, the user-mode pointer authentication mask for data
+pointers.  It is 64 bits in size.
+</li><li>- &lsquo;<samp>pauth_cmask</samp>&rsquo;, the user-mode pointer authentication mask for code
+pointers.  It is 64 bits in size.
+</li><li>- &lsquo;<samp>pauth_dmask_high</samp>&rsquo;, the kernel-mode pointer authentication mask for
+data pointers.  It is 64 bits in size.
+</li><li>- &lsquo;<samp>pauth_cmask_high</samp>&rsquo;, the kernel-mode pointer authentication mask for
+code pointers.  It is 64 bits in size.
+</li></ul>
+
+<p>If <small>GDB</small> sees any of the two sets of registers in this feature, it will
+assume the target is capable of signing pointers.  If so, <small>GDB</small> will
+decorate backtraces with a &lsquo;<samp>[PAC]</samp>&rsquo; marker alongside a function that
+has a signed link register value that needs to be unmasked/decoded.
+</p>
+<p><small>GDB</small> will also use the masks to remove non-address bits from pointers.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<p>Please note the &lsquo;<samp>org.gnu.gdb.aarch64.pauth</samp>&rsquo; feature string is deprecated
+and must only be used for backwards compatibility with older releases of
+<small>GDB</small> and <code>gdbserver</code>.  Targets that support Pointer
+Authentication must advertise such capability by using the
+&lsquo;<samp>org.gnu.gdb.aarch64.pauth_v2</samp>&rsquo; feature string instead.
+</p>
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.pauth_v2</samp>&rsquo; feature has the exact same contents
+as feature &lsquo;<samp>org.gnu.gdb.aarch64.pauth</samp>&rsquo;.
+</p>
+<p>The reason for having feature &lsquo;<samp>org.gnu.gdb.aarch64.pauth_v2</samp>&rsquo; is a bug in
+previous versions of <small>GDB</small> (versions 9, 10, 11 and 12).  This bug
+caused <small>GDB</small> to crash whenever the target reported support for Pointer
+Authentication (using feature string &lsquo;<samp>org.gnu.gdb.aarch64.pauth</samp>&rsquo;) and also
+reported additional system registers that were not accounted for by
+<small>GDB</small>.  This is more common when using emulators and on bare-metal
+debugging scenarios.
+</p>
+<p>It can also happen if a newer gdbserver is used with an old <small>GDB</small> that
+has the bug.  In such a case, the newer gdbserver might report Pointer
+Authentication support via the &lsquo;<samp>org.gnu.gdb.aarch64.pauth</samp>&rsquo; feature string
+and also report additional registers the older <small>GDB</small> does not know
+about, potentially leading to a crash.
+</p>
+<span id="AArch64-TLS-registers-feature"></span><h4 class="subsubsection">G.5.1.5 AArch64 TLS registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.tls</samp>&rsquo; optional feature was introduced to expose
+the TLS registers to <small>GDB</small>.  If present, it must contain either one
+of the following register sets.
+</p>
+<p>Only &lsquo;<samp>tpidr</samp>&rsquo;:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>tpidr</samp>&rsquo;, the software thread id register.  It is 64 bits in size and has a
+type of &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li></ul>
+
+<p>Both &lsquo;<samp>tpidr</samp>&rsquo; and &lsquo;<samp>tpidr2</samp>&rsquo;.
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>tpidr</samp>&rsquo;, the software thread id register.  It is 64 bits in size and has a
+type of &lsquo;<samp>data_ptr</samp>&rsquo;.
+</li><li>- &lsquo;<samp>tpidr2</samp>&rsquo;, the second software thread id register.  It is 64 bits in size
+and has a type of &lsquo;<samp>data_ptr</samp>&rsquo;.  It may be used in the future alongside
+the Scalable Matrix Extension for a lazy restore scheme.
+</li></ul>
+
+<p>If <small>GDB</small> sees this feature, it will attempt to find one of the
+variations of the register set.  If &lsquo;<samp>tpidr2</samp>&rsquo; is available,
+<small>GDB</small> may act on it to display additional data in the future.
+</p>
+<p>There is no XML for this feature as the presence of &lsquo;<samp>tpidr2</samp>&rsquo; is
+determined dynamically at runtime.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="AArch64-MTE-registers-feature"></span><h4 class="subsubsection">G.5.1.6 AArch64 MTE registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.mte</samp>&rsquo; optional feature was introduced so
+<small>GDB</small> could detect support for the Memory Tagging Extension and
+control memory tagging settings.  If present, this feature must have the
+following register:
+</p>
+<ul class="no-bullet">
+<li>- &lsquo;<samp>tag_ctl</samp>&rsquo;, the tag control register.  It is 64 bits in size and has a type
+of &lsquo;<samp>uint64</samp>&rsquo;.
+</li></ul>
+
+<p>Memory Tagging detection is done via a runtime check though, so the presence
+of this feature and register is not enough to enable memory tagging support.
+</p>
+<p>This restriction may be lifted in the future.
+</p>
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<span id="AArch64-SME-registers-feature"></span><h4 class="subsubsection">G.5.1.7 AArch64 SME registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.sme</samp>&rsquo; feature is optional.  If present,
+it should contain registers <code>ZA</code>, <code>SVG</code> and <code>SVCR</code>.
+See <a href="AArch64.html#AArch64-SME">AArch64 SME</a>.
+</p>
+<ul class="no-bullet">
+<li>- <code>ZA</code> is a register represented by a vector of <var>svl</var>x<var>svl</var>
+bytes.  See <a href="AArch64.html#svl">svl</a>.
+
+</li><li>- <code>SVG</code> is a 64-bit register containing the value of <var>svg</var>.  See <a href="AArch64.html#svg">svg</a>.
+
+</li><li>- <code>SVCR</code> is a 64-bit status pseudo-register with two valid bits.  Bit 0
+(<small>SM</small>) shows whether the streaming <acronym>SVE</acronym> mode is enabled or disabled.
+Bit 1 (<small>ZA</small>) shows whether the <code>ZA</code> register state is active (in use) or
+not.
+See <a href="AArch64.html#aarch64-sme-svcr">aarch64 sme svcr</a>.
+
+<p>The rest of the unused bits of the <code>SVCR</code> pseudo-register is undefined
+and reserved.  Such bits should not be used and may be defined by future
+extensions of the architecture.
+</p>
+</li></ul>
+
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.sme</samp>&rsquo; feature is required when the target also
+reports support for the &lsquo;<samp>org.gnu.gdb.aarch64.sme2</samp>&rsquo; feature.
+</p>
+<span id="AArch64-SME2-registers-feature"></span><h4 class="subsubsection">G.5.1.8 AArch64 SME2 registers feature</h4>
+
+<p>The &lsquo;<samp>org.gnu.gdb.aarch64.sme2</samp>&rsquo; feature is optional.  If present,
+then the &lsquo;<samp>org.gnu.gdb.aarch64.sme</samp>&rsquo; feature must also be present.  The
+&lsquo;<samp>org.gnu.gdb.aarch64.sme2</samp>&rsquo; feature should contain the following:
+See <a href="AArch64.html#AArch64-SME2">AArch64 SME2</a>.
+</p>
+<ul class="no-bullet">
+<li>- <code>ZT0</code> is a register of 512 bits (64 bytes).  It is defined as a vector
+of bytes.
+
+</li></ul>
+
+<p>Extra registers are allowed in this feature, but they will not affect
+<small>GDB</small>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="ARC-Features.html" accesskey="n" rel="next">ARC Features</a>, Up: <a href="Standard-Target-Features.html" accesskey="u" rel="up">Standard Target Features</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

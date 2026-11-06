@@ -1,0 +1,924 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Overall Options (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="Overall Options (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="Overall Options (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Invoking-GCC.html" rel="up" title="Invoking GCC">
+<link href="Invoking-G_002b_002b.html" rel="next" title="Invoking G++">
+<link href="Option-Summary.html" rel="prev" title="Option Summary">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="Overall-Options"></span><div class="header">
+<p>
+Next: <a href="Invoking-G_002b_002b.html" accesskey="n" rel="next">Invoking G++</a>, Previous: <a href="Option-Summary.html" accesskey="p" rel="prev">Option Summary</a>, Up: <a href="Invoking-GCC.html" accesskey="u" rel="up">Invoking GCC</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Options-Controlling-the-Kind-of-Output"></span><h3 class="section">3.2 Options Controlling the Kind of Output</h3>
+
+<p>Compilation can involve up to four stages: preprocessing, compilation
+proper, assembly and linking, always in that order.  GCC is capable of
+preprocessing and compiling several files either into several
+assembler input files, or into one assembler input file; then each
+assembler input file produces an object file, and linking combines all
+the object files (those newly compiled, and those specified as input)
+into an executable file.
+</p>
+<span id="index-file-name-suffix"></span>
+<p>For any given input file, the file name suffix determines what kind of
+compilation is done:
+</p>
+<dl compact="compact">
+<dt><code><var>file</var>.c</code></dt>
+<dd><p>C source code that must be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.i</code></dt>
+<dd><p>C source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.ii</code></dt>
+<dd><p>C++ source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.m</code></dt>
+<dd><p>Objective-C source code.  Note that you must link with the <samp>libobjc</samp>
+library to make an Objective-C program work.
+</p>
+</dd>
+<dt><code><var>file</var>.mi</code></dt>
+<dd><p>Objective-C source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.mm</code></dt>
+<dt><code><var>file</var>.M</code></dt>
+<dd><p>Objective-C++ source code.  Note that you must link with the <samp>libobjc</samp>
+library to make an Objective-C++ program work.  Note that &lsquo;<samp>.M</samp>&rsquo; refers
+to a literal capital M.
+</p>
+</dd>
+<dt><code><var>file</var>.mii</code></dt>
+<dd><p>Objective-C++ source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.h</code></dt>
+<dd><p>C, C++, Objective-C or Objective-C++ header file to be turned into a
+precompiled header (default), or C, C++ header file to be turned into an
+Ada spec (via the <samp>-fdump-ada-spec</samp> switch).
+</p>
+</dd>
+<dt><code><var>file</var>.cc</code></dt>
+<dt><code><var>file</var>.cp</code></dt>
+<dt><code><var>file</var>.cxx</code></dt>
+<dt><code><var>file</var>.cpp</code></dt>
+<dt><code><var>file</var>.CPP</code></dt>
+<dt><code><var>file</var>.c++</code></dt>
+<dt><code><var>file</var>.C</code></dt>
+<dd><p>C++ source code that must be preprocessed.  Note that in &lsquo;<samp>.cxx</samp>&rsquo;,
+the last two letters must both be literally &lsquo;<samp>x</samp>&rsquo;.  Likewise,
+&lsquo;<samp>.C</samp>&rsquo; refers to a literal capital C.
+</p>
+</dd>
+<dt><code><var>file</var>.mm</code></dt>
+<dt><code><var>file</var>.M</code></dt>
+<dd><p>Objective-C++ source code that must be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.mii</code></dt>
+<dd><p>Objective-C++ source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.hh</code></dt>
+<dt><code><var>file</var>.H</code></dt>
+<dt><code><var>file</var>.hp</code></dt>
+<dt><code><var>file</var>.hxx</code></dt>
+<dt><code><var>file</var>.hpp</code></dt>
+<dt><code><var>file</var>.HPP</code></dt>
+<dt><code><var>file</var>.h++</code></dt>
+<dt><code><var>file</var>.tcc</code></dt>
+<dd><p>C++ header file to be turned into a precompiled header or Ada spec.
+</p>
+</dd>
+<dt><code><var>file</var>.f</code></dt>
+<dt><code><var>file</var>.for</code></dt>
+<dt><code><var>file</var>.ftn</code></dt>
+<dd><p>Fixed form Fortran source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.F</code></dt>
+<dt><code><var>file</var>.FOR</code></dt>
+<dt><code><var>file</var>.fpp</code></dt>
+<dt><code><var>file</var>.FPP</code></dt>
+<dt><code><var>file</var>.FTN</code></dt>
+<dd><p>Fixed form Fortran source code that must be preprocessed (with the traditional
+preprocessor).
+</p>
+</dd>
+<dt><code><var>file</var>.f90</code></dt>
+<dt><code><var>file</var>.f95</code></dt>
+<dt><code><var>file</var>.f03</code></dt>
+<dt><code><var>file</var>.f08</code></dt>
+<dd><p>Free form Fortran source code that should not be preprocessed.
+</p>
+</dd>
+<dt><code><var>file</var>.F90</code></dt>
+<dt><code><var>file</var>.F95</code></dt>
+<dt><code><var>file</var>.F03</code></dt>
+<dt><code><var>file</var>.F08</code></dt>
+<dd><p>Free form Fortran source code that must be preprocessed (with the
+traditional preprocessor).
+</p>
+</dd>
+<dt><code><var>file</var>.go</code></dt>
+<dd><p>Go source code.
+</p>
+</dd>
+<dt><code><var>file</var>.d</code></dt>
+<dd><p>D source code.
+</p>
+</dd>
+<dt><code><var>file</var>.di</code></dt>
+<dd><p>D interface file.
+</p>
+</dd>
+<dt><code><var>file</var>.dd</code></dt>
+<dd><p>D documentation code (Ddoc).
+</p>
+</dd>
+<dt><code><var>file</var>.ads</code></dt>
+<dd><p>Ada source code file that contains a library unit declaration (a
+declaration of a package, subprogram, or generic, or a generic
+instantiation), or a library unit renaming declaration (a package,
+generic, or subprogram renaming declaration).  Such files are also
+called <em>specs</em>.
+</p>
+</dd>
+<dt><code><var>file</var>.adb</code></dt>
+<dd><p>Ada source code file containing a library unit body (a subprogram or
+package body).  Such files are also called <em>bodies</em>.
+</p>
+
+</dd>
+<dt><code><var>file</var>.s</code></dt>
+<dd><p>Assembler code.
+</p>
+</dd>
+<dt><code><var>file</var>.S</code></dt>
+<dt><code><var>file</var>.sx</code></dt>
+<dd><p>Assembler code that must be preprocessed.
+</p>
+</dd>
+<dt><code><var>other</var></code></dt>
+<dd><p>An object file to be fed straight into linking.
+Any file name with no recognized suffix is treated this way.
+</p></dd>
+</dl>
+
+<span id="index-x"></span>
+<p>You can specify the input language explicitly with the <samp>-x</samp> option:
+</p>
+<dl compact="compact">
+<dt><code>-x <var>language</var></code></dt>
+<dd><p>Specify explicitly the <var>language</var> for the following input files
+(rather than letting the compiler choose a default based on the file
+name suffix).  This option applies to all following input files until
+the next <samp>-x</samp> option.  Possible values for <var>language</var> are:
+</p><div class="example">
+<pre class="example">c  c-header  cpp-output
+c++  c++-header  c++-system-header c++-user-header c++-cpp-output
+objective-c  objective-c-header  objective-c-cpp-output
+objective-c++ objective-c++-header objective-c++-cpp-output
+assembler  assembler-with-cpp
+ada
+d
+f77  f77-cpp-input f95  f95-cpp-input
+go
+</pre></div>
+
+</dd>
+<dt><code>-x none</code></dt>
+<dd><p>Turn off any specification of a language, so that subsequent files are
+handled according to their file name suffixes (as they are if <samp>-x</samp>
+has not been used at all).
+</p></dd>
+</dl>
+
+<p>If you only want some of the stages of compilation, you can use
+<samp>-x</samp> (or filename suffixes) to tell <code>gcc</code> where to start, and
+one of the options <samp>-c</samp>, <samp>-S</samp>, or <samp>-E</samp> to say where
+<code>gcc</code> is to stop.  Note that some combinations (for example,
+&lsquo;<samp>-x cpp-output -E</samp>&rsquo;) instruct <code>gcc</code> to do nothing at all.
+</p>
+<dl compact="compact">
+<dd><span id="index-c"></span>
+</dd>
+<dt><code>-c</code></dt>
+<dd><p>Compile or assemble the source files, but do not link.  The linking
+stage simply is not done.  The ultimate output is in the form of an
+object file for each source file.
+</p>
+<p>By default, the object file name for a source file is made by replacing
+the suffix &lsquo;<samp>.c</samp>&rsquo;, &lsquo;<samp>.i</samp>&rsquo;, &lsquo;<samp>.s</samp>&rsquo;, etc., with &lsquo;<samp>.o</samp>&rsquo;.
+</p>
+<p>Unrecognized input files, not requiring compilation or assembly, are
+ignored.
+</p>
+<span id="index-S"></span>
+</dd>
+<dt><code>-S</code></dt>
+<dd><p>Stop after the stage of compilation proper; do not assemble.  The output
+is in the form of an assembler code file for each non-assembler input
+file specified.
+</p>
+<p>By default, the assembler file name for a source file is made by
+replacing the suffix &lsquo;<samp>.c</samp>&rsquo;, &lsquo;<samp>.i</samp>&rsquo;, etc., with &lsquo;<samp>.s</samp>&rsquo;.
+</p>
+<p>Input files that don&rsquo;t require compilation are ignored.
+</p>
+<span id="index-E"></span>
+</dd>
+<dt><code>-E</code></dt>
+<dd><p>Stop after the preprocessing stage; do not run the compiler proper.  The
+output is in the form of preprocessed source code, which is sent to the
+standard output.
+</p>
+<p>Input files that don&rsquo;t require preprocessing are ignored.
+</p>
+<span id="index-output-file-option"></span>
+<span id="index-o"></span>
+</dd>
+<dt><code>-o <var>file</var></code></dt>
+<dd><p>Place the primary output in file <var>file</var>.  This applies to whatever
+sort of output is being produced, whether it be an executable file, an
+object file, an assembler file or preprocessed C code.
+</p>
+<p>If <samp>-o</samp> is not specified, the default is to put an executable
+file in <samp>a.out</samp>, the object file for
+<samp><var>source</var>.<var>suffix</var></samp> in <samp><var>source</var>.o</samp>, its
+assembler file in <samp><var>source</var>.s</samp>, a precompiled header file in
+<samp><var>source</var>.<var>suffix</var>.gch</samp>, and all preprocessed C source on
+standard output.
+</p>
+<p>Though <samp>-o</samp> names only the primary output, it also affects the
+naming of auxiliary and dump outputs.  See the examples below.  Unless
+overridden, both auxiliary outputs and dump outputs are placed in the
+same directory as the primary output.  In auxiliary outputs, the suffix
+of the input file is replaced with that of the auxiliary output file
+type; in dump outputs, the suffix of the dump file is appended to the
+input file suffix.  In compilation commands, the base name of both
+auxiliary and dump outputs is that of the primary output; in compile and
+link commands, the primary output name, minus the executable suffix, is
+combined with the input file name.  If both share the same base name,
+disregarding the suffix, the result of the combination is that base
+name, otherwise, they are concatenated, separated by a dash.
+</p>
+<div class="example">
+<pre class="example">gcc -c foo.c ...
+</pre></div>
+
+<p>will use <samp>foo.o</samp> as the primary output, and place aux outputs and
+dumps next to it, e.g., aux file <samp>foo.dwo</samp> for
+<samp>-gsplit-dwarf</samp>, and dump file <samp>foo.c.???r.final</samp> for
+<samp>-fdump-rtl-final</samp>.
+</p>
+<p>If a non-linker output file is explicitly specified, aux and dump files
+by default take the same base name:
+</p>
+<div class="example">
+<pre class="example">gcc -c foo.c -o dir/foobar.o ...
+</pre></div>
+
+<p>will name aux outputs <samp>dir/foobar.*</samp> and dump outputs
+<samp>dir/foobar.c.*</samp>.
+</p>
+<p>A linker output will instead prefix aux and dump outputs:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -o dir/foobar ...
+</pre></div>
+
+<p>will generally name aux outputs <samp>dir/foobar-foo.*</samp> and
+<samp>dir/foobar-bar.*</samp>, and dump outputs <samp>dir/foobar-foo.c.*</samp> and
+<samp>dir/foobar-bar.c.*</samp>.
+</p>
+<p>The one exception to the above is when the executable shares the base
+name with the single input:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c -o dir/foo ...
+</pre></div>
+
+<p>in which case aux outputs are named <samp>dir/foo.*</samp> and dump outputs
+named <samp>dir/foo.c.*</samp>.
+</p>
+<p>The location and the names of auxiliary and dump outputs can be adjusted
+by the options <samp>-dumpbase</samp>, <samp>-dumpbase-ext</samp>,
+<samp>-dumpdir</samp>, <samp>-save-temps=cwd</samp>, and
+<samp>-save-temps=obj</samp>.
+</p>
+
+<span id="index-dumpbase"></span>
+</dd>
+<dt><code>-dumpbase <var>dumpbase</var></code></dt>
+<dd><p>This option sets the base name for auxiliary and dump output files.  It
+does not affect the name of the primary output file.  Intermediate
+outputs, when preserved, are not regarded as primary outputs, but as
+auxiliary outputs:
+</p>
+<div class="example">
+<pre class="example">gcc -save-temps -S foo.c
+</pre></div>
+
+<p>saves the (no longer) temporary preprocessed file in <samp>foo.i</samp>, and
+then compiles to the (implied) output file <samp>foo.s</samp>, whereas:
+</p>
+<div class="example">
+<pre class="example">gcc -save-temps -dumpbase save-foo -c foo.c
+</pre></div>
+
+<p>preprocesses to in <samp>save-foo.i</samp>, compiles to <samp>save-foo.s</samp> (now
+an intermediate, thus auxiliary output), and then assembles to the
+(implied) output file <samp>foo.o</samp>.
+</p>
+<p>Absent this option, dump and aux files take their names from the input
+file, or from the (non-linker) output file, if one is explicitly
+specified: dump output files (e.g. those requested by <samp>-fdump-*</samp>
+options) with the input name suffix, and aux output files (those
+requested by other non-dump options, e.g. <code>-save-temps</code>,
+<code>-gsplit-dwarf</code>, <code>-fcallgraph-info</code>) without it.
+</p>
+<p>Similar suffix differentiation of dump and aux outputs can be attained
+for explicitly-given <samp>-dumpbase basename.suf</samp> by also specifying
+<samp>-dumpbase-ext .suf</samp>.
+</p>
+<p>If <var>dumpbase</var> is explicitly specified with any directory component,
+any <var>dumppfx</var> specification (e.g. <samp>-dumpdir</samp> or
+<samp>-save-temps=*</samp>) is ignored, and instead of appending to it,
+<var>dumpbase</var> fully overrides it:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c -c -o dir/foo.o -dumpbase alt/foo \
+  -dumpdir pfx- -save-temps=cwd ...
+</pre></div>
+
+<p>creates auxiliary and dump outputs named <samp>alt/foo.*</samp>, disregarding
+<samp>dir/</samp> in <samp>-o</samp>, the <samp>./</samp> prefix implied by
+<samp>-save-temps=cwd</samp>, and <samp>pfx-</samp> in <samp>-dumpdir</samp>.
+</p>
+<p>When <samp>-dumpbase</samp> is specified in a command that compiles multiple
+inputs, or that compiles and then links, it may be combined with
+<var>dumppfx</var>, as specified under <samp>-dumpdir</samp>.  Then, each input
+file is compiled using the combined <var>dumppfx</var>, and default values
+for <var>dumpbase</var> and <var>auxdropsuf</var> are computed for each input
+file:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -c -dumpbase main ...
+</pre></div>
+
+<p>creates <samp>foo.o</samp> and <samp>bar.o</samp> as primary outputs, and avoids
+overwriting the auxiliary and dump outputs by using the <var>dumpbase</var>
+as a prefix, creating auxiliary and dump outputs named <samp>main-foo.*</samp>
+and <samp>main-bar.*</samp>.
+</p>
+<p>An empty string specified as <var>dumpbase</var> avoids the influence of the
+output basename in the naming of auxiliary and dump outputs during
+compilation, computing default values :
+</p>
+<div class="example">
+<pre class="example">gcc -c foo.c -o dir/foobar.o -dumpbase '' ...
+</pre></div>
+
+<p>will name aux outputs <samp>dir/foo.*</samp> and dump outputs
+<samp>dir/foo.c.*</samp>.  Note how their basenames are taken from the input
+name, but the directory still defaults to that of the output.
+</p>
+<p>The empty-string dumpbase does not prevent the use of the output
+basename for outputs during linking:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -o dir/foobar -dumpbase '' -flto ...
+</pre></div>
+
+<p>The compilation of the source files will name auxiliary outputs
+<samp>dir/foo.*</samp> and <samp>dir/bar.*</samp>, and dump outputs
+<samp>dir/foo.c.*</samp> and <samp>dir/bar.c.*</samp>.  LTO recompilation during
+linking will use <samp>dir/foobar.</samp> as the prefix for dumps and
+auxiliary files.
+</p>
+
+<span id="index-dumpbase_002dext"></span>
+</dd>
+<dt><code>-dumpbase-ext <var>auxdropsuf</var></code></dt>
+<dd><p>When forming the name of an auxiliary (but not a dump) output file, drop
+trailing <var>auxdropsuf</var> from <var>dumpbase</var> before appending any
+suffixes.  If not specified, this option defaults to the suffix of a
+default <var>dumpbase</var>, i.e., the suffix of the input file when
+<samp>-dumpbase</samp> is not present in the command line, or <var>dumpbase</var>
+is combined with <var>dumppfx</var>.
+</p>
+<div class="example">
+<pre class="example">gcc foo.c -c -o dir/foo.o -dumpbase x-foo.c -dumpbase-ext .c ...
+</pre></div>
+
+<p>creates <samp>dir/foo.o</samp> as the main output, and generates auxiliary
+outputs in <samp>dir/x-foo.*</samp>, taking the location of the primary
+output, and dropping the <samp>.c</samp> suffix from the <var>dumpbase</var>.  Dump
+outputs retain the suffix: <samp>dir/x-foo.c.*</samp>.
+</p>
+<p>This option is disregarded if it does not match the suffix of a
+specified <var>dumpbase</var>, except as an alternative to the executable
+suffix when appending the linker output base name to <var>dumppfx</var>, as
+specified below:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -o main.out -dumpbase-ext .out ...
+</pre></div>
+
+<p>creates <samp>main.out</samp> as the primary output, and avoids overwriting
+the auxiliary and dump outputs by using the executable name minus
+<var>auxdropsuf</var> as a prefix, creating auxiliary outputs named
+<samp>main-foo.*</samp> and <samp>main-bar.*</samp> and dump outputs named
+<samp>main-foo.c.*</samp> and <samp>main-bar.c.*</samp>.
+</p>
+
+<span id="index-dumpdir"></span>
+</dd>
+<dt><code>-dumpdir <var>dumppfx</var></code></dt>
+<dd><p>When forming the name of an auxiliary or dump output file, use
+<var>dumppfx</var> as a prefix:
+</p>
+<div class="example">
+<pre class="example">gcc -dumpdir pfx- -c foo.c ...
+</pre></div>
+
+<p>creates <samp>foo.o</samp> as the primary output, and auxiliary outputs named
+<samp>pfx-foo.*</samp>, combining the given <var>dumppfx</var> with the default
+<var>dumpbase</var> derived from the default primary output, derived in turn
+from the input name.  Dump outputs also take the input name suffix:
+<samp>pfx-foo.c.*</samp>.
+</p>
+<p>If <var>dumppfx</var> is to be used as a directory name, it must end with a
+directory separator:
+</p>
+<div class="example">
+<pre class="example">gcc -dumpdir dir/ -c foo.c -o obj/bar.o ...
+</pre></div>
+
+<p>creates <samp>obj/bar.o</samp> as the primary output, and auxiliary outputs
+named <samp>dir/bar.*</samp>, combining the given <var>dumppfx</var> with the
+default <var>dumpbase</var> derived from the primary output name.  Dump
+outputs also take the input name suffix: <samp>dir/bar.c.*</samp>.
+</p>
+<p>It defaults to the location of the output file, unless the output
+file is a special file like <code>/dev/null</code>. Options
+<samp>-save-temps=cwd</samp> and <samp>-save-temps=obj</samp> override this
+default, just like an explicit <samp>-dumpdir</samp> option.  In case
+multiple such options are given, the last one prevails:
+</p>
+<div class="example">
+<pre class="example">gcc -dumpdir pfx- -c foo.c -save-temps=obj ...
+</pre></div>
+
+<p>outputs <samp>foo.o</samp>, with auxiliary outputs named <samp>foo.*</samp> because
+<samp>-save-temps=*</samp> overrides the <var>dumppfx</var> given by the earlier
+<samp>-dumpdir</samp> option.  It does not matter that <samp>=obj</samp> is the
+default for <samp>-save-temps</samp>, nor that the output directory is
+implicitly the current directory.  Dump outputs are named
+<samp>foo.c.*</samp>.
+</p>
+<p>When compiling from multiple input files, if <samp>-dumpbase</samp> is
+specified, <var>dumpbase</var>, minus a <var>auxdropsuf</var> suffix, and a dash
+are appended to (or override, if containing any directory components) an
+explicit or defaulted <var>dumppfx</var>, so that each of the multiple
+compilations gets differently-named aux and dump outputs.
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -c -dumpdir dir/pfx- -dumpbase main ...
+</pre></div>
+
+<p>outputs auxiliary dumps to <samp>dir/pfx-main-foo.*</samp> and
+<samp>dir/pfx-main-bar.*</samp>, appending <var>dumpbase</var>- to <var>dumppfx</var>.
+Dump outputs retain the input file suffix: <samp>dir/pfx-main-foo.c.*</samp>
+and <samp>dir/pfx-main-bar.c.*</samp>, respectively.  Contrast with the
+single-input compilation:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c -c -dumpdir dir/pfx- -dumpbase main ...
+</pre></div>
+
+<p>that, applying <samp>-dumpbase</samp> to a single source, does not compute
+and append a separate <var>dumpbase</var> per input file.  Its auxiliary and
+dump outputs go in <samp>dir/pfx-main.*</samp>.
+</p>
+<p>When compiling and then linking from multiple input files, a defaulted
+or explicitly specified <var>dumppfx</var> also undergoes the <var>dumpbase</var>-
+transformation above (e.g. the compilation of <samp>foo.c</samp> and
+<samp>bar.c</samp> above, but without <samp>-c</samp>).  If neither
+<samp>-dumpdir</samp> nor <samp>-dumpbase</samp> are given, the linker output
+base name, minus <var>auxdropsuf</var>, if specified, or the executable
+suffix otherwise, plus a dash is appended to the default <var>dumppfx</var>
+instead.  Note, however, that unlike earlier cases of linking:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c bar.c -dumpdir dir/pfx- -o main ...
+</pre></div>
+
+<p>does not append the output name <samp>main</samp> to <var>dumppfx</var>, because
+<samp>-dumpdir</samp> is explicitly specified.  The goal is that the
+explicitly-specified <var>dumppfx</var> may contain the specified output name
+as part of the prefix, if desired; only an explicitly-specified
+<samp>-dumpbase</samp> would be combined with it, in order to avoid simply
+discarding a meaningful option.
+</p>
+<p>When compiling and then linking from a single input file, the linker
+output base name will only be appended to the default <var>dumppfx</var> as
+above if it does not share the base name with the single input file
+name.  This has been covered in single-input linking cases above, but
+not with an explicit <samp>-dumpdir</samp> that inhibits the combination,
+even if overridden by <samp>-save-temps=*</samp>:
+</p>
+<div class="example">
+<pre class="example">gcc foo.c -dumpdir alt/pfx- -o dir/main.exe -save-temps=cwd ...
+</pre></div>
+
+<p>Auxiliary outputs are named <samp>foo.*</samp>, and dump outputs
+<samp>foo.c.*</samp>, in the current working directory as ultimately requested
+by <samp>-save-temps=cwd</samp>.
+</p>
+<p>Summing it all up for an intuitive though slightly imprecise data flow:
+the primary output name is broken into a directory part and a basename
+part; <var>dumppfx</var> is set to the former, unless overridden by
+<samp>-dumpdir</samp> or <samp>-save-temps=*</samp>, and <var>dumpbase</var> is set
+to the latter, unless overriden by <samp>-dumpbase</samp>.  If there are
+multiple inputs or linking, this <var>dumpbase</var> may be combined with
+<var>dumppfx</var> and taken from each input file.  Auxiliary output names
+for each input are formed by combining <var>dumppfx</var>, <var>dumpbase</var>
+minus suffix, and the auxiliary output suffix; dump output names are
+only different in that the suffix from <var>dumpbase</var> is retained.
+</p>
+<p>When it comes to auxiliary and dump outputs created during LTO
+recompilation, a combination of <var>dumppfx</var> and <var>dumpbase</var>, as
+given or as derived from the linker output name but not from inputs,
+even in cases in which this combination would not otherwise be used as
+such, is passed down with a trailing period replacing the compiler-added
+dash, if any, as a <samp>-dumpdir</samp> option to <code>lto-wrapper</code>;
+being involved in linking, this program does not normally get any
+<samp>-dumpbase</samp> and <samp>-dumpbase-ext</samp>, and it ignores them.
+</p>
+<p>When running sub-compilers, <code>lto-wrapper</code> appends LTO stage
+names to the received <var>dumppfx</var>, ensures it contains a directory
+component so that it overrides any <samp>-dumpdir</samp>, and passes that as
+<samp>-dumpbase</samp> to sub-compilers.
+</p>
+<span id="index-v"></span>
+</dd>
+<dt><code>-v</code></dt>
+<dd><p>Print (on standard error output) the commands executed to run the stages
+of compilation.  Also print the version number of the compiler driver
+program and of the preprocessor and the compiler proper.
+</p>
+<span id="index-_0023_0023_0023"></span>
+</dd>
+<dt><code>-###</code></dt>
+<dd><p>Like <samp>-v</samp> except the commands are not executed and arguments
+are quoted unless they contain only alphanumeric characters or <code>./-_</code>.
+This is useful for shell scripts to capture the driver-generated command lines.
+</p>
+<span id="index-help"></span>
+</dd>
+<dt><code>--help</code></dt>
+<dd><p>Print (on the standard output) a description of the command-line options
+understood by <code>gcc</code>.  If the <samp>-v</samp> option is also specified
+then <samp>--help</samp> is also passed on to the various processes
+invoked by <code>gcc</code>, so that they can display the command-line options
+they accept.  If the <samp>-Wextra</samp> option has also been specified
+(prior to the <samp>--help</samp> option), then command-line options that
+have no documentation associated with them are also displayed.
+</p>
+<span id="index-target_002dhelp"></span>
+</dd>
+<dt><code>--target-help</code></dt>
+<dd><p>Print (on the standard output) a description of target-specific command-line
+options for each tool.  For some targets extra target-specific
+information may also be printed.
+</p>
+</dd>
+<dt><code>--help={<var>class</var><span class="roman">|[</span>^<span class="roman">]</span><var>qualifier</var>}<span class="roman">[</span>,&hellip;<span class="roman">]</span></code></dt>
+<dd><p>Print (on the standard output) a description of the command-line
+options understood by the compiler that fit into all specified classes
+and qualifiers.  These are the supported classes:
+</p>
+<dl compact="compact">
+<dt>&lsquo;<samp>optimizers</samp>&rsquo;</dt>
+<dd><p>Display all of the optimization options supported by the
+compiler.
+</p>
+</dd>
+<dt>&lsquo;<samp>warnings</samp>&rsquo;</dt>
+<dd><p>Display all of the options controlling warning messages
+produced by the compiler.
+</p>
+</dd>
+<dt>&lsquo;<samp>target</samp>&rsquo;</dt>
+<dd><p>Display target-specific options.  Unlike the
+<samp>--target-help</samp> option however, target-specific options of the
+linker and assembler are not displayed.  This is because those
+tools do not currently support the extended <samp>--help=</samp> syntax.
+</p>
+</dd>
+<dt>&lsquo;<samp>params</samp>&rsquo;</dt>
+<dd><p>Display the values recognized by the <samp>--param</samp>
+option.
+</p>
+</dd>
+<dt><var>language</var></dt>
+<dd><p>Display the options supported for <var>language</var>, where
+<var>language</var> is the name of one of the languages supported in this
+version of GCC.  If an option is supported by all languages, one needs
+to select &lsquo;<samp>common</samp>&rsquo; class.
+</p>
+</dd>
+<dt>&lsquo;<samp>common</samp>&rsquo;</dt>
+<dd><p>Display the options that are common to all languages.
+</p></dd>
+</dl>
+
+<p>These are the supported qualifiers:
+</p>
+<dl compact="compact">
+<dt>&lsquo;<samp>undocumented</samp>&rsquo;</dt>
+<dd><p>Display only those options that are undocumented.
+</p>
+</dd>
+<dt>&lsquo;<samp>joined</samp>&rsquo;</dt>
+<dd><p>Display options taking an argument that appears after an equal
+sign in the same continuous piece of text, such as:
+&lsquo;<samp>--help=target</samp>&rsquo;.
+</p>
+</dd>
+<dt>&lsquo;<samp>separate</samp>&rsquo;</dt>
+<dd><p>Display options taking an argument that appears as a separate word
+following the original option, such as: &lsquo;<samp>-o output-file</samp>&rsquo;.
+</p></dd>
+</dl>
+
+<p>Thus for example to display all the undocumented target-specific
+switches supported by the compiler, use:
+</p>
+<div class="example">
+<pre class="example">--help=target,undocumented
+</pre></div>
+
+<p>The sense of a qualifier can be inverted by prefixing it with the
+&lsquo;<samp>^</samp>&rsquo; character, so for example to display all binary warning
+options (i.e., ones that are either on or off and that do not take an
+argument) that have a description, use:
+</p>
+<div class="example">
+<pre class="example">--help=warnings,^joined,^undocumented
+</pre></div>
+
+<p>The argument to <samp>--help=</samp> should not consist solely of inverted
+qualifiers.
+</p>
+<p>Combining several classes is possible, although this usually
+restricts the output so much that there is nothing to display.  One
+case where it does work, however, is when one of the classes is
+<var>target</var>.  For example, to display all the target-specific
+optimization options, use:
+</p>
+<div class="example">
+<pre class="example">--help=target,optimizers
+</pre></div>
+
+<p>The <samp>--help=</samp> option can be repeated on the command line.  Each
+successive use displays its requested class of options, skipping
+those that have already been displayed.  If <samp>--help</samp> is also
+specified anywhere on the command line then this takes precedence
+over any <samp>--help=</samp> option.
+</p>
+<p>If the <samp>-Q</samp> option appears on the command line before the
+<samp>--help=</samp> option, then the descriptive text displayed by
+<samp>--help=</samp> is changed.  Instead of describing the displayed
+options, an indication is given as to whether the option is enabled,
+disabled or set to a specific value (assuming that the compiler
+knows this at the point where the <samp>--help=</samp> option is used).
+</p>
+<p>Here is a truncated example from the ARM port of <code>gcc</code>:
+</p>
+<div class="example">
+<pre class="example">  % gcc -Q -mabi=2 --help=target -c
+  The following options are target specific:
+  -mabi=                                2
+  -mabort-on-noreturn                   [disabled]
+  -mapcs                                [disabled]
+</pre></div>
+
+<p>The output is sensitive to the effects of previous command-line
+options, so for example it is possible to find out which optimizations
+are enabled at <samp>-O2</samp> by using:
+</p>
+<div class="example">
+<pre class="example">-Q -O2 --help=optimizers
+</pre></div>
+
+<p>Alternatively you can discover which binary optimizations are enabled
+by <samp>-O3</samp> by using:
+</p>
+<div class="example">
+<pre class="example">gcc -c -Q -O3 --help=optimizers &gt; /tmp/O3-opts
+gcc -c -Q -O2 --help=optimizers &gt; /tmp/O2-opts
+diff /tmp/O2-opts /tmp/O3-opts | grep enabled
+</pre></div>
+
+<span id="index-version"></span>
+</dd>
+<dt><code>--version</code></dt>
+<dd><p>Display the version number and copyrights of the invoked GCC.
+</p>
+<span id="index-pass_002dexit_002dcodes"></span>
+</dd>
+<dt><code>-pass-exit-codes</code></dt>
+<dd><p>Normally the <code>gcc</code> program exits with the code of 1 if any
+phase of the compiler returns a non-success return code.  If you specify
+<samp>-pass-exit-codes</samp>, the <code>gcc</code> program instead returns with
+the numerically highest error produced by any phase returning an error
+indication.  The C, C++, and Fortran front ends return 4 if an internal
+compiler error is encountered.
+</p>
+<span id="index-pipe"></span>
+</dd>
+<dt><code>-pipe</code></dt>
+<dd><p>Use pipes rather than temporary files for communication between the
+various stages of compilation.  This fails to work on some systems where
+the assembler is unable to read from a pipe; but the GNU assembler has
+no trouble.
+</p>
+<span id="index-specs"></span>
+</dd>
+<dt><code>-specs=<var>file</var></code></dt>
+<dd><p>Process <var>file</var> after the compiler reads in the standard <samp>specs</samp>
+file, in order to override the defaults which the <code>gcc</code> driver
+program uses when determining what switches to pass to <code>cc1</code>,
+<code>cc1plus</code>, <code>as</code>, <code>ld</code>, etc.  More than one
+<samp>-specs=<var>file</var></samp> can be specified on the command line, and they
+are processed in order, from left to right.  See <a href="Spec-Files.html">Spec Files</a>, for
+information about the format of the <var>file</var>.
+</p>
+<span id="index-wrapper"></span>
+</dd>
+<dt><code>-wrapper</code></dt>
+<dd><p>Invoke all subcommands under a wrapper program.  The name of the
+wrapper program and its parameters are passed as a comma separated
+list.
+</p>
+<div class="example">
+<pre class="example">gcc -c t.c -wrapper gdb,--args
+</pre></div>
+
+<p>This invokes all subprograms of <code>gcc</code> under
+&lsquo;<samp>gdb --args</samp>&rsquo;, thus the invocation of <code>cc1</code> is
+&lsquo;<samp>gdb --args cc1 &hellip;</samp>&rsquo;.
+</p>
+<span id="index-ffile_002dprefix_002dmap"></span>
+</dd>
+<dt><code>-ffile-prefix-map=<var>old</var>=<var>new</var></code></dt>
+<dd><p>When compiling files residing in directory <samp><var>old</var></samp>, record
+any references to them in the result of the compilation as if the
+files resided in directory <samp><var>new</var></samp> instead.  Specifying this
+option is equivalent to specifying all the individual
+<samp>-f*-prefix-map</samp> options.  This can be used to make reproducible
+builds that are location independent.  Directories referenced by
+directives are not affected by these options.  See also
+<samp>-fmacro-prefix-map</samp>, <samp>-fdebug-prefix-map</samp>,
+<samp>-fprofile-prefix-map</samp> and <samp>-fcanon-prefix-map</samp>.
+</p>
+<span id="index-fcanon_002dprefix_002dmap"></span>
+</dd>
+<dt><code>-fcanon-prefix-map</code></dt>
+<dd><p>For the <samp>-f*-prefix-map</samp> options normally comparison
+of <samp><var>old</var></samp> prefix against the filename that would be normally
+referenced in the result of the compilation is done using textual
+comparison of the prefixes, or ignoring character case for case insensitive
+filesystems and considering slashes and backslashes as equal on DOS based
+filesystems.  The <samp>-fcanon-prefix-map</samp> causes such comparisons
+to be done on canonicalized paths of <samp><var>old</var></samp>
+and the referenced filename.
+</p>
+<span id="index-fplugin"></span>
+</dd>
+<dt><code>-fplugin=<var>name</var>.so</code></dt>
+<dd><p>Load the plugin code in file <var>name</var>.so, assumed to be a
+shared object to be dlopen&rsquo;d by the compiler.  The base name of
+the shared object file is used to identify the plugin for the
+purposes of argument parsing (See
+<samp>-fplugin-arg-<var>name</var>-<var>key</var>=<var>value</var></samp> below).
+Each plugin should define the callback functions specified in the
+Plugins API.
+</p>
+<span id="index-fplugin_002darg"></span>
+</dd>
+<dt><code>-fplugin-arg-<var>name</var>-<var>key</var>=<var>value</var></code></dt>
+<dd><p>Define an argument called <var>key</var> with a value of <var>value</var>
+for the plugin called <var>name</var>.
+</p>
+<span id="index-fdump_002dada_002dspec"></span>
+</dd>
+<dt><code>-fdump-ada-spec<span class="roman">[</span>-slim<span class="roman">]</span></code></dt>
+<dd><p>For C and C++ source and include files, generate corresponding Ada specs.
+See <a href="https://gcc.gnu.org/onlinedocs/gnat_ugn/Generating-Ada-Bindings-for-C-and-C_002b_002b-headers.html#Generating-Ada-Bindings-for-C-and-C_002b_002b-headers">Generating Ada Bindings for C and C++ headers</a> in <cite>GNAT User&rsquo;s Guide</cite>, which provides detailed documentation on this feature.
+</p>
+<span id="index-fada_002dspec_002dparent"></span>
+</dd>
+<dt><code>-fada-spec-parent=<var>unit</var></code></dt>
+<dd><p>In conjunction with <samp>-fdump-ada-spec<span class="roman">[</span>-slim<span class="roman">]</span></samp> above, generate
+Ada specs as child units of parent <var>unit</var>.
+</p>
+<span id="index-fdump_002dgo_002dspec"></span>
+</dd>
+<dt><code>-fdump-go-spec=<var>file</var></code></dt>
+<dd><p>For input files in any language, generate corresponding Go
+declarations in <var>file</var>.  This generates Go <code>const</code>,
+<code>type</code>, <code>var</code>, and <code>func</code> declarations which may be a
+useful way to start writing a Go interface to code written in some
+other language.
+</p>
+
+</dd>
+<dt><code>@<var>file</var></code></dt>
+<dd><p>Read command-line options from <var>file</var>.  The options read are
+inserted in place of the original @<var>file</var> option.  If <var>file</var>
+does not exist, or cannot be read, then the option will be treated
+literally, and not removed.  
+</p>
+<p>Options in <var>file</var> are separated by whitespace.  A whitespace
+character may be included in an option by surrounding the entire
+option in either single or double quotes.  Any character (including a
+backslash) may be included by prefixing the character to be included
+with a backslash.  The <var>file</var> may itself contain additional
+@<var>file</var> options; any such options will be processed recursively.
+</p></dd>
+</dl>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Invoking-G_002b_002b.html" accesskey="n" rel="next">Invoking G++</a>, Previous: <a href="Option-Summary.html" accesskey="p" rel="prev">Option Summary</a>, Up: <a href="Invoking-GCC.html" accesskey="u" rel="up">Invoking GCC</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

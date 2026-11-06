@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>LoongArch Base Built-in Functions (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="LoongArch Base Built-in Functions (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="LoongArch Base Built-in Functions (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Target-Builtins.html" rel="up" title="Target Builtins">
+<link href="MIPS-DSP-Built_002din-Functions.html" rel="next" title="MIPS DSP Built-in Functions">
+<link href="Other-Built_002din-Functions.html" rel="prev" title="Other Built-in Functions">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="LoongArch-Base-Built_002din-Functions"></span><div class="header">
+<p>
+Next: <a href="MIPS-DSP-Built_002din-Functions.html" accesskey="n" rel="next">MIPS DSP Built-in Functions</a>, Previous: <a href="FR_002dV-Built_002din-Functions.html" accesskey="p" rel="prev">FR-V Built-in Functions</a>, Up: <a href="Target-Builtins.html" accesskey="u" rel="up">Target Builtins</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="LoongArch-Base-Built_002din-Functions-1"></span><h4 class="subsection">6.60.14 LoongArch Base Built-in Functions</h4>
+
+<p>These built-in functions are available for LoongArch.
+</p>
+<p>Data Type Description:
+</p><ul>
+<li> <code>imm0_31</code>, a compile-time constant in range 0 to 31;
+</li><li> <code>imm0_16383</code>, a compile-time constant in range 0 to 16383;
+</li><li> <code>imm0_32767</code>, a compile-time constant in range 0 to 32767;
+</li><li> <code>imm_n2048_2047</code>, a compile-time constant in range -2048 to 2047;
+</li></ul>
+
+<p>The intrinsics provided are listed below:
+</p><div class="example">
+<pre class="example">    unsigned int __builtin_loongarch_movfcsr2gr (imm0_31)
+    void __builtin_loongarch_movgr2fcsr (imm0_31, unsigned int)
+    void __builtin_loongarch_cacop_d (imm0_31, unsigned long int, imm_n2048_2047)
+    unsigned int __builtin_loongarch_cpucfg (unsigned int)
+    void __builtin_loongarch_asrtle_d (long int, long int)
+    void __builtin_loongarch_asrtgt_d (long int, long int)
+    long int __builtin_loongarch_lddir_d (long int, imm0_31)
+    void __builtin_loongarch_ldpte_d (long int, imm0_31)
+
+    int __builtin_loongarch_crc_w_b_w (char, int)
+    int __builtin_loongarch_crc_w_h_w (short, int)
+    int __builtin_loongarch_crc_w_w_w (int, int)
+    int __builtin_loongarch_crc_w_d_w (long int, int)
+    int __builtin_loongarch_crcc_w_b_w (char, int)
+    int __builtin_loongarch_crcc_w_h_w (short, int)
+    int __builtin_loongarch_crcc_w_w_w (int, int)
+    int __builtin_loongarch_crcc_w_d_w (long int, int)
+
+    unsigned int __builtin_loongarch_csrrd_w (imm0_16383)
+    unsigned int __builtin_loongarch_csrwr_w (unsigned int, imm0_16383)
+    unsigned int __builtin_loongarch_csrxchg_w (unsigned int, unsigned int, imm0_16383)
+    unsigned long int __builtin_loongarch_csrrd_d (imm0_16383)
+    unsigned long int __builtin_loongarch_csrwr_d (unsigned long int, imm0_16383)
+    unsigned long int __builtin_loongarch_csrxchg_d (unsigned long int, unsigned long int, imm0_16383)
+
+    unsigned char __builtin_loongarch_iocsrrd_b (unsigned int)
+    unsigned short __builtin_loongarch_iocsrrd_h (unsigned int)
+    unsigned int __builtin_loongarch_iocsrrd_w (unsigned int)
+    unsigned long int __builtin_loongarch_iocsrrd_d (unsigned int)
+    void __builtin_loongarch_iocsrwr_b (unsigned char, unsigned int)
+    void __builtin_loongarch_iocsrwr_h (unsigned short, unsigned int)
+    void __builtin_loongarch_iocsrwr_w (unsigned int, unsigned int)
+    void __builtin_loongarch_iocsrwr_d (unsigned long int, unsigned int)
+
+    void __builtin_loongarch_dbar (imm0_32767)
+    void __builtin_loongarch_ibar (imm0_32767)
+
+    void __builtin_loongarch_syscall (imm0_32767)
+    void __builtin_loongarch_break (imm0_32767)
+</pre></div>
+
+<p><em>Note:</em>Since the control register is divided into 32-bit and 64-bit,
+but the access instruction is not distinguished. So GCC renames the control
+instructions when implementing intrinsics.
+</p>
+<p>Take the csrrd instruction as an example, built-in functions are implemented as follows:
+</p><div class="example">
+<pre class="example">  __builtin_loongarch_csrrd_w  // When reading the 32-bit control register use.
+  __builtin_loongarch_csrrd_d  // When reading the 64-bit control register use.
+</pre></div>
+
+<p>For the convenience of use, the built-in functions are encapsulated,
+the encapsulated functions and <code>__drdtime_t, __rdtime_t</code> are
+defined in the <code>larchintrin.h</code>. So if you call the following
+function you need to include <code>larchintrin.h</code>.
+</p>
+<div class="example">
+<pre class="example">     typedef struct drdtime{
+            unsigned long dvalue;
+            unsigned long dtimeid;
+     } __drdtime_t;
+
+     typedef struct rdtime{
+            unsigned int value;
+            unsigned int timeid;
+     } __rdtime_t;
+</pre></div>
+
+<div class="example">
+<pre class="example">    __drdtime_t __rdtime_d (void)
+    __rdtime_t  __rdtimel_w (void)
+    __rdtime_t  __rdtimeh_w (void)
+    unsigned int  __movfcsr2gr (imm0_31)
+    void __movgr2fcsr (imm0_31, unsigned int)
+    void __cacop_d (imm0_31, unsigned long, imm_n2048_2047)
+    unsigned int  __cpucfg (unsigned int)
+    void __asrtle_d (long int, long int)
+    void __asrtgt_d (long int, long int)
+    long int  __lddir_d (long int, imm0_31)
+    void __ldpte_d (long int, imm0_31)
+
+    int  __crc_w_b_w (char, int)
+    int  __crc_w_h_w (short, int)
+    int  __crc_w_w_w (int, int)
+    int  __crc_w_d_w (long int, int)
+    int  __crcc_w_b_w (char, int)
+    int  __crcc_w_h_w (short, int)
+    int  __crcc_w_w_w (int, int)
+    int  __crcc_w_d_w (long int, int)
+
+    unsigned int  __csrrd_w (imm0_16383)
+    unsigned int  __csrwr_w (unsigned int, imm0_16383)
+    unsigned int  __csrxchg_w (unsigned int, unsigned int, imm0_16383)
+    unsigned long  __csrrd_d (imm0_16383)
+    unsigned long  __csrwr_d (unsigned long, imm0_16383)
+    unsigned long  __csrxchg_d (unsigned long, unsigned long, imm0_16383)
+
+    unsigned char   __iocsrrd_b (unsigned int)
+    unsigned short  __iocsrrd_h (unsigned int)
+    unsigned int  __iocsrrd_w (unsigned int)
+    unsigned long  __iocsrrd_d (unsigned int)
+    void __iocsrwr_b (unsigned char, unsigned int)
+    void __iocsrwr_h (unsigned short, unsigned int)
+    void __iocsrwr_w (unsigned int, unsigned int)
+    void __iocsrwr_d (unsigned long, unsigned int)
+
+    void __dbar (imm0_32767)
+    void __ibar (imm0_32767)
+
+    void __syscall (imm0_32767)
+    void __break (imm0_32767)
+</pre></div>
+
+<p>Returns the value that is currently set in the &lsquo;<samp>tp</samp>&rsquo; register.
+</p><div class="example">
+<pre class="example">    void * __builtin_thread_pointer (void)
+</pre></div>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="MIPS-DSP-Built_002din-Functions.html" accesskey="n" rel="next">MIPS DSP Built-in Functions</a>, Previous: <a href="FR_002dV-Built_002din-Functions.html" accesskey="p" rel="prev">FR-V Built-in Functions</a>, Up: <a href="Target-Builtins.html" accesskey="u" rel="up">Target Builtins</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>C++ Module Mapper (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="C++ Module Mapper (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="C++ Module Mapper (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="C_002b_002b-Modules.html" rel="up" title="C++ Modules">
+<link href="C_002b_002b-Module-Preprocessing.html" rel="next" title="C++ Module Preprocessing">
+<link href="C_002b_002b-Modules.html" rel="prev" title="C++ Modules">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="C_002b_002b-Module-Mapper"></span><div class="header">
+<p>
+Next: <a href="C_002b_002b-Module-Preprocessing.html" accesskey="n" rel="next">C++ Module Preprocessing</a>, Up: <a href="C_002b_002b-Modules.html" accesskey="u" rel="up">C++ Modules</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Module-Mapper"></span><h4 class="subsection">3.23.1 Module Mapper</h4>
+<span id="index-C_002b_002b-Module-Mapper"></span>
+
+<p>A module mapper provides a server or file that the compiler queries to
+determine the mapping between module names and CMI files.  It is also
+used to build CMIs on demand.  <em>Mapper functionality is in its
+infancy and is intended for experimentation with build system
+interactions.</em>
+</p>
+<p>You can specify a mapper with the <samp>-fmodule-mapper=<var>val</var></samp>
+option or <code>CXX_MODULE_MAPPER</code> environment variable.  The value may
+have one of the following forms:
+</p>
+<dl compact="compact">
+<dt><code><span class="roman">[</span><var>hostname</var><span class="roman">]</span>:<var>port</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dd><p>An optional hostname and a numeric port number to connect to.  If the
+hostname is omitted, the loopback address is used.  If the hostname
+corresponds to multiple IPV6 addresses, these are tried in turn, until
+one is successful.  If your host lacks IPv6, this form is
+non-functional.  If you must use IPv4 use
+<samp>-fmodule-mapper='|ncat <var>ipv4host</var> <var>port</var>'</samp>.
+</p>
+</dd>
+<dt><code>=<var>socket</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dd><p>A local domain socket.  If your host lacks local domain sockets, this
+form is non-functional.
+</p>
+</dd>
+<dt><code>|<var>program</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span> <span class="roman">[</span><var>args...</var><span class="roman">]</span></code></dt>
+<dd><p>A program to spawn, and communicate with on its stdin/stdout streams.
+Your <var>PATH</var> environment variable is searched for the program.
+Arguments are separated by space characters, (it is not possible for
+one of the arguments delivered to the program to contain a space).  An
+exception is if <var>program</var> begins with @.  In that case
+<var>program</var> (sans @) is looked for in the compiler&rsquo;s internal
+binary directory.  Thus the sample mapper-server can be specified
+with <code>@g++-mapper-server</code>.
+</p>
+</dd>
+<dt><code>&lt;&gt;<span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dt><code>&lt;&gt;<var>inout</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dt><code>&lt;<var>in</var>&gt;<var>out</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dd><p>Named pipes or file descriptors to communicate over.  The first form,
+<samp>&lt;&gt;</samp>, communicates over stdin and stdout.  The other forms
+allow you to specify a file descriptor or name a pipe.  A numeric value
+is interpreted as a file descriptor, otherwise named pipe is opened.
+The second form specifies a bidirectional pipe and the last form
+allows specifying two independent pipes.  Using file descriptors
+directly in this manner is fragile in general, as it can require the
+cooperation of intermediate processes.  In particular using stdin &amp;
+stdout is fraught with danger as other compiler options might also
+cause the compiler to read stdin or write stdout, and it can have
+unfortunate interactions with signal delivery from the terminal.
+</p>
+</dd>
+<dt><code><var>file</var><span class="roman">[</span>?<var>ident</var><span class="roman">]</span></code></dt>
+<dd><p>A mapping file consisting of space-separated module-name, filename
+pairs, one per line.  Only the mappings for the direct imports and any
+module export name need be provided.  If other mappings are provided,
+they override those stored in any imported CMI files.  A repository
+root may be specified in the mapping file by using &lsquo;<samp>$root</samp>&rsquo; as the
+module name in the first active line.  Use of this option will disable
+any default module-&gt;CMI name mapping.
+</p>
+</dd>
+</dl>
+
+<p>As shown, an optional <var>ident</var> may suffix the first word of the
+option, indicated by a &lsquo;<samp>?</samp>&rsquo; prefix.  The value is used in the
+initial handshake with the module server, or to specify a prefix on
+mapping file lines.  In the server case, the main source file name is
+used if no <var>ident</var> is specified.  In the file case, all non-blank
+lines are significant, unless a value is specified, in which case only
+lines beginning with <var>ident</var> are significant.  The <var>ident</var>
+must be separated by whitespace from the module name.  Be aware that
+&lsquo;<samp>&lt;</samp>&rsquo;, &lsquo;<samp>&gt;</samp>&rsquo;, &lsquo;<samp>?</samp>&rsquo;, and &lsquo;<samp>|</samp>&rsquo; characters are often
+significant to the shell, and therefore may need quoting.
+</p>
+<p>The mapper is connected to or loaded lazily, when the first module
+mapping is required.  The networking protocols are only supported on
+hosts that provide networking.  If no mapper is specified a default is
+provided.
+</p>
+<p>A project-specific mapper is expected to be provided by the build
+system that invokes the compiler.  It is not expected that a
+general-purpose server is provided for all compilations.  As such, the
+server will know the build configuration, the compiler it invoked, and
+the environment (such as working directory) in which that is
+operating.  As it may parallelize builds, several compilations may
+connect to the same socket.
+</p>
+<p>The default mapper generates CMI files in a &lsquo;<samp>gcm.cache</samp>&rsquo;
+directory.  CMI files have a &lsquo;<samp>.gcm</samp>&rsquo; suffix.  The module unit name
+is used directly to provide the basename.  Header units construct a
+relative path using the underlying header file name.  If the path is
+already relative, a &lsquo;<samp>,</samp>&rsquo; directory is prepended.  Internal
+&lsquo;<samp>..</samp>&rsquo; components are translated to &lsquo;<samp>,,</samp>&rsquo;.  No attempt is made
+to canonicalize these filenames beyond that done by the preprocessor&rsquo;s
+include search algorithm, as in general it is ambiguous when symbolic
+links are present.
+</p>
+<p>The mapper protocol was published as &ldquo;A Module Mapper&rdquo;
+<a href="https://wg21.link/p1184">https://wg21.link/p1184</a>.  The implementation is provided by
+<code>libcody</code>, <a href="https://github.com/urnathan/libcody">https://github.com/urnathan/libcody</a>,
+which specifies the canonical protocol definition.  A proof of concept
+server implementation embedded in <code>make</code> was described in
+&rdquo;Make Me A Module&rdquo;, <a href="https://wg21.link/p1602">https://wg21.link/p1602</a>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="C_002b_002b-Module-Preprocessing.html" accesskey="n" rel="next">C++ Module Preprocessing</a>, Up: <a href="C_002b_002b-Modules.html" accesskey="u" rel="up">C++ Modules</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

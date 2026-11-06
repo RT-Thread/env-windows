@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Free Software" and "Free Software Needs
+Free Documentation", with the Front-Cover Texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: "You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom." -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Debugger Adapter Protocol (Debugging with GDB)</title>
+
+<meta name="description" content="Debugger Adapter Protocol (Debugging with GDB)">
+<meta name="keywords" content="Debugger Adapter Protocol (Debugging with GDB)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="index.html" rel="up" title="Top">
+<link href="JIT-Interface.html" rel="next" title="JIT Interface">
+<link href="Source-Annotations.html" rel="prev" title="Source Annotations">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Debugger-Adapter-Protocol"></span><div class="header">
+<p>
+Next: <a href="JIT-Interface.html" accesskey="n" rel="next">JIT Interface</a>, Previous: <a href="Annotations.html" accesskey="p" rel="prev">Annotations</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Debugger-Adapter-Protocol-1"></span><h2 class="chapter">29 Debugger Adapter Protocol</h2>
+
+<p>Generally, <small>GDB</small> implements the Debugger Adapter Protocol as
+written.  However, in some cases, extensions are either needed or even
+expected.
+</p>
+<p><small>GDB</small> defines some parameters that can be passed to the
+<code>launch</code> request:
+</p>
+<dl compact="compact">
+<dt><code>args</code></dt>
+<dd><p>If provided, this should be an array of strings.  These strings are
+provided as command-line arguments to the inferior, as if by
+<code>set args</code>.  See <a href="Arguments.html">Arguments</a>.
+</p>
+</dd>
+<dt><code>cwd</code></dt>
+<dd><p>If provided, this should be a string.  <small>GDB</small> will change its
+working directory to this directory, as if by the <code>cd</code> command
+(see <a href="Working-Directory.html">Working Directory</a>).  The launched program will inherit this
+as its working directory.  Note that change of directory happens
+before the <code>program</code> parameter is processed.  This will affect
+the result if <code>program</code> is a relative filename.
+</p>
+</dd>
+<dt><code>env</code></dt>
+<dd><p>If provided, this should be an object.  Each key of the object will be
+used as the name of an environment variable; each value must be a
+string and will be the value of that variable.  The environment of the
+inferior will be set to exactly as passed in.  See <a href="Environment.html">Environment</a>.
+</p>
+</dd>
+<dt><code>program</code></dt>
+<dd><p>If provided, this is a string that specifies the program to use.  This
+corresponds to the <code>file</code> command.  See <a href="Files.html">Files</a>.
+</p>
+</dd>
+<dt><code>stopAtBeginningOfMainSubprogram</code></dt>
+<dd><p>If provided, this must be a boolean.  When &lsquo;<samp>True</samp>&rsquo;, <small>GDB</small>
+will set a temporary breakpoint at the program&rsquo;s main procedure, using
+the same approach as the <code>start</code> command.  See <a href="Starting.html">Starting</a>.
+</p></dd>
+</dl>
+
+<p><small>GDB</small> defines some parameters that can be passed to the
+<code>attach</code> request.  One of these must be specified.
+</p>
+<dl compact="compact">
+<dt><code>pid</code></dt>
+<dd><p>The process ID to which <small>GDB</small> should attach.  See <a href="Attach.html">Attach</a>.
+</p>
+</dd>
+<dt><code>target</code></dt>
+<dd><p>The target to which <small>GDB</small> should connect.  This is a string and
+is passed to the <code>target remote</code> command.  See <a href="Connecting.html">Connecting</a>.
+</p></dd>
+</dl>
+
+<p>In response to the <code>disassemble</code> request, DAP allows the client
+to return the bytes of each instruction in an implementation-defined
+format.  <small>GDB</small> implements this by sending a string with the
+bytes encoded in hex, like <code>&quot;55a2b900&quot;</code>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="JIT-Interface.html" accesskey="n" rel="next">JIT Interface</a>, Previous: <a href="Annotations.html" accesskey="p" rel="prev">Annotations</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
