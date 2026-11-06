@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Runtime Options (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="Runtime Options (The GNU Fortran Compiler)">
+<meta name="keywords" content="Runtime Options (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Invoking-GNU-Fortran.html" rel="up" title="Invoking GNU Fortran">
+<link href="Code-Gen-Options.html" rel="next" title="Code Gen Options">
+<link href="Link-Options.html" rel="prev" title="Link Options">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Runtime-Options"></span><div class="header">
+<p>
+Next: <a href="Code-Gen-Options.html" accesskey="n" rel="next">Code Gen Options</a>, Previous: <a href="Link-Options.html" accesskey="p" rel="prev">Link Options</a>, Up: <a href="Invoking-GNU-Fortran.html" accesskey="u" rel="up">Invoking GNU Fortran</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Influencing-runtime-behavior"></span><h3 class="section">2.8 Influencing runtime behavior</h3>
+<span id="index-options_002c-runtime"></span>
+
+<p>These options affect the runtime behavior of programs compiled with GNU Fortran.
+</p>
+<dl compact="compact">
+<dd><span id="index-fconvert_003dconversion"></span>
+</dd>
+<dt><code>-fconvert=<var>conversion</var></code></dt>
+<dd><p>Specify the representation of data for unformatted files.  Valid
+values for conversion on most systems are: &lsquo;<samp>native</samp>&rsquo;, the default;
+&lsquo;<samp>swap</samp>&rsquo;, swap between big- and little-endian; &lsquo;<samp>big-endian</samp>&rsquo;, use
+big-endian representation for unformatted files; &lsquo;<samp>little-endian</samp>&rsquo;, use
+little-endian representation for unformatted files.
+</p>
+<p>On POWER systems which suppport <samp>-mabi=ieeelongdouble</samp>,
+there are additional options, which can be combined with others with
+commas.  Those are
+</p><ul class="no-bullet">
+<li><!-- /@w --> <samp>-fconvert=r16_ieee</samp> Use IEEE 128-bit format for
+<code>REAL(KIND=16)</code>.
+</li><li><!-- /@w --> <samp>-fconvert=r16_ibm</samp> Use IBM long double format for
+<code>REAL(KIND=16)</code>.
+</li></ul>
+
+<p><em>This option has an effect only when used in the main program.
+The <code>CONVERT</code> specifier and the GFORTRAN_CONVERT_UNIT environment
+variable override the default specified by <samp>-fconvert</samp>.</em>
+</p>
+<span id="index-frecord_002dmarker_003dlength"></span>
+</dd>
+<dt><code>-frecord-marker=<var>length</var></code></dt>
+<dd><p>Specify the length of record markers for unformatted files.
+Valid values for <var>length</var> are 4 and 8.  Default is 4.
+<em>This is different from previous versions of <code>gfortran</code></em>,
+which specified a default record marker length of 8 on most
+systems.  If you want to read or write files compatible
+with earlier versions of <code>gfortran</code>, use <samp>-frecord-marker=8</samp>.
+</p>
+<span id="index-fmax_002dsubrecord_002dlength_003dlength"></span>
+</dd>
+<dt><code>-fmax-subrecord-length=<var>length</var></code></dt>
+<dd><p>Specify the maximum length for a subrecord.  The maximum permitted
+value for length is 2147483639, which is also the default.  Only
+really useful for use by the gfortran testsuite.
+</p>
+<span id="index-fsign_002dzero"></span>
+</dd>
+<dt><code>-fsign-zero</code></dt>
+<dd><p>When enabled, floating point numbers of value zero with the sign bit set
+are written as negative number in formatted output and treated as
+negative in the <code>SIGN</code> intrinsic.  <samp>-fno-sign-zero</samp> does not
+print the negative sign of zero values (or values rounded to zero for I/O)
+and regards zero as positive number in the <code>SIGN</code> intrinsic for
+compatibility with Fortran 77. The default is <samp>-fsign-zero</samp>.
+</p></dd>
+</dl>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Code-Gen-Options.html" accesskey="n" rel="next">Code Gen Options</a>, Previous: <a href="Link-Options.html" accesskey="p" rel="prev">Link Options</a>, Up: <a href="Invoking-GNU-Fortran.html" accesskey="u" rel="up">Invoking GNU Fortran</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

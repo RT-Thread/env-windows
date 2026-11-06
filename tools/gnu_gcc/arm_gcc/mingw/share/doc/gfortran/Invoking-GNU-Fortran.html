@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Invoking GNU Fortran (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="Invoking GNU Fortran (The GNU Fortran Compiler)">
+<meta name="keywords" content="Invoking GNU Fortran (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="index.html" rel="up" title="Top">
+<link href="Option-Summary.html" rel="next" title="Option Summary">
+<link href="Fortran-2018-status.html" rel="prev" title="Fortran 2018 status">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Invoking-GNU-Fortran"></span><div class="header">
+<p>
+Next: <a href="Runtime.html" accesskey="n" rel="next">Runtime</a>, Previous: <a href="Introduction.html" accesskey="p" rel="prev">Introduction</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="GNU-Fortran-Command-Options"></span><h2 class="chapter">2 GNU Fortran Command Options</h2>
+<span id="index-GNU-Fortran-command-options"></span>
+<span id="index-command-options"></span>
+<span id="index-options_002c-gfortran-command"></span>
+
+
+<p>The <code>gfortran</code> command supports all the options supported by the
+<code>gcc</code> command.  Only options specific to GNU Fortran are documented
+here.
+</p>
+<p>See <a href="https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html#Invoking-GCC">GCC Command Options</a> in <cite>Using the GNU Compiler
+Collection (GCC)</cite>, for information
+on the non-Fortran-specific aspects of the <code>gcc</code> command (and,
+therefore, the <code>gfortran</code> command).
+</p>
+<span id="index-options_002c-negative-forms"></span>
+<p>All GCC and GNU Fortran options
+are accepted both by <code>gfortran</code> and by <code>gcc</code>
+(as well as any other drivers built at the same time,
+such as <code>g++</code>),
+since adding GNU Fortran to the GCC distribution
+enables acceptance of GNU Fortran options
+by all of the relevant drivers.
+</p>
+<p>In some cases, options have positive and negative forms;
+the negative form of <samp>-ffoo</samp> would be <samp>-fno-foo</samp>.
+This manual documents only one of these two forms, whichever
+one is not the default.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="Option-Summary.html" accesskey="1">Option Summary</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Brief list of all <code>gfortran</code> options,
+                        without explanations.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Fortran-Dialect-Options.html" accesskey="2">Fortran Dialect Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Controlling the variant of Fortran language
+                             compiled.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Preprocessing-Options.html" accesskey="3">Preprocessing Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Enable and customize preprocessing.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Error-and-Warning-Options.html" accesskey="4">Error and Warning Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How picky should the compiler be?
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Debugging-Options.html" accesskey="5">Debugging Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Symbol tables, measurements, and debugging dumps.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Directory-Options.html" accesskey="6">Directory Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Where to find module files
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Link-Options.html" accesskey="7">Link Options </a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Influencing the linking step
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Runtime-Options.html" accesskey="8">Runtime Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Influencing runtime behavior
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Code-Gen-Options.html" accesskey="9">Code Gen Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Specifying conventions for function calls, data layout
+                        and register usage.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Interoperability-Options.html">Interoperability Options</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Options for interoperability with other
+                              languages.
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="Environment-Variables.html">Environment Variables</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Environment variables that affect <code>gfortran</code>.
+</td></tr>
+</table>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Runtime.html" accesskey="n" rel="next">Runtime</a>, Previous: <a href="Introduction.html" accesskey="p" rel="prev">Introduction</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

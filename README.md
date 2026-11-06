@@ -15,6 +15,20 @@ git clone --recursive --depth 1 https://gitee.com/mirrors_RT-Thread/env-windows.
 - [How to use QEMU simulator with Env tool in Windows (document)](https://github.com/RT-Thread/rt-thread/blob/master/documentation/quick-start/quick_start_qemu/quick_start_qemu_windows.md)
 - [Development Tools Selection (video)](https://www.youtube.com/watch?v=F_kU1CMjLKw)
 
+## Arm GNU Toolchain
+
+Env bundles Arm GNU Toolchain **13.3.Rel1** (GCC **13.3.1**) for `arm-none-eabi`.
+The toolchain is installed in `tools/gnu_gcc/arm_gcc/mingw`, which Env adds to `PATH`.
+Open an Env terminal and check the version with:
+
+```shell
+arm-none-eabi-gcc --version
+```
+
+Release information is available from the
+[Arm GNU Toolchain downloads](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads).
+The bundled package includes its build manifest, headers, libraries and documentation.
+
 ## Upstream and dependencies repository
 
 These repositories will be covered as submodles in this project.

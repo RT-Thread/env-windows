@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This file documents the use of the GNU compilers.
+
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>LoongArch Options (Using the GNU Compiler Collection (GCC))</title>
+
+<meta name="description" content="LoongArch Options (Using the GNU Compiler Collection (GCC))">
+<meta name="keywords" content="LoongArch Options (Using the GNU Compiler Collection (GCC))">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Indices.html" rel="index" title="Indices">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Submodel-Options.html" rel="up" title="Submodel Options">
+<link href="M32C-Options.html" rel="next" title="M32C Options">
+<link href="LM32-Options.html" rel="prev" title="LM32 Options">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en_US">
+<span id="LoongArch-Options"></span><div class="header">
+<p>
+Next: <a href="M32C-Options.html" accesskey="n" rel="next">M32C Options</a>, Previous: <a href="LM32-Options.html" accesskey="p" rel="prev">LM32 Options</a>, Up: <a href="Submodel-Options.html" accesskey="u" rel="up">Submodel Options</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="LoongArch-Options-1"></span><h4 class="subsection">3.19.22 LoongArch Options</h4>
+<span id="index-LoongArch-Options"></span>
+
+<p>These command-line options are defined for LoongArch targets:
+</p>
+<dl compact="compact">
+<dd><span id="index-march-7"></span>
+</dd>
+<dt><code>-march=<var>cpu-type</var></code></dt>
+<dd><p>Generate instructions for the machine type <var>cpu-type</var>.  In contrast to
+<samp>-mtune=<var>cpu-type</var></samp>, which merely tunes the generated code
+for the specified <var>cpu-type</var>, <samp>-march=<var>cpu-type</var></samp> allows GCC
+to generate code that may not run at all on processors other than the one
+indicated.  Specifying <samp>-march=<var>cpu-type</var></samp> implies
+<samp>-mtune=<var>cpu-type</var></samp>, except where noted otherwise.
+</p>
+<p>The choices for <var>cpu-type</var> are:
+</p>
+<dl compact="compact">
+<dt>&lsquo;<samp>native</samp>&rsquo;</dt>
+<dd><p>This selects the CPU to generate code for at compilation time by determining
+the processor type of the compiling machine.  Using <samp>-march=native</samp>
+enables all instruction subsets supported by the local machine (hence
+the result might not run on different machines).  Using <samp>-mtune=native</samp>
+produces code optimized for the local machine under the constraints
+of the selected instruction set.
+</p></dd>
+<dt>&lsquo;<samp>loongarch64</samp>&rsquo;</dt>
+<dd><p>A generic CPU with 64-bit extensions.
+</p></dd>
+<dt>&lsquo;<samp>la464</samp>&rsquo;</dt>
+<dd><p>LoongArch LA464 CPU with LBT, LSX, LASX, LVZ.
+</p></dd>
+</dl>
+
+<span id="index-mtune-8"></span>
+</dd>
+<dt><code>-mtune=<var>cpu-type</var></code></dt>
+<dd><p>Optimize the output for the given processor, specified by microarchitecture
+name.
+</p>
+<span id="index-mabi-2"></span>
+</dd>
+<dt><code>-mabi=<var>base-abi-type</var></code></dt>
+<dd><p>Generate code for the specified calling convention.
+<var>base-abi-type</var> can be one of:
+</p><dl compact="compact">
+<dt>&lsquo;<samp>lp64d</samp>&rsquo;</dt>
+<dd><p>Uses 64-bit general purpose registers and 32/64-bit floating-point
+registers for parameter passing.  Data model is LP64, where &lsquo;<samp>int</samp>&rsquo;
+is 32 bits, while &lsquo;<samp>long int</samp>&rsquo; and pointers are 64 bits.
+</p></dd>
+<dt>&lsquo;<samp>lp64f</samp>&rsquo;</dt>
+<dd><p>Uses 64-bit general purpose registers and 32-bit floating-point
+registers for parameter passing.  Data model is LP64, where &lsquo;<samp>int</samp>&rsquo;
+is 32 bits, while &lsquo;<samp>long int</samp>&rsquo; and pointers are 64 bits.
+</p></dd>
+<dt>&lsquo;<samp>lp64s</samp>&rsquo;</dt>
+<dd><p>Uses 64-bit general purpose registers and no floating-point
+registers for parameter passing.  Data model is LP64, where &lsquo;<samp>int</samp>&rsquo;
+is 32 bits, while &lsquo;<samp>long int</samp>&rsquo; and pointers are 64 bits.
+</p></dd>
+</dl>
+
+<span id="index-mfpu-2"></span>
+</dd>
+<dt><code>-mfpu=<var>fpu-type</var></code></dt>
+<dd><p>Generate code for the specified FPU type, which can be one of:
+</p><dl compact="compact">
+<dt>&lsquo;<samp>64</samp>&rsquo;</dt>
+<dd><p>Allow the use of hardware floating-point instructions for 32-bit
+and 64-bit operations.
+</p></dd>
+<dt>&lsquo;<samp>32</samp>&rsquo;</dt>
+<dd><p>Allow the use of hardware floating-point instructions for 32-bit
+operations.
+</p></dd>
+<dt>&lsquo;<samp>none</samp>&rsquo;</dt>
+<dt>&lsquo;<samp>0</samp>&rsquo;</dt>
+<dd><p>Prevent the use of hardware floating-point instructions.
+</p></dd>
+</dl>
+
+<span id="index-msoft_002dfloat-5"></span>
+</dd>
+<dt><code>-msoft-float</code></dt>
+<dd><p>Force <samp>-mfpu=none</samp> and prevents the use of floating-point
+registers for parameter passing.  This option may change the target
+ABI.
+</p>
+<span id="index-msingle_002dfloat"></span>
+</dd>
+<dt><code>-msingle-float</code></dt>
+<dd><p>Force <samp>-mfpu=32</samp> and allow the use of 32-bit floating-point
+registers for parameter passing.  This option may change the target
+ABI.
+</p>
+<span id="index-mdouble_002dfloat-1"></span>
+</dd>
+<dt><code>-mdouble-float</code></dt>
+<dd><p>Force <samp>-mfpu=64</samp> and allow the use of 32/64-bit floating-point
+registers for parameter passing.  This option may change the target
+ABI.
+</p>
+<span id="index-mbranch_002dcost-2"></span>
+</dd>
+<dt><code>-mbranch-cost=<var>n</var></code></dt>
+<dd><p>Set the cost of branches to roughly <var>n</var> instructions.
+</p>
+<span id="index-mcheck_002dzero_002ddivision"></span>
+</dd>
+<dt><code>-mcheck-zero-division</code></dt>
+<dt><code>-mno-check-zero-divison</code></dt>
+<dd><p>Trap (do not trap) on integer division by zero.  The default is
+<samp>-mcheck-zero-division</samp> for <samp>-O0</samp> or <samp>-Og</samp>, and
+<samp>-mno-check-zero-division</samp> for other optimization levels.
+</p>
+<span id="index-mcond_002dmove_002dint"></span>
+</dd>
+<dt><code>-mcond-move-int</code></dt>
+<dt><code>-mno-cond-move-int</code></dt>
+<dd><p>Conditional moves for integral data in general-purpose registers
+are enabled (disabled).  The default is <samp>-mcond-move-int</samp>.
+</p>
+<span id="index-mcond_002dmove_002dfloat"></span>
+</dd>
+<dt><code>-mcond-move-float</code></dt>
+<dt><code>-mno-cond-move-float</code></dt>
+<dd><p>Conditional moves for floating-point registers are enabled (disabled).
+The default is <samp>-mcond-move-float</samp>.
+</p>
+<span id="index-mmemcpy"></span>
+</dd>
+<dt><code>-mmemcpy</code></dt>
+<dt><code>-mno-memcpy</code></dt>
+<dd><p>Force (do not force) the use of <code>memcpy</code> for non-trivial block moves.
+The default is <samp>-mno-memcpy</samp>, which allows GCC to inline most
+constant-sized copies.  Setting optimization level to <samp>-Os</samp> also
+forces the use of <code>memcpy</code>, but <samp>-mno-memcpy</samp> may override this
+behavior if explicitly specified, regardless of the order these options on
+the command line.
+</p>
+<span id="index-mstrict_002dalign-1"></span>
+</dd>
+<dt><code>-mstrict-align</code></dt>
+<dt><code>-mno-strict-align</code></dt>
+<dd><p>Avoid or allow generating memory accesses that may not be aligned on a natural
+object boundary as described in the architecture specification. The default is
+<samp>-mno-strict-align</samp>.
+</p>
+<span id="index-msmall_002ddata_002dlimit"></span>
+</dd>
+<dt><code>-msmall-data-limit=<var>number</var></code></dt>
+<dd><p>Put global and static data smaller than <var>number</var> bytes into a special
+section (on some targets).  The default value is 0.
+</p>
+<span id="index-mmax_002dinline_002dmemcpy_002dsize"></span>
+</dd>
+<dt><code>-mmax-inline-memcpy-size=<var>n</var></code></dt>
+<dd><p>Inline all block moves (such as calls to <code>memcpy</code> or structure copies)
+less than or equal to <var>n</var> bytes.  The default value of <var>n</var> is 1024.
+</p>
+</dd>
+<dt><code>-mcmodel=<var>code-model</var></code></dt>
+<dd><p>Set the code model to one of:
+</p><dl compact="compact">
+<dt>&lsquo;<samp>tiny-static (Not implemented yet)</samp>&rsquo;</dt>
+<dt>&lsquo;<samp>tiny (Not implemented yet)</samp>&rsquo;</dt>
+<dt>&lsquo;<samp>normal</samp>&rsquo;</dt>
+<dd><p>The text segment must be within 128MB addressing space.  The data segment must
+be within 2GB addressing space.
+</p>
+</dd>
+<dt>&lsquo;<samp>medium</samp>&rsquo;</dt>
+<dd><p>The text segment and data segment must be within 2GB addressing space.
+</p>
+</dd>
+<dt>&lsquo;<samp>large (Not implemented yet)</samp>&rsquo;</dt>
+<dt>&lsquo;<samp>extreme</samp>&rsquo;</dt>
+<dd><p>This mode does not limit the size of the code segment and data segment.
+The <samp>-mcmodel=extreme</samp> option is incompatible with <samp>-fplt</samp> and
+<samp>-mno-explicit-relocs</samp>.
+</p></dd>
+</dl>
+<p>The default code model is <code>normal</code>.
+</p>
+<span id="index-mexplicit_002drelocs-1"></span>
+<span id="index-mno_002dexplicit_002drelocs-1"></span>
+</dd>
+<dt><code>-mexplicit-relocs</code></dt>
+<dt><code>-mno-explicit-relocs</code></dt>
+<dd><p>Use or do not use assembler relocation operators when dealing with symbolic
+addresses.  The alternative is to use assembler macros instead, which may
+limit instruction scheduling but allow linker relaxation.  The default
+value for the option is determined with the assembler capability detected
+during GCC build-time and the setting of <code>-mrelax</code>:
+<code>-mexplicit-relocs</code> if the assembler supports relocation operators
+but <code>-mrelax</code> is not enabled, <code>-mno-explicit-relocs</code> otherwise.
+</p>
+<span id="index-mdirect_002dextern_002daccess"></span>
+</dd>
+<dt><code>-mdirect-extern-access</code></dt>
+<dt><code>-mno-direct-extern-access</code></dt>
+<dd><p>Do not use or use GOT to access external symbols.  The default is
+<samp>-mno-direct-extern-access</samp>: GOT is used for external symbols with
+default visibility, but not used for other external symbols.
+</p>
+<p>With <samp>-mdirect-extern-access</samp>, GOT is not used and all external
+symbols are PC-relatively addressed.  It is <strong>only</strong> suitable for
+environments where no dynamic link is performed, like firmwares, OS
+kernels, executables linked with <samp>-static</samp> or <samp>-static-pie</samp>.
+<samp>-mdirect-extern-access</samp> is not compatible with <samp>-fPIC</samp> or
+<samp>-fpic</samp>.
+</p>
+</dd>
+<dt><code>-mrelax</code></dt>
+<dt><code>-mno-relax</code></dt>
+<dd><p>Take (do not take) advantage of linker relaxations.  If
+<samp>-mpass-mrelax-to-as</samp> is enabled, this option is also passed to
+the assembler.  The default is determined during GCC build-time by
+detecting corresponding assembler support:
+<samp>-mrelax</samp> if the assembler supports both the <samp>-mrelax</samp>
+option and the conditional branch relaxation (it&rsquo;s required or the
+<code>.align</code> directives and conditional branch instructions in the
+assembly code outputted by GCC may be rejected by the assembler because
+of a relocation overflow), <samp>-mno-relax</samp> otherwise.
+</p>
+</dd>
+<dt><code>-mpass-mrelax-to-as</code></dt>
+<dt><code>-mno-pass-mrelax-to-as</code></dt>
+<dd><p>Pass (do not pass) the <samp>-mrelax</samp> or <samp>-mno-relax</samp> option
+to the assembler.  The default is determined during GCC build-time by
+detecting corresponding assembler support:
+<samp>-mpass-mrelax-to-as</samp> if the assembler supports the
+<samp>-mrelax</samp> option, <samp>-mno-pass-mrelax-to-as</samp> otherwise.
+This option is mostly useful for debugging, or interoperation with
+assemblers different from the build-time one.
+</p></dd>
+</dl>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="M32C-Options.html" accesskey="n" rel="next">M32C Options</a>, Previous: <a href="LM32-Options.html" accesskey="p" rel="prev">LM32 Options</a>, Up: <a href="Submodel-Options.html" accesskey="u" rel="up">Submodel Options</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Indices.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

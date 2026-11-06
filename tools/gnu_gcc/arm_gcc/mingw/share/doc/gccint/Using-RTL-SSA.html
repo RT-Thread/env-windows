@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1988-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Using RTL SSA (GNU Compiler Collection (GCC) Internals)</title>
+
+<meta name="description" content="Using RTL SSA (GNU Compiler Collection (GCC) Internals)">
+<meta name="keywords" content="Using RTL SSA (GNU Compiler Collection (GCC) Internals)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="RTL-SSA.html" rel="up" title="RTL SSA">
+<link href="RTL-SSA-Instructions.html" rel="next" title="RTL SSA Instructions">
+<link href="RTL-SSA.html" rel="prev" title="RTL SSA">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="Using-RTL-SSA"></span><div class="header">
+<p>
+Next: <a href="RTL-SSA-Instructions.html" accesskey="n" rel="next">RTL SSA Instructions</a>, Up: <a href="RTL-SSA.html" accesskey="u" rel="up">RTL SSA</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Using-RTL-SSA-in-a-pass"></span><h4 class="subsection">14.21.1 Using RTL SSA in a pass</h4>
+
+<p>A pass that wants to use the RTL SSA form should start with the following:
+</p>
+<div class="example">
+<pre class="example">#define INCLUDE_ALGORITHM
+#define INCLUDE_FUNCTIONAL
+#include &quot;config.h&quot;
+#include &quot;system.h&quot;
+#include &quot;coretypes.h&quot;
+#include &quot;backend.h&quot;
+#include &quot;rtl.h&quot;
+#include &quot;df.h&quot;
+#include &quot;rtl-ssa.h&quot;
+</pre></div>
+
+<p>All the RTL SSA code is contained in the <code>rtl_ssa</code> namespace,
+so most passes will then want to do:
+</p>
+<div class="example">
+<pre class="example">using namespace rtl_ssa;
+</pre></div>
+
+<p>However, this is purely a matter of taste, and the examples in the rest of
+this section do not require it.
+</p>
+<p>The RTL SSA represention is an optional on-the-side feature that applies
+on top of the normal RTL instructions.  It is currently local to individual
+RTL passes and is not maintained across passes.
+</p>
+<p>However, in order to allow the RTL SSA information to be preserved across
+passes in future, &lsquo;<samp>crtl-&gt;ssa</samp>&rsquo; points to the current function&rsquo;s
+SSA form (if any).  Passes that want to use the RTL SSA form should
+first do:
+</p>
+<div class="example">
+<pre class="example">crtl-&gt;ssa = new rtl_ssa::function_info (<var>fn</var>);
+</pre></div>
+
+<p>where <var>fn</var> is the function that the pass is processing.
+(Passes that are <code>using namespace rtl_ssa</code> do not need
+the &lsquo;<samp>rtl_ssa::</samp>&rsquo;.)
+</p>
+<p>Once the pass has finished with the SSA form, it should do the following:
+</p>
+<div class="example">
+<pre class="example">free_dominance_info (CDI_DOMINATORS);
+if (crtl-&gt;ssa-&gt;perform_pending_updates ())
+  cleanup_cfg (0);
+
+delete crtl-&gt;ssa;
+crtl-&gt;ssa = nullptr;
+</pre></div>
+
+<p>The <code>free_dominance_info</code> call is necessary because
+dominance information is not currently maintained between RTL passes.
+The next two lines commit any changes to the RTL instructions that
+were queued for later; see the comment above the declaration of
+<code>perform_pending_updates</code> for details.  The final two lines
+discard the RTL SSA form and free the associated memory.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="RTL-SSA-Instructions.html" accesskey="n" rel="next">RTL SSA Instructions</a>, Up: <a href="RTL-SSA.html" accesskey="u" rel="up">RTL SSA</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

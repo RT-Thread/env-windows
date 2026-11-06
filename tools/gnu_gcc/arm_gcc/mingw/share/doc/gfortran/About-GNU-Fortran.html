@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright (C) 1999-2023 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development. -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>About GNU Fortran (The GNU Fortran Compiler)</title>
+
+<meta name="description" content="About GNU Fortran (The GNU Fortran Compiler)">
+<meta name="keywords" content="About GNU Fortran (The GNU Fortran Compiler)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Option-Index.html" rel="index" title="Option Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Introduction.html" rel="up" title="Introduction">
+<link href="GNU-Fortran-and-GCC.html" rel="next" title="GNU Fortran and GCC">
+<link href="Introduction.html" rel="prev" title="Introduction">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<span id="About-GNU-Fortran"></span><div class="header">
+<p>
+Next: <a href="GNU-Fortran-and-GCC.html" accesskey="n" rel="next">GNU Fortran and GCC</a>, Up: <a href="Introduction.html" accesskey="u" rel="up">Introduction</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="About-GNU-Fortran-1"></span><h3 class="section">1.1 About GNU Fortran</h3>
+
+<p>The GNU Fortran compiler is the successor to <code>g77</code>, the
+Fortran 77 front end included in GCC prior to version 4 (released in
+2005).  While it is backward-compatible with most <code>g77</code>
+extensions and command-line options, <code>gfortran</code> is a completely new
+implemention designed to support more modern dialects of Fortran.
+GNU Fortran implements the Fortran 77, 90 and 95 standards
+completely, most of the Fortran 2003 and 2008 standards, and some
+features from the 2018 standard.  It also implements several extensions
+including OpenMP and OpenACC support for parallel programming.
+</p>
+<p>The GNU Fortran compiler passes the
+<a href="http://www.fortran-2000.com/ArnaudRecipes/fcvs21_f95.html">NIST Fortran 77 Test Suite</a>, and produces acceptable results on the
+<a href="https://www.netlib.org/lapack/faq.html">LAPACK Test Suite</a>.
+It also provides respectable performance on
+the <a href="https://polyhedron.com/?page_id=175">Polyhedron Fortran compiler benchmarks</a> and the
+<a href="https://www.netlib.org/benchmark/livermore">Livermore Fortran Kernels test</a>.  It has been used to compile a number of
+large real-world programs, including
+<a href="http://hirlam.org/">the HARMONIE and HIRLAM weather forecasting code</a> and
+<a href="https://github.com/dylan-jayatilaka/tonto">the Tonto quantum chemistry package</a>; see
+<a href="https://gcc.gnu.org/wiki/GfortranApps">https://gcc.gnu.org/wiki/GfortranApps</a> for an extended list.
+</p>
+<p>GNU Fortran provides the following functionality:
+</p>
+<ul>
+<li> Read a program, stored in a file and containing <em>source code</em>
+instructions written in Fortran 77.
+
+</li><li> Translate the program into instructions a computer
+can carry out more quickly than it takes to translate the
+original Fortran instructions.
+The result after compilation of a program is
+<em>machine code</em>,
+which is efficiently translated and processed
+by a machine such as your computer.
+Humans usually are not as good writing machine code
+as they are at writing Fortran (or C++, Ada, or Java),
+because it is easy to make tiny mistakes writing machine code.
+
+</li><li> Provide information about the reasons why
+the compiler may be unable to create a binary from the source code,
+for example if the source code is flawed.
+The Fortran language standards require that the compiler can point out
+mistakes in your code.
+An incorrect usage of the language causes an <em>error message</em>.
+
+<p>The compiler also attempts to diagnose cases where your
+program contains a correct usage of the language,
+but instructs the computer to do something questionable.
+This kind of diagnostic message is called a <em>warning message</em>.
+</p>
+</li><li> Provide optional information about the translation passes
+from the source code to machine code.
+This can help you to find the cause of
+certain bugs which may not be obvious in the source code,
+but may be more easily found at a lower level compiler output.
+It also helps developers to find bugs in the compiler itself.
+
+</li><li> Provide information in the generated machine code that can
+make it easier to find bugs in the program (using a debugging tool,
+called a <em>debugger</em>, such as the GNU Debugger <code>gdb</code>).
+
+</li><li> Locate and gather machine code already generated to
+perform actions requested by statements in the program.
+This machine code is organized into <em>modules</em> and is located
+and <em>linked</em> to the user program.
+</li></ul>
+
+<p>The GNU Fortran compiler consists of several components:
+</p>
+<ul>
+<li> A version of the <code>gcc</code> command
+(which also might be installed as the system&rsquo;s <code>cc</code> command)
+that also understands and accepts Fortran source code.
+The <code>gcc</code> command is the <em>driver</em> program for
+all the languages in the GNU Compiler Collection (GCC);
+With <code>gcc</code>,
+you can compile the source code of any language for
+which a front end is available in GCC.
+
+</li><li> The <code>gfortran</code> command itself,
+which also might be installed as the
+system&rsquo;s <code>f95</code> command.
+<code>gfortran</code> is just another driver program,
+but specifically for the Fortran compiler only.
+The primary difference between the <code>gcc</code> and <code>gfortran</code>
+commands is that the latter automatically links the correct libraries
+to your program.
+
+</li><li> A collection of run-time libraries.
+These libraries contain the machine code needed to support
+capabilities of the Fortran language that are not directly
+provided by the machine code generated by the
+<code>gfortran</code> compilation phase,
+such as intrinsic functions and subroutines,
+and routines for interaction with files and the operating system.
+
+</li><li> The Fortran compiler itself, (<code>f951</code>).
+This is the GNU Fortran parser and code generator,
+linked to and interfaced with the GCC backend library.
+<code>f951</code> &ldquo;translates&rdquo; the source code to
+assembler code.  You would typically not use this
+program directly;
+instead, the <code>gcc</code> or <code>gfortran</code> driver
+programs call it for you.
+</li></ul>
+
+
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="GNU-Fortran-and-GCC.html" accesskey="n" rel="next">GNU Fortran and GCC</a>, Up: <a href="Introduction.html" accesskey="u" rel="up">Introduction</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Option-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
